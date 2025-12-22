@@ -99,6 +99,11 @@
         btn.addEventListener('click', () => closeKnowl(panel));
       });
 
+      // Preload any nested knowls in this panel
+      panel.querySelectorAll('.knowl').forEach(nestedKnowl => {
+        preloadUrl(nestedKnowl.dataset.knowl);
+      });
+
     } catch (error) {
       panel.innerHTML = `<div class="knowl-error">Failed to load definition. <a href="${trigger.href}">View full page</a></div>`;
     }
