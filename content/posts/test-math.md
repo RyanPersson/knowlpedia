@@ -1,6 +1,6 @@
 ---
 title: "Testing Math Rendering"
-date: 2024-01-01
+date: 2025-12-21
 draft: false
 comments: true
 summary: "A test post demonstrating inline math, display equations, matrices, and the knowl system for expandable definitions."

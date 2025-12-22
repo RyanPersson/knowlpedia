@@ -1,6 +1,6 @@
 ---
 title: "Example Post: Testing Features"
-date: 2024-01-15
+date: 2025-12-21
 summary: "A test post demonstrating math, code blocks, knowls, and more."
 ---
 

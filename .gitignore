@@ -1,5 +1,7 @@
 # Research notes (not for public repo)
 /research
+/.claude
+
 
 # Hugo build output
 /public/
@@ -17,3 +19,6 @@
 
 # Windows
 Thumbs.db
+
+# IDE/Editor/BuildProcess
+/CLAUDE.md
