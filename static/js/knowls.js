@@ -104,13 +104,9 @@
     }
   }
 
-  // Preload on hover
-  async function preloadKnowl(event) {
-    const trigger = event.target.closest('.knowl');
-    if (!trigger) return;
-
-    const url = trigger.dataset.knowl;
-    if (cache.has(url)) return; // Already cached
+  // Preload a knowl URL
+  async function preloadUrl(url) {
+    if (cache.has(url)) return;
 
     try {
       const response = await fetch(url);
@@ -126,9 +122,43 @@
     }
   }
 
+  // Preload on hover (desktop)
+  function preloadOnHover(event) {
+    const trigger = event.target.closest('.knowl');
+    if (!trigger) return;
+    preloadUrl(trigger.dataset.knowl);
+  }
+
+  // Preload when knowls become visible (mobile + desktop)
+  function setupVisibilityPreload() {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const url = entry.target.dataset.knowl;
+          // Preload during idle time to avoid blocking UI
+          if ('requestIdleCallback' in window) {
+            requestIdleCallback(() => preloadUrl(url));
+          } else {
+            setTimeout(() => preloadUrl(url), 100);
+          }
+          observer.unobserve(entry.target); // Only preload once
+        }
+      });
+    }, { rootMargin: '50px' }); // Start preloading slightly before visible
+
+    document.querySelectorAll('.knowl').forEach(el => observer.observe(el));
+  }
+
   // Event delegation
-  document.addEventListener('mouseover', preloadKnowl);
+  document.addEventListener('mouseover', preloadOnHover);
   document.addEventListener('click', toggleKnowl);
+
+  // Start visibility preloading when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupVisibilityPreload);
+  } else {
+    setupVisibilityPreload();
+  }
 
   // Close on Escape key
   document.addEventListener('keydown', (e) => {
