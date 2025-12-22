@@ -93,9 +93,9 @@
 }
 
 .knowl-depth-even {
-  background: var(--code-bg);
+  background: var(--theme);
 }
 
 .knowl-depth-odd {
-  background: var(--theme);
+  background: var(--code-bg);
 }

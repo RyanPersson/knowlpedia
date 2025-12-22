@@ -19,7 +19,16 @@
 .knowl-loading,.knowl-error{padding:1rem;color:var(--secondary);font-style:italic}
 .knowl-error a{color:var(--primary)}
 .knowl-panel .knowl-panel{margin-left:.5rem}
-.knowl-depth-even{background:var(--code-bg)}
-.knowl-depth-odd{background:var(--theme)}
+.knowl-depth-even{background:var(--theme)}
+.knowl-depth-odd{background:var(--code-bg)}
+.dark .knowl-depth-even{background:var(--code-bg)}
+.dark .knowl-depth-odd{background:var(--theme)}
+@media print{
+.knowl{color:#000;border-bottom:none;font-weight:600}
+.knowl-panel{border:1px solid #000;border-left:3px solid #000;background:none;break-inside:avoid}
+.knowl-close,.knowl-loading,.knowl-error,.knowl-footer{display:none}
+.knowl-header{background:none;border-bottom:1px solid #ccc}
+.knowl-depth-even,.knowl-depth-odd{background:none}
+}
 </style>
 <script defer src="{{ "js/knowls.js" | relURL }}"></script>
