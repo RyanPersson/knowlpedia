@@ -1,4 +1,4 @@
-baseURL = 'https://example.org/'
+baseURL = 'https://snacc.io/'
 languageCode = 'en-us'
 title = 'Math Blog'
 theme = 'PaperMod'
