@@ -8,4 +8,4 @@ cascade:
     list: local
 ---
 
-A collection of mathematical definitions. Click any term to see its definition inline, or browse the full entries below.
+A collection of mathematical definitions. Click any term to see its definition.
