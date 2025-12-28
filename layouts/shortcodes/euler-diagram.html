@@ -1,0 +1,372 @@
+<div class="euler-diagram-container" id="euler-diagram-{{ .Ordinal }}">
+  <style>
+    .euler-diagram-container {
+      --ed-magma-fill: #e8e8e8;
+      --ed-text-primary: #1a1a2e;
+      --ed-text-secondary: #555;
+      --ed-text-muted: #888;
+      --ed-bg-panel: rgba(0, 0, 0, 0.03);
+      --ed-bg-panel-border: rgba(0, 0, 0, 0.1);
+    }
+    .dark .euler-diagram-container {
+      --ed-magma-fill: #2d3748;
+      --ed-text-primary: #e0e0e0;
+      --ed-text-secondary: #888;
+      --ed-text-muted: #666;
+      --ed-bg-panel: rgba(255, 255, 255, 0.05);
+      --ed-bg-panel-border: rgba(255, 255, 255, 0.1);
+    }
+    .euler-diagram-wrapper {
+      background: var(--ed-bg-panel);
+      border: 1px solid var(--ed-bg-panel-border);
+      border-radius: 12px;
+      padding: 15px;
+      margin: 1.5em 0;
+    }
+    .euler-diagram-svg-container {
+      width: 100%;
+      height: 480px;
+    }
+    .euler-diagram-svg-container svg {
+      width: 100%;
+      height: 100%;
+    }
+    .euler-diagram-container .region-hitbox {
+      cursor: pointer;
+      fill: transparent;
+      stroke: transparent;
+    }
+    .euler-diagram-container .label {
+      font-size: 14px;
+      font-weight: 600;
+      pointer-events: none;
+      text-anchor: middle;
+    }
+    .euler-diagram-container .label-sub {
+      font-size: 10px;
+      pointer-events: none;
+      text-anchor: middle;
+      opacity: 0.8;
+    }
+    .euler-diagram-container .circle-label {
+      font-size: 13px;
+      font-weight: 700;
+      text-anchor: middle;
+      letter-spacing: 0.5px;
+    }
+    .euler-diagram-container .highlight-overlay {
+      pointer-events: none;
+      fill: black;
+      opacity: 0;
+    }
+    .dark .euler-diagram-container .highlight-overlay {
+      fill: white;
+      mix-blend-mode: overlay;
+    }
+    .euler-diagram-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 15px;
+      font-size: 0.85rem;
+      color: var(--ed-text-secondary);
+    }
+    .euler-diagram-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .euler-diagram-legend-color {
+      width: 16px;
+      height: 16px;
+      border-radius: 3px;
+    }
+    .euler-diagram-legend-stripes {
+      width: 16px;
+      height: 16px;
+      border-radius: 3px;
+      background: repeating-linear-gradient(45deg, #009E73, #009E73 4px, #E69F00 4px, #E69F00 8px);
+    }
+    .euler-diagram-info-panel {
+      background: var(--ed-bg-panel);
+      border: 1px solid var(--ed-bg-panel-border);
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 15px;
+      min-height: 160px;
+      color: var(--ed-text-primary);
+    }
+    .euler-diagram-info-panel h3 {
+      margin: 0 0 8px 0;
+      font-size: 1.2rem;
+    }
+    .euler-diagram-info-panel p {
+      margin: 0 0 10px 0;
+      font-size: 0.9rem;
+      color: var(--ed-text-secondary);
+    }
+    .euler-diagram-axiom {
+      background: var(--ed-bg-panel);
+      border-left: 3px solid;
+      padding: 6px 10px;
+      margin: 5px 0;
+      border-radius: 0 4px 4px 0;
+    }
+    .euler-diagram-axiom-name {
+      font-weight: 600;
+      font-size: 0.8rem;
+    }
+    .euler-diagram-axiom-formula {
+      font-family: 'Times New Roman', serif;
+      font-style: italic;
+      color: var(--ed-text-secondary);
+      font-size: 0.85rem;
+    }
+    .euler-diagram-examples {
+      margin-top: 12px;
+      padding: 10px;
+      background: var(--ed-bg-panel);
+      border-radius: 6px;
+      font-size: 0.85rem;
+    }
+    .euler-diagram-examples strong {
+      font-size: 0.75rem;
+      color: var(--ed-text-secondary);
+      text-transform: uppercase;
+    }
+  </style>
+
+  <div class="euler-diagram-wrapper">
+    <div class="euler-diagram-svg-container">
+      <svg viewBox="0 0 800 480">
+        <defs>
+          <clipPath id="clipS-{{ .Ordinal }}"><ellipse cx="250" cy="240" rx="185" ry="175"/></clipPath>
+          <clipPath id="clipU-{{ .Ordinal }}"><ellipse cx="400" cy="240" rx="160" ry="175"/></clipPath>
+          <clipPath id="clipQ-{{ .Ordinal }}"><ellipse cx="550" cy="240" rx="185" ry="175"/></clipPath>
+          <clipPath id="clipNotS-{{ .Ordinal }}"><path d="M0,0 H800 V480 H0 Z M250,240 m-185,0 a185,175 0 1,0 370,0 a185,175 0 1,0 -370,0" clip-rule="evenodd"/></clipPath>
+          <clipPath id="clipNotU-{{ .Ordinal }}"><path d="M0,0 H800 V480 H0 Z M400,240 m-160,0 a160,175 0 1,0 320,0 a160,175 0 1,0 -320,0" clip-rule="evenodd"/></clipPath>
+          <clipPath id="clipNotQ-{{ .Ordinal }}"><path d="M0,0 H800 V480 H0 Z M550,240 m-185,0 a185,175 0 1,0 370,0 a185,175 0 1,0 -370,0" clip-rule="evenodd"/></clipPath>
+          <pattern id="groupStripes-{{ .Ordinal }}" patternUnits="userSpaceOnUse" width="12" height="12" patternTransform="rotate(45)">
+            <rect x="0" y="0" width="6" height="12" fill="#009E73"/>
+            <rect x="6" y="0" width="6" height="12" fill="#E69F00"/>
+          </pattern>
+        </defs>
+
+        <!-- Background: Magma -->
+        <rect x="0" y="0" width="800" height="480" class="magma-bg-{{ .Ordinal }}"/>
+
+        <!-- S only: Semigroup -->
+        <g clip-path="url(#clipS-{{ .Ordinal }})"><g clip-path="url(#clipNotU-{{ .Ordinal }})"><g clip-path="url(#clipNotQ-{{ .Ordinal }})">
+          <rect x="0" y="0" width="800" height="480" fill="#0072B2"/>
+        </g></g></g>
+
+        <!-- U only: Unital Magma -->
+        <g clip-path="url(#clipU-{{ .Ordinal }})"><g clip-path="url(#clipNotS-{{ .Ordinal }})"><g clip-path="url(#clipNotQ-{{ .Ordinal }})">
+          <rect x="0" y="0" width="800" height="480" fill="#CC79A7"/>
+        </g></g></g>
+
+        <!-- Q only: Quasigroup -->
+        <g clip-path="url(#clipQ-{{ .Ordinal }})"><g clip-path="url(#clipNotU-{{ .Ordinal }})"><g clip-path="url(#clipNotS-{{ .Ordinal }})">
+          <rect x="0" y="0" width="800" height="480" fill="#D55E00"/>
+        </g></g></g>
+
+        <!-- S ∩ U \ Q: Monoid -->
+        <g clip-path="url(#clipS-{{ .Ordinal }})"><g clip-path="url(#clipU-{{ .Ordinal }})"><g clip-path="url(#clipNotQ-{{ .Ordinal }})">
+          <rect x="0" y="0" width="800" height="480" fill="#009E73"/>
+        </g></g></g>
+
+        <!-- U ∩ Q \ S: Loop -->
+        <g clip-path="url(#clipU-{{ .Ordinal }})"><g clip-path="url(#clipQ-{{ .Ordinal }})"><g clip-path="url(#clipNotS-{{ .Ordinal }})">
+          <rect x="0" y="0" width="800" height="480" fill="#E69F00"/>
+        </g></g></g>
+
+        <!-- S ∩ U ∩ Q: Group -->
+        <g clip-path="url(#clipS-{{ .Ordinal }})"><g clip-path="url(#clipU-{{ .Ordinal }})"><g clip-path="url(#clipQ-{{ .Ordinal }})">
+          <rect x="0" y="0" width="800" height="480" fill="url(#groupStripes-{{ .Ordinal }})"/>
+        </g></g></g>
+
+        <!-- Highlight overlays -->
+        <g clip-path="url(#clipS-{{ .Ordinal }})" class="highlight-overlay" data-highlight="semigroup"><rect x="0" y="0" width="800" height="480"/></g>
+        <g clip-path="url(#clipU-{{ .Ordinal }})" class="highlight-overlay" data-highlight="unital"><rect x="0" y="0" width="800" height="480"/></g>
+        <g clip-path="url(#clipQ-{{ .Ordinal }})" class="highlight-overlay" data-highlight="quasigroup"><rect x="0" y="0" width="800" height="480"/></g>
+        <g clip-path="url(#clipS-{{ .Ordinal }})"><g clip-path="url(#clipU-{{ .Ordinal }})" class="highlight-overlay" data-highlight="monoid"><rect x="0" y="0" width="800" height="480"/></g></g>
+        <g clip-path="url(#clipU-{{ .Ordinal }})"><g clip-path="url(#clipQ-{{ .Ordinal }})" class="highlight-overlay" data-highlight="loop"><rect x="0" y="0" width="800" height="480"/></g></g>
+        <g clip-path="url(#clipS-{{ .Ordinal }})"><g clip-path="url(#clipU-{{ .Ordinal }})"><g clip-path="url(#clipQ-{{ .Ordinal }})" class="highlight-overlay" data-highlight="group"><rect x="0" y="0" width="800" height="480"/></g></g></g>
+
+        <!-- Circle outlines -->
+        <ellipse cx="250" cy="240" rx="185" ry="175" fill="none" stroke="#0072B2" stroke-width="3"/>
+        <ellipse cx="400" cy="240" rx="160" ry="175" fill="none" stroke="#CC79A7" stroke-width="3"/>
+        <ellipse cx="550" cy="240" rx="185" ry="175" fill="none" stroke="#D55E00" stroke-width="3"/>
+
+        <!-- Labels -->
+        <text x="95" y="80" class="circle-label" fill="#0072B2">SEMIGROUP</text>
+        <text x="95" y="98" class="label-sub" fill="#0072B2">(associative)</text>
+        <text x="400" y="35" class="circle-label" fill="#CC79A7">UNITAL MAGMA</text>
+        <text x="400" y="53" class="label-sub" fill="#CC79A7">(has identity)</text>
+        <text x="705" y="80" class="circle-label" fill="#D55E00">QUASIGROUP</text>
+        <text x="705" y="98" class="label-sub" fill="#D55E00">(divisible)</text>
+
+        <text x="45" y="35" class="label diagram-label-{{ .Ordinal }}" font-size="12">MAGMA</text>
+        <text x="150" y="245" class="label" fill="#fff">Semigroup</text>
+        <text x="650" y="245" class="label" fill="#fff">Quasigroup</text>
+        <text x="295" y="245" class="label" fill="#fff" font-size="13">Monoid</text>
+        <text x="505" y="245" class="label" fill="#fff" font-size="13">Loop</text>
+        <text x="400" y="245" class="label" fill="#fff" font-size="15" font-weight="700">GROUP</text>
+
+        <!-- Hitboxes -->
+        <rect x="0" y="0" width="800" height="480" class="region-hitbox" data-structure="magma"/>
+        <g clip-path="url(#clipS-{{ .Ordinal }})"><rect x="0" y="0" width="800" height="480" class="region-hitbox" data-structure="semigroup"/></g>
+        <g clip-path="url(#clipU-{{ .Ordinal }})"><rect x="0" y="0" width="800" height="480" class="region-hitbox" data-structure="unital"/></g>
+        <g clip-path="url(#clipQ-{{ .Ordinal }})"><rect x="0" y="0" width="800" height="480" class="region-hitbox" data-structure="quasigroup"/></g>
+        <g clip-path="url(#clipS-{{ .Ordinal }})"><g clip-path="url(#clipU-{{ .Ordinal }})"><rect x="0" y="0" width="800" height="480" class="region-hitbox" data-structure="monoid"/></g></g>
+        <g clip-path="url(#clipU-{{ .Ordinal }})"><g clip-path="url(#clipQ-{{ .Ordinal }})"><rect x="0" y="0" width="800" height="480" class="region-hitbox" data-structure="loop"/></g></g>
+        <g clip-path="url(#clipS-{{ .Ordinal }})"><g clip-path="url(#clipU-{{ .Ordinal }})"><g clip-path="url(#clipQ-{{ .Ordinal }})"><rect x="0" y="0" width="800" height="480" class="region-hitbox" data-structure="group"/></g></g></g>
+      </svg>
+    </div>
+
+    <div class="euler-diagram-legend">
+      <div class="euler-diagram-legend-item"><div class="euler-diagram-legend-color magma-legend-{{ .Ordinal }}"></div><span>Magma</span></div>
+      <div class="euler-diagram-legend-item"><div class="euler-diagram-legend-color" style="background:#0072B2"></div><span>Semigroup</span></div>
+      <div class="euler-diagram-legend-item"><div class="euler-diagram-legend-color" style="background:#CC79A7"></div><span>Unital Magma</span></div>
+      <div class="euler-diagram-legend-item"><div class="euler-diagram-legend-color" style="background:#D55E00"></div><span>Quasigroup</span></div>
+      <div class="euler-diagram-legend-item"><div class="euler-diagram-legend-color" style="background:#009E73"></div><span>Monoid</span></div>
+      <div class="euler-diagram-legend-item"><div class="euler-diagram-legend-color" style="background:#E69F00"></div><span>Loop</span></div>
+      <div class="euler-diagram-legend-item"><div class="euler-diagram-legend-stripes"></div><span>Group</span></div>
+    </div>
+
+    <div class="euler-diagram-info-panel">
+      <p style="color: var(--ed-text-muted); font-style: italic;">Click on a region to see its definition and examples.</p>
+    </div>
+  </div>
+
+  <script>
+  (function() {
+    const container = document.getElementById('euler-diagram-{{ .Ordinal }}');
+    const infoPanel = container.querySelector('.euler-diagram-info-panel');
+    const magmaBg = container.querySelector('.magma-bg-{{ .Ordinal }}');
+    const magmaLegend = container.querySelector('.magma-legend-{{ .Ordinal }}');
+    const diagramLabel = container.querySelector('.diagram-label-{{ .Ordinal }}');
+
+    function updateThemeColors() {
+      const isDark = document.body.classList.contains('dark');
+      const magmaColor = isDark ? '#2d3748' : '#e8e8e8';
+      const labelColor = isDark ? '#94a3b8' : '#64748b';
+      if (magmaBg) magmaBg.setAttribute('fill', magmaColor);
+      if (magmaLegend) magmaLegend.style.background = magmaColor;
+      if (diagramLabel) diagramLabel.setAttribute('fill', labelColor);
+    }
+
+    updateThemeColors();
+    const observer = new MutationObserver(updateThemeColors);
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+
+    const structures = {
+      magma: {
+        name: "Magma", color: "#64748b",
+        description: "The most general structure: a set with any binary operation. No additional properties required.",
+        axioms: [{ name: "Closure", formula: "∀ a,b ∈ A: ab ∈ A", color: "#64748b" }],
+        examples: ["Any set with any binary operation", "Rock-paper-scissors (winner function)"]
+      },
+      semigroup: {
+        name: "Semigroup", color: "#0072B2",
+        description: "An associative magma. The visible region shows semigroups without identity.",
+        axioms: [
+          { name: "Closure", formula: "∀ a,b ∈ A: ab ∈ A", color: "#64748b" },
+          { name: "Associativity", formula: "∀ a,b,c: (ab)c = a(bc)", color: "#0072B2" }
+        ],
+        examples: ["(ℤ⁺, +) — positive integers", "Non-empty strings under concatenation"]
+      },
+      unital: {
+        name: "Unital Magma", color: "#CC79A7",
+        description: "A magma with an identity element e where ea = ae = a for all a.",
+        axioms: [
+          { name: "Closure", formula: "∀ a,b ∈ A: ab ∈ A", color: "#64748b" },
+          { name: "Identity", formula: "∃ e ∈ A: ∀ a, ea = ae = a", color: "#CC79A7" }
+        ],
+        examples: ["Includes all monoids, loops, and groups"]
+      },
+      quasigroup: {
+        name: "Quasigroup", color: "#D55E00",
+        description: "A magma where equations ax = b and ya = b always have unique solutions (Latin square).",
+        axioms: [
+          { name: "Closure", formula: "∀ a,b ∈ A: ab ∈ A", color: "#64748b" },
+          { name: "Left division", formula: "∀ a,b, ∃! x: ax = b", color: "#D55E00" },
+          { name: "Right division", formula: "∀ a,b, ∃! y: ya = b", color: "#D55E00" }
+        ],
+        examples: ["(ℤ, −) — integers under subtraction", "(ℝ⁺, ÷) — positive reals under division"]
+      },
+      monoid: {
+        name: "Monoid", color: "#009E73",
+        description: "A semigroup with identity (S ∩ U). The green region shows monoids that aren't groups.",
+        axioms: [
+          { name: "Closure", formula: "∀ a,b ∈ A: ab ∈ A", color: "#64748b" },
+          { name: "Associativity", formula: "∀ a,b,c: (ab)c = a(bc)", color: "#0072B2" },
+          { name: "Identity", formula: "∃ e ∈ A: ∀ a, ea = ae = a", color: "#CC79A7" }
+        ],
+        examples: ["(ℕ, +, 0)", "(ℕ, ·, 1)", "Strings with concatenation"]
+      },
+      loop: {
+        name: "Loop", color: "#E69F00",
+        description: "A quasigroup with identity (U ∩ Q). The orange region shows non-associative loops.",
+        axioms: [
+          { name: "Closure", formula: "∀ a,b ∈ A: ab ∈ A", color: "#64748b" },
+          { name: "Identity", formula: "∃ e ∈ A: ∀ a, ea = ae = a", color: "#CC79A7" },
+          { name: "Divisibility", formula: "∀ a,b, ∃! x,y: ax = b, ya = b", color: "#D55E00" }
+        ],
+        examples: ["Unit octonions (non-associative!)", "Moufang loops"]
+      },
+      group: {
+        name: "Group", color: "#009E73",
+        description: "The intersection of Monoid and Loop. Associativity + divisibility + identity gives inverses for free.",
+        axioms: [
+          { name: "Closure", formula: "∀ a,b ∈ A: ab ∈ A", color: "#64748b" },
+          { name: "Associativity", formula: "∀ a,b,c: (ab)c = a(bc)", color: "#0072B2" },
+          { name: "Identity", formula: "∃ e ∈ A: ∀ a, ea = ae = a", color: "#CC79A7" },
+          { name: "Inverses", formula: "∀ a, ∃ a⁻¹: aa⁻¹ = a⁻¹a = e", color: "#E69F00" }
+        ],
+        examples: ["(ℤ, +)", "(ℚ \\ {0}, ·)", "Symmetric groups Sₙ", "GL(n, ℝ)"]
+      }
+    };
+
+    let activeStructure = null;
+
+    function highlight(id, show) {
+      if (id === 'magma') return;
+      const el = container.querySelector('[data-highlight="' + id + '"]');
+      if (el) el.style.opacity = show ? '0.2' : '0';
+    }
+
+    function showInfo(id) {
+      const d = structures[id];
+      const isGroup = id === 'group';
+      const titleStyle = isGroup
+        ? 'background: repeating-linear-gradient(45deg, #009E73, #009E73 3px, #E69F00 3px, #E69F00 6px); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;'
+        : 'color:' + d.color;
+
+      infoPanel.innerHTML = '<h3 style="' + titleStyle + '">' + d.name + '</h3>' +
+        '<p>' + d.description + '</p>' +
+        '<div style="margin-top:10px">' +
+        d.axioms.map(a => '<div class="euler-diagram-axiom" style="border-color:' + a.color + '">' +
+          '<span class="euler-diagram-axiom-name" style="color:' + a.color + '">' + a.name + '</span><br>' +
+          '<span class="euler-diagram-axiom-formula">' + a.formula + '</span></div>').join('') +
+        '</div>' +
+        '<div class="euler-diagram-examples"><strong>Examples</strong><br>' +
+        d.examples.map(e => '• ' + e).join('<br>') + '</div>';
+    }
+
+    container.querySelectorAll('.region-hitbox').forEach(hb => {
+      const id = hb.dataset.structure;
+      hb.addEventListener('mouseenter', () => highlight(id, true));
+      hb.addEventListener('mouseleave', () => { if (activeStructure !== id) highlight(id, false); });
+      hb.addEventListener('click', e => {
+        e.stopPropagation();
+        if (activeStructure && activeStructure !== 'magma') highlight(activeStructure, false);
+        activeStructure = id;
+        highlight(id, true);
+        showInfo(id);
+      });
+    });
+  })();
+  </script>
+</div>
