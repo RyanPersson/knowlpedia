@@ -3,7 +3,7 @@ title: "Universal Property of Quotient Groups"
 description: "Homomorphisms out of G that kill N factor uniquely through G/N"
 ---
 
-**Universal Property of Quotient Groups**: Let $G$ be a {{</* knowl id="group" text="group" */>}} and let $N\trianglelefteq G$ be a {{</* knowl id="normal-subgroup" text="normal subgroup" */>}}. Let $\pi:G\to G/N$ be the canonical projection to the {{</* knowl id="quotient-group" text="quotient group" */>}}. If $K$ is a group and $f:G\to K$ is a {{</* knowl id="group-homomorphism" text="group homomorphism" */>}} such that $N\subseteq \ker(f)$ (where $\ker(f)$ is the {{</* knowl id="kernel-group" text="kernel" */>}} of $f$), then there exists a unique homomorphism $\bar f:G/N\to K$ with
+**Universal Property of Quotient Groups**: Let $G$ be a {{< knowl id="group" text="group" >}} and let $N\trianglelefteq G$ be a {{< knowl id="normal-subgroup" text="normal subgroup" >}}. Let $\pi:G\to G/N$ be the canonical projection to the {{< knowl id="quotient-group" text="quotient group" >}}. If $K$ is a group and $f:G\to K$ is a {{< knowl id="group-homomorphism" text="group homomorphism" >}} such that $N\subseteq \ker(f)$ (where $\ker(f)$ is the {{< knowl id="kernel-group" text="kernel" >}} of $f$), then there exists a unique homomorphism $\bar f:G/N\to K$ with
 $
 f = \bar f \circ \pi.
 $

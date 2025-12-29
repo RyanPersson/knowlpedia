@@ -4,7 +4,7 @@ description: "Any intersection of subgroups of a fixed group is again a subgroup
 ---
 
 **Proposition (Intersection of subgroups).**
-Let $G$ be a {{</* knowl id="group" text="group" */>}} and let $\{H_i\}_{i\in I}$ be a family of {{</* knowl id="subgroup" text="subgroups" */>}} of $G$. Then the set-theoretic {{</* knowl id="intersection" text="intersection" */>}}
+Let $G$ be a {{< knowl id="group" text="group" >}} and let $\{H_i\}_{i\in I}$ be a family of {{< knowl id="subgroup" text="subgroups" >}} of $G$. Then the set-theoretic {{< knowl id="intersection" text="intersection" >}}
 $$
 H \;=\; \bigcap_{i\in I} H_i
 $$

@@ -4,7 +4,7 @@ description: "If N and M are normal in G then NM is a normal subgroup of G"
 ---
 
 **Proposition (Product of normal subgroups).**
-Let $G$ be a {{</* knowl id="group" text="group" */>}} and let $N,M \lhd G$ be {{</* knowl id="normal-subgroup" text="normal subgroups" */>}}. Define
+Let $G$ be a {{< knowl id="group" text="group" >}} and let $N,M \lhd G$ be {{< knowl id="normal-subgroup" text="normal subgroups" >}}. Define
 $$
 NM \;=\; \{nm : n\in N,\ m\in M\}\subseteq G.
 $$

@@ -3,9 +3,9 @@ title: "Group monomorphism"
 description: "An injective group homomorphism"
 ---
 
-A **group monomorphism** is a {{</* knowl id="group-homomorphism" text="group homomorphism" */>}} $\varphi\colon G\to H$ that is injective as an {{</* knowl id="injective-function" text="injective function" */>}}.
+A **group monomorphism** is a {{< knowl id="group-homomorphism" text="group homomorphism" >}} $\varphi\colon G\to H$ that is injective as an {{< knowl id="injective-function" text="injective function" >}}.
 
-Equivalently, $\varphi$ is a monomorphism if and only if its {{</* knowl id="kernel-group" text="kernel" */>}} is trivial: $\ker(\varphi)=\{e_G\}$. In that case $\varphi$ identifies $G$ with the {{</* knowl id="image-group" text="image" */>}} $\varphi(G)$, which is a {{</* knowl id="subgroup" text="subgroup" */>}} of $H$.
+Equivalently, $\varphi$ is a monomorphism if and only if its {{< knowl id="kernel-group" text="kernel" >}} is trivial: $\ker(\varphi)=\{e_G\}$. In that case $\varphi$ identifies $G$ with the {{< knowl id="image-group" text="image" >}} $\varphi(G)$, which is a {{< knowl id="subgroup" text="subgroup" >}} of $H$.
 
 **Examples:**
 - If $H\le G$, the inclusion $H\hookrightarrow G$ is a group monomorphism.
