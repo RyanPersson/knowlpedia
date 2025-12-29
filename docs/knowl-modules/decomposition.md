@@ -10,52 +10,52 @@ This document decomposes the source lists into focused modules. Items appearing 
 Basic set theory, logic, and function concepts used across all mathematics.
 
 **Definitions:**
-- Set (×2)
-- Subset (×2)
-- Proper subset (×1, but foundational)
-- Empty set (×1, but foundational)
-- Union (×1, but foundational)
-- Intersection (×1, but foundational)
-- Set difference (×1)
-- Complement (×1)
-- Cartesian product (×2)
-- Ordered pair (×1)
-- Partition of a set (×2)
-- Function (map) (×2)
-- Composition of functions (×2)
-- Identity function (×1, but foundational)
-- Domain (×1)
-- Codomain (×1)
-- Image of a function (×2)
-- Preimage of a function (×2)
-- Injective function (×2)
-- Surjective function (×2)
-- Bijective function (×2)
-- Inverse function (×1)
-- Relation (×2)
-- Equivalence relation (×2)
-- Equivalence class (×2)
-- Quotient set (×1)
-- Partial order (poset) (×2)
-- Total order (linear order) (×2)
-- Upper bound (×2)
-- Lower bound (×2)
-- Well-ordered set (×1)
-- Cardinality (×1)
-- Countable set (×1)
-- Binary operation (×2)
+- Set (×2) → `set.md`
+- Subset (×2) → `subset.md`
+- Proper subset (×1, but foundational) → `proper-subset.md`
+- Empty set (×1, but foundational) → `empty-set.md`
+- Union (×1, but foundational) → `union.md`
+- Intersection (×1, but foundational) → `intersection.md`
+- Set difference (×1) → `set-difference.md`
+- Complement (×1) → `complement.md`
+- Cartesian product (×2) → `cartesian-product.md`
+- Ordered pair (×1) → `ordered-pair.md`
+- Partition of a set (×2) → `partition.md`
+- Function (map) (×2) → `function.md`
+- Composition of functions (×2) → `composition.md`
+- Identity function (×1, but foundational) → `identity-function.md`
+- Domain (×1) → `domain.md`
+- Codomain (×1) → `codomain.md`
+- Image of a function (×2) → `image.md`
+- Preimage of a function (×2) → `preimage.md`
+- Injective function (×2) → `injective-function.md`
+- Surjective function (×2) → `surjective-function.md`
+- Bijective function (×2) → `bijective-function.md`
+- Inverse function (×1) → `inverse-function.md`
+- Relation (×2) → `relation.md`
+- Equivalence relation (×2) → `equivalence-relation.md`
+- Equivalence class (×2) → `equivalence-class.md`
+- Quotient set (×1) → `quotient-set.md`
+- Partial order (poset) (×2) → `partial-order.md`
+- Total order (linear order) (×2) → `total-order.md`
+- Upper bound (×2) → `upper-bound.md`
+- Lower bound (×2) → `lower-bound.md`
+- Well-ordered set (×1) → `well-ordered-set.md`
+- Cardinality (×1) → `cardinality.md`
+- Countable set (×1) → `countable-set.md`
+- Binary operation (×2) → `binary-operation.md`
 
 **Axioms:**
-- Zermelo–Fraenkel axioms with Choice (ZFC) (×1, but foundational)
-- Axiom of Choice (×1)
-- Principle of mathematical induction (×1)
+- Zermelo–Fraenkel axioms with Choice (ZFC) (×1, but foundational) → `zfc-axioms.md`
+- Axiom of Choice (×1) → `axiom-of-choice.md`
+- Principle of mathematical induction (×1) → `mathematical-induction.md`
 
 **Theorems:**
-- Well-ordering theorem (×1)
-- Well-ordering principle for ℕ (×1)
+- Well-ordering theorem (×1) → `well-ordering-theorem.md`
+- Well-ordering principle for ℕ (×1) → `well-ordering-principle.md`
 
 **Lemmas:**
-- Zorn's lemma (×1, but foundational across algebra)
+- Zorn's lemma (×1, but foundational across algebra) → `zorns-lemma.md`
 
 ---
 
@@ -63,26 +63,26 @@ Basic set theory, logic, and function concepts used across all mathematics.
 Vector spaces, linear maps, and matrix theory used in both analysis and algebra.
 
 **Definitions:**
-- Vector space (×2)
-- Linear map (×2)
-- Linear operator (×1)
-- Eigenvalue (×1)
-- Eigenvector (×1)
-- Eigenspace (×1)
-- Determinant (×1)
-- Trace (linear algebra) (×1)
-- Characteristic polynomial (×1)
-- Minimal polynomial (linear operator) (×1)
-- Euclidean space ℝ^k (×1)
-- Euclidean norm (×1)
-- Inner product on ℝ^k (×1)
-- Orthogonality (×1)
-- Operator norm (×1)
+- Vector space (×2) → `vector-space.md`
+- Linear map (×2) → `linear-map.md`
+- Linear operator (×1) → `linear-operator.md`
+- Eigenvalue (×1) → `eigenvalue.md`
+- Eigenvector (×1) → `eigenvector.md`
+- Eigenspace (×1) → `eigenspace.md`
+- Determinant (×1) → `determinant.md`
+- Trace (linear algebra) (×1) → `trace.md`
+- Characteristic polynomial (×1) → `characteristic-polynomial.md`
+- Minimal polynomial (linear operator) (×1) → `minimal-polynomial.md`
+- Euclidean space ℝ^k (×1) → `euclidean-space.md`
+- Euclidean norm (×1) → `euclidean-norm.md`
+- Inner product on ℝ^k (×1) → `inner-product.md`
+- Orthogonality (×1) → `orthogonality.md`
+- Operator norm (×1) → `operator-norm.md`
 
 **Theorems:**
-- Cayley–Hamilton theorem (×1)
-- Rank–nullity theorem (×1)
-- Existence of a basis for every vector space (×1)
+- Cayley–Hamilton theorem (×1) → `cayley-hamilton-theorem.md`
+- Rank–nullity theorem (×1) → `rank-nullity-theorem.md`
+- Existence of a basis for every vector space (×1) → `basis-existence-theorem.md`
 
 ---
 
@@ -94,39 +94,39 @@ The ordered field structure of ℝ and completeness properties.
 *Depends on:* `shared-foundations`
 
 **Definitions:**
-- Supremum (least upper bound)
-- Infimum (greatest lower bound)
-- Maximum
-- Minimum
-- Bounded above
-- Bounded below
-- Bounded set (in an ordered set)
-- Real numbers ℝ (as a complete ordered field)
-- Complex numbers ℂ
-- Complex conjugate
-- Absolute value on ℝ
-- Modulus (absolute value) on ℂ
+- Supremum (least upper bound) → `supremum.md`
+- Infimum (greatest lower bound) → `infimum.md`
+- Maximum → `maximum.md`
+- Minimum → `minimum.md`
+- Bounded above → `bounded-above.md`
+- Bounded below → `bounded-below.md`
+- Bounded set (in an ordered set) → `bounded-set.md`
+- Real numbers ℝ (as a complete ordered field) → `real-numbers.md`
+- Complex numbers ℂ → `complex-numbers.md`
+- Complex conjugate → `complex-conjugate.md`
+- Absolute value on ℝ → `absolute-value.md`
+- Modulus (absolute value) on ℂ → `modulus.md`
 
 **Axioms:**
-- Field axioms (for ℝ, ℂ)
-- Order axioms (for ℝ as an ordered field)
-- Completeness axiom of ℝ (least upper bound / supremum property)
+- Field axioms (for ℝ, ℂ) → `field-axioms.md`
+- Order axioms (for ℝ as an ordered field) → `order-axioms.md`
+- Completeness axiom of ℝ (least upper bound / supremum property) → `completeness-axiom.md`
 
 **Theorems:**
-- Least upper bound theorem
-- Greatest lower bound theorem
-- Archimedean property of ℝ
-- Density of ℚ in ℝ
-- Density of ℝ \ ℚ in ℝ
-- Nested interval theorem
+- Least upper bound theorem → `least-upper-bound-theorem.md`
+- Greatest lower bound theorem → `greatest-lower-bound-theorem.md`
+- Archimedean property of ℝ → `archimedean-property.md`
+- Density of ℚ in ℝ → `density-of-rationals.md`
+- Density of ℝ \ ℚ in ℝ → `density-of-irrationals.md`
+- Nested interval theorem → `nested-interval-theorem.md`
 
 **Lemmas:**
-- Supremum approximation lemma
+- Supremum approximation lemma → `supremum-approximation-lemma.md`
 
 **Propositions:**
-- Uniqueness of supremum and infimum
-- Basic algebraic properties of sup and inf
-- Completeness equivalences
+- Uniqueness of supremum and infimum → `uniqueness-of-supremum.md`
+- Basic algebraic properties of sup and inf → `sup-inf-properties.md`
+- Completeness equivalences → `completeness-equivalences.md`
 
 ---
 
@@ -136,33 +136,33 @@ Metric spaces and point-set topology in the metric context.
 *Depends on:* `shared-foundations`, `analysis-order-completeness`
 
 **Definitions:**
-- Distance (metric)
-- Metric space
-- Open ball
-- Closed ball
-- Sphere (metric sphere)
-- Neighborhood
-- Open set (in a metric space)
-- Closed set (in a metric space)
-- Interior of a set
-- Closure of a set
-- Boundary of a set
-- Limit point (accumulation point)
-- Isolated point
-- Derived set
-- Dense subset
-- Diameter of a set
-- Bounded set (in a metric space)
+- Distance (metric) → `metric.md`
+- Metric space → `metric-space.md`
+- Open ball → `open-ball.md`
+- Closed ball → `closed-ball.md`
+- Sphere (metric sphere) → `sphere.md`
+- Neighborhood → `neighborhood.md`
+- Open set (in a metric space) → `open-set.md`
+- Closed set (in a metric space) → `closed-set.md`
+- Interior of a set → `interior.md`
+- Closure of a set → `closure.md`
+- Boundary of a set → `boundary.md`
+- Limit point (accumulation point) → `limit-point.md`
+- Isolated point → `isolated-point.md`
+- Derived set → `derived-set.md`
+- Dense subset → `dense-subset.md`
+- Diameter of a set → `diameter.md`
+- Bounded set (in a metric space) → `bounded-set-metric.md`
 
 **Theorems:**
-- Open sets form a topology
-- Closed sets are complements of open sets
-- Sequential characterization of closure
-- Sequential characterization of closed sets
+- Open sets form a topology → `open-sets-form-topology.md`
+- Closed sets are complements of open sets → `closed-sets-complements.md`
+- Sequential characterization of closure → `sequential-closure-characterization.md`
+- Sequential characterization of closed sets → `sequential-closed-characterization.md`
 
 **Lemmas:**
-- Triangle inequality
-- Reverse triangle inequality
+- Triangle inequality → `triangle-inequality.md`
+- Reverse triangle inequality → `reverse-triangle-inequality.md`
 
 ---
 
@@ -172,54 +172,54 @@ Sequences, series, and convergence in ℝ and ℝ^k.
 *Depends on:* `analysis-order-completeness`, `analysis-metric-topology`
 
 **Definitions:**
-- Convergent sequence
-- Limit of a sequence
-- Bounded sequence
-- Monotone sequence
-- Subsequence
-- Limit superior (lim sup)
-- Limit inferior (lim inf)
-- Cauchy sequence
-- Complete metric space
-- Summable family / series
-- Partial sums
-- Convergent series
-- Divergent series
-- Absolutely convergent series
-- Conditionally convergent series
-- Rearrangement of a series
-- Cauchy product
+- Convergent sequence → `convergent-sequence.md`
+- Limit of a sequence → `limit-of-sequence.md`
+- Bounded sequence → `bounded-sequence.md`
+- Monotone sequence → `monotone-sequence.md`
+- Subsequence → `subsequence.md`
+- Limit superior (lim sup) → `limsup.md`
+- Limit inferior (lim inf) → `liminf.md`
+- Cauchy sequence → `cauchy-sequence.md`
+- Complete metric space → `complete-metric-space.md`
+- Summable family / series → `series.md`
+- Partial sums → `partial-sums.md`
+- Convergent series → `convergent-series.md`
+- Divergent series → `divergent-series.md`
+- Absolutely convergent series → `absolutely-convergent-series.md`
+- Conditionally convergent series → `conditionally-convergent-series.md`
+- Rearrangement of a series → `rearrangement.md`
+- Cauchy product → `cauchy-product.md`
 
 **Theorems:**
-- Monotone convergence theorem (sequences)
-- Cauchy criterion for convergence
-- Bolzano–Weierstrass theorem
-- Algebra of limits for sequences
-- Squeeze theorem
-- Absolute convergence implies convergence
-- Comparison test
-- Limit comparison test
-- Ratio test
-- Root test
-- Integral test
-- Cauchy condensation test
-- Alternating series test
-- Dirichlet test
-- Abel test
-- Rearrangement theorem (absolutely convergent)
-- Riemann rearrangement theorem
-- Mertens theorem
+- Monotone convergence theorem (sequences) → `monotone-convergence-theorem.md`
+- Cauchy criterion for convergence → `cauchy-criterion.md`
+- Bolzano–Weierstrass theorem → `bolzano-weierstrass-theorem.md`
+- Algebra of limits for sequences → `algebra-of-limits.md`
+- Squeeze theorem → `squeeze-theorem.md`
+- Absolute convergence implies convergence → `absolute-convergence-implies-convergence.md`
+- Comparison test → `comparison-test.md`
+- Limit comparison test → `limit-comparison-test.md`
+- Ratio test → `ratio-test.md`
+- Root test → `root-test.md`
+- Integral test → `integral-test.md`
+- Cauchy condensation test → `cauchy-condensation-test.md`
+- Alternating series test → `alternating-series-test.md`
+- Dirichlet test → `dirichlet-test.md`
+- Abel test → `abel-test.md`
+- Rearrangement theorem (absolutely convergent) → `rearrangement-theorem.md`
+- Riemann rearrangement theorem → `riemann-rearrangement-theorem.md`
+- Mertens theorem → `mertens-theorem.md`
 
 **Lemmas:**
-- Monotone subsequence lemma
-- Basic properties of lim sup and lim inf
-- Uniqueness of limits
-- A convergent sequence is Cauchy
-- Every Cauchy sequence is bounded
+- Monotone subsequence lemma → `monotone-subsequence-lemma.md`
+- Basic properties of lim sup and lim inf → `limsup-liminf-properties.md`
+- Uniqueness of limits → `uniqueness-of-limits.md`
+- A convergent sequence is Cauchy → `convergent-implies-cauchy.md`
+- Every Cauchy sequence is bounded → `cauchy-implies-bounded.md`
 
 **Corollaries:**
-- Every bounded sequence in ℝ^k has a convergent subsequence
-- A convergent series has terms tending to 0
+- Every bounded sequence in ℝ^k has a convergent subsequence → `bounded-sequence-convergent-subsequence.md`
+- A convergent series has terms tending to 0 → `convergent-series-terms-to-zero.md`
 
 ---
 
@@ -229,25 +229,25 @@ Limits and continuity of functions.
 *Depends on:* `analysis-metric-topology`, `analysis-sequences-series`
 
 **Definitions:**
-- Limit of a function at a point (ε–δ)
-- One-sided limit
-- Limit at infinity
-- Continuity at a point
-- Continuity on a set
-- Uniform continuity
-- Lipschitz continuity
-- Hölder continuity
-- Isometry
-- Homeomorphism
+- Limit of a function at a point (ε–δ) → `limit-of-function.md`
+- One-sided limit → `one-sided-limit.md`
+- Limit at infinity → `limit-at-infinity.md`
+- Continuity at a point → `continuity-at-point.md`
+- Continuity on a set → `continuity-on-set.md`
+- Uniform continuity → `uniform-continuity.md`
+- Lipschitz continuity → `lipschitz-continuity.md`
+- Hölder continuity → `holder-continuity.md`
+- Isometry → `isometry.md`
+- Homeomorphism → `homeomorphism.md`
 
 **Theorems:**
-- Continuity via sequences
-- Continuity via open sets
+- Continuity via sequences → `continuity-via-sequences.md`
+- Continuity via open sets → `continuity-via-open-sets.md`
 
 **Propositions:**
-- Equivalent definitions of continuity
-- Uniform continuity implies continuity
-- Uniform continuity preserves Cauchy sequences
+- Equivalent definitions of continuity → `equivalent-continuity-definitions.md`
+- Uniform continuity implies continuity → `uniform-implies-continuity.md`
+- Uniform continuity preserves Cauchy sequences → `uniform-continuity-preserves-cauchy.md`
 
 ---
 
@@ -257,46 +257,46 @@ Compactness and connectedness in metric spaces.
 *Depends on:* `analysis-metric-topology`, `analysis-continuity`
 
 **Definitions:**
-- Compact set (open-cover)
-- Sequentially compact set
-- Totally bounded set
-- Connected set
-- Separated sets
-- Component (connected component)
-- Path
-- Path-connected set
-- Interval (in ℝ)
-- Curve (parametrized curve)
-- Nowhere dense set
-- Meager set
-- Residual set
+- Compact set (open-cover) → `compact-set.md`
+- Sequentially compact set → `sequentially-compact-set.md`
+- Totally bounded set → `totally-bounded-set.md`
+- Connected set → `connected-set.md`
+- Separated sets → `separated-sets.md`
+- Component (connected component) → `connected-component.md`
+- Path → `path.md`
+- Path-connected set → `path-connected-set.md`
+- Interval (in ℝ) → `interval.md`
+- Curve (parametrized curve) → `curve.md`
+- Nowhere dense set → `nowhere-dense-set.md`
+- Meager set → `meager-set.md`
+- Residual set → `residual-set.md`
 
 **Theorems:**
-- Sequential compactness equals compactness (metric spaces)
-- Finite intersection property theorem
-- Lebesgue number lemma
-- Compactness implies completeness
-- Compactness implies total boundedness
-- Continuous image of compact set is compact
-- Extreme value theorem
-- Heine–Cantor theorem
-- Continuous bijection from compact to metric space is homeomorphism
-- Heine–Borel theorem
-- Continuous image of connected set is connected
-- Connected subsets of ℝ are intervals
-- Intermediate value theorem
-- Cantor intersection theorem
-- Baire category theorem
+- Sequential compactness equals compactness (metric spaces) → `sequential-compactness-equals-compactness.md`
+- Finite intersection property theorem → `finite-intersection-property.md`
+- Lebesgue number lemma → `lebesgue-number-lemma.md`
+- Compactness implies completeness → `compactness-implies-completeness.md`
+- Compactness implies total boundedness → `compactness-implies-total-boundedness.md`
+- Continuous image of compact set is compact → `continuous-image-of-compact.md`
+- Extreme value theorem → `extreme-value-theorem.md`
+- Heine–Cantor theorem → `heine-cantor-theorem.md`
+- Continuous bijection from compact to metric space is homeomorphism → `compact-bijection-homeomorphism.md`
+- Heine–Borel theorem → `heine-borel-theorem.md`
+- Continuous image of connected set is connected → `continuous-image-of-connected.md`
+- Connected subsets of ℝ are intervals → `connected-subsets-of-r-are-intervals.md`
+- Intermediate value theorem → `intermediate-value-theorem.md`
+- Cantor intersection theorem → `cantor-intersection-theorem.md`
+- Baire category theorem → `baire-category-theorem.md`
 
 **Lemmas:**
-- Compactness implies boundedness
-- Compactness implies closedness
-- Closed subset of compact is compact
+- Compactness implies boundedness → `compactness-implies-boundedness.md`
+- Compactness implies closedness → `compactness-implies-closedness.md`
+- Closed subset of compact is compact → `closed-subset-of-compact.md`
 
 **Corollaries:**
-- Continuous function on compact is bounded
-- Continuous function on compact attains max and min
-- Continuous function on compact is uniformly continuous
+- Continuous function on compact is bounded → `continuous-on-compact-is-bounded.md`
+- Continuous function on compact attains max and min → `continuous-on-compact-attains-extrema.md`
+- Continuous function on compact is uniformly continuous → `continuous-on-compact-is-uniformly-continuous.md`
 
 ---
 
@@ -306,36 +306,36 @@ One-variable differentiation.
 *Depends on:* `analysis-continuity`
 
 **Definitions:**
-- Differentiability at a point
-- Difference quotient
-- Derivative
-- Right/left derivative
-- Higher derivatives
-- Class C^k function
-- Critical point
-- Local maximum / local minimum
-- Global maximum / global minimum
-- Taylor polynomial
-- Remainder term in Taylor's theorem
+- Differentiability at a point → `differentiability.md`
+- Difference quotient → `difference-quotient.md`
+- Derivative → `derivative.md`
+- Right/left derivative → `one-sided-derivative.md`
+- Higher derivatives → `higher-derivatives.md`
+- Class C^k function → `smooth-function.md`
+- Critical point → `critical-point.md`
+- Local maximum / local minimum → `local-extremum.md`
+- Global maximum / global minimum → `global-extremum.md`
+- Taylor polynomial → `taylor-polynomial.md`
+- Remainder term in Taylor's theorem → `taylor-remainder.md`
 
 **Theorems:**
-- Rolle's theorem
-- Mean value theorem (Lagrange)
-- Cauchy mean value theorem
-- Fixed sign of derivative implies monotonicity
-- Taylor's theorem with remainder
-- Darboux theorem
-- Inverse function theorem (1D)
-- L'Hôpital's rule
+- Rolle's theorem → `rolles-theorem.md`
+- Mean value theorem (Lagrange) → `mean-value-theorem.md`
+- Cauchy mean value theorem → `cauchy-mean-value-theorem.md`
+- Fixed sign of derivative implies monotonicity → `derivative-sign-monotonicity.md`
+- Taylor's theorem with remainder → `taylors-theorem.md`
+- Darboux theorem → `darboux-theorem.md`
+- Inverse function theorem (1D) → `inverse-function-theorem-1d.md`
+- L'Hôpital's rule → `lhopitals-rule.md`
 
 **Propositions:**
-- Differentiability rules (linearity, product, quotient, chain)
-- Derivative zero implies constant
-- Bounded derivative implies uniformly continuous
+- Differentiability rules (linearity, product, quotient, chain) → `differentiation-rules.md`
+- Derivative zero implies constant → `derivative-zero-implies-constant.md`
+- Bounded derivative implies uniformly continuous → `bounded-derivative-uniform-continuity.md`
 
 **Corollaries:**
-- f′ > 0 implies strictly increasing
-- f′ = 0 implies constant
+- f′ > 0 implies strictly increasing → `positive-derivative-strictly-increasing.md`
+- f′ = 0 implies constant → `zero-derivative-constant.md`
 
 ---
 
@@ -345,45 +345,45 @@ Riemann and Riemann–Stieltjes integration.
 *Depends on:* `analysis-differentiation-1d`, `analysis-compactness-connectedness`
 
 **Definitions:**
-- Step function
-- Partition of an interval
-- Refinement
-- Mesh (norm) of partition
-- Upper sum / Lower sum
-- Tagged partition
-- Riemann sum
-- Riemann integrable function
-- Riemann integral
-- Oscillation of a function
-- Set of measure zero
-- Content (Jordan content)
-- Riemann–Stieltjes integral
-- Integrator function
+- Step function → `step-function.md`
+- Partition of an interval → `partition-interval.md`
+- Refinement → `refinement.md`
+- Mesh (norm) of partition → `mesh.md`
+- Upper sum / Lower sum → `upper-lower-sum.md`
+- Tagged partition → `tagged-partition.md`
+- Riemann sum → `riemann-sum.md`
+- Riemann integrable function → `riemann-integrable.md`
+- Riemann integral → `riemann-integral.md`
+- Oscillation of a function → `oscillation.md`
+- Set of measure zero → `measure-zero.md`
+- Content (Jordan content) → `jordan-content.md`
+- Riemann–Stieltjes integral → `riemann-stieltjes-integral.md`
+- Integrator function → `integrator.md`
 
 **Theorems:**
-- Existence of Riemann integral for continuous functions
-- Riemann integrability of monotone functions
-- Riemann integrability with finitely many discontinuities
-- Lebesgue criterion for Riemann integrability
-- Mean value theorem for integrals
-- Fundamental theorem of calculus (Part I)
-- Fundamental theorem of calculus (Part II)
-- Substitution rule
-- Riemann–Stieltjes integrability theorem
-- Integration by parts (R-S)
+- Existence of Riemann integral for continuous functions → `riemann-integral-continuous-functions.md`
+- Riemann integrability of monotone functions → `riemann-integrability-monotone.md`
+- Riemann integrability with finitely many discontinuities → `riemann-integrability-finite-discontinuities.md`
+- Lebesgue criterion for Riemann integrability → `lebesgue-criterion-riemann.md`
+- Mean value theorem for integrals → `mean-value-theorem-integrals.md`
+- Fundamental theorem of calculus (Part I) → `ftc-part-1.md`
+- Fundamental theorem of calculus (Part II) → `ftc-part-2.md`
+- Substitution rule → `substitution-rule.md`
+- Riemann–Stieltjes integrability theorem → `riemann-stieltjes-integrability.md`
+- Integration by parts (R-S) → `integration-by-parts.md`
 
 **Lemmas:**
-- Refinement lemma for upper/lower sums
-- Oscillation criterion lemma
-- Additivity and linearity lemmas
+- Refinement lemma for upper/lower sums → `refinement-lemma.md`
+- Oscillation criterion lemma → `oscillation-criterion-lemma.md`
+- Additivity and linearity lemmas → `integral-additivity-linearity.md`
 
 **Propositions:**
-- Riemann integrability implies boundedness
-- |f| integrable if f integrable
-- Closure properties (sums, products)
+- Riemann integrability implies boundedness → `integrability-implies-boundedness.md`
+- |f| integrable if f integrable → `absolute-value-integrable.md`
+- Closure properties (sums, products) → `integrable-closure-properties.md`
 
 **Corollaries:**
-- FTC corollary: integration differentiates antiderivatives
+- FTC corollary: integration differentiates antiderivatives → `ftc-corollary.md`
 
 ---
 
@@ -393,36 +393,36 @@ Sequences and series of functions, uniform convergence, power series.
 *Depends on:* `analysis-riemann-integration`, `analysis-compactness-connectedness`
 
 **Definitions:**
-- Pointwise convergence
-- Uniform convergence
-- Uniform Cauchy sequence of functions
-- Uniform convergence on compact sets
-- Series of functions
-- Equicontinuity (family of functions)
+- Pointwise convergence → `pointwise-convergence.md`
+- Uniform convergence → `uniform-convergence.md`
+- Uniform Cauchy sequence of functions → `uniform-cauchy-functions.md`
+- Uniform convergence on compact sets → `uniform-convergence-on-compacts.md`
+- Series of functions → `series-of-functions.md`
+- Equicontinuity (family of functions) → `equicontinuity.md`
 
 **Theorems:**
-- Uniform limit theorem for continuity
-- Weierstrass M-test
-- Uniform convergence and integration theorem
-- Uniform convergence and differentiation theorem
-- Dini's theorem
-- Weierstrass approximation theorem
-- Stone–Weierstrass theorem
-- Cauchy–Hadamard theorem (radius of convergence)
-- Uniform convergence of power series on compact subsets
-- Term-by-term differentiation of power series
-- Term-by-term integration of power series
-- Abel's theorem
+- Uniform limit theorem for continuity → `uniform-limit-continuity.md`
+- Weierstrass M-test → `weierstrass-m-test.md`
+- Uniform convergence and integration theorem → `uniform-convergence-integration.md`
+- Uniform convergence and differentiation theorem → `uniform-convergence-differentiation.md`
+- Dini's theorem → `dinis-theorem.md`
+- Weierstrass approximation theorem → `weierstrass-approximation-theorem.md`
+- Stone–Weierstrass theorem → `stone-weierstrass-theorem.md`
+- Cauchy–Hadamard theorem (radius of convergence) → `cauchy-hadamard-theorem.md`
+- Uniform convergence of power series on compact subsets → `power-series-uniform-convergence.md`
+- Term-by-term differentiation of power series → `power-series-differentiation.md`
+- Term-by-term integration of power series → `power-series-integration.md`
+- Abel's theorem → `abels-theorem.md`
 
 **Lemmas:**
-- Uniform convergence implies uniform Cauchy
-- Uniform Cauchy implies uniform convergence (complete codomain)
-- Uniform convergence preserves boundedness
+- Uniform convergence implies uniform Cauchy → `uniform-convergence-implies-uniform-cauchy.md`
+- Uniform Cauchy implies uniform convergence (complete codomain) → `uniform-cauchy-implies-uniform-convergence.md`
+- Uniform convergence preserves boundedness → `uniform-convergence-preserves-boundedness.md`
 
 **Corollaries:**
-- Uniform convergence implies pointwise convergence
-- Uniform limit of continuous functions is continuous
-- Power series are analytic on disk of convergence
+- Uniform convergence implies pointwise convergence → `uniform-implies-pointwise.md`
+- Uniform limit of continuous functions is continuous → `uniform-limit-of-continuous-is-continuous.md`
+- Power series are analytic on disk of convergence → `power-series-analytic.md`
 
 ---
 
@@ -432,47 +432,47 @@ Multivariable differentiation and integration.
 *Depends on:* `shared-linear-algebra`, `analysis-differentiation-1d`, `analysis-riemann-integration`
 
 **Definitions:**
-- Partial derivative
-- Mixed partial derivative
-- Directional derivative
-- Gradient
-- Jacobian matrix
-- Jacobian determinant
-- Hessian matrix
-- Total derivative (Fréchet derivative)
-- Differentiable map (ℝ^k → ℝ^m)
-- Class C^k map
-- Diffeomorphism
-- Implicitly defined function
-- Regular point / critical point
-- Regular value / critical value
-- Multiple integral over a rectangle
-- Iterated integral
-- Change of variables
-- Constraint set
-- Lagrange multiplier condition
+- Partial derivative → `partial-derivative.md`
+- Mixed partial derivative → `mixed-partial-derivative.md`
+- Directional derivative → `directional-derivative.md`
+- Gradient → `gradient.md`
+- Jacobian matrix → `jacobian-matrix.md`
+- Jacobian determinant → `jacobian-determinant.md`
+- Hessian matrix → `hessian-matrix.md`
+- Total derivative (Fréchet derivative) → `total-derivative.md`
+- Differentiable map (ℝ^k → ℝ^m) → `differentiable-map.md`
+- Class C^k map → `smooth-map.md`
+- Diffeomorphism → `diffeomorphism.md`
+- Implicitly defined function → `implicit-function.md`
+- Regular point / critical point → `regular-point.md`
+- Regular value / critical value → `critical-value.md`
+- Multiple integral over a rectangle → `multiple-integral.md`
+- Iterated integral → `iterated-integral.md`
+- Change of variables → `change-of-variables.md`
+- Constraint set → `constraint-set.md`
+- Lagrange multiplier condition → `lagrange-multiplier.md`
 
 **Theorems:**
-- Differentiability implies continuity (multivariable)
-- Chain rule (multivariable)
-- Mean value inequality
-- C^1 implies differentiable
-- Schwarz (Clairaut) theorem
-- Taylor's theorem (several variables)
-- Inverse function theorem (ℝ^k)
-- Implicit function theorem
-- Fubini theorem (Riemann)
-- Change of variables formula
-- Lagrange multipliers theorem
+- Differentiability implies continuity (multivariable) → `differentiability-implies-continuity-multivariable.md`
+- Chain rule (multivariable) → `chain-rule-multivariable.md`
+- Mean value inequality → `mean-value-inequality.md`
+- C^1 implies differentiable → `c1-implies-differentiable.md`
+- Schwarz (Clairaut) theorem → `schwarz-theorem.md`
+- Taylor's theorem (several variables) → `taylors-theorem-multivariable.md`
+- Inverse function theorem (ℝ^k) → `inverse-function-theorem.md`
+- Implicit function theorem → `implicit-function-theorem.md`
+- Fubini theorem (Riemann) → `fubini-theorem.md`
+- Change of variables formula → `change-of-variables-formula.md`
+- Lagrange multipliers theorem → `lagrange-multipliers-theorem.md`
 
 **Lemmas:**
-- Mean value estimate lemma
-- Determinant nonvanishing implies local invertibility
+- Mean value estimate lemma → `mean-value-estimate-lemma.md`
+- Determinant nonvanishing implies local invertibility → `determinant-local-invertibility.md`
 
 **Corollaries:**
-- Equality of mixed partials under C^2
-- Local diffeomorphism corollary
-- Implicit function parameterization corollary
+- Equality of mixed partials under C^2 → `mixed-partials-equality.md`
+- Local diffeomorphism corollary → `local-diffeomorphism-corollary.md`
+- Implicit function parameterization corollary → `implicit-parameterization-corollary.md`
 
 ---
 
@@ -484,148 +484,148 @@ Group theory through Sylow theorems and structure.
 *Depends on:* `shared-foundations`
 
 **Definitions:**
-- Semigroup
-- Monoid
-- Group
-- Abelian group
-- Subgroup
-- Trivial subgroup
-- Proper subgroup
-- Cyclic subgroup
-- Generated subgroup
-- Normal subgroup
-- Characteristic subgroup
-- Simple group
-- Solvable group
-- Nilpotent group
-- Perfect group
-- Center of a group
-- Centralizer
-- Normalizer
-- Conjugate element
-- Conjugacy class
-- Class function
-- Commutator of elements
-- Commutator subgroup (derived subgroup)
-- Derived series
-- Lower central series
-- Upper central series
-- p-group
-- Sylow p-subgroup
-- Hall subgroup
-- Composition series (group)
-- Subnormal series
-- Chief series
-- Group homomorphism
-- Group monomorphism
-- Group epimorphism
-- Group isomorphism
-- Kernel (group homomorphism)
-- Image (group homomorphism)
-- Coset (left/right)
-- Index of a subgroup
-- Quotient group
-- Direct product of groups
-- Direct sum of groups
-- Internal direct product
-- Semidirect product
-- Internal semidirect product
-- Group action
-- Orbit
-- Stabilizer
-- Fixed-point set
-- Kernel of an action
-- Faithful action
-- Free action
-- Transitive action
-- Regular action
-- Permutation representation
-- Conjugation action
-- Automorphism group
-- Inner automorphism
-- Outer automorphism group
-- Group presentation
-- Generating set
-- Free group
-- Normal closure
-- Group extension
-- Split extension
-- Central extension
-- Exact sequence of groups
+- Semigroup → `semigroup.md`
+- Monoid → `monoid.md`
+- Group → `group.md`
+- Abelian group → `abelian-group.md`
+- Subgroup → `subgroup.md`
+- Trivial subgroup → `trivial-subgroup.md`
+- Proper subgroup → `proper-subgroup.md`
+- Cyclic subgroup → `cyclic-subgroup.md`
+- Generated subgroup → `generated-subgroup.md`
+- Normal subgroup → `normal-subgroup.md`
+- Characteristic subgroup → `characteristic-subgroup.md`
+- Simple group → `simple-group.md`
+- Solvable group → `solvable-group.md`
+- Nilpotent group → `nilpotent-group.md`
+- Perfect group → `perfect-group.md`
+- Center of a group → `center-of-group.md`
+- Centralizer → `centralizer.md`
+- Normalizer → `normalizer.md`
+- Conjugate element → `conjugate-element.md`
+- Conjugacy class → `conjugacy-class.md`
+- Class function → `class-function.md`
+- Commutator of elements → `commutator.md`
+- Commutator subgroup (derived subgroup) → `commutator-subgroup.md`
+- Derived series → `derived-series.md`
+- Lower central series → `lower-central-series.md`
+- Upper central series → `upper-central-series.md`
+- p-group → `p-group.md`
+- Sylow p-subgroup → `sylow-subgroup.md`
+- Hall subgroup → `hall-subgroup.md`
+- Composition series (group) → `composition-series-group.md`
+- Subnormal series → `subnormal-series.md`
+- Chief series → `chief-series.md`
+- Group homomorphism → `group-homomorphism.md`
+- Group monomorphism → `group-monomorphism.md`
+- Group epimorphism → `group-epimorphism.md`
+- Group isomorphism → `group-isomorphism.md`
+- Kernel (group homomorphism) → `kernel-group.md`
+- Image (group homomorphism) → `image-group.md`
+- Coset (left/right) → `coset.md`
+- Index of a subgroup → `index-of-subgroup.md`
+- Quotient group → `quotient-group.md`
+- Direct product of groups → `direct-product-groups.md`
+- Direct sum of groups → `direct-sum-groups.md`
+- Internal direct product → `internal-direct-product.md`
+- Semidirect product → `semidirect-product.md`
+- Internal semidirect product → `internal-semidirect-product.md`
+- Group action → `group-action.md`
+- Orbit → `orbit.md`
+- Stabilizer → `stabilizer.md`
+- Fixed-point set → `fixed-point-set.md`
+- Kernel of an action → `kernel-of-action.md`
+- Faithful action → `faithful-action.md`
+- Free action → `free-action.md`
+- Transitive action → `transitive-action.md`
+- Regular action → `regular-action.md`
+- Permutation representation → `permutation-representation.md`
+- Conjugation action → `conjugation-action.md`
+- Automorphism group → `automorphism-group.md`
+- Inner automorphism → `inner-automorphism.md`
+- Outer automorphism group → `outer-automorphism-group.md`
+- Group presentation → `group-presentation.md`
+- Generating set → `generating-set.md`
+- Free group → `free-group.md`
+- Normal closure → `normal-closure.md`
+- Group extension → `group-extension.md`
+- Split extension → `split-extension.md`
+- Central extension → `central-extension.md`
+- Exact sequence of groups → `exact-sequence-groups.md`
 
 **Axioms:**
-- Group axioms
+- Group axioms → `group-axioms.md`
 
 **Theorems:**
-- First isomorphism theorem (groups)
-- Second isomorphism theorem (groups)
-- Third isomorphism theorem (groups)
-- Correspondence theorem (groups)
-- Cayley's theorem
-- Lagrange's theorem
-- Cauchy's theorem (finite groups)
-- Orbit–stabilizer theorem
-- Class equation
-- Burnside's lemma
-- Sylow's first theorem
-- Sylow's second theorem
-- Sylow's third theorem
-- Jordan–Hölder theorem (groups)
-- Schreier refinement theorem
-- Fundamental theorem of finitely generated abelian groups
-- Nielsen–Schreier theorem
-- Schur–Zassenhaus theorem
-- Burnside's p^a q^b theorem
-- Krull–Remak–Schmidt theorem (groups)
+- First isomorphism theorem (groups) → `first-isomorphism-theorem-groups.md`
+- Second isomorphism theorem (groups) → `second-isomorphism-theorem-groups.md`
+- Third isomorphism theorem (groups) → `third-isomorphism-theorem-groups.md`
+- Correspondence theorem (groups) → `correspondence-theorem-groups.md`
+- Cayley's theorem → `cayleys-theorem.md`
+- Lagrange's theorem → `lagranges-theorem.md`
+- Cauchy's theorem (finite groups) → `cauchys-theorem-groups.md`
+- Orbit–stabilizer theorem → `orbit-stabilizer-theorem.md`
+- Class equation → `class-equation.md`
+- Burnside's lemma → `burnsides-lemma.md`
+- Sylow's first theorem → `sylows-first-theorem.md`
+- Sylow's second theorem → `sylows-second-theorem.md`
+- Sylow's third theorem → `sylows-third-theorem.md`
+- Jordan–Hölder theorem (groups) → `jordan-holder-theorem-groups.md`
+- Schreier refinement theorem → `schreier-refinement-theorem.md`
+- Fundamental theorem of finitely generated abelian groups → `fundamental-theorem-fg-abelian-groups.md`
+- Nielsen–Schreier theorem → `nielsen-schreier-theorem.md`
+- Schur–Zassenhaus theorem → `schur-zassenhaus-theorem.md`
+- Burnside's p^a q^b theorem → `burnsides-pq-theorem.md`
+- Krull–Remak–Schmidt theorem (groups) → `krull-remak-schmidt-theorem-groups.md`
 
 **Lemmas:**
-- Subgroup test (one-step)
-- Subgroup test (two-step)
-- Normal subgroup criterion
-- Subgroup of index 2 is normal
-- p-group has nontrivial center
-- Orbit decomposition lemma
-- Conjugacy class size lemma
-- Sylow conjugacy lemma
-- Frattini argument
-- Schreier's lemma
-- Cosets partition a group
-- Universal property of quotient groups
-- Kernels are normal subgroups
+- Subgroup test (one-step) → `subgroup-test-one-step.md`
+- Subgroup test (two-step) → `subgroup-test-two-step.md`
+- Normal subgroup criterion → `normal-subgroup-criterion.md`
+- Subgroup of index 2 is normal → `index-2-normal.md`
+- p-group has nontrivial center → `p-group-nontrivial-center.md`
+- Orbit decomposition lemma → `orbit-decomposition-lemma.md`
+- Conjugacy class size lemma → `conjugacy-class-size-lemma.md`
+- Sylow conjugacy lemma → `sylow-conjugacy-lemma.md`
+- Frattini argument → `frattini-argument.md`
+- Schreier's lemma → `schreiers-lemma.md`
+- Cosets partition a group → `cosets-partition.md`
+- Universal property of quotient groups → `quotient-group-universal-property.md`
+- Kernels are normal subgroups → `kernels-are-normal.md`
 
 **Propositions:**
-- Uniqueness of identity
-- Uniqueness of inverses
-- Cancellation laws
-- Subgroups closed under inverses and products
-- Intersection of subgroups is a subgroup
-- Product of normal subgroups is normal
-- Center is characteristic
-- Kernel is normal
-- Image is a subgroup
-- G/ker(f) ≅ im(f)
-- Conjugation preserves order
-- Subgroups of cyclic groups are cyclic
-- Finite cyclic group ≅ ℤ/nℤ
-- Aut(cyclic of order n) ≅ (ℤ/nℤ)×
-- Group acts on itself by left multiplication
-- Group acts on itself by conjugation
-- Class equation decomposition
-- |G| prime implies G cyclic
-- |G| = p² implies G abelian
-- Abelian implies all subgroups normal
-- Finite p-group has subgroups of every order p^k
-- n_p = 1 implies Sylow p-subgroup is normal
-- Semidirect product from splitting exact sequence
+- Uniqueness of identity → `uniqueness-of-identity-group.md`
+- Uniqueness of inverses → `uniqueness-of-inverses-group.md`
+- Cancellation laws → `cancellation-laws-group.md`
+- Subgroups closed under inverses and products → `subgroups-closed.md`
+- Intersection of subgroups is a subgroup → `intersection-of-subgroups.md`
+- Product of normal subgroups is normal → `product-of-normal-subgroups.md`
+- Center is characteristic → `center-is-characteristic.md`
+- Kernel is normal → `kernel-is-normal.md`
+- Image is a subgroup → `image-is-subgroup.md`
+- G/ker(f) ≅ im(f) → `first-isomorphism-consequence-groups.md`
+- Conjugation preserves order → `conjugation-preserves-order.md`
+- Subgroups of cyclic groups are cyclic → `subgroups-of-cyclic-are-cyclic.md`
+- Finite cyclic group ≅ ℤ/nℤ → `finite-cyclic-isomorphic-zn.md`
+- Aut(cyclic of order n) ≅ (ℤ/nℤ)× → `automorphism-group-cyclic.md`
+- Group acts on itself by left multiplication → `left-multiplication-action.md`
+- Group acts on itself by conjugation → `conjugation-action-self.md`
+- Class equation decomposition → `class-equation-decomposition.md`
+- |G| prime implies G cyclic → `prime-order-cyclic.md`
+- |G| = p² implies G abelian → `p-squared-abelian.md`
+- Abelian implies all subgroups normal → `abelian-all-subgroups-normal.md`
+- Finite p-group has subgroups of every order p^k → `p-group-subgroups-all-orders.md`
+- n_p = 1 implies Sylow p-subgroup is normal → `sylow-normal-criterion.md`
+- Semidirect product from splitting exact sequence → `semidirect-product-splitting.md`
 
 **Corollaries:**
-- Fermat's little theorem
-- Euler's theorem
-- Order of element divides order of group
-- Finite p-group has nontrivial center
-- n_p ≡ 1 mod p
-- Classification of finite abelian groups
-- Jordan–Hölder uniqueness
+- Fermat's little theorem → `fermats-little-theorem.md`
+- Euler's theorem → `eulers-theorem.md`
+- Order of element divides order of group → `order-divides-group-order.md`
+- Finite p-group has nontrivial center → `p-group-nontrivial-center-corollary.md`
+- n_p ≡ 1 mod p → `sylow-congruence.md`
+- Classification of finite abelian groups → `classification-finite-abelian-groups.md`
+- Jordan–Hölder uniqueness → `jordan-holder-uniqueness.md`
 
 ---
 
@@ -635,124 +635,124 @@ Ring theory and ideal structure.
 *Depends on:* `shared-foundations`, `algebra-groups` (abelian groups)
 
 **Definitions:**
-- Ring
-- Ring with identity (unital ring)
-- Commutative ring
-- Subring
-- Ring homomorphism
-- Ring monomorphism
-- Ring epimorphism
-- Ring isomorphism
-- Kernel (ring homomorphism)
-- Image (ring homomorphism)
-- Ideal (left/right)
-- Two-sided ideal
-- Principal ideal
-- Ideal generated by a subset
-- Sum of ideals
-- Product of ideals
-- Intersection of ideals
-- Quotient ring
-- Unit (invertible element)
-- Group of units
-- Zero divisor
-- Regular element
-- Nilpotent element
-- Idempotent element
-- Reduced ring
-- Nil ideal
-- Nilradical
-- Jacobson radical
-- Annihilator ideal
-- Prime ideal
-- Maximal ideal
-- Radical of an ideal
-- Primary ideal
-- Integral domain
-- Field
-- Division ring (skew field)
-- Prime ring
-- Simple ring
-- Semiprime ideal
-- Semisimple ring
-- Artinian semisimple ring
-- Center of a ring
-- Opposite ring
-- Matrix ring
-- Characteristic of a ring/field
-- Polynomial ring
-- Laurent polynomial ring
-- Formal power series ring
-- Content of a polynomial
-- Primitive polynomial
-- Irreducible polynomial
-- Minimal polynomial (over a field)
-- Euclidean domain
-- Principal ideal domain (PID)
-- Unique factorization domain (UFD)
-- Prime element
-- Irreducible element
-- Associated elements
-- Greatest common divisor
-- Least common multiple
-- Fraction field
-- Total ring of fractions
+- Ring → `ring.md`
+- Ring with identity (unital ring) → `unital-ring.md`
+- Commutative ring → `commutative-ring.md`
+- Subring → `subring.md`
+- Ring homomorphism → `ring-homomorphism.md`
+- Ring monomorphism → `ring-monomorphism.md`
+- Ring epimorphism → `ring-epimorphism.md`
+- Ring isomorphism → `ring-isomorphism.md`
+- Kernel (ring homomorphism) → `kernel-ring.md`
+- Image (ring homomorphism) → `image-ring.md`
+- Ideal (left/right) → `ideal.md`
+- Two-sided ideal → `two-sided-ideal.md`
+- Principal ideal → `principal-ideal.md`
+- Ideal generated by a subset → `ideal-generated.md`
+- Sum of ideals → `sum-of-ideals.md`
+- Product of ideals → `product-of-ideals.md`
+- Intersection of ideals → `intersection-of-ideals.md`
+- Quotient ring → `quotient-ring.md`
+- Unit (invertible element) → `unit.md`
+- Group of units → `group-of-units.md`
+- Zero divisor → `zero-divisor.md`
+- Regular element → `regular-element.md`
+- Nilpotent element → `nilpotent-element.md`
+- Idempotent element → `idempotent-element.md`
+- Reduced ring → `reduced-ring.md`
+- Nil ideal → `nil-ideal.md`
+- Nilradical → `nilradical.md`
+- Jacobson radical → `jacobson-radical.md`
+- Annihilator ideal → `annihilator-ideal.md`
+- Prime ideal → `prime-ideal.md`
+- Maximal ideal → `maximal-ideal.md`
+- Radical of an ideal → `radical-of-ideal.md`
+- Primary ideal → `primary-ideal.md`
+- Integral domain → `integral-domain.md`
+- Field → `field.md`
+- Division ring (skew field) → `division-ring.md`
+- Prime ring → `prime-ring.md`
+- Simple ring → `simple-ring.md`
+- Semiprime ideal → `semiprime-ideal.md`
+- Semisimple ring → `semisimple-ring.md`
+- Artinian semisimple ring → `artinian-semisimple-ring.md`
+- Center of a ring → `center-of-ring.md`
+- Opposite ring → `opposite-ring.md`
+- Matrix ring → `matrix-ring.md`
+- Characteristic of a ring/field → `characteristic.md`
+- Polynomial ring → `polynomial-ring.md`
+- Laurent polynomial ring → `laurent-polynomial-ring.md`
+- Formal power series ring → `formal-power-series-ring.md`
+- Content of a polynomial → `content-polynomial.md`
+- Primitive polynomial → `primitive-polynomial.md`
+- Irreducible polynomial → `irreducible-polynomial.md`
+- Minimal polynomial (over a field) → `minimal-polynomial-field.md`
+- Euclidean domain → `euclidean-domain.md`
+- Principal ideal domain (PID) → `pid.md`
+- Unique factorization domain (UFD) → `ufd.md`
+- Prime element → `prime-element.md`
+- Irreducible element → `irreducible-element.md`
+- Associated elements → `associated-elements.md`
+- Greatest common divisor → `gcd.md`
+- Least common multiple → `lcm.md`
+- Fraction field → `fraction-field.md`
+- Total ring of fractions → `total-ring-of-fractions.md`
 
 **Axioms:**
-- Ring axioms
-- Unital ring axiom
-- Commutative ring axiom
-- Field axioms
+- Ring axioms → `ring-axioms.md`
+- Unital ring axiom → `unital-ring-axiom.md`
+- Commutative ring axiom → `commutative-ring-axiom.md`
+- Field axioms → `field-axioms-algebra.md`
 
 **Theorems:**
-- First isomorphism theorem (rings)
-- Second isomorphism theorem (rings)
-- Third isomorphism theorem (rings)
-- Correspondence theorem (rings)
-- Chinese remainder theorem
-- Existence of maximal ideals (Zorn)
-- Wedderburn's little theorem
-- Artin–Wedderburn theorem
-- Hilbert basis theorem
-- Hilbert's Nullstellensatz (weak)
-- Hilbert's Nullstellensatz (strong)
-- Gauss's lemma (content)
-- Eisenstein's criterion
-- Unique factorization theorem
-- Euclidean domain ⇒ PID
-- PID ⇒ UFD
-- Gauss's theorem (UFD ⇒ polynomial ring is UFD)
+- First isomorphism theorem (rings) → `first-isomorphism-theorem-rings.md`
+- Second isomorphism theorem (rings) → `second-isomorphism-theorem-rings.md`
+- Third isomorphism theorem (rings) → `third-isomorphism-theorem-rings.md`
+- Correspondence theorem (rings) → `correspondence-theorem-rings.md`
+- Chinese remainder theorem → `chinese-remainder-theorem.md`
+- Existence of maximal ideals (Zorn) → `existence-of-maximal-ideals.md`
+- Wedderburn's little theorem → `wedderburns-little-theorem.md`
+- Artin–Wedderburn theorem → `artin-wedderburn-theorem.md`
+- Hilbert basis theorem → `hilbert-basis-theorem.md`
+- Hilbert's Nullstellensatz (weak) → `nullstellensatz-weak.md`
+- Hilbert's Nullstellensatz (strong) → `nullstellensatz-strong.md`
+- Gauss's lemma (content) → `gauss-lemma.md`
+- Eisenstein's criterion → `eisensteins-criterion.md`
+- Unique factorization theorem → `unique-factorization-theorem.md`
+- Euclidean domain ⇒ PID → `euclidean-implies-pid.md`
+- PID ⇒ UFD → `pid-implies-ufd.md`
+- Gauss's theorem (UFD ⇒ polynomial ring is UFD) → `ufd-polynomial-ring.md`
 
 **Lemmas:**
-- Gauss lemma (content multiplicativity)
-- Maximal ideals are prime
-- Fields are exactly commutative division rings
-- Maximal ideal iff quotient is field
-- Prime ideal iff quotient is integral domain
-- Universal property of quotient rings
-- Kernels are two-sided ideals
+- Gauss lemma (content multiplicativity) → `gauss-content-lemma.md`
+- Maximal ideals are prime → `maximal-ideals-are-prime.md`
+- Fields are exactly commutative division rings → `fields-are-division-rings.md`
+- Maximal ideal iff quotient is field → `maximal-iff-quotient-field.md`
+- Prime ideal iff quotient is integral domain → `prime-iff-quotient-domain.md`
+- Universal property of quotient rings → `quotient-ring-universal-property.md`
+- Kernels are two-sided ideals → `kernels-are-ideals.md`
 
 **Propositions:**
-- Ring homomorphisms preserve 0, 1, +, ×
-- Kernel is an ideal
-- Image is a subring
-- Ideal correspondence (ideals containing I ↔ ideals of R/I)
-- Units map to units
-- Commutative ring is field iff only ideals are (0) and (1)
-- Cancellation in integral domains
-- Characteristic of integral domain is 0 or prime
-- UFD implies GCDs exist
-- Euclidean algorithm yields gcd and Bézout identity
-- Content formula
-- Nilradical = intersection of prime ideals
-- Idempotents ↔ product decompositions
-- Chinese remainder decomposition (comaximal ideals)
+- Ring homomorphisms preserve 0, 1, +, × → `ring-homomorphism-properties.md`
+- Kernel is an ideal → `kernel-is-ideal.md`
+- Image is a subring → `image-is-subring.md`
+- Ideal correspondence (ideals containing I ↔ ideals of R/I) → `ideal-correspondence.md`
+- Units map to units → `units-map-to-units.md`
+- Commutative ring is field iff only ideals are (0) and (1) → `field-iff-trivial-ideals.md`
+- Cancellation in integral domains → `cancellation-integral-domain.md`
+- Characteristic of integral domain is 0 or prime → `characteristic-zero-or-prime.md`
+- UFD implies GCDs exist → `ufd-implies-gcd-exists.md`
+- Euclidean algorithm yields gcd and Bézout identity → `euclidean-algorithm.md`
+- Content formula → `content-formula.md`
+- Nilradical = intersection of prime ideals → `nilradical-intersection-primes.md`
+- Idempotents ↔ product decompositions → `idempotent-product-decomposition.md`
+- Chinese remainder decomposition (comaximal ideals) → `chinese-remainder-decomposition.md`
 
 **Corollaries:**
-- Every nontrivial commutative ring with 1 has a maximal ideal
-- Every field has prime subfield ≅ ℚ or 𝔽_p
-- Every finite integral domain is a field
-- Every finite division ring is commutative (Wedderburn)
+- Every nontrivial commutative ring with 1 has a maximal ideal → `maximal-ideal-existence-corollary.md`
+- Every field has prime subfield ≅ ℚ or 𝔽_p → `prime-subfield.md`
+- Every finite integral domain is a field → `finite-integral-domain-is-field.md`
+- Every finite division ring is commutative (Wedderburn) → `finite-division-ring-commutative.md`
 
 ---
 
@@ -762,100 +762,100 @@ Module theory over rings.
 *Depends on:* `algebra-rings`, `shared-linear-algebra`
 
 **Definitions:**
-- Module (left/right)
-- Bimodule
-- Submodule
-- Quotient module
-- Module homomorphism
-- Kernel (module homomorphism)
-- Image (module homomorphism)
-- Cokernel (module)
-- Exact sequence of modules
-- Short exact sequence
-- Split exact sequence
-- Direct sum of modules
-- Direct product of modules
-- Cyclic module
-- Finitely generated module
-- Free module
-- Basis (of a free module)
-- Rank (of a free module)
-- Torsion element
-- Torsion module
-- Torsion-free module
-- Annihilator of an element
-- Annihilator of a module
-- Simple module
-- Semisimple module
-- Composition series (module)
-- Length (Jordan–Hölder length)
-- Noetherian module
-- Artinian module
-- Projective module
-- Injective module
-- Flat module
-- Tensor product of modules
-- Bilinear map
-- Universal property of tensor product
-- Hom module
-- Dual module
-- Tensor–Hom adjunction data
-- Algebra over a commutative ring
-- Algebra homomorphism
-- Tensor product of algebras
-- Graded ring
-- Graded module
-- Filtered ring
-- Associated graded ring
+- Module (left/right) → `module.md`
+- Bimodule → `bimodule.md`
+- Submodule → `submodule.md`
+- Quotient module → `quotient-module.md`
+- Module homomorphism → `module-homomorphism.md`
+- Kernel (module homomorphism) → `kernel-module.md`
+- Image (module homomorphism) → `image-module.md`
+- Cokernel (module) → `cokernel-module.md`
+- Exact sequence of modules → `exact-sequence-modules.md`
+- Short exact sequence → `short-exact-sequence.md`
+- Split exact sequence → `split-exact-sequence.md`
+- Direct sum of modules → `direct-sum-modules.md`
+- Direct product of modules → `direct-product-modules.md`
+- Cyclic module → `cyclic-module.md`
+- Finitely generated module → `finitely-generated-module.md`
+- Free module → `free-module.md`
+- Basis (of a free module) → `basis-module.md`
+- Rank (of a free module) → `rank-module.md`
+- Torsion element → `torsion-element.md`
+- Torsion module → `torsion-module.md`
+- Torsion-free module → `torsion-free-module.md`
+- Annihilator of an element → `annihilator-element.md`
+- Annihilator of a module → `annihilator-module.md`
+- Simple module → `simple-module.md`
+- Semisimple module → `semisimple-module.md`
+- Composition series (module) → `composition-series-module.md`
+- Length (Jordan–Hölder length) → `length-module.md`
+- Noetherian module → `noetherian-module.md`
+- Artinian module → `artinian-module.md`
+- Projective module → `projective-module.md`
+- Injective module → `injective-module.md`
+- Flat module → `flat-module.md`
+- Tensor product of modules → `tensor-product.md`
+- Bilinear map → `bilinear-map.md`
+- Universal property of tensor product → `tensor-product-universal-property.md`
+- Hom module → `hom-module.md`
+- Dual module → `dual-module.md`
+- Tensor–Hom adjunction data → `tensor-hom-adjunction.md`
+- Algebra over a commutative ring → `algebra-over-ring.md`
+- Algebra homomorphism → `algebra-homomorphism.md`
+- Tensor product of algebras → `tensor-product-algebras.md`
+- Graded ring → `graded-ring.md`
+- Graded module → `graded-module.md`
+- Filtered ring → `filtered-ring.md`
+- Associated graded ring → `associated-graded-ring.md`
 
 **Axioms:**
-- Module axioms
-- Vector space axioms
+- Module axioms → `module-axioms.md`
+- Vector space axioms → `vector-space-axioms.md`
 
 **Theorems:**
-- First isomorphism theorem (modules)
-- Second isomorphism theorem (modules)
-- Third isomorphism theorem (modules)
-- Correspondence theorem (modules)
-- Structure theorem for f.g. modules over PID
-- Elementary divisor theorem
-- Smith normal form theorem
-- Rational canonical form theorem
-- Jordan canonical form theorem
-- Krull–Schmidt–Azumaya theorem
+- First isomorphism theorem (modules) → `first-isomorphism-theorem-modules.md`
+- Second isomorphism theorem (modules) → `second-isomorphism-theorem-modules.md`
+- Third isomorphism theorem (modules) → `third-isomorphism-theorem-modules.md`
+- Correspondence theorem (modules) → `correspondence-theorem-modules.md`
+- Structure theorem for f.g. modules over PID → `structure-theorem-pid.md`
+- Elementary divisor theorem → `elementary-divisor-theorem.md`
+- Smith normal form theorem → `smith-normal-form-theorem.md`
+- Rational canonical form theorem → `rational-canonical-form-theorem.md`
+- Jordan canonical form theorem → `jordan-canonical-form-theorem.md`
+- Krull–Schmidt–Azumaya theorem → `krull-schmidt-azumaya-theorem.md`
 
 **Lemmas:**
-- Splitting lemma
-- Projective iff every s.e.s. ending in it splits
-- Projective is direct summand of free
-- Baer's criterion (injectivity)
-- Tensor product preserves direct sums
-- Tensor–Hom adjunction lemma
-- Universal property of quotient modules
-- Kernels are submodules
+- Splitting lemma → `splitting-lemma.md`
+- Projective iff every s.e.s. ending in it splits → `projective-ses-criterion.md`
+- Projective is direct summand of free → `projective-summand-of-free.md`
+- Baer's criterion (injectivity) → `baers-criterion.md`
+- Tensor product preserves direct sums → `tensor-preserves-direct-sums.md`
+- Tensor–Hom adjunction lemma → `tensor-hom-adjunction-lemma.md`
+- Universal property of quotient modules → `quotient-module-universal-property.md`
+- Kernels are submodules → `kernels-are-submodules.md`
 
 **Propositions:**
-- Submodule criterion
-- Kernel and image are submodules
-- M/ker(f) ≅ im(f)
-- Exactness via kernels and images
-- Direct sum universal property
-- Free module universal property
-- Tensor product universal property
-- Tensor commutes with direct limits/sums
-- Hom turns sums into products
-- Projective ⇒ flat
-- f.g. projective are locally free
-- Semisimple ⇔ every submodule is direct summand
-- Artinian + Noetherian ⇒ finite length
+- Submodule criterion → `submodule-criterion.md`
+- Kernel and image are submodules → `kernel-image-submodules.md`
+- M/ker(f) ≅ im(f) → `first-isomorphism-consequence-modules.md`
+- Exactness via kernels and images → `exactness-via-kernels-images.md`
+- Direct sum universal property → `direct-sum-universal-property.md`
+- Free module universal property → `free-module-universal-property.md`
+- Tensor product universal property → `tensor-product-universal-property-prop.md`
+- Tensor commutes with direct limits/sums → `tensor-commutes-with-sums.md`
+- Hom turns sums into products → `hom-sums-to-products.md`
+- Projective ⇒ flat → `projective-implies-flat.md`
+- f.g. projective are locally free → `fg-projective-locally-free.md`
+- Semisimple ⇔ every submodule is direct summand → `semisimple-direct-summand.md`
+- Artinian + Noetherian ⇒ finite length → `artinian-noetherian-finite-length.md`
 
 **Corollaries:**
-- f.g. torsion-free over PID is free
-- Classification of f.g. abelian groups
-- Rational canonical form from structure theorem
-- Jordan canonical form from RCF
-- Smith normal form invariants
-- Chinese remainder for modules
+- f.g. torsion-free over PID is free → `fg-torsion-free-pid-free.md`
+- Classification of f.g. abelian groups → `classification-fg-abelian-groups.md`
+- Rational canonical form from structure theorem → `rcf-from-structure-theorem.md`
+- Jordan canonical form from RCF → `jcf-from-rcf.md`
+- Smith normal form invariants → `smith-normal-form-invariants.md`
+- Chinese remainder for modules → `chinese-remainder-modules.md`
 
 ---
 
@@ -865,70 +865,70 @@ Field extensions and Galois theory.
 *Depends on:* `algebra-rings`, `algebra-groups`
 
 **Definitions:**
-- Field extension
-- Intermediate field
-- Degree of a field extension
-- Simple field extension
-- Tower of fields
-- Algebraic element
-- Transcendental element
-- Algebraic extension
-- Transcendental extension
-- Finitely generated field extension
-- Splitting field
-- Algebraic closure
-- Normal extension
-- Separable element
-- Separable extension
-- Inseparable extension
-- Perfect field
-- Galois extension
-- Galois group
-- Fixed field
-- Field embedding
-- Field automorphism
-- Trace (field extension)
-- Norm (field extension)
-- Discriminant (field extension)
-- Finite field
-- Frobenius endomorphism
-- Cyclotomic polynomial
-- Primitive root of unity
-- Cyclotomic extension
+- Field extension → `field-extension.md`
+- Intermediate field → `intermediate-field.md`
+- Degree of a field extension → `degree-of-extension.md`
+- Simple field extension → `simple-extension.md`
+- Tower of fields → `tower-of-fields.md`
+- Algebraic element → `algebraic-element.md`
+- Transcendental element → `transcendental-element.md`
+- Algebraic extension → `algebraic-extension.md`
+- Transcendental extension → `transcendental-extension.md`
+- Finitely generated field extension → `fg-field-extension.md`
+- Splitting field → `splitting-field.md`
+- Algebraic closure → `algebraic-closure.md`
+- Normal extension → `normal-extension.md`
+- Separable element → `separable-element.md`
+- Separable extension → `separable-extension.md`
+- Inseparable extension → `inseparable-extension.md`
+- Perfect field → `perfect-field.md`
+- Galois extension → `galois-extension.md`
+- Galois group → `galois-group.md`
+- Fixed field → `fixed-field.md`
+- Field embedding → `field-embedding.md`
+- Field automorphism → `field-automorphism.md`
+- Trace (field extension) → `trace-field.md`
+- Norm (field extension) → `norm-field.md`
+- Discriminant (field extension) → `discriminant-field.md`
+- Finite field → `finite-field.md`
+- Frobenius endomorphism → `frobenius-endomorphism.md`
+- Cyclotomic polynomial → `cyclotomic-polynomial.md`
+- Primitive root of unity → `primitive-root-of-unity.md`
+- Cyclotomic extension → `cyclotomic-extension.md`
 
 **Theorems:**
-- Tower law (degree formula)
-- Existence and uniqueness of splitting fields
-- Existence of algebraic closures
-- Primitive element theorem
-- Fundamental theorem of symmetric polynomials
-- Fundamental theorem of Galois theory
-- Artin's theorem on fixed fields
-- Existence and uniqueness of finite fields
-- Cyclicity of multiplicative group of finite field
-- Galois group of finite field is cyclic (Frobenius)
+- Tower law (degree formula) → `tower-law.md`
+- Existence and uniqueness of splitting fields → `splitting-field-existence-uniqueness.md`
+- Existence of algebraic closures → `algebraic-closure-existence.md`
+- Primitive element theorem → `primitive-element-theorem.md`
+- Fundamental theorem of symmetric polynomials → `fundamental-theorem-symmetric-polynomials.md`
+- Fundamental theorem of Galois theory → `fundamental-theorem-galois-theory.md`
+- Artin's theorem on fixed fields → `artins-theorem-fixed-fields.md`
+- Existence and uniqueness of finite fields → `finite-field-existence-uniqueness.md`
+- Cyclicity of multiplicative group of finite field → `finite-field-multiplicative-group-cyclic.md`
+- Galois group of finite field is cyclic (Frobenius) → `finite-field-galois-group-cyclic.md`
 
 **Lemmas:**
-- Dedekind's independence lemma
-- Separable polynomial has distinct roots
-- Separability preserved under towers
-- Normality = being a splitting field
+- Dedekind's independence lemma → `dedekind-independence-lemma.md`
+- Separable polynomial has distinct roots → `separable-distinct-roots.md`
+- Separability preserved under towers → `separability-towers.md`
+- Normality = being a splitting field → `normality-splitting-field.md`
 
 **Propositions:**
-- Finite extension over perfect field is separable
-- Finite fields are perfect
-- Separable + normal ⇔ Galois
-- Trace/norm in towers
-- Splitting field degree bounds
+- Finite extension over perfect field is separable → `finite-extension-perfect-separable.md`
+- Finite fields are perfect → `finite-fields-perfect.md`
+- Separable + normal ⇔ Galois → `separable-normal-galois.md`
+- Trace/norm in towers → `trace-norm-towers.md`
+- Splitting field degree bounds → `splitting-field-degree-bounds.md`
 
 **Corollaries:**
-- Uniqueness of splitting fields up to K-isomorphism
-- Uniqueness of algebraic closures
-- Galois correspondence (subgroups ↔ intermediate fields)
-- |Gal(L/K)| = [L:K] for Galois extensions
-- Finite field Galois groups are cyclic
-- Existence and uniqueness of 𝔽_{p^n}
-- Multiplicative group of finite field is cyclic
+- Uniqueness of splitting fields up to K-isomorphism → `splitting-field-uniqueness.md`
+- Uniqueness of algebraic closures → `algebraic-closure-uniqueness.md`
+- Galois correspondence (subgroups ↔ intermediate fields) → `galois-correspondence.md`
+- |Gal(L/K)| = [L:K] for Galois extensions → `galois-degree-equals-group-order.md`
+- Finite field Galois groups are cyclic → `finite-field-galois-cyclic.md`
+- Existence and uniqueness of 𝔽_{p^n} → `finite-field-existence.md`
+- Multiplicative group of finite field is cyclic → `finite-field-multiplicative-cyclic.md`
 
 ---
 
@@ -938,60 +938,60 @@ Commutative algebra: localization, Noetherian rings, primary decomposition.
 *Depends on:* `algebra-rings`, `algebra-modules`
 
 **Definitions:**
-- Localization of a ring
-- Multiplicative set
-- Localization at a prime ideal
-- Local ring
-- Maximal ideal of a local ring
-- Residue field
-- Localization of a module
-- Extension of scalars
-- Restriction of scalars
-- Prime spectrum (Spec R)
-- Maximal spectrum (MaxSpec R)
-- Zariski topology
-- Krull dimension
-- Height of a prime ideal
-- Integral element (over a subring)
-- Integral extension
-- Integral closure
-- Integrally closed domain
-- Primary decomposition (ideal-theoretic)
-- Noetherian ring (ACC on ideals)
-- Artinian ring (DCC on ideals)
-- Dedekind domain
-- Discrete valuation ring (DVR)
+- Localization of a ring → `localization-ring.md`
+- Multiplicative set → `multiplicative-set.md`
+- Localization at a prime ideal → `localization-at-prime.md`
+- Local ring → `local-ring.md`
+- Maximal ideal of a local ring → `maximal-ideal-local-ring.md`
+- Residue field → `residue-field.md`
+- Localization of a module → `localization-module.md`
+- Extension of scalars → `extension-of-scalars.md`
+- Restriction of scalars → `restriction-of-scalars.md`
+- Prime spectrum (Spec R) → `prime-spectrum.md`
+- Maximal spectrum (MaxSpec R) → `maximal-spectrum.md`
+- Zariski topology → `zariski-topology.md`
+- Krull dimension → `krull-dimension.md`
+- Height of a prime ideal → `height-of-prime.md`
+- Integral element (over a subring) → `integral-element.md`
+- Integral extension → `integral-extension.md`
+- Integral closure → `integral-closure.md`
+- Integrally closed domain → `integrally-closed-domain.md`
+- Primary decomposition (ideal-theoretic) → `primary-decomposition.md`
+- Noetherian ring (ACC on ideals) → `noetherian-ring.md`
+- Artinian ring (DCC on ideals) → `artinian-ring.md`
+- Dedekind domain → `dedekind-domain.md`
+- Discrete valuation ring (DVR) → `dvr.md`
 
 **Theorems:**
-- Correspondence of primes under localization
-- Krull's principal ideal theorem
-- Lasker–Noether primary decomposition theorem
-- Going-up theorem
-- Lying-over theorem
-- Going-down theorem
-- Nullstellensatz (ideal–variety correspondence)
+- Correspondence of primes under localization → `localization-prime-correspondence.md`
+- Krull's principal ideal theorem → `krull-principal-ideal-theorem.md`
+- Lasker–Noether primary decomposition theorem → `lasker-noether-theorem.md`
+- Going-up theorem → `going-up-theorem.md`
+- Lying-over theorem → `lying-over-theorem.md`
+- Going-down theorem → `going-down-theorem.md`
+- Nullstellensatz (ideal–variety correspondence) → `nullstellensatz-variety-correspondence.md`
 
 **Lemmas:**
-- Localization inverts precisely the multiplicative set
-- Nakayama lemma
-- Prime avoidance lemma
-- Noether normalization lemma
-- Jacobson radical = intersection of maximal ideals
+- Localization inverts precisely the multiplicative set → `localization-inverts-multiplicative-set.md`
+- Nakayama lemma → `nakayama-lemma.md`
+- Prime avoidance lemma → `prime-avoidance-lemma.md`
+- Noether normalization lemma → `noether-normalization-lemma.md`
+- Jacobson radical = intersection of maximal ideals → `jacobson-radical-intersection-maximals.md`
 
 **Propositions:**
-- Localization is exact (flatness)
-- Localization of Noetherian is Noetherian
-- Localization preserves primality/maximality
-- Jacobson radical annihilates simple modules
-- Simple Artinian = matrix ring over division ring
-- Semisimple Artinian = product of matrix rings
+- Localization is exact (flatness) → `localization-exact.md`
+- Localization of Noetherian is Noetherian → `localization-noetherian.md`
+- Localization preserves primality/maximality → `localization-preserves-primality.md`
+- Jacobson radical annihilates simple modules → `jacobson-annihilates-simples.md`
+- Simple Artinian = matrix ring over division ring → `simple-artinian-matrix-ring.md`
+- Semisimple Artinian = product of matrix rings → `semisimple-artinian-product.md`
 
 **Corollaries:**
-- Every ideal in Noetherian ring has primary decomposition
-- Hilbert basis theorem corollary (k[x₁,...,x_n] Noetherian)
-- Nullstellensatz corollary (radical ideals ↔ affine algebraic sets)
-- Localization corollary (localizations of Noetherian are Noetherian)
-- Nakayama corollary (M f.g., IM = M, I ⊆ Jac(R) ⇒ M = 0)
+- Every ideal in Noetherian ring has primary decomposition → `noetherian-primary-decomposition.md`
+- Hilbert basis theorem corollary (k[x₁,...,x_n] Noetherian) → `hilbert-basis-corollary.md`
+- Nullstellensatz corollary (radical ideals ↔ affine algebraic sets) → `nullstellensatz-corollary.md`
+- Localization corollary (localizations of Noetherian are Noetherian) → `localization-noetherian-corollary.md`
+- Nakayama corollary (M f.g., IM = M, I ⊆ Jac(R) ⇒ M = 0) → `nakayama-corollary.md`
 
 ---
 
@@ -1001,44 +1001,44 @@ Homological algebra: chain complexes, derived functors.
 *Depends on:* `algebra-modules`, `algebra-category-theory`
 
 **Definitions:**
-- Chain complex
-- Cochain complex
-- Chain map
-- Homotopy of chain maps
-- Exact complex
-- Homology module
-- Cohomology module
-- Projective resolution
-- Injective resolution
-- Derived functor
-- Ext^n
-- Tor_n
-- Long exact sequence (of derived functors)
+- Chain complex → `chain-complex.md`
+- Cochain complex → `cochain-complex.md`
+- Chain map → `chain-map.md`
+- Homotopy of chain maps → `chain-homotopy.md`
+- Exact complex → `exact-complex.md`
+- Homology module → `homology-module.md`
+- Cohomology module → `cohomology-module.md`
+- Projective resolution → `projective-resolution.md`
+- Injective resolution → `injective-resolution.md`
+- Derived functor → `derived-functor.md`
+- Ext^n → `ext.md`
+- Tor_n → `tor.md`
+- Long exact sequence (of derived functors) → `long-exact-sequence-derived.md`
 
 **Theorems:**
-- Tensor product is right exact
-- Hom functor is left exact
-- Long exact sequence of Tor
-- Long exact sequence of Ext
+- Tensor product is right exact → `tensor-right-exact.md`
+- Hom functor is left exact → `hom-left-exact.md`
+- Long exact sequence of Tor → `long-exact-sequence-tor.md`
+- Long exact sequence of Ext → `long-exact-sequence-ext.md`
 
 **Lemmas:**
-- Snake lemma
-- Five lemma
-- Four lemma
-- Nine lemma (3×3 lemma)
-- Horseshoe lemma
-- Connecting homomorphism yields long exact sequence
-- Ext and Tor are derived functors of Hom and ⊗
+- Snake lemma → `snake-lemma.md`
+- Five lemma → `five-lemma.md`
+- Four lemma → `four-lemma.md`
+- Nine lemma (3×3 lemma) → `nine-lemma.md`
+- Horseshoe lemma → `horseshoe-lemma.md`
+- Connecting homomorphism yields long exact sequence → `connecting-homomorphism-lemma.md`
+- Ext and Tor are derived functors of Hom and ⊗ → `ext-tor-derived-functors.md`
 
 **Propositions:**
-- Exactness of Hom and ⊗ in short exact sequences
-- Projective resolutions exist
-- Injective resolutions exist
+- Exactness of Hom and ⊗ in short exact sequences → `hom-tensor-exactness.md`
+- Projective resolutions exist → `projective-resolutions-exist.md`
+- Injective resolutions exist → `injective-resolutions-exist.md`
 
 **Corollaries:**
-- Snake lemma corollary (long exact sequence from s.e.s. of chain complexes)
-- Five lemma corollary (isomorphism criterion)
-- Ext^1 classifies extensions
+- Snake lemma corollary (long exact sequence from s.e.s. of chain complexes) → `snake-lemma-corollary.md`
+- Five lemma corollary (isomorphism criterion) → `five-lemma-corollary.md`
+- Ext^1 classifies extensions → `ext1-classifies-extensions.md`
 
 ---
 
@@ -1048,35 +1048,35 @@ Representation theory of finite groups.
 *Depends on:* `algebra-groups`, `algebra-modules`, `shared-linear-algebra`
 
 **Definitions:**
-- (Linear) representation of a group
-- Subrepresentation
-- Irreducible representation
-- Completely reducible representation
-- Group algebra
-- Character of a representation
-- Irreducible character
-- Induced representation
-- Restricted representation
-- Regular representation
+- (Linear) representation of a group → `group-representation.md`
+- Subrepresentation → `subrepresentation.md`
+- Irreducible representation → `irreducible-representation.md`
+- Completely reducible representation → `completely-reducible-representation.md`
+- Group algebra → `group-algebra.md`
+- Character of a representation → `character.md`
+- Irreducible character → `irreducible-character.md`
+- Induced representation → `induced-representation.md`
+- Restricted representation → `restricted-representation.md`
+- Regular representation → `regular-representation.md`
 
 **Theorems:**
-- Maschke's theorem
-- Character orthogonality relations
+- Maschke's theorem → `maschkes-theorem.md`
+- Character orthogonality relations → `character-orthogonality.md`
 
 **Lemmas:**
-- Schur's lemma
+- Schur's lemma → `schurs-lemma.md`
 
 **Propositions:**
-- Character of direct sum = sum of characters
-- Character of tensor product = product of characters
-- Number of irreducibles = number of conjugacy classes
-- Sum of squares of degrees = |G|
+- Character of direct sum = sum of characters → `character-direct-sum.md`
+- Character of tensor product = product of characters → `character-tensor-product.md`
+- Number of irreducibles = number of conjugacy classes → `number-irreducibles-conjugacy-classes.md`
+- Sum of squares of degrees = |G| → `sum-squares-degrees.md`
 
 **Corollaries:**
-- Maschke corollary (group algebra semisimple when char ∤ |G|)
-- Complete reducibility over ℂ
-- Schur corollary (End of irreducible over ℂ is ℂ)
-- Orthogonality corollary (irreducible characters are orthonormal basis)
+- Maschke corollary (group algebra semisimple when char ∤ |G|) → `maschke-corollary.md`
+- Complete reducibility over ℂ → `complete-reducibility-complex.md`
+- Schur corollary (End of irreducible over ℂ is ℂ) → `schur-corollary.md`
+- Orthogonality corollary (irreducible characters are orthonormal basis) → `character-orthonormality.md`
 
 ---
 
@@ -1086,52 +1086,52 @@ Category theory foundations.
 *Depends on:* `shared-foundations`
 
 **Definitions:**
-- Category
-- Object (of a category)
-- Morphism (arrow)
-- Composition (in a category)
-- Identity morphism
-- Isomorphism (in a category)
-- Monomorphism
-- Epimorphism
-- Endomorphism (categorical)
-- Automorphism (categorical)
-- Subcategory
-- Full subcategory
-- Opposite category
-- Functor (covariant)
-- Contravariant functor
-- Natural transformation
-- Natural isomorphism
-- Equivalence of categories
-- Product (categorical)
-- Coproduct
-- Equalizer
-- Coequalizer
-- Pullback (fiber product)
-- Pushout
-- Limit
-- Colimit
-- Representable functor
-- Yoneda embedding
-- Adjoint functors
-- Unit of an adjunction
-- Counit of an adjunction
-- Additive category
-- Kernel (categorical)
-- Cokernel (categorical)
-- Exact sequence (in an additive/abelian category)
-- Abelian category
-- Left exact functor
-- Right exact functor
-- Exact functor
+- Category → `category.md`
+- Object (of a category) → `object.md`
+- Morphism (arrow) → `morphism.md`
+- Composition (in a category) → `composition-category.md`
+- Identity morphism → `identity-morphism.md`
+- Isomorphism (in a category) → `isomorphism-category.md`
+- Monomorphism → `monomorphism-category.md`
+- Epimorphism → `epimorphism-category.md`
+- Endomorphism (categorical) → `endomorphism-category.md`
+- Automorphism (categorical) → `automorphism-category.md`
+- Subcategory → `subcategory.md`
+- Full subcategory → `full-subcategory.md`
+- Opposite category → `opposite-category.md`
+- Functor (covariant) → `functor.md`
+- Contravariant functor → `contravariant-functor.md`
+- Natural transformation → `natural-transformation.md`
+- Natural isomorphism → `natural-isomorphism.md`
+- Equivalence of categories → `equivalence-of-categories.md`
+- Product (categorical) → `categorical-product.md`
+- Coproduct → `coproduct.md`
+- Equalizer → `equalizer.md`
+- Coequalizer → `coequalizer.md`
+- Pullback (fiber product) → `pullback.md`
+- Pushout → `pushout.md`
+- Limit → `limit.md`
+- Colimit → `colimit.md`
+- Representable functor → `representable-functor.md`
+- Yoneda embedding → `yoneda-embedding.md`
+- Adjoint functors → `adjoint-functors.md`
+- Unit of an adjunction → `unit-adjunction.md`
+- Counit of an adjunction → `counit-adjunction.md`
+- Additive category → `additive-category.md`
+- Kernel (categorical) → `kernel-categorical.md`
+- Cokernel (categorical) → `cokernel-categorical.md`
+- Exact sequence (in an additive/abelian category) → `exact-sequence-categorical.md`
+- Abelian category → `abelian-category.md`
+- Left exact functor → `left-exact-functor.md`
+- Right exact functor → `right-exact-functor.md`
+- Exact functor → `exact-functor.md`
 
 **Axioms:**
-- Category axioms
-- Axioms of an abelian category
+- Category axioms → `category-axioms.md`
+- Axioms of an abelian category → `abelian-category-axioms.md`
 
 **Lemmas:**
-- Yoneda lemma
+- Yoneda lemma → `yoneda-lemma.md`
 
 ---
 

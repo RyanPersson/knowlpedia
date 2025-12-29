@@ -16,18 +16,48 @@ You will receive a categorized list from Step 1 containing:
 
 ## Output Format
 
-Produce a single markdown code block containing a **flat, ordered list** where each item can only depend on items that appear earlier in the list.
+Produce **two outputs**:
+
+### 1. Dependency-Sorted Sequence
+
+A flat, ordered list where each item can only depend on items that appear earlier in the list.
 
 ```markdown
 # [Subject] — [Level] Dependency-Sorted Sequence
 
-1. [Type]: [Name]
-2. [Type]: [Name]
-3. [Type]: [Name]
+1. [Type]: [Name] → `slug.md`
+2. [Type]: [Name] → `slug.md`
+3. [Type]: [Name] → `slug.md`
 ...
 ```
 
 Where `[Type]` is one of: `Definition`, `Axiom`, `Theorem`, `Lemma`, `Proposition`, `Corollary`.
+
+### 2. Slug Manifest
+
+A complete list of all slugs for cross-referencing (used by Step 3 agents for linking):
+
+```markdown
+# Slug Manifest
+
+group.md
+subgroup.md
+coset.md
+lagranges-theorem.md
+...
+```
+
+### Slug Convention
+
+Convert names to URL-friendly slugs:
+- Lowercase
+- Replace spaces with hyphens
+- Remove apostrophes, parentheses, and special characters
+- Examples:
+  - "Lagrange's Theorem" → `lagranges-theorem.md`
+  - "Group" → `group.md`
+  - "L^p spaces" → `lp-spaces.md`
+  - "First Isomorphism Theorem" → `first-isomorphism-theorem.md`
 
 ## Sorting Rules
 
@@ -94,18 +124,33 @@ Mathematical definitions occasionally have apparent circular dependencies (e.g.,
 ```markdown
 # Group Theory — Dependency-Sorted Sequence
 
-1. Axiom: Group axioms
-2. Definition: Group
-3. Definition: Subgroup
-4. Lemma: Subgroup criterion
-5. Definition: Coset
-6. Theorem: Lagrange's Theorem
-7. Corollary: Order of element divides order of group
-8. Definition: Normal subgroup
-9. Definition: Quotient group
-10. Definition: Group homomorphism
-11. Definition: Kernel
-12. Theorem: First Isomorphism Theorem
+1. Axiom: Group axioms → `group-axioms.md`
+2. Definition: Group → `group.md`
+3. Definition: Subgroup → `subgroup.md`
+4. Lemma: Subgroup criterion → `subgroup-criterion.md`
+5. Definition: Coset → `coset.md`
+6. Theorem: Lagrange's Theorem → `lagranges-theorem.md`
+7. Corollary: Order of element divides order of group → `order-divides-group-order.md`
+8. Definition: Normal subgroup → `normal-subgroup.md`
+9. Definition: Quotient group → `quotient-group.md`
+10. Definition: Group homomorphism → `group-homomorphism.md`
+11. Definition: Kernel → `kernel-group.md`
+12. Theorem: First Isomorphism Theorem → `first-isomorphism-theorem-groups.md`
+
+# Slug Manifest
+
+group-axioms.md
+group.md
+subgroup.md
+subgroup-criterion.md
+coset.md
+lagranges-theorem.md
+order-divides-group-order.md
+normal-subgroup.md
+quotient-group.md
+group-homomorphism.md
+kernel-group.md
+first-isomorphism-theorem-groups.md
 ```
 
 **Rationale**:
@@ -133,4 +178,8 @@ Before submitting your sorted list, verify:
 
 ## After Completion
 
-Once you have produced the dependency-sorted sequence, it will be passed to Step 3 for knowl creation. Do not proceed to Step 3 yourself—output only the sorted list.
+Once you have produced the dependency-sorted sequence and slug manifest, they will be passed to Step 3 agents for knowl creation. Each Step 3 agent receives:
+1. The complete slug manifest (for cross-linking)
+2. A batch of items from the sorted sequence (their assignment)
+
+Do not proceed to Step 3 yourself—output only the sorted list and slug manifest.
