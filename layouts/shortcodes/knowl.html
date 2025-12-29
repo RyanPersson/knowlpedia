@@ -1,7 +1,8 @@
 {{- $id := .Get "id" -}}
 {{- $text := .Get "text" | default $id -}}
+{{- $section := .Get "section" | default (.Page.Section) -}}
 <a class="knowl"
-   href="/glossary/{{ $id }}/"
-   data-knowl="/glossary/{{ $id }}/"
+   href="/{{ $section }}/{{ $id }}/"
+   data-knowl="/{{ $section }}/{{ $id }}/"
    role="button"
    aria-expanded="false">{{ $text }}</a>

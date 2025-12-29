@@ -3,6 +3,9 @@ title: "Real Analysis Knowls"
 description: "Baby Rudin style 400-level dependency-sorted definitions, axioms, theorems, lemmas, propositions, and corollaries"
 ---
 
+Click any term below to expand its definition. Definitions link to related concepts which can be expanded nested up to 2 levels deep.
+
+<!--
 # Real Analysis Knowl Tracking
 
 This page tracks the completion status of all knowls in the Real Analysis (Baby Rudin style) collection.
@@ -481,3 +484,4 @@ This page tracks the completion status of all knowls in the Real Analysis (Baby 
 **Completed:** 151 (all definitions through multivariable differentiation basics)
 
 **Remaining:** ~129 (remaining definitions, all axioms, theorems, lemmas, propositions, corollaries)
+-->

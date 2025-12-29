@@ -45,3 +45,8 @@ theme = 'PaperMod'
     name = "Glossary"
     url = "/glossary/"
     weight = 20
+  [[menu.main]]
+    identifier = "analysis"
+    name = "Analysis"
+    url = "/analysis/"
+    weight = 15
