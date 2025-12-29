@@ -1,6 +1,6 @@
 baseURL = 'https://snacc.io/'
 languageCode = 'en-us'
-title = 'Math Blog'
+title = ''
 theme = 'PaperMod'
 
 # Build-time math rendering (KaTeX via transform.ToMath)
@@ -29,9 +29,6 @@ theme = 'PaperMod'
   # For math blog - show full content in list pages
   ShowFullTextinRSS = true
 
-  [params.homeInfoParams]
-    Title = "Math Blog"
-    Content = "A mathematics blog with collapsible definitions."
 
 # Menu
 [menu]
@@ -40,11 +37,6 @@ theme = 'PaperMod'
     name = "Posts"
     url = "/posts/"
     weight = 10
-  [[menu.main]]
-    identifier = "glossary"
-    name = "Glossary"
-    url = "/glossary/"
-    weight = 20
   [[menu.main]]
     identifier = "analysis"
     name = "Analysis"
@@ -55,11 +47,6 @@ theme = 'PaperMod'
     name = "Convex Analysis"
     url = "/convex-analysis/"
     weight = 16
-  [[menu.main]]
-    identifier = "langlands-letter"
-    name = "Langlands Letter"
-    url = "/langlands-letter/"
-    weight = 17
   [[menu.main]]
     identifier = "shared-foundations"
     name = "Foundations"

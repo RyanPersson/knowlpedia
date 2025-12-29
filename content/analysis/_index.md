@@ -1,6 +1,6 @@
 ---
 title: "Real Analysis Knowls"
-description: "Baby Rudin style 400-level dependency-sorted definitions, axioms, theorems, lemmas, propositions, and corollaries"
+description: ""
 ---
 
 Click any term below to expand its definition. Definitions link to related concepts which can be expanded nested up to 2 levels deep.
