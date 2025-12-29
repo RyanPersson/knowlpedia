@@ -3,6 +3,7 @@ title: "Modern Analysis: Lecture Notes and Further Reading Materials"
 description: "Lecture notes on vector spaces, metric spaces, normed vector spaces, convex sets, convex functions, and convex separation"
 author: "Mau Nam Nguyen"
 institution: "Portland State University"
+draft: true
 ---
 
 ## Contents

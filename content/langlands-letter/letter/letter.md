@@ -2,6 +2,7 @@
 title: "Langlands' Letter to Weil"
 description: "The 1967 letter that launched the Langlands program"
 date: 1967-01-01
+draft: true
 ---
 
 # Letter to Andre Weil — January 1967
