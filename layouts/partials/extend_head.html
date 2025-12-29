@@ -11,8 +11,11 @@
 .knowl-content{padding:0;position:relative}
 .knowl-header{display:flex;justify-content:space-between;align-items:center;padding:.75rem 1rem;background:var(--tertiary);border-bottom:1px solid var(--border)}
 .knowl-header strong{font-size:.9rem;text-transform:uppercase;letter-spacing:.05em}
+.knowl-header-buttons{display:flex;align-items:center;gap:.25rem}
 .knowl-close{background:none;border:none;font-size:1.5rem;line-height:1;cursor:pointer;color:var(--primary);padding:0 .25rem}
 .knowl-close:hover{opacity:.7}
+.knowl-copy{background:none;border:none;font-size:1.4rem;line-height:1;cursor:pointer;color:var(--primary);padding:0 .25rem;transition:opacity .15s ease}
+.knowl-copy:hover{opacity:.7}
 .knowl-body{padding:1rem}
 .knowl-body p:last-child{margin-bottom:0}
 .knowl-footer{position:absolute;bottom:.5rem;right:.5rem}
@@ -26,7 +29,7 @@
 @media print{
 .knowl{color:#000;border-bottom:none;font-weight:600}
 .knowl-panel{border:1px solid #000;border-left:3px solid #000;background:none;break-inside:avoid}
-.knowl-close,.knowl-loading,.knowl-error,.knowl-footer{display:none}
+.knowl-header-buttons,.knowl-loading,.knowl-error,.knowl-footer{display:none}
 .knowl-header{background:none;border-bottom:1px solid #ccc}
 .knowl-depth-even,.knowl-depth-odd{background:none}
 }

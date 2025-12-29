@@ -7,6 +7,95 @@
 
   const cache = new Map();
 
+  /**
+   * Copy knowl content to clipboard in specified format
+   * @param {HTMLElement} panel - The knowl panel element
+   * @param {string} format - 'markdown' or 'latex'
+   */
+  function copyKnowlContent(panel, format) {
+    const body = panel.querySelector('.knowl-body');
+    if (!body) return;
+
+    // Clone the body to manipulate without affecting the display
+    const clone = body.cloneNode(true);
+
+    // Handle display math first (wrapped in .katex-display)
+    clone.querySelectorAll('.katex-display').forEach(display => {
+      const annotation = display.querySelector('annotation[encoding="application/x-tex"]');
+      if (annotation) {
+        const tex = annotation.textContent;
+        const replacement = format === 'markdown' ? `$$${tex}$$` : `\\[${tex}\\]`;
+        display.replaceWith(document.createTextNode('\n' + replacement + '\n'));
+      }
+    });
+
+    // Handle remaining inline math
+    clone.querySelectorAll('.katex').forEach(katex => {
+      const annotation = katex.querySelector('annotation[encoding="application/x-tex"]');
+      if (annotation) {
+        const tex = annotation.textContent;
+        const replacement = format === 'markdown' ? `$${tex}$` : `\\(${tex}\\)`;
+        katex.replaceWith(document.createTextNode(replacement));
+      }
+    });
+
+    // Get text content and clean up whitespace
+    let text = clone.textContent;
+    // Collapse multiple spaces/tabs to single space
+    text = text.replace(/[ \t]+/g, ' ');
+    // Trim whitespace after newlines
+    text = text.replace(/\n[ \t]*/g, '\n');
+    // Single newlines (not paragraph breaks) → space
+    text = text.replace(/([^\n])\n([^\n])/g, '$1 $2');
+    // Remove space before punctuation (from knowl link artifacts)
+    text = text.replace(/ ([.,;:!?])/g, '$1');
+    // Normalize multiple newlines to max 2
+    text = text.replace(/\n{3,}/g, '\n\n');
+    text = text.trim();
+
+    // Copy to clipboard
+    navigator.clipboard.writeText(text).then(() => {
+      // Visual feedback - briefly change button text
+      const btn = panel.querySelector(`.knowl-copy-${format}`);
+      if (btn) {
+        const original = btn.textContent;
+        btn.textContent = '✓';
+        setTimeout(() => { btn.textContent = original; }, 1000);
+      }
+    }).catch(err => {
+      console.error('Failed to copy:', err);
+    });
+  }
+
+  /**
+   * Inject copy button into knowl header
+   * @param {HTMLElement} panel - The knowl panel element
+   */
+  function addCopyButtons(panel) {
+    const header = panel.querySelector('.knowl-header');
+    if (!header) return;
+
+    const closeBtn = header.querySelector('.knowl-close');
+    if (!closeBtn) return;
+
+    // Create button group container
+    const btnGroup = document.createElement('div');
+    btnGroup.className = 'knowl-header-buttons';
+
+    // Copy as Markdown button
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'knowl-copy knowl-copy-markdown';
+    copyBtn.setAttribute('aria-label', 'Copy as Markdown');
+    copyBtn.setAttribute('title', 'Copy as Markdown');
+    copyBtn.innerHTML = '&#x2398;'; // Copy icon (⎘)
+    copyBtn.addEventListener('click', () => copyKnowlContent(panel, 'markdown'));
+
+    // Move close button into group, add copy before it
+    btnGroup.appendChild(copyBtn);
+    btnGroup.appendChild(closeBtn);
+    header.appendChild(btnGroup);
+  }
+
   function getKnowlDepth(element) {
     let depth = 0;
     let parent = element.closest('.knowl-panel');
@@ -98,6 +187,9 @@
       panel.querySelectorAll('.knowl-close').forEach(btn => {
         btn.addEventListener('click', () => closeKnowl(panel));
       });
+
+      // Add copy buttons to header
+      addCopyButtons(panel);
 
       // Preload any nested knowls in this panel
       panel.querySelectorAll('.knowl').forEach(nestedKnowl => {
