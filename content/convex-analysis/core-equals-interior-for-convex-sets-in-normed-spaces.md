@@ -11,7 +11,7 @@ $$
 $$
 
 **Context:**
-The equality identifies the purely algebraic notion {{< knowl id="algebraic-interior-core-and-linear-closure" text="core(Ω)" >}} with the usual topological interior once the set is convex and has nonempty interior. The proof in the notes uses the geometric lemma {{< knowl id="segments-from-interior-points-stay-in-the-interior" text="segments from interior points stay in the interior" >}}.
+The equality identifies the purely algebraic notion {{< knowl id="algebraic-interior-core" text="core(Ω)" >}} with the usual topological interior once the set is convex and has nonempty interior. The proof in the notes uses the geometric lemma {{< knowl id="segments-from-interior-points-stay-in-the-interior" text="segments from interior points stay in the interior" >}}.
 
 **Proof sketch (idea):**
 The inclusion $\operatorname{int}(\Omega)\subset \operatorname{core}(\Omega)$ is direct. For the reverse direction, translate so that $0\in\operatorname{int}(\Omega)$ and use convexity plus the segment lemma to show any core point must lie in the interior.

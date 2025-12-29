@@ -173,7 +173,7 @@ The theorem below asserts that we can add more vectors to a linearly independent
 
 It follows from definition that $M\pm N$ and $\alpha M$ are subsets of $X$ and that $M+N=N+M$.
 
-**Remark 1.13.** For every set $M\subset X$, we have $2M\subset M+M$ but the reverse inclusion is generally not true. Hence, for the operations just defined, the set $\mathcal{P}^*(X)=\mathcal{P}(X)\setminus\{\varnothing\}$ does not have the structure of a vector space, but it is still convenient for presenting other problems.
+**Remark 1.13.** For every set $M\subset X$, we have $2M\subset M+M$ but the reverse inclusion is generally not true. Hence, for the operations just defined, the set $\mathcal{P}^\ast (X)=\mathcal{P}(X)\setminus\{\varnothing\}$ does not have the structure of a vector space, but it is still convenient for presenting other problems.
 
 The operations on sets introduced in this section provide convenient tools to define many important notions in what follows.
 
@@ -1763,7 +1763,7 @@ Letting now $\varepsilon\downarrow 0$ ensures the convexity of the optimal value
 
 #### 3.1.1 Algebraic Interior and Linear Closure
 
-Given a subset $\Omega$ of a real vector space $X$, define the following algebraic notions, known as the {{< knowl id="algebraic-interior-core-and-linear-closure" text="algebraic interior (or core)" >}} of $\Omega$ and the {{< knowl id="algebraic-interior-core-and-linear-closure" text="linear closure" >}} of $\Omega$, respectively, by
+Given a subset $\Omega$ of a real vector space $X$, define the following algebraic notions, known as the {{< knowl id="algebraic-interior-core" text="algebraic interior (or core)" >}} of $\Omega$ and the {{< knowl id="linear-closure" text="linear closure" >}} of $\Omega$, respectively, by
 
 $$
 \operatorname{core}(\Omega) := \{\, x \in \Omega \mid \forall v \in X,\ \exists \delta > 0,\ \forall t \text{ with } |t| < \delta : x + t v \in \Omega \,\},
@@ -2046,16 +2046,16 @@ $$
 Then "$\le$" is a partially ordered relation on $\mathcal{F}$. Let $\mathcal{N}$ be a totally ordered subset of $\mathcal{F}$. Define the set
 
 $$
-D^* = \bigcup_{g \in \mathcal{N}} D_g.
+D^\ast  = \bigcup_{g \in \mathcal{N}} D_g.
 $$
 
-Fix any $x \in D^*$. Then there is a functional $g \in \mathcal{N}$ such that $x \in D_g$ and we define $g^*(x) = g(x)$. Since $\mathcal{N}$ is a totally ordered set, $D^*$ is a linear subspace of $X$. Furthermore, $g^*$ is well-defined as a linear functional on $D^*$. Then
+Fix any $x \in D^\ast $. Then there is a functional $g \in \mathcal{N}$ such that $x \in D_g$ and we define $g^\ast (x) = g(x)$. Since $\mathcal{N}$ is a totally ordered set, $D^\ast $ is a linear subspace of $X$. Furthermore, $g^\ast $ is well-defined as a linear functional on $D^\ast $. Then
 
 $$
-g^*(x) = g(x) \le p(x), \quad \text{for all } x \in D_g,
+g^\ast (x) = g(x) \le p(x), \quad \text{for all } x \in D_g,
 $$
 
-and thus $g^*$ is an upper bound of $\mathcal{N}$. By Zorn's lemma, there exists a maximal element $F$ in $\mathcal{F}$.
+and thus $g^\ast $ is an upper bound of $\mathcal{N}$. By Zorn's lemma, there exists a maximal element $F$ in $\mathcal{F}$.
 
 Next, we will show the domain $D$ of $F$ is the entire space $X$, and then we conclude that $F$ is a desire linear functional. On the contrary, suppose that $D \subsetneq X$. Then there is an element $x_0 \in X \setminus D$. Since $D$ is a linear subspace, $x_0 \ne 0$. Denote
 
@@ -2591,74 +2591,74 @@ $$
 
 Therefore, $f$ is bounded and hence it is continuous. $\square$
 
-Let $X$ be a normed space and let $X^*$ represent the set of all continuous linear functionals on $X$. For each $x^* \in X^*$ and $x \in X$, the expression $\langle x^*,x\rangle = x^*(x)$ defines the {{< knowl id="dual-space-and-duality-pairing" text="duality pairing" >}} between $x^*$ and $x$.
+Let $X$ be a normed space and let $X^\ast $ represent the set of all continuous linear functionals on $X$. For each $x^\ast  \in X^\ast $ and $x \in X$, the expression $\langle x^\ast ,x\rangle = x^\ast (x)$ defines the {{< knowl id="dual-space-and-duality-pairing" text="duality pairing" >}} between $x^\ast $ and $x$.
 
-**Definition 3.39.** ({{< knowl id="separation-by-a-closed-hyperplane" text="Separation by a closed hyperplane" >}}) Let $\Omega_1$ and $\Omega_2$ be two nonempty sets in a real normed space $X$. We say that $\Omega_1$ and $\Omega_2$ can be **separated by a closed hyperplane** if there exists a nonzero continuous linear functional $x^* \in X^*\setminus\{0\}$ such that
+**Definition 3.39.** ({{< knowl id="separation-by-a-closed-hyperplane" text="Separation by a closed hyperplane" >}}) Let $\Omega_1$ and $\Omega_2$ be two nonempty sets in a real normed space $X$. We say that $\Omega_1$ and $\Omega_2$ can be **separated by a closed hyperplane** if there exists a nonzero continuous linear functional $x^\ast  \in X^\ast \setminus\{0\}$ such that
 
 $$
-\langle x^*,x\rangle \le \langle x^*,y\rangle \quad \text{whenever } x \in \Omega_1,\, y \in \Omega_2.
+\langle x^\ast ,x\rangle \le \langle x^\ast ,y\rangle \quad \text{whenever } x \in \Omega_1,\, y \in \Omega_2.
 \qquad (3.12)
 $$
 
 **Theorem 3.40.** ({{< knowl id="separation-by-closed-hyperplane-under-interior-condition" text="Separation by closed hyperplane under interior condition" >}}) Let $X$ be a real normed space and let $\Omega_1,\Omega_2$ be two nonempty convex sets in $X$. Suppose that $\operatorname{int}\Omega_1 \ne \emptyset$ and $(\operatorname{int}\Omega_1)\cap \Omega_2 = \emptyset$. Then $\Omega_1$ and $\Omega_2$ can be separated by a closed hyperplane.
 
-*Proof.* Since $\operatorname{int}\Omega \ne \emptyset$, we have $\operatorname{core}\Omega = \operatorname{int}\Omega$. By Theorem 3.36, there exists $x^* \in X'\setminus\{0\}$ such that (3.12) is satisfied. It remains to show that $x^* \in X^*$, i.e., $x^*$ is continuous.
+*Proof.* Since $\operatorname{int}\Omega \ne \emptyset$, we have $\operatorname{core}\Omega = \operatorname{int}\Omega$. By Theorem 3.36, there exists $x^\ast  \in X'\setminus\{0\}$ such that (3.12) is satisfied. It remains to show that $x^\ast  \in X^\ast $, i.e., $x^\ast $ is continuous.
 
-Choose $x_0 \in \operatorname{int}\Omega_1$ and $r>0$ such that $B(x_0;r) \subset \Omega_1$. Then fix $y_0 \in \Omega_2$ and let $\alpha = \langle x^*,y_0\rangle$. We have
-
-$$
-\langle x^*,x\rangle \le \alpha \quad \text{for all } x \in B(x_0;r),
-$$
-
-which implies the continuity of $x^*$ by following the proof of Theorem 3.38. $\square$
-
-We continue with an enhanced version of convex separation when a set involved is open. The corollary below follows directly from Theorem 3.40 and the fact that the linear functional $x^*$ therein is an open mapping.
-
-**Corollary 3.41.** ({{< knowl id="strict-separation-with-an-open-convex-set" text="Strict separation with an open convex set" >}}) Let $X$ be a real normed space, and let $G,\Omega$ be two nonempty convex sets in $X$. Suppose that $G$ is {{< knowl id="open-subset" text="open" >}}. Then there exists $x^* \in X^*$ and $\beta \in \mathbb{R}$ such that
+Choose $x_0 \in \operatorname{int}\Omega_1$ and $r>0$ such that $B(x_0;r) \subset \Omega_1$. Then fix $y_0 \in \Omega_2$ and let $\alpha = \langle x^\ast ,y_0\rangle$. We have
 
 $$
-\langle x^*,x\rangle < \beta \le \langle x^*,y\rangle \quad \text{whenever } x \in G,\, y \in \Omega.
+\langle x^\ast ,x\rangle \le \alpha \quad \text{for all } x \in B(x_0;r),
 $$
 
-**Definition 3.42.** ({{< knowl id="strict-separation-by-a-closed-hyperplane" text="Strict separation by a closed hyperplane" >}}) Let $\Omega_1$ and $\Omega_2$ be two nonempty sets in a real normed space $X$. We say that $\Omega_1$ and $\Omega_2$ can be **strictly separated by a closed hyperplane** if there exist $x^* \in X^*$ and $\alpha,\beta \in \mathbb{R}$ such that
+which implies the continuity of $x^\ast $ by following the proof of Theorem 3.38. $\square$
+
+We continue with an enhanced version of convex separation when a set involved is open. The corollary below follows directly from Theorem 3.40 and the fact that the linear functional $x^\ast $ therein is an open mapping.
+
+**Corollary 3.41.** ({{< knowl id="strict-separation-with-an-open-convex-set" text="Strict separation with an open convex set" >}}) Let $X$ be a real normed space, and let $G,\Omega$ be two nonempty convex sets in $X$. Suppose that $G$ is {{< knowl id="open-subset" text="open" >}}. Then there exists $x^\ast  \in X^\ast $ and $\beta \in \mathbb{R}$ such that
 
 $$
-\langle x^*,x\rangle \le \alpha < \beta \le \langle x^*,y\rangle \quad \text{whenever } x \in \Omega_1,\, y \in \Omega_2.
+\langle x^\ast ,x\rangle < \beta \le \langle x^\ast ,y\rangle \quad \text{whenever } x \in G,\, y \in \Omega.
+$$
+
+**Definition 3.42.** ({{< knowl id="strict-separation-by-a-closed-hyperplane" text="Strict separation by a closed hyperplane" >}}) Let $\Omega_1$ and $\Omega_2$ be two nonempty sets in a real normed space $X$. We say that $\Omega_1$ and $\Omega_2$ can be **strictly separated by a closed hyperplane** if there exist $x^\ast  \in X^\ast $ and $\alpha,\beta \in \mathbb{R}$ such that
+
+$$
+\langle x^\ast ,x\rangle \le \alpha < \beta \le \langle x^\ast ,y\rangle \quad \text{whenever } x \in \Omega_1,\, y \in \Omega_2.
 \qquad (3.13)
 $$
 
-Note that in the setting of Definition 3.42, the sets $\Omega_1$ and $\Omega_2$ can be strictly separated by a closed hyperplane if and only if there exists $x^* \in X^*$ such that
+Note that in the setting of Definition 3.42, the sets $\Omega_1$ and $\Omega_2$ can be strictly separated by a closed hyperplane if and only if there exists $x^\ast  \in X^\ast $ such that
 
 $$
-\sup_{x \in \Omega_1} \langle x^*,x\rangle < \inf_{y \in \Omega_2} \langle x^*,y\rangle.
+\sup_{x \in \Omega_1} \langle x^\ast ,x\rangle < \inf_{y \in \Omega_2} \langle x^\ast ,y\rangle.
 $$
 
 **Theorem 3.43.** ({{< knowl id="strict-separation-of-compact-and-closed-convex-sets" text="Strict separation of compact and closed convex sets" >}}) Let $K$ and $F$ be two nonempty convex sets in a real normed space $X$. Suppose that $K$ is compact, $F$ is {{< knowl id="closed-subset" text="closed" >}}, and $K \cap F = \emptyset$. Then $K$ and $F$ can be strictly separated by a closed hyperplane.
 
-*Proof.* Consider the set $\Theta = F - K$. Then $\Theta$ is a convex set and $0 \notin \Theta$ because $\Omega_1$ and $\Omega_2$ are disjoint convex sets. Since $K$ is compact and $F$ is closed, we see that $\Theta$ is closed. Choose $\delta > 0$ such that $B(0;\delta) \cap \Theta = \emptyset$. Consider two nonempty convex sets: $\Omega_1 = B(0;\delta)$ and $\Omega_2 = \Theta$. By Theorem 3.40, there exists $x^* \in X^*$ such that
+*Proof.* Consider the set $\Theta = F - K$. Then $\Theta$ is a convex set and $0 \notin \Theta$ because $\Omega_1$ and $\Omega_2$ are disjoint convex sets. Since $K$ is compact and $F$ is closed, we see that $\Theta$ is closed. Choose $\delta > 0$ such that $B(0;\delta) \cap \Theta = \emptyset$. Consider two nonempty convex sets: $\Omega_1 = B(0;\delta)$ and $\Omega_2 = \Theta$. By Theorem 3.40, there exists $x^\ast  \in X^\ast $ such that
 
 $$
-\sup_{x \in B(0;\delta)} \langle x^*,x\rangle \le \inf_{z \in \Theta} \langle x^*,z\rangle.
+\sup_{x \in B(0;\delta)} \langle x^\ast ,x\rangle \le \inf_{z \in \Theta} \langle x^\ast ,z\rangle.
 $$
 
 This implies that
 
 $$
-0 < \delta \le \inf_{z \in \Theta} \langle x^*,z\rangle.
+0 < \delta \le \inf_{z \in \Theta} \langle x^\ast ,z\rangle.
 $$
 
 Now, for any $x \in K$ and $y \in F$ we have $z = y - x \in \Theta$. Thus,
 
 $$
-\delta \le \langle x^*,y-x\rangle = \langle x^*,y\rangle - \langle x^*,x\rangle,
+\delta \le \langle x^\ast ,y-x\rangle = \langle x^\ast ,y\rangle - \langle x^\ast ,x\rangle,
 $$
 
-and hence $\delta + \langle x^*,x\rangle \le \langle x^*,y\rangle$ whenever $x \in K$ and $y \in F$. It follows that
+and hence $\delta + \langle x^\ast ,x\rangle \le \langle x^\ast ,y\rangle$ whenever $x \in K$ and $y \in F$. It follows that
 
 $$
-\sup_{x \in K} \langle x^*,x\rangle
-< \delta + \sup_{x \in K} \langle x^*,x\rangle
-\le \inf_{y \in F} \langle x^*,y\rangle.
+\sup_{x \in K} \langle x^\ast ,x\rangle
+< \delta + \sup_{x \in K} \langle x^\ast ,x\rangle
+\le \inf_{y \in F} \langle x^\ast ,y\rangle.
 $$
 
 Therefore, $F$ and $K$ can be strictly separated by a closed hyperplane. $\square$

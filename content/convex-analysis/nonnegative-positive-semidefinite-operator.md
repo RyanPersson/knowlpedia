@@ -12,4 +12,4 @@ $$
 
 **Context.** Nonnegative operators correspond to convex quadratic forms. In finite dimensions, this matches the usual matrix notion of positive semidefiniteness.
 
-**Example.** If $A=B^*B$ for some linear operator $B$, then $\langle Ax,x\rangle=\langle Bx,Bx\rangle\ge 0$, so $A$ is nonnegative.
+**Example.** If $A=B^\ast B$ for some linear operator $B$, then $\langle Ax,x\rangle=\langle Bx,Bx\rangle\ge 0$, so $A$ is nonnegative.

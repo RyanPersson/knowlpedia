@@ -9,11 +9,11 @@ Let $X$ be a {{< knowl id="vector-space" text="vector space" >}} and let $\Omega
 1. $p_\Omega$ is real-valued and {{< knowl id="subadditive-positively-homogeneous-and-sublinear-functions" text="sublinear" >}}.
 2. The strict sublevel set satisfies
    $$
-   \{x\in X\mid p_\Omega(x)<1\}={{< knowl id="algebraic-interior-core-and-linear-closure" text="core(Ω)" >}}.
+   \{x\in X\mid p_\Omega(x)<1\}={{< knowl id="algebraic-interior-core" text="core(Ω)" >}}.
    $$
 3. The non-strict sublevel set satisfies
    $$
-   \{x\in X\mid p_\Omega(x)\le 1\}={{< knowl id="algebraic-interior-core-and-linear-closure" text="lin(Ω)" >}}.
+   \{x\in X\mid p_\Omega(x)\le 1\}={{< knowl id="linear-closure" text="lin(Ω)" >}}.
    $$
 
 **Context:**

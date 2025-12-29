@@ -3,7 +3,7 @@ title: "Complex Separation Theorem (Real Parts)"
 description: "In complex vector spaces, separation holds via the real part of a complex linear functional."
 ---
 
-Let $X$ be a complex {{< knowl id="vector-space" text="vector space" >}} and let $\Omega_1,\Omega_2\subset X$ be nonempty {{< knowl id="convex-set" text="convex sets" >}}. Assume {{< knowl id="algebraic-interior-core-and-linear-closure" text="core(Ω₁)" >}}$\neq\emptyset$ and $\operatorname{core}(\Omega_1)\cap\Omega_2=\emptyset$.
+Let $X$ be a complex {{< knowl id="vector-space" text="vector space" >}} and let $\Omega_1,\Omega_2\subset X$ be nonempty {{< knowl id="convex-set" text="convex sets" >}}. Assume {{< knowl id="algebraic-interior-core" text="core(Ω₁)" >}}$\neq\emptyset$ and $\operatorname{core}(\Omega_1)\cap\Omega_2=\emptyset$.
 
 **Theorem**: There exists a nonzero complex-linear functional $F$ on $X$ such that
 $$

@@ -10,4 +10,4 @@ $$
 \operatorname{core}(\operatorname{core}(\Omega))=\operatorname{core}(\Omega).
 $$
 
-Here {{< knowl id="algebraic-interior-core-and-linear-closure" text="core" >}} denotes the algebraic interior. This follows from {{< knowl id="segments-from-core-points-stay-in-the-core" text="segments from core points stay in the core" >}}: once a point is in $\operatorname{core}(\Omega)$, small segment perturbations remain inside, so taking the core again does not remove any points.
+Here {{< knowl id="algebraic-interior-core" text="core" >}} denotes the algebraic interior. This follows from {{< knowl id="segments-from-core-points-stay-in-the-core" text="segments from core points stay in the core" >}}: once a point is in $\operatorname{core}(\Omega)$, small segment perturbations remain inside, so taking the core again does not remove any points.

@@ -8,9 +8,9 @@ Let $X$ be a real {{< knowl id="norm-normed-vector-space" text="normed space" >}
 - $F$ is {{< knowl id="closed-subset" text="closed" >}}, and
 - $K\cap F=\emptyset$.
 
-**Theorem**: The sets $K$ and $F$ can be {{< knowl id="strict-separation-by-a-closed-hyperplane" text="strictly separated by a closed hyperplane" >}}. Equivalently, there exists $x^*\in {{< knowl id="dual-space-and-duality-pairing" text="X*" >}}$ such that
+**Theorem**: The sets $K$ and $F$ can be {{< knowl id="strict-separation-by-a-closed-hyperplane" text="strictly separated by a closed hyperplane" >}}. Equivalently, there exists $x^\ast \in X^\ast$ (see {{< knowl id="dual-space-and-duality-pairing" text="dual space" >}}) such that
 $$
-\sup_{x\in K}\langle x^*,x\rangle < \inf_{y\in F}\langle x^*,y\rangle.
+\sup_{x\in K}\langle x^\ast ,x\rangle < \inf_{y\in F}\langle x^\ast ,y\rangle.
 $$
 
 **Context:**

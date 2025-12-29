@@ -5,7 +5,7 @@ description: "If a is in core(Ω) and b in Ω, then points on [a,b) remain in co
 
 Let $X$ be a {{< knowl id="vector-space" text="vector space" >}} and let $\Omega\subset X$ be {{< knowl id="convex-set" text="convex" >}}.
 
-**Proposition**: If $a\in {{< knowl id="algebraic-interior-core-and-linear-closure" text="core(Ω)" >}}$ and $b\in\Omega$, then
+**Proposition**: If $a\in\operatorname{core}(\Omega)$ (see {{< knowl id="algebraic-interior-core" text="core" >}}) and $b\in\Omega$, then
 $$
 [a,b)\subset \operatorname{core}(\Omega),
 $$

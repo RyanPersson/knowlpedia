@@ -8,9 +8,9 @@ $$
 \operatorname{int}(\Omega_1)\cap\Omega_2=\emptyset.
 $$
 
-**Theorem**: The sets $\Omega_1$ and $\Omega_2$ can be {{< knowl id="separation-by-a-closed-hyperplane" text="separated by a closed hyperplane" >}}; i.e., there exists $x^*\in X^*\setminus\{0\}$ such that
+**Theorem**: The sets $\Omega_1$ and $\Omega_2$ can be {{< knowl id="separation-by-a-closed-hyperplane" text="separated by a closed hyperplane" >}}; i.e., there exists $x^\ast \in X^\ast \setminus\{0\}$ such that
 $$
-\langle x^*,x\rangle \le \langle x^*,y\rangle\quad \text{for all }x\in\Omega_1,\ y\in\Omega_2.
+\langle x^\ast ,x\rangle \le \langle x^\ast ,y\rangle\quad \text{for all }x\in\Omega_1,\ y\in\Omega_2.
 $$
 
 **Context:**

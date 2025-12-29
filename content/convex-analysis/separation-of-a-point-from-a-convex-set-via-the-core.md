@@ -3,7 +3,7 @@ title: "Separating a Point from a Convex Set via the Core"
 description: "If x0 is outside core(Ω) and core(Ω)≠∅, then Ω and {x0} are separable by a hyperplane."
 ---
 
-Let $X$ be a real {{< knowl id="vector-space" text="vector space" >}}, let $x_0\in X$, and let $\Omega\subset X$ be {{< knowl id="convex-set" text="convex" >}}. Assume that {{< knowl id="algebraic-interior-core-and-linear-closure" text="core(Ω)" >}} is nonempty and $x_0\notin \operatorname{core}(\Omega)$.
+Let $X$ be a real {{< knowl id="vector-space" text="vector space" >}}, let $x_0\in X$, and let $\Omega\subset X$ be {{< knowl id="convex-set" text="convex" >}}. Assume that {{< knowl id="algebraic-interior-core" text="core(Ω)" >}} is nonempty and $x_0\notin \operatorname{core}(\Omega)$.
 
 **Theorem**: The sets $\Omega$ and $\{x_0\}$ can be {{< knowl id="separation-by-a-hyperplane" text="separated by a hyperplane" >}}. Equivalently, there exists a nonzero linear functional $f:X\to\mathbb{R}$ such that
 $$
