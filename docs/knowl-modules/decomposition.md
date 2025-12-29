@@ -136,33 +136,33 @@ Metric spaces and point-set topology in the metric context.
 *Depends on:* `shared-foundations`, `analysis-order-completeness`
 
 **Definitions:**
-- Distance (metric) → `metric.md`
-- Metric space → `metric-space.md`
-- Open ball → `open-ball.md`
-- Closed ball → `closed-ball.md`
-- Sphere (metric sphere) → `sphere.md`
-- Neighborhood → `neighborhood.md`
-- Open set (in a metric space) → `open-set.md`
-- Closed set (in a metric space) → `closed-set.md`
-- Interior of a set → `interior.md`
-- Closure of a set → `closure.md`
-- Boundary of a set → `boundary.md`
-- Limit point (accumulation point) → `limit-point.md`
-- Isolated point → `isolated-point.md`
-- Derived set → `derived-set.md`
-- Dense subset → `dense-subset.md`
-- Diameter of a set → `diameter.md`
+- ✓ Distance (metric) → `metric.md`
+- ✓ Metric space → `metric-space.md`
+- ✓ Open ball → `open-ball.md`
+- ✓ Closed ball → `closed-ball.md`
+- ✓ Sphere (metric sphere) → `sphere-metric-sphere.md`
+- ✓ Neighborhood → `neighborhood.md`
+- ✓ Open set (in a metric space) → `open-set.md`
+- ✓ Closed set (in a metric space) → `closed-set.md`
+- ✓ Interior of a set → `interior.md`
+- ✓ Closure of a set → `closure.md`
+- ✓ Boundary of a set → `boundary.md`
+- ✓ Limit point (accumulation point) → `limit-point-accumulation-point-cluster-point.md`
+- ✓ Isolated point → `isolated-point.md`
+- ✓ Derived set → `derived-set.md`
+- ✓ Dense subset → `dense-subset.md`
+- ✓ Diameter of a set → `diameter.md`
 - Bounded set (in a metric space) → `bounded-set-metric.md`
 
 **Theorems:**
-- Open sets form a topology → `open-sets-form-topology.md`
-- Closed sets are complements of open sets → `closed-sets-complements.md`
-- Sequential characterization of closure → `sequential-closure-characterization.md`
-- Sequential characterization of closed sets → `sequential-closed-characterization.md`
+- ✓ Open sets form a topology → `open-sets-form-a-topology.md`
+- ✓ Closed sets are complements of open sets → `closed-sets-are-complements-of-open-sets.md`
+- ✓ Sequential characterization of closure → `sequential-characterization-of-closure.md`
+- ✓ Sequential characterization of closed sets → `sequential-characterization-of-closed-sets.md`
 
 **Lemmas:**
-- Triangle inequality → `triangle-inequality.md`
-- Reverse triangle inequality → `reverse-triangle-inequality.md`
+- ✓ Triangle inequality → `triangle-inequality.md`
+- ✓ Reverse triangle inequality → `reverse-triangle-inequality.md`
 
 ---
 
@@ -172,54 +172,54 @@ Sequences, series, and convergence in ℝ and ℝ^k.
 *Depends on:* `analysis-order-completeness`, `analysis-metric-topology`
 
 **Definitions:**
-- Convergent sequence → `convergent-sequence.md`
-- Limit of a sequence → `limit-of-sequence.md`
-- Bounded sequence → `bounded-sequence.md`
-- Monotone sequence → `monotone-sequence.md`
-- Subsequence → `subsequence.md`
-- Limit superior (lim sup) → `limsup.md`
-- Limit inferior (lim inf) → `liminf.md`
-- Cauchy sequence → `cauchy-sequence.md`
-- Complete metric space → `complete-metric-space.md`
-- Summable family / series → `series.md`
-- Partial sums → `partial-sums.md`
-- Convergent series → `convergent-series.md`
-- Divergent series → `divergent-series.md`
-- Absolutely convergent series → `absolutely-convergent-series.md`
-- Conditionally convergent series → `conditionally-convergent-series.md`
-- Rearrangement of a series → `rearrangement.md`
-- Cauchy product → `cauchy-product.md`
+- ✓ Convergent sequence → `convergent-sequence.md`
+- ✓ Limit of a sequence → `limit-of-a-sequence.md`
+- ✓ Bounded sequence → `bounded-sequence.md`
+- ✓ Monotone sequence → `monotone-sequence.md`
+- ✓ Subsequence → `subsequence.md`
+- ✓ Limit superior (lim sup) → `limit-superior-lim-sup.md`
+- ✓ Limit inferior (lim inf) → `limit-inferior-lim-inf.md`
+- ✓ Cauchy sequence → `cauchy-sequence.md`
+- ✓ Complete metric space → `complete-metric-space.md`
+- ✓ Summable family / series → `series.md`
+- ✓ Partial sums → `partial-sums.md`
+- ✓ Convergent series → `convergent-series.md`
+- ✓ Divergent series → `divergent-series.md`
+- ✓ Absolutely convergent series → `absolutely-convergent-series.md`
+- ✓ Conditionally convergent series → `conditionally-convergent-series.md`
+- ✓ Rearrangement of a series → `rearrangement-of-a-series.md`
+- ✓ Cauchy product → `cauchy-product.md`
 
 **Theorems:**
-- Monotone convergence theorem (sequences) → `monotone-convergence-theorem.md`
-- Cauchy criterion for convergence → `cauchy-criterion.md`
-- Bolzano–Weierstrass theorem → `bolzano-weierstrass-theorem.md`
-- Algebra of limits for sequences → `algebra-of-limits.md`
-- Squeeze theorem → `squeeze-theorem.md`
-- Absolute convergence implies convergence → `absolute-convergence-implies-convergence.md`
-- Comparison test → `comparison-test.md`
-- Limit comparison test → `limit-comparison-test.md`
-- Ratio test → `ratio-test.md`
-- Root test → `root-test.md`
-- Integral test → `integral-test.md`
-- Cauchy condensation test → `cauchy-condensation-test.md`
-- Alternating series test → `alternating-series-test.md`
-- Dirichlet test → `dirichlet-test.md`
-- Abel test → `abel-test.md`
-- Rearrangement theorem (absolutely convergent) → `rearrangement-theorem.md`
-- Riemann rearrangement theorem → `riemann-rearrangement-theorem.md`
-- Mertens theorem → `mertens-theorem.md`
+- ✓ Monotone convergence theorem (sequences) → `monotone-convergence-theorem.md`
+- ✓ Cauchy criterion for convergence → `cauchy-criterion-for-convergence-in-rk.md`
+- ✓ Bolzano–Weierstrass theorem → `bolzano-weierstrass-theorem.md`
+- ✓ Algebra of limits for sequences → `algebra-of-limits-for-sequences.md`
+- ✓ Squeeze theorem → `squeeze-theorem.md`
+- ✓ Absolute convergence implies convergence → `absolute-convergence-implies-convergence.md`
+- ✓ Comparison test → `comparison-test.md`
+- ✓ Limit comparison test → `limit-comparison-test.md`
+- ✓ Ratio test → `ratio-test.md`
+- ✓ Root test → `root-test.md`
+- ✓ Integral test → `integral-test.md`
+- ✓ Cauchy condensation test → `cauchy-condensation-test.md`
+- ✓ Alternating series test → `alternating-series-test.md`
+- ✓ Dirichlet test → `dirichlet-test.md`
+- ✓ Abel test → `abel-test.md`
+- ✓ Rearrangement theorem (absolutely convergent) → `rearrangement-theorem-for-absolutely-convergent-series.md`
+- ✓ Riemann rearrangement theorem → `riemann-rearrangement-theorem.md`
+- ✓ Mertens theorem → `mertens-theorem-on-cauchy-products.md`
 
 **Lemmas:**
-- Monotone subsequence lemma → `monotone-subsequence-lemma.md`
-- Basic properties of lim sup and lim inf → `limsup-liminf-properties.md`
-- Uniqueness of limits → `uniqueness-of-limits.md`
-- A convergent sequence is Cauchy → `convergent-implies-cauchy.md`
-- Every Cauchy sequence is bounded → `cauchy-implies-bounded.md`
+- ✓ Monotone subsequence lemma → `monotone-subsequence-lemma.md`
+- ✓ Basic properties of lim sup and lim inf → `basic-properties-of-lim-sup-and-lim-inf.md`
+- ✓ Uniqueness of limits → `uniqueness-of-limits.md`
+- ✓ A convergent sequence is Cauchy → `convergent-sequence-is-cauchy.md`
+- ✓ Every Cauchy sequence is bounded → `every-cauchy-sequence-is-bounded.md`
 
 **Corollaries:**
-- Every bounded sequence in ℝ^k has a convergent subsequence → `bounded-sequence-convergent-subsequence.md`
-- A convergent series has terms tending to 0 → `convergent-series-terms-to-zero.md`
+- ✓ Every bounded sequence in ℝ^k has a convergent subsequence → `bounded-sequence-has-convergent-subsequence.md`
+- ✓ A convergent series has terms tending to 0 → `convergent-series-terms-go-to-zero.md`
 
 ---
 
@@ -229,25 +229,25 @@ Limits and continuity of functions.
 *Depends on:* `analysis-metric-topology`, `analysis-sequences-series`
 
 **Definitions:**
-- Limit of a function at a point (ε–δ) → `limit-of-function.md`
-- One-sided limit → `one-sided-limit.md`
-- Limit at infinity → `limit-at-infinity.md`
-- Continuity at a point → `continuity-at-point.md`
-- Continuity on a set → `continuity-on-set.md`
-- Uniform continuity → `uniform-continuity.md`
-- Lipschitz continuity → `lipschitz-continuity.md`
-- Hölder continuity → `holder-continuity.md`
-- Isometry → `isometry.md`
-- Homeomorphism → `homeomorphism.md`
+- ✓ Limit of a function at a point (ε–δ) → `limit-of-a-function-at-a-point.md`
+- ✓ One-sided limit → `one-sided-limit.md`
+- ✓ Limit at infinity → `limit-of-a-function-at-infinity.md`
+- ✓ Continuity at a point → `continuity-at-a-point.md`
+- ✓ Continuity on a set → `continuity-on-a-set.md`
+- ✓ Uniform continuity → `uniform-continuity.md`
+- ✓ Lipschitz continuity → `lipschitz-continuity.md`
+- ✓ Hölder continuity → `holder-continuity.md`
+- ✓ Isometry → `isometry.md`
+- ✓ Homeomorphism → `homeomorphism.md`
 
 **Theorems:**
-- Continuity via sequences → `continuity-via-sequences.md`
-- Continuity via open sets → `continuity-via-open-sets.md`
+- ✓ Continuity via sequences → `continuity-via-sequences.md`
+- ✓ Continuity via open sets → `continuity-via-open-sets.md`
 
 **Propositions:**
-- Equivalent definitions of continuity → `equivalent-continuity-definitions.md`
-- Uniform continuity implies continuity → `uniform-implies-continuity.md`
-- Uniform continuity preserves Cauchy sequences → `uniform-continuity-preserves-cauchy.md`
+- ✓ Equivalent definitions of continuity → `equivalent-definitions-continuity.md`
+- ✓ Uniform continuity implies continuity → `uniform-continuity-implies-continuity.md`
+- ✓ Uniform continuity preserves Cauchy sequences → `uniform-continuity-preserves-cauchy.md`
 
 ---
 
@@ -257,46 +257,46 @@ Compactness and connectedness in metric spaces.
 *Depends on:* `analysis-metric-topology`, `analysis-continuity`
 
 **Definitions:**
-- Compact set (open-cover) → `compact-set.md`
-- Sequentially compact set → `sequentially-compact-set.md`
-- Totally bounded set → `totally-bounded-set.md`
-- Connected set → `connected-set.md`
-- Separated sets → `separated-sets.md`
-- Component (connected component) → `connected-component.md`
-- Path → `path.md`
-- Path-connected set → `path-connected-set.md`
-- Interval (in ℝ) → `interval.md`
-- Curve (parametrized curve) → `curve.md`
-- Nowhere dense set → `nowhere-dense-set.md`
-- Meager set → `meager-set.md`
-- Residual set → `residual-set.md`
+- ✓ Compact set (open-cover) → `compact-set.md`
+- ✓ Sequentially compact set → `sequentially-compact-set.md`
+- ✓ Totally bounded set → `totally-bounded-set.md`
+- ✓ Connected set → `connected-set.md`
+- ✓ Separated sets → `separated-sets.md`
+- ✓ Component (connected component) → `connected-component.md`
+- ✓ Path → `path.md`
+- ✓ Path-connected set → `path-connected-set.md`
+- ✓ Interval (in ℝ) → `interval.md`
+- ✓ Curve (parametrized curve) → `curve.md`
+- ✓ Nowhere dense set → `nowhere-dense-set.md`
+- ✓ Meager set → `meager-set.md`
+- ✓ Residual set → `residual-set.md`
 
 **Theorems:**
-- Sequential compactness equals compactness (metric spaces) → `sequential-compactness-equals-compactness.md`
-- Finite intersection property theorem → `finite-intersection-property.md`
-- Lebesgue number lemma → `lebesgue-number-lemma.md`
-- Compactness implies completeness → `compactness-implies-completeness.md`
-- Compactness implies total boundedness → `compactness-implies-total-boundedness.md`
-- Continuous image of compact set is compact → `continuous-image-of-compact.md`
-- Extreme value theorem → `extreme-value-theorem.md`
-- Heine–Cantor theorem → `heine-cantor-theorem.md`
-- Continuous bijection from compact to metric space is homeomorphism → `compact-bijection-homeomorphism.md`
-- Heine–Borel theorem → `heine-borel-theorem.md`
-- Continuous image of connected set is connected → `continuous-image-of-connected.md`
-- Connected subsets of ℝ are intervals → `connected-subsets-of-r-are-intervals.md`
-- Intermediate value theorem → `intermediate-value-theorem.md`
-- Cantor intersection theorem → `cantor-intersection-theorem.md`
-- Baire category theorem → `baire-category-theorem.md`
+- ✓ Sequential compactness equals compactness (metric spaces) → `sequential-compactness-equals-compactness.md`
+- ✓ Finite intersection property theorem → `finite-intersection-property-theorem.md`
+- ✓ Lebesgue number lemma → `lebesgue-number-lemma.md`
+- ✓ Compactness implies completeness → `compactness-implies-completeness.md`
+- ✓ Compactness implies total boundedness → `compactness-implies-total-boundedness.md`
+- ✓ Continuous image of compact set is compact → `continuous-image-of-compact-set-is-compact.md`
+- ✓ Extreme value theorem → `extreme-value-theorem.md`
+- ✓ Heine–Cantor theorem → `heine-cantor-theorem.md`
+- ✓ Continuous bijection from compact to metric space is homeomorphism → `continuous-bijection-from-compact-homeomorphism-criterion.md`
+- ✓ Heine–Borel theorem → `heine-borel-theorem.md`
+- ✓ Continuous image of connected set is connected → `continuous-image-of-connected-set-is-connected.md`
+- ✓ Connected subsets of ℝ are intervals → `connected-subsets-of-r-are-intervals.md`
+- ✓ Intermediate value theorem → `intermediate-value-theorem.md`
+- ✓ Cantor intersection theorem → `cantor-intersection-theorem.md`
+- ✓ Baire category theorem → `baire-category-theorem.md`
 
 **Lemmas:**
-- Compactness implies boundedness → `compactness-implies-boundedness.md`
-- Compactness implies closedness → `compactness-implies-closedness.md`
-- Closed subset of compact is compact → `closed-subset-of-compact.md`
+- ✓ Compactness implies boundedness → `compactness-implies-boundedness.md`
+- ✓ Compactness implies closedness → `compactness-implies-closedness.md`
+- ✓ Closed subset of compact is compact → `closed-subset-of-compact-set-is-compact.md`
 
 **Corollaries:**
-- Continuous function on compact is bounded → `continuous-on-compact-is-bounded.md`
-- Continuous function on compact attains max and min → `continuous-on-compact-attains-extrema.md`
-- Continuous function on compact is uniformly continuous → `continuous-on-compact-is-uniformly-continuous.md`
+- ✓ Continuous function on compact is bounded → `continuous-on-compact-is-bounded.md`
+- ✓ Continuous function on compact attains max and min → `continuous-attains-max-min-compact.md`
+- ✓ Continuous function on compact is uniformly continuous → `heine-cantor-corollary.md`
 
 ---
 
@@ -306,36 +306,36 @@ One-variable differentiation.
 *Depends on:* `analysis-continuity`
 
 **Definitions:**
-- Differentiability at a point → `differentiability.md`
-- Difference quotient → `difference-quotient.md`
-- Derivative → `derivative.md`
-- Right/left derivative → `one-sided-derivative.md`
-- Higher derivatives → `higher-derivatives.md`
-- Class C^k function → `smooth-function.md`
-- Critical point → `critical-point.md`
-- Local maximum / local minimum → `local-extremum.md`
-- Global maximum / global minimum → `global-extremum.md`
-- Taylor polynomial → `taylor-polynomial.md`
-- Remainder term in Taylor's theorem → `taylor-remainder.md`
+- ✓ Differentiability at a point → `differentiability-one-variable.md`
+- ✓ Difference quotient → `difference-quotient.md`
+- ✓ Derivative → `derivative.md`
+- ✓ Right/left derivative → `right-derivative-left-derivative.md`
+- ✓ Higher derivatives → `higher-derivatives.md`
+- ✓ Class C^k function → `class-ck-function-one-variable.md`
+- ✓ Critical point → `critical-point.md`
+- ✓ Local maximum / local minimum → `local-maximum-local-minimum.md`
+- ✓ Global maximum / global minimum → `global-maximum-global-minimum.md`
+- ✓ Taylor polynomial → `taylor-polynomial.md`
+- ✓ Remainder term in Taylor's theorem → `remainder-term-in-taylors-theorem.md`
 
 **Theorems:**
-- Rolle's theorem → `rolles-theorem.md`
-- Mean value theorem (Lagrange) → `mean-value-theorem.md`
-- Cauchy mean value theorem → `cauchy-mean-value-theorem.md`
-- Fixed sign of derivative implies monotonicity → `derivative-sign-monotonicity.md`
-- Taylor's theorem with remainder → `taylors-theorem.md`
-- Darboux theorem → `darboux-theorem.md`
-- Inverse function theorem (1D) → `inverse-function-theorem-1d.md`
-- L'Hôpital's rule → `lhopitals-rule.md`
+- ✓ Rolle's theorem → `rolles-theorem.md`
+- ✓ Mean value theorem (Lagrange) → `mean-value-theorem.md`
+- ✓ Cauchy mean value theorem → `cauchy-mean-value-theorem.md`
+- ✓ Fixed sign of derivative implies monotonicity → `fixed-sign-of-derivative-implies-monotonicity.md`
+- ✓ Taylor's theorem with remainder → `taylors-theorem-with-remainder.md`
+- ✓ Darboux theorem → `darboux-theorem.md`
+- ✓ Inverse function theorem (1D) → `inverse-function-theorem-one-variable.md`
+- ✓ L'Hôpital's rule → `lhopitals-rule.md`
 
 **Propositions:**
-- Differentiability rules (linearity, product, quotient, chain) → `differentiation-rules.md`
-- Derivative zero implies constant → `derivative-zero-implies-constant.md`
-- Bounded derivative implies uniformly continuous → `bounded-derivative-uniform-continuity.md`
+- ✓ Differentiability rules (linearity, product, quotient, chain) → `differentiation-rules-one-variable.md`
+- ✓ Derivative zero implies constant → `derivative-zero-implies-constant.md`
+- ✓ Bounded derivative implies uniformly continuous → `bounded-derivative-implies-uniform-continuity.md`
 
 **Corollaries:**
-- f′ > 0 implies strictly increasing → `positive-derivative-strictly-increasing.md`
-- f′ = 0 implies constant → `zero-derivative-constant.md`
+- ✓ f′ > 0 implies strictly increasing → `positive-derivative-strictly-increasing.md`
+- ✓ f′ = 0 implies constant → `zero-derivative-constant-corollary.md`
 
 ---
 
@@ -345,45 +345,45 @@ Riemann and Riemann–Stieltjes integration.
 *Depends on:* `analysis-differentiation-1d`, `analysis-compactness-connectedness`
 
 **Definitions:**
-- Step function → `step-function.md`
-- Partition of an interval → `partition-interval.md`
-- Refinement → `refinement.md`
-- Mesh (norm) of partition → `mesh.md`
-- Upper sum / Lower sum → `upper-lower-sum.md`
-- Tagged partition → `tagged-partition.md`
-- Riemann sum → `riemann-sum.md`
-- Riemann integrable function → `riemann-integrable.md`
-- Riemann integral → `riemann-integral.md`
-- Oscillation of a function → `oscillation.md`
-- Set of measure zero → `measure-zero.md`
-- Content (Jordan content) → `jordan-content.md`
-- Riemann–Stieltjes integral → `riemann-stieltjes-integral.md`
-- Integrator function → `integrator.md`
+- ✓ Step function → `step-function.md`
+- ✓ Partition of an interval → `partition-of-an-interval.md`
+- ✓ Refinement → `refinement-of-a-partition.md`
+- ✓ Mesh (norm) of partition → `mesh-of-a-partition.md`
+- ✓ Upper sum / Lower sum → `upper-sum-riemann.md` and `lower-sum-riemann.md`
+- ✓ Tagged partition → `tagged-partition.md`
+- ✓ Riemann sum → `riemann-sum.md`
+- ✓ Riemann integrable function → `riemann-integrable-function.md`
+- ✓ Riemann integral → `riemann-integral.md`
+- ✓ Oscillation of a function → `oscillation-of-a-function.md`
+- ✓ Set of measure zero → `set-of-measure-zero-in-rk.md`
+- ✓ Content (Jordan content) → `jordan-content.md`
+- ✓ Riemann–Stieltjes integral → `riemann-stieltjes-integral.md`
+- ✓ Integrator function → `integrator-function.md`
 
 **Theorems:**
-- Existence of Riemann integral for continuous functions → `riemann-integral-continuous-functions.md`
-- Riemann integrability of monotone functions → `riemann-integrability-monotone.md`
-- Riemann integrability with finitely many discontinuities → `riemann-integrability-finite-discontinuities.md`
-- Lebesgue criterion for Riemann integrability → `lebesgue-criterion-riemann.md`
-- Mean value theorem for integrals → `mean-value-theorem-integrals.md`
-- Fundamental theorem of calculus (Part I) → `ftc-part-1.md`
-- Fundamental theorem of calculus (Part II) → `ftc-part-2.md`
-- Substitution rule → `substitution-rule.md`
-- Riemann–Stieltjes integrability theorem → `riemann-stieltjes-integrability.md`
-- Integration by parts (R-S) → `integration-by-parts.md`
+- ✓ Existence of Riemann integral for continuous functions → `existence-of-riemann-integral-for-continuous-functions.md`
+- ✓ Riemann integrability of monotone functions → `riemann-integrability-of-monotone-functions.md`
+- ✓ Riemann integrability with finitely many discontinuities → `riemann-integrability-of-functions-with-finitely-many-discontinuities.md`
+- ✓ Lebesgue criterion for Riemann integrability → `lebesgue-criterion-for-riemann-integrability.md`
+- ✓ Mean value theorem for integrals → `mean-value-theorem-for-integrals.md`
+- ✓ Fundamental theorem of calculus (Part I) → `fundamental-theorem-of-calculus-part-i.md`
+- ✓ Fundamental theorem of calculus (Part II) → `fundamental-theorem-of-calculus-part-ii.md`
+- ✓ Substitution rule → `substitution-rule-for-one-variable-riemann-integrals.md`
+- ✓ Riemann–Stieltjes integrability theorem → `riemann-stieltjes-integrability-theorem.md`
+- ✓ Integration by parts (R-S) → `integration-by-parts-riemann-stieltjes.md`
 
 **Lemmas:**
-- Refinement lemma for upper/lower sums → `refinement-lemma.md`
-- Oscillation criterion lemma → `oscillation-criterion-lemma.md`
-- Additivity and linearity lemmas → `integral-additivity-linearity.md`
+- ✓ Refinement lemma for upper/lower sums → `refinement-lemma-upper-lower-sums.md`
+- ✓ Oscillation criterion lemma → `oscillation-criterion-lemma.md`
+- ✓ Additivity and linearity lemmas → `additivity-linearity-riemann-integral.md`
 
 **Propositions:**
-- Riemann integrability implies boundedness → `integrability-implies-boundedness.md`
-- |f| integrable if f integrable → `absolute-value-integrable.md`
-- Closure properties (sums, products) → `integrable-closure-properties.md`
+- ✓ Riemann integrability implies boundedness → `riemann-integrability-implies-boundedness.md`
+- ✓ |f| integrable if f integrable → `absolute-value-preserves-integrability.md`
+- ✓ Closure properties (sums, products) → `algebra-of-riemann-integrable-functions.md`
 
 **Corollaries:**
-- FTC corollary: integration differentiates antiderivatives → `ftc-corollary.md`
+- ✓ FTC corollary: integration differentiates antiderivatives → `newton-leibniz-formula.md`
 
 ---
 
@@ -393,36 +393,36 @@ Sequences and series of functions, uniform convergence, power series.
 *Depends on:* `analysis-riemann-integration`, `analysis-compactness-connectedness`
 
 **Definitions:**
-- Pointwise convergence → `pointwise-convergence.md`
-- Uniform convergence → `uniform-convergence.md`
-- Uniform Cauchy sequence of functions → `uniform-cauchy-functions.md`
-- Uniform convergence on compact sets → `uniform-convergence-on-compacts.md`
-- Series of functions → `series-of-functions.md`
-- Equicontinuity (family of functions) → `equicontinuity.md`
+- ✓ Pointwise convergence → `pointwise-convergence.md`
+- ✓ Uniform convergence → `uniform-convergence-of-a-sequence-of-functions.md`
+- ✓ Uniform Cauchy sequence of functions → `uniform-cauchy-sequence-of-functions.md`
+- ✓ Uniform convergence on compact sets → `uniform-convergence-on-compact-sets.md`
+- ✓ Series of functions → `series-of-functions.md`
+- ✓ Equicontinuity (family of functions) → `equicontinuity.md`
 
 **Theorems:**
-- Uniform limit theorem for continuity → `uniform-limit-continuity.md`
-- Weierstrass M-test → `weierstrass-m-test.md`
-- Uniform convergence and integration theorem → `uniform-convergence-integration.md`
-- Uniform convergence and differentiation theorem → `uniform-convergence-differentiation.md`
-- Dini's theorem → `dinis-theorem.md`
-- Weierstrass approximation theorem → `weierstrass-approximation-theorem.md`
-- Stone–Weierstrass theorem → `stone-weierstrass-theorem.md`
-- Cauchy–Hadamard theorem (radius of convergence) → `cauchy-hadamard-theorem.md`
-- Uniform convergence of power series on compact subsets → `power-series-uniform-convergence.md`
-- Term-by-term differentiation of power series → `power-series-differentiation.md`
-- Term-by-term integration of power series → `power-series-integration.md`
-- Abel's theorem → `abels-theorem.md`
+- ✓ Uniform limit theorem for continuity → `uniform-limit-theorem-for-continuity.md`
+- ✓ Weierstrass M-test → `weierstrass-m-test.md`
+- ✓ Uniform convergence and integration theorem → `uniform-convergence-and-integration-theorem.md`
+- ✓ Uniform convergence and differentiation theorem → `uniform-convergence-and-differentiation-theorem.md`
+- ✓ Dini's theorem → `dinis-theorem.md`
+- ✓ Weierstrass approximation theorem → `weierstrass-approximation-theorem.md`
+- ✓ Stone–Weierstrass theorem → `stone-weierstrass-theorem.md`
+- ✓ Cauchy–Hadamard theorem (radius of convergence) → `cauchy-hadamard-theorem.md`
+- ✓ Uniform convergence of power series on compact subsets → `uniform-convergence-of-power-series-on-compact-subsets.md`
+- ✓ Term-by-term differentiation of power series → `term-by-term-differentiation-of-power-series.md`
+- ✓ Term-by-term integration of power series → `term-by-term-integration-of-power-series.md`
+- ✓ Abel's theorem → `abels-theorem.md`
 
 **Lemmas:**
-- Uniform convergence implies uniform Cauchy → `uniform-convergence-implies-uniform-cauchy.md`
-- Uniform Cauchy implies uniform convergence (complete codomain) → `uniform-cauchy-implies-uniform-convergence.md`
-- Uniform convergence preserves boundedness → `uniform-convergence-preserves-boundedness.md`
+- ✓ Uniform convergence implies uniform Cauchy → `uniform-convergence-implies-uniform-cauchy.md`
+- ✓ Uniform Cauchy implies uniform convergence (complete codomain) → `uniform-cauchy-implies-uniform-convergence.md`
+- ✓ Uniform convergence preserves boundedness → `uniform-convergence-preserves-boundedness.md`
 
 **Corollaries:**
-- Uniform convergence implies pointwise convergence → `uniform-implies-pointwise.md`
-- Uniform limit of continuous functions is continuous → `uniform-limit-of-continuous-is-continuous.md`
-- Power series are analytic on disk of convergence → `power-series-analytic.md`
+- ✓ Uniform convergence implies pointwise convergence → `uniform-convergence-implies-pointwise.md`
+- ✓ Uniform limit of continuous functions is continuous → `uniform-limit-of-continuous-is-continuous.md`
+- ✓ Power series are analytic on disk of convergence → `power-series-analytic-on-disk.md`
 
 ---
 
@@ -432,47 +432,47 @@ Multivariable differentiation and integration.
 *Depends on:* `shared-linear-algebra`, `analysis-differentiation-1d`, `analysis-riemann-integration`
 
 **Definitions:**
-- Partial derivative → `partial-derivative.md`
-- Mixed partial derivative → `mixed-partial-derivative.md`
-- Directional derivative → `directional-derivative.md`
-- Gradient → `gradient.md`
-- Jacobian matrix → `jacobian-matrix.md`
-- Jacobian determinant → `jacobian-determinant.md`
-- Hessian matrix → `hessian-matrix.md`
-- Total derivative (Fréchet derivative) → `total-derivative.md`
-- Differentiable map (ℝ^k → ℝ^m) → `differentiable-map.md`
-- Class C^k map → `smooth-map.md`
-- Diffeomorphism → `diffeomorphism.md`
-- Implicitly defined function → `implicit-function.md`
-- Regular point / critical point → `regular-point.md`
-- Regular value / critical value → `critical-value.md`
-- Multiple integral over a rectangle → `multiple-integral.md`
-- Iterated integral → `iterated-integral.md`
-- Change of variables → `change-of-variables.md`
-- Constraint set → `constraint-set.md`
-- Lagrange multiplier condition → `lagrange-multiplier.md`
+- ✓ Partial derivative → `partial-derivative.md`
+- ✓ Mixed partial derivative → `mixed-partial-derivative.md`
+- ✓ Directional derivative → `directional-derivative.md`
+- ✓ Gradient → `gradient.md`
+- ✓ Jacobian matrix → `jacobian-matrix.md`
+- ✓ Jacobian determinant → `jacobian-determinant.md`
+- ✓ Hessian matrix → `hessian-matrix.md`
+- ✓ Total derivative (Fréchet derivative) → `total-derivative-frechet-derivative.md`
+- ✓ Differentiable map (ℝ^k → ℝ^m) → `differentiable-map.md`
+- ✓ Class C^k map → `class-ck-map.md`
+- ✓ Diffeomorphism → `diffeomorphism.md`
+- ✓ Implicitly defined function → `implicitly-defined-function.md`
+- ✓ Regular point / critical point → `regular-point-critical-point-multivariable.md`
+- ✓ Regular value / critical value → `regular-value-critical-value-multivariable.md`
+- ✓ Multiple integral over a rectangle → `multiple-riemann-integral-over-a-rectangle.md`
+- ✓ Iterated integral → `iterated-integral.md`
+- ✓ Change of variables → `change-of-variables-for-multiple-integrals.md`
+- ✓ Constraint set → `constraint-set.md`
+- ✓ Lagrange multiplier condition → `lagrange-multiplier-condition.md`
 
 **Theorems:**
-- Differentiability implies continuity (multivariable) → `differentiability-implies-continuity-multivariable.md`
-- Chain rule (multivariable) → `chain-rule-multivariable.md`
-- Mean value inequality → `mean-value-inequality.md`
-- C^1 implies differentiable → `c1-implies-differentiable.md`
-- Schwarz (Clairaut) theorem → `schwarz-theorem.md`
-- Taylor's theorem (several variables) → `taylors-theorem-multivariable.md`
-- Inverse function theorem (ℝ^k) → `inverse-function-theorem.md`
-- Implicit function theorem → `implicit-function-theorem.md`
-- Fubini theorem (Riemann) → `fubini-theorem.md`
-- Change of variables formula → `change-of-variables-formula.md`
-- Lagrange multipliers theorem → `lagrange-multipliers-theorem.md`
+- ✓ Differentiability implies continuity (multivariable) → `differentiability-implies-continuity.md`
+- ✓ Chain rule (multivariable) → `chain-rule-multivariable.md`
+- ✓ Mean value inequality → `mean-value-inequality-multivariable.md`
+- ✓ C^1 implies differentiable → `sufficient-condition-for-differentiability.md`
+- ✓ Schwarz (Clairaut) theorem → `schwarz-clairaut-theorem.md`
+- ✓ Taylor's theorem (several variables) → `taylors-theorem-in-several-variables.md`
+- ✓ Inverse function theorem (ℝ^k) → `inverse-function-theorem-rk.md`
+- ✓ Implicit function theorem → `implicit-function-theorem.md`
+- ✓ Fubini theorem (Riemann) → `fubini-theorem-for-riemann-integrals.md`
+- ✓ Change of variables formula → `change-of-variables-formula-for-multiple-integrals.md`
+- ✓ Lagrange multipliers theorem → `lagrange-multipliers-theorem.md`
 
 **Lemmas:**
-- Mean value estimate lemma → `mean-value-estimate-lemma.md`
+- ✓ Mean value estimate lemma → `mean-value-estimate-lemma.md`
 - Determinant nonvanishing implies local invertibility → `determinant-local-invertibility.md`
 
 **Corollaries:**
-- Equality of mixed partials under C^2 → `mixed-partials-equality.md`
-- Local diffeomorphism corollary → `local-diffeomorphism-corollary.md`
-- Implicit function parameterization corollary → `implicit-parameterization-corollary.md`
+- ✓ Equality of mixed partials under C^2 → `c2-implies-equal-mixed-partials.md`
+- ✓ Local diffeomorphism corollary → `local-diffeomorphism-corollary.md`
+- ✓ Implicit function parameterization corollary → `local-implicit-function-parameterization.md`
 
 ---
 
@@ -1311,6 +1311,85 @@ Category theory foundations.
 
 **Lemmas:**
 - Yoneda lemma → `yoneda-lemma.md`
+
+---
+
+## Additional Knowls (not yet categorized)
+
+These knowls exist in the content directories but are not listed in the module definitions above.
+
+### `analysis` (additional)
+
+**Definitions:**
+- ✓ Baire space → `baire-space.md`
+- ✓ Characteristic function (indicator function) → `characteristic-function-indicator-function.md`
+- ✓ Contraction mapping → `contraction-mapping.md`
+- ✓ Dense set → `dense-set.md`
+- ✓ Equicontinuous family → `equicontinuous-family.md`
+- ✓ Euclidean space ℝ^k → `euclidean-space-rk.md`
+- ✓ Fixed point → `fixed-point.md`
+- ✓ Indexed family of sets → `indexed-family-of-sets.md`
+- ✓ Inner product on ℝ^k → `inner-product-on-rk.md`
+- ✓ Pointwise bounded family → `pointwise-bounded-family.md`
+- ✓ Power set → `power-set.md`
+- ✓ Relatively compact set → `relatively-compact-set.md`
+- ✓ Restriction of a function → `restriction-of-a-function.md`
+- ✓ Symmetric difference → `symmetric-difference.md`
+- ✓ Uniformly bounded family → `uniformly-bounded-family.md`
+
+**Theorems:**
+- ✓ Arzelà–Ascoli theorem → `arzela-ascoli-theorem.md`
+- ✓ Banach fixed point theorem → `banach-fixed-point-theorem.md`
+- ✓ Cauchy–Schwarz inequality → `cauchy-schwarz-inequality.md`
+- ✓ Compactness criteria in ℝ^k → `compactness-criteria-rk.md`
+- ✓ Completeness of C^k → `completeness-of-ck.md`
+- ✓ Compact iff complete and totally bounded → `compact-iff-complete-totally-bounded.md`
+- ✓ Connectedness criteria in ℝ → `connectedness-criteria-r.md`
+- ✓ Convergence in product metric spaces → `convergence-in-product-metric-spaces.md`
+- ✓ Second derivative tests → `second-derivative-tests.md`
+
+**Lemmas:**
+- ✓ Absolute convergence implies Cauchy criterion → `absolute-convergence-implies-cauchy-criterion.md`
+- ✓ Bounded infinite set has limit point → `bounded-infinite-set-has-limit-point.md`
+- ✓ Compactness of graphs lemma → `compactness-of-graphs-lemma.md`
+- ✓ Equicontinuity: pointwise bounded implies uniformly bounded → `equicontinuity-pointwise-bounded-uniform-bounded.md`
+- ✓ Equicontinuity: pointwise convergence on dense set lemma → `equicontinuity-pointwise-convergence-dense-set-lemma.md`
+- ✓ Finite subcover lemma → `finite-subcover-lemma.md`
+- ✓ Jordan decomposition lemma → `jordan-decomposition-lemma.md`
+- ✓ Lebesgue number lemma (auxiliary refinement) → `lebesgue-number-lemma-auxiliary-refinement.md`
+- ✓ Neumann series lemma → `neumann-series-lemma.md`
+- ✓ Totally bounded implies Cauchy subsequence → `totally-bounded-cauchy-subsequence.md`
+
+**Propositions:**
+- ✓ Composition preserves Riemann integrability → `composition-preserves-riemann-integrability.md`
+- ✓ Continuous on compact: bounded corollary → `continuous-on-compact-bounded-corollary.md`
+- ✓ Continuous image: compact, closed, bounded → `continuous-image-compact-closed-bounded.md`
+- ✓ Differentiability criterion via remainder → `differentiability-criterion-remainder.md`
+- ✓ Differentiability on an interval → `differentiability-on-an-interval.md`
+- ✓ Image of compact connected is interval → `image-compact-connected-is-interval.md`
+- ✓ Integration by parts → `integration-by-parts.md`
+- ✓ Interchange of limit and integral (uniform) → `interchange-limit-integral-uniform.md`
+- ✓ Linearity in integrator (Riemann–Stieltjes) → `linearity-in-integrator-riemann-stieltjes.md`
+- ✓ Total boundedness via ε-nets → `total-boundedness-epsilon-nets.md`
+- ✓ Uniform convergence implies convergence of sup norms → `uniform-convergence-implies-convergence-of-sup-norms.md`
+- ✓ Uniform limit of integrable functions → `uniform-limit-of-integrable-functions.md`
+- ✓ Uniform convergence of series of functions → `uniform-convergence-of-a-series-of-functions.md`
+
+**Corollaries:**
+- ✓ IVT corollary → `ivt-corollary.md`
+- ✓ M-test: continuity and integration corollary → `m-test-continuity-integration-corollary.md`
+- ✓ Term-by-term operations on series → `term-by-term-operations-series.md`
+- ✓ Change of variables (Jacobian corollary) → `change-of-variables-jacobian-corollary.md`
+
+### `convex-analysis` (additional)
+
+**Lemmas:**
+- ✓ Nonnegative real less than every ε > 0 must be zero → `nonnegative-real-less-than-every-0-must-be-zero.md`
+- ✓ Subsequence index bound (n_k ≥ k) → `subsequence-index-bound-n_k-k.md`
+
+**Propositions:**
+- ✓ Set operations: sum, scalar multiple, difference → `set-operations-sum-scalar-multiple-difference.md`
+- ✓ Closed sets characterized by sequences (version II) → `closed-sets-characterized-by-sequences-version-ii.md`
 
 ---
 

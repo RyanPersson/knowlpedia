@@ -4,7 +4,7 @@ description: "In a finite group, the order of a subgroup divides the order of th
 ---
 
 **Lagrange's Theorem.**
-Let $G$ be a finite {{< knowl id="group" text="group" >}}, and let $H \le G$ be a {{< knowl id="subgroup" text="subgroup" >}}. Then all left {{< knowl id="coset" text="cosets" >}} of $H$ in $G$ have the same {{< knowl id="cardinality" text="cardinality" >}} as $H$, the distinct left cosets form a {{< knowl id="partition" text="partition" >}} of $G$, and
+Let $G$ be a finite {{< knowl id="group" text="group" >}}, and let $H \le G$ be a {{< knowl id="subgroup" text="subgroup" >}}. Then all left {{< knowl id="coset" text="cosets" >}} of $H$ in $G$ have the same {{< knowl id="cardinality" section="shared-foundations" text="cardinality" >}} as $H$, the distinct left cosets form a {{< knowl id="partition" section="shared-foundations" text="partition" >}} of $G$, and
 $$
 |G| = [G:H]\cdot |H|,
 $$

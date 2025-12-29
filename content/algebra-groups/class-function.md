@@ -3,7 +3,7 @@ title: "Class function"
 description: "A function on a group that is constant on conjugacy classes"
 ---
 
-Let $G$ be a {{</* knowl id="group" text="group" */>}} and let $A$ be a set. A **class function** on $G$ with values in $A$ is a {{</* knowl id="function" text="function" */>}} $f\colon G\to A$ such that for all $x,g\in G$,
+Let $G$ be a {{</* knowl id="group" text="group" */>}} and let $A$ be a set. A **class function** on $G$ with values in $A$ is a {{</* knowl id="function" section="shared-foundations" text="function" */>}} $f\colon G\to A$ such that for all $x,g\in G$,
 $
 f(xgx^{-1})=f(g).
 $

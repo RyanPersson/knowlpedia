@@ -3,7 +3,7 @@ title: "Characteristic Subgroup"
 description: "A subgroup fixed by every automorphism of the group"
 ---
 
-Let $G$ be a {{</* knowl id="group" text="group" */>}} and let $H\le G$ be a subgroup. The subgroup $H$ is **characteristic** in $G$ (written $H \operatorname{char} G$) if for every automorphism $\varphi:G\to G$ (i.e. a bijective group homomorphism), one has
+Let $G$ be a {{</* knowl id="group" text="group" */>}} and let $H\le G$ be a {{</* knowl id="subgroup" text="subgroup" */>}}. The subgroup $H$ is **characteristic** in $G$ (written $H \operatorname{char} G$) if for every automorphism $\varphi:G\to G$ (i.e. a bijective {{</* knowl id="group-homomorphism" text="group homomorphism" */>}}), one has
 $
 \varphi(H)=H.
 $

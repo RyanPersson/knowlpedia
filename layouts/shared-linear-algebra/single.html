@@ -1,0 +1,31 @@
+{{ define "main" }}
+<article class="post-single glossary-entry">
+  <header class="post-header">
+    {{ partial "breadcrumbs.html" . }}
+    <h1 class="post-title">{{ .Title }}</h1>
+    {{- if .Description }}
+    <div class="post-description">
+      {{ .Description }}
+    </div>
+    {{- end }}
+  </header>
+
+  {{/* This div is extracted by knowls.js for inline display */}}
+  <div class="knowl-content" data-knowl-id="{{ .File.ContentBaseName }}">
+    <div class="knowl-header">
+      <strong>{{ .Title }}</strong>
+      <button class="knowl-close" aria-label="Close">&times;</button>
+    </div>
+    <div class="knowl-body">
+      {{ .Content }}
+    </div>
+    <div class="knowl-footer">
+      <button class="knowl-close" aria-label="Close">&times;</button>
+    </div>
+  </div>
+
+  <footer class="post-footer">
+    <p><a href="/shared-linear-algebra/">← Back to Linear Algebra</a></p>
+  </footer>
+</article>
+{{ end }}
