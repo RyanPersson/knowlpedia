@@ -3,10 +3,10 @@ title: "Uniform continuity"
 description: "Continuity with a single δ(ε) working uniformly for all points in the domain."
 ---
 
-Let $(X,d_X)$ and $(Y,d_Y)$ be metric spaces, let $E\subseteq X$, and let $f:E\to Y$. The function $f$ is **uniformly continuous on $E$** if
+Let $(X,d_X)$ and $(Y,d_Y)$ be {{< knowl id="metric-space" text="metric spaces" >}}, let $E\subseteq X$, and let $f:E\to Y$. The function $f$ is **uniformly continuous on $E$** if
 $$\forall \varepsilon>0,\ \exists \delta>0\ \text{such that}\ \forall x,y\in E,\ \bigl(d_X(x,y)<\delta \Rightarrow d_Y(f(x),f(y))<\varepsilon\bigr).$$
 
-Uniform continuity strengthens pointwise continuity by requiring that the same $\delta$ works everywhere on $E$. It is essential for interchanging limits and integrals and for extension theorems; continuous functions on compact sets are uniformly continuous.
+Uniform continuity strengthens {{< knowl id="continuity-at-a-point" text="pointwise continuity" >}} by requiring that the same $\delta$ works everywhere on $E$. It is essential for interchanging limits and integrals and for extension theorems; {{< knowl id="continuity-on-a-set" text="continuous functions" >}} on {{< knowl id="compact-set" text="compact sets" >}} are uniformly continuous.
 
 **Examples:**
 - $f(x)=x^2$ is not uniformly continuous on $\mathbb{R}$, but it is uniformly continuous on every bounded interval $[a,b]$.

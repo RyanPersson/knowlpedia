@@ -3,11 +3,11 @@ title: "Inverse function"
 description: "The function that undoes a bijective function."
 ---
 
-Let $f:X\to Y$ be bijective. The **inverse function** of $f$ is the function $f^{-1}:Y\to X$ defined by
+Let $f:X\to Y$ be {{< knowl id="bijective-function" text="bijective" >}}. The **inverse function** of $f$ is the {{< knowl id="function-map" text="function" >}} $f^{-1}:Y\to X$ defined by
 $$f^{-1}(y)=x\quad\text{where $x\in X$ is the unique element with }f(x)=y.$$
 It satisfies
 $$f^{-1}\circ f = \mathrm{id}_X \quad\text{and}\quad f\circ f^{-1}=\mathrm{id}_Y,$$
-where $\mathrm{id}_X:X\to X$ is the identity map $\mathrm{id}_X(x)=x$.
+where $\mathrm{id}_X:X\to X$ is the identity map $\mathrm{id}_X(x)=x$ (see {{< knowl id="composition-of-functions" text="composition" >}}).
 
 Inverse functions are central in analysis: many theorems (e.g., inverse function theorems) give conditions under which a function has a (local) inverse with additional regularity.
 

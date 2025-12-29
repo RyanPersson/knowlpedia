@@ -3,11 +3,11 @@ title: "Euclidean space ℝ^k"
 description: "The set of k-tuples of real numbers, viewed as k-dimensional space."
 ---
 
-For an integer $k\ge 1$, **Euclidean space** $\mathbb{R}^k$ is the Cartesian product
+For an integer $k\ge 1$, **Euclidean space** $\mathbb{R}^k$ is the {{< knowl id="cartesian-product" text="Cartesian product" >}}
 $$\mathbb{R}^k := \underbrace{\mathbb{R}\times\cdots\times\mathbb{R}}_{k\ \text{factors}}.$$
 An element $x\in\mathbb{R}^k$ is written $x=(x_1,\dots,x_k)$ with $x_i\in\mathbb{R}$.
 
-Euclidean spaces are the standard setting for multivariable calculus and for many basic examples in metric space theory. They come equipped with canonical algebraic and geometric structures (addition, scalar multiplication, inner product, norm).
+Euclidean spaces are the standard setting for multivariable calculus and for many basic examples in {{< knowl id="metric-space" text="metric space" >}} theory. They come equipped with canonical algebraic and geometric structures (addition, scalar multiplication, {{< knowl id="inner-product-on-rk" text="inner product" >}}, {{< knowl id="euclidean-norm" text="norm" >}}).
 
 **Examples:**
 - $\mathbb{R}^1=\mathbb{R}$.

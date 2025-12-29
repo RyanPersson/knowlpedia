@@ -3,9 +3,9 @@ title: "Dense subset"
 description: "A subset whose closure is the whole space."
 ---
 
-Let $(X,d)$ be a metric space and let $D\subseteq X$. The set $D$ is **dense** in $X$ if
-$$\overline{D}=X.$$
-Equivalently, $D$ is dense in $X$ iff for every nonempty open set $U\subseteq X$, one has $U\cap D\neq\varnothing$.
+Let $(X,d)$ be a {{< knowl id="metric-space" text="metric space" >}} and let $D\subseteq X$. The set $D$ is **dense** in $X$ if
+$$\overline{D}=X$$
+(see {{< knowl id="closure" text="closure" >}}). Equivalently, $D$ is dense in $X$ iff for every nonempty {{< knowl id="open-set" text="open set" >}} $U\subseteq X$, one has $U\cap D\neq\varnothing$.
 
 Density means that every point of $X$ can be approximated arbitrarily well by points of $D$. Dense subsets are central in approximation theorems and in separability questions.
 

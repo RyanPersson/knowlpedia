@@ -3,12 +3,12 @@ title: "Compact set"
 description: "A set for which every open cover has a finite subcover."
 ---
 
-Let $(X,d)$ be a metric space and let $K\subseteq X$. The set $K$ is **compact** if for every family of open sets $\{U_i\}_{i\in I}$ in $X$ such that
+Let $(X,d)$ be a {{< knowl id="metric-space" text="metric space" >}} and let $K\subseteq X$. The set $K$ is **compact** if for every family of {{< knowl id="open-set" text="open sets" >}} $\{U_i\}_{i\in I}$ in $X$ such that
 $$K\subseteq \bigcup_{i\in I} U_i,$$
 there exist finitely many indices $i_1,\dots,i_N\in I$ such that
 $$K\subseteq U_{i_1}\cup\cdots\cup U_{i_N}.$$
 
-Compactness is a finiteness condition on the topology. In analysis it is the hypothesis behind uniform continuity (Heine–Cantor), attainment of extrema (Extreme Value Theorem), and many extraction arguments (existence of convergent subsequences).
+Compactness is a finiteness condition on the topology. In analysis it is the hypothesis behind {{< knowl id="uniform-continuity" text="uniform continuity" >}} (Heine–Cantor), attainment of extrema (Extreme Value Theorem), and many extraction arguments (existence of convergent {{< knowl id="subsequence" text="subsequences" >}}).
 
 **Examples:**
 - In $\mathbb{R}$ with the usual metric, $[a,b]$ is compact.

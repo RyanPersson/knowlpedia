@@ -3,11 +3,11 @@ title: "Infimum (greatest lower bound)"
 description: "The largest lower bound of a subset in an ordered set, if it exists."
 ---
 
-Let $(X,\le)$ be an ordered set and let $S\subseteq X$. An element $i^\ast\in X$ is the **infimum** of $S$, written $i^\ast=\inf S$, if:
-- $i^\ast$ is a lower bound of $S$, i.e. $\forall s\in S,\ i^\ast\le s$, and
+Let $(X,\le)$ be a {{< knowl id="partial-order" text="partially ordered set" >}} and let $S\subseteq X$. An element $i^\ast\in X$ is the **infimum** of $S$, written $i^\ast=\inf S$, if:
+- $i^\ast$ is a {{< knowl id="lower-bound" text="lower bound" >}} of $S$, i.e. $\forall s\in S,\ i^\ast\le s$, and
 - $i^\ast$ is the greatest such lower bound: for every lower bound $\ell$ of $S$, one has $\ell\le i^\ast$.
 
-Infima are the "best possible" lower bounds. In $\mathbb{R}$, the existence of infima for bounded-below sets is equivalent to the existence of suprema for bounded-above sets.
+Infima are the "best possible" lower bounds. In $\mathbb{R}$, the existence of infima for {{< knowl id="bounded-below" text="bounded-below" >}} sets is equivalent to the existence of {{< knowl id="supremum" text="suprema" >}} for {{< knowl id="bounded-above" text="bounded-above" >}} sets.
 
 **Examples:**
 - In $\mathbb{R}$, $\inf(0,1)=0$ (even though $0\notin(0,1)$).

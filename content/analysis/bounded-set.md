@@ -5,10 +5,10 @@ description: "A set that stays within finite bounds, in an ordered set or in a m
 
 A subset $S$ is called **bounded** in two common contexts:
 
-- In an ordered set $(X,\le)$, a subset $S\subseteq X$ is **bounded** if it is bounded above and bounded below, i.e. if there exist $\ell,u\in X$ such that
+- In an ordered set $(X,\le)$, a subset $S\subseteq X$ is **bounded** if it is {{< knowl id="bounded-above" text="bounded above" >}} and {{< knowl id="bounded-below" text="bounded below" >}}, i.e. if there exist $\ell,u\in X$ such that
   $$\forall s\in S,\ \ell\le s\le u.$$
 
-- In a metric space $(X,d)$, a subset $S\subseteq X$ is **bounded** if there exist $x_0\in X$ and $M\in[0,\infty)$ such that
+- In a {{< knowl id="metric-space" text="metric space" >}} $(X,d)$, a subset $S\subseteq X$ is **bounded** if there exist $x_0\in X$ and $M\in[0,\infty)$ such that
   $$\forall x\in S,\ d(x,x_0)\le M.$$
 
 In $\mathbb{R}$ with its usual metric $d(x,y)=|x-y|$, these two notions agree. In general metric spaces there is no order, so the metric definition is the relevant one.

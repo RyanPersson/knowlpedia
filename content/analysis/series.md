@@ -5,7 +5,7 @@ description: "An infinite sum ∑ a_n defined via convergence of its partial sum
 
 Let $(a_n)_{n\in\mathbb{N}}$ be a sequence in $\mathbb{R}$ or $\mathbb{C}$. The **series**
 $$\sum_{n=1}^\infty a_n$$
-is defined via its **partial sums** $s_N=\sum_{n=1}^N a_n$. One says the series is **summable** if the sequence $(s_N)$ converges.
+is defined via its {{< knowl id="partial-sums" text="partial sums" >}} $s_N=\sum_{n=1}^N a_n$. One says the series is **summable** if the sequence $(s_N)$ {{< knowl id="convergent-sequence" text="converges" >}}.
 
 Series are the basic mechanism for defining many analytic objects (power series, Fourier series, infinite products) and for quantifying convergence beyond finite sums.
 

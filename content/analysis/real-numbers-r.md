@@ -7,13 +7,13 @@ The **real numbers** $\mathbb{R}$ are characterized (up to a unique order-preser
 
 - $(\mathbb{R},+,\cdot)$ is a **field**: $(\mathbb{R},+)$ is an abelian group with identity $0$, $(\mathbb{R}\setminus\{0\},\cdot)$ is an abelian group with identity $1$, and multiplication distributes over addition.
 
-- $\le$ is a **total order** on $\mathbb{R}$ compatible with the field operations, meaning:
+- $\le$ is a {{< knowl id="total-order-linear-order" text="total order" >}} on $\mathbb{R}$ compatible with the field operations, meaning:
   - if $a\le b$ then $a+c\le b+c$ for all $c\in\mathbb{R}$,
   - if $0\le a$ and $0\le b$ then $0\le ab$.
 
-- (**Completeness / least upper bound property**) Every nonempty subset $S\subseteq\mathbb{R}$ that is bounded above has a supremum in $\mathbb{R}$.
+- (**Completeness / least upper bound property**) Every nonempty {{< knowl id="subset" text="subset" >}} $S\subseteq\mathbb{R}$ that is {{< knowl id="bounded-above" text="bounded above" >}} has a {{< knowl id="supremum" text="supremum" >}} in $\mathbb{R}$.
 
-Completeness is what distinguishes $\mathbb{R}$ from $\mathbb{Q}$ and underlies many limit and convergence theorems in analysis.
+Completeness is what distinguishes $\mathbb{R}$ from $\mathbb{Q}$ and underlies many limit and {{< knowl id="convergent-sequence" text="convergence" >}} theorems in analysis.
 
 **Examples:**
 - The set $S=(0,1)$ is nonempty and bounded above, and $\sup S=1\in\mathbb{R}$.
