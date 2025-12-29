@@ -50,3 +50,8 @@ theme = 'PaperMod'
     name = "Analysis"
     url = "/analysis/"
     weight = 15
+  [[menu.main]]
+    identifier = "langlands-letter"
+    name = "Langlands Letter"
+    url = "/langlands-letter/"
+    weight = 17
