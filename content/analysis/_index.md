@@ -138,9 +138,11 @@ This page tracks the completion status of all knowls in the Real Analysis (Baby 
 - [x] curve
 
 ### Category notions (built from topology)
+- [x] dense-set
 - [x] nowhere-dense-set
 - [x] meager-set
 - [x] residual-set
+- [x] baire-space
 
 ### One-variable differentiation
 - [x] differentiability-one-variable
@@ -181,6 +183,9 @@ This page tracks the completion status of all knowls in the Real Analysis (Baby 
 - [x] series-of-functions
 - [x] uniform-convergence-of-a-series-of-functions
 - [x] equicontinuity
+- [x] equicontinuous-family
+- [x] pointwise-bounded-family
+- [x] uniformly-bounded-family
 
 ### Multivariable differentiation and calculus
 - [x] partial-derivative
@@ -197,6 +202,13 @@ This page tracks the completion status of all knowls in the Real Analysis (Baby 
 - [ ] implicitly-defined-function
 - [ ] regular-point-critical-point-multivariable
 - [ ] regular-value-critical-value-multivariable
+
+### Fixed point theory and contractions
+- [x] fixed-point
+- [x] contraction-mapping
+
+### Compactness in function spaces
+- [x] relatively-compact-set
 
 ### Multiple integration and transformations
 - [ ] multiple-riemann-integral-over-a-rectangle
@@ -264,12 +276,16 @@ This page tracks the completion status of all knowls in the Real Analysis (Baby 
 - [ ] cantor-intersection-theorem
 - [ ] baire-category-theorem
 
+### Fixed point theorems
+- [x] banach-fixed-point-theorem
+
 ### Compactness and its consequences
 - [ ] sequential-compactness-equals-compactness
 - [ ] finite-intersection-property-theorem
 - [ ] lebesgue-number-lemma
 - [ ] compactness-implies-completeness
 - [ ] compactness-implies-total-boundedness
+- [x] compact-iff-complete-totally-bounded
 - [ ] continuous-image-of-compact-set-is-compact
 - [ ] extreme-value-theorem
 - [ ] heine-cantor-theorem
@@ -315,6 +331,10 @@ This page tracks the completion status of all knowls in the Real Analysis (Baby 
 ### Approximation theorems
 - [ ] weierstrass-approximation-theorem
 - [ ] stone-weierstrass-theorem
+
+### Function space compactness
+- [x] completeness-of-ck
+- [x] arzela-ascoli-theorem
 
 ### Power series
 - [ ] cauchy-hadamard-theorem
@@ -375,6 +395,7 @@ This page tracks the completion status of all knowls in the Real Analysis (Baby 
 - [ ] uniform-convergence-preserves-boundedness
 - [ ] uniform-convergence-implies-convergence-of-sup-norms
 - [ ] equicontinuity-pointwise-convergence-dense-set-lemma
+- [x] equicontinuity-pointwise-bounded-uniform-bounded
 
 ### Riemann / Riemann–Stieltjes technical lemmas
 - [x] refinement-lemma-for-upper-and-lower-sums
@@ -426,6 +447,7 @@ This page tracks the completion status of all knowls in the Real Analysis (Baby 
 ### Compactness/totally-bounded rephrasings
 - [ ] equivalence-of-compactness-and-sequential-compactness
 - [x] total-boundedness-characterization-via-epsilon-nets
+- [x] totally-bounded-cauchy-subsequence
 
 ### Multivariable differentiability and extrema tests
 - [x] differentiability-criteria-via-remainder-estimates
@@ -482,7 +504,7 @@ This page tracks the completion status of all knowls in the Real Analysis (Baby 
 
 **Total items in list:** ~280
 
-**Completed:** 203 (all definitions through multivariable differentiation basics + lemmas, propositions, corollaries batch)
+**Completed:** 221 (all definitions through multivariable differentiation basics + lemmas, propositions, corollaries batch + category/Baire/fixed-point/Arzelà–Ascoli batch)
 
-**Remaining:** ~77 (remaining definitions, axioms, theorems)
+**Remaining:** ~59 (remaining definitions, axioms, theorems)
 -->
