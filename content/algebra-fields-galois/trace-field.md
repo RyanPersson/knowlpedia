@@ -11,7 +11,7 @@ The **trace** of \(\alpha\) from \(L\) to \(K\) is
 \[
 \mathrm{Tr}_{L/K}(\alpha) \;=\; \mathrm{tr}(m_\alpha)\in K,
 \]
-the ordinary {{< knowl id="trace" text="trace" >}} of this linear operator.
+the ordinary {{< knowl id="trace" section="shared-linear-algebra" text="trace" >}} of this linear operator.
 
 The trace is \(K\)-linear and interacts with towers via {{< knowl id="trace-norm-towers" text="trace in towers" >}}.
 

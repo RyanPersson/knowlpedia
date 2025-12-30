@@ -17,4 +17,4 @@ This complements {{< knowl id="algebraic-closure-existence" text="existence of a
 2. Any algebraic closure of \(\mathbb{F}_p\) is isomorphic (over \(\mathbb{F}_p\)) to \(\bigcup_{n\ge1}\mathbb{F}_{p^n}\).
 3. If \(\overline{K}\) is fixed, any other algebraic closure can be identified with a \(K\)-subfield of \(\overline{K}\) via such an isomorphism (after choosing one).
 
-**Related.** {{< knowl id="zorns-lemma" text="Zorn's lemma" >}}, {{< knowl id="axiom-of-choice" text="axiom of choice" >}}.
+**Related.** {{< knowl id="zorns-lemma" section="shared-foundations" text="Zorn's lemma" >}}, {{< knowl id="axiom-of-choice" section="shared-foundations" text="axiom of choice" >}}.

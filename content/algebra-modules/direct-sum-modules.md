@@ -7,7 +7,7 @@ Given a family of $R$-{{< knowl id="module" text="modules" >}} $(M_i)_{i\in I}$,
 \[
 \bigoplus_{i\in I} M_i=\{(m_i)\in \prod_{i\in I} M_i : m_i=0 \text{ for all but finitely many } i\},
 \]
-with coordinatewise addition and scalar multiplication. It is naturally a submodule of the {{< knowl id="direct-product-modules" text="direct product" >}}, which itself is modeled on the {{< knowl id="cartesian-product" text="Cartesian product" >}} of sets.
+with coordinatewise addition and scalar multiplication. It is naturally a submodule of the {{< knowl id="direct-product-modules" text="direct product" >}}, which itself is modeled on the {{< knowl id="cartesian-product" section="analysis" text="Cartesian product" >}} of sets.
 
 The direct sum is characterized by the {{< knowl id="direct-sum-universal-property" text="universal property of the direct sum" >}}: maps out of a direct sum are uniquely determined by maps out of each summand, subject to finite support.
 

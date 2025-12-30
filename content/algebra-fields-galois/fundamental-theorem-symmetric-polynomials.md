@@ -4,7 +4,7 @@ description: "Every symmetric polynomial is a polynomial in the elementary symme
 ---
 
 **Theorem.**  
-Let \(R\) be a {{< knowl id="commutative-ring" text="commutative ring" >}} and consider \(R[x_1,\dots,x_n]\) (a {{< knowl id="polynomial-ring" text="polynomial ring" >}}). A polynomial \(f\in R[x_1,\dots,x_n]\) is **symmetric** if it is invariant under every permutation of the variables.  
+Let \(R\) be a {{< knowl id="commutative-ring" section="algebra-rings" text="commutative ring" >}} and consider \(R[x_1,\dots,x_n]\) (a {{< knowl id="polynomial-ring" section="algebra-rings" text="polynomial ring" >}}). A polynomial \(f\in R[x_1,\dots,x_n]\) is **symmetric** if it is invariant under every permutation of the variables.  
 
 Then every symmetric polynomial \(f\) can be written uniquely as
 \[

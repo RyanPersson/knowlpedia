@@ -13,4 +13,4 @@ Moreover, if \(L\) and \(L'\) are splitting fields of \(f\) over \(K\), then the
 2. Over \(\mathbb{Q}\), \(f=x^3-2\) has splitting field \(L=\mathbb{Q}(\sqrt[3]{2},\omega)\) where \(\omega\) is a primitive cube root of unity.
 3. Over \(\mathbb{F}_2\), \(f=x^2+x+1\) is irreducible and its splitting field is \(\mathbb{F}_4\).
 
-**Related.** {{< knowl id="polynomial-ring" text="polynomial rings" >}}, {{< knowl id="field-extension" text="field extensions" >}}, {{< knowl id="normality-splitting-field" text="normality via splitting fields" >}}.
+**Related.** {{< knowl id="polynomial-ring" section="algebra-rings" text="polynomial rings" >}}, {{< knowl id="field-extension" text="field extensions" >}}, {{< knowl id="normality-splitting-field" text="normality via splitting fields" >}}.

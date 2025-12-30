@@ -3,7 +3,7 @@ title: "Torsion element"
 description: "An element killed by a nonzero scalar in a module over an integral domain."
 ---
 
-Let $R$ be an {{< knowl id="integral-domain" text="integral domain" >}} and $M$ a (left) $R$-{{< knowl id="module" text="module" >}}. An element $m\in M$ is a **torsion element** if there exists a nonzero $r\in R$ such that $rm=0$. Equivalently, the {{< knowl id="annihilator-element" text="annihilator" >}}
+Let $R$ be an {{< knowl id="integral-domain" section="algebra-rings" text="integral domain" >}} and $M$ a (left) $R$-{{< knowl id="module" text="module" >}}. An element $m\in M$ is a **torsion element** if there exists a nonzero $r\in R$ such that $rm=0$. Equivalently, the {{< knowl id="annihilator-element" text="annihilator" >}}
 $\operatorname{ann}(m)$ is a nonzero ideal of $R$.
 
 Torsion detects “failure of cancellation” under scalar multiplication and is a central invariant in structure theorems over PIDs and Dedekind domains.

@@ -17,4 +17,4 @@ In particular, a finite extension \(L/K\) is {{< knowl id="separable-extension" 
 2. Over \(\mathbb{F}_p(t)\), \(f=x^{p}-t\) has derivative \(0\), hence is inseparable; it has a single root of multiplicity \(p\) in an algebraic closure.
 3. Over \(\mathbb{F}_p\), \(f=x^{p}-x\) satisfies \(f'=-1\neq 0\), hence has no repeated roots and splits with \(p\) distinct roots (namely all elements of \(\mathbb{F}_p\)).
 
-**Related.** {{< knowl id="irreducible-polynomial" text="irreducible polynomials" >}}, {{< knowl id="inseparable-extension" text="inseparable extensions" >}}.
+**Related.** {{< knowl id="irreducible-polynomial" section="algebra-rings" text="irreducible polynomials" >}}, {{< knowl id="inseparable-extension" text="inseparable extensions" >}}.

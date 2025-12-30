@@ -8,4 +8,4 @@ description: "The Smith normal form diagonal entries are canonical invariants an
 \operatorname{coker}(A)\cong R^m/\operatorname{im}(A)\cong \bigoplus_{i=1}^r R/(d_i)\;\oplus\;R^{\,m-r}.
 \]
 
-The uniqueness part comes from the {{< knowl id="smith-normal-form-theorem" text="Smith normal form theorem" >}}, and the decomposition agrees with the invariant factors in the {{< knowl id="structure-theorem-pid" text="structure theorem over a PID" >}}, computing {{< knowl id="cokernel-module" text="cokernels" >}} over a {{< knowl id="pid" text="PID" >}}.
+The uniqueness part comes from the {{< knowl id="smith-normal-form-theorem" text="Smith normal form theorem" >}}, and the decomposition agrees with the invariant factors in the {{< knowl id="structure-theorem-pid" text="structure theorem over a PID" >}}, computing {{< knowl id="cokernel-module" text="cokernels" >}} over a {{< knowl id="pid" section="algebra-rings" text="PID" >}}.

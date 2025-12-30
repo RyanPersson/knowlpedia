@@ -7,11 +7,11 @@ description: "For a finite extension L/K, N_{L/K}(α) is the determinant of mult
 \[
 \mathrm{N}_{L/K}(\alpha) \;=\; \det(m_\alpha)\in K,
 \]
-the usual {{< knowl id="determinant" text="determinant" >}} of this \(K\)-linear operator.
+the usual {{< knowl id="determinant" section="shared-linear-algebra" text="determinant" >}} of this \(K\)-linear operator.
 
 The norm is multiplicative: \(\mathrm{N}(\alpha\beta)=\mathrm{N}(\alpha)\mathrm{N}(\beta)\), and is compatible with towers (see {{< knowl id="trace-norm-towers" text="norm in towers" >}}).
 
-**See also.** {{< knowl id="trace-field" text="field trace" >}}, {{< knowl id="group-of-units" text="units" >}} (the norm sends \(L^\times\to K^\times\)).
+**See also.** {{< knowl id="trace-field" text="field trace" >}}, {{< knowl id="group-of-units" section="algebra-rings" text="units" >}} (the norm sends \(L^\times\to K^\times\)).
 
 **Examples.**
 1. In \(L=\mathbb{Q}(\sqrt d)\) (char \(\neq 2\)), \(\mathrm{N}_{L/\mathbb{Q}}(a+b\sqrt d)=a^2-d b^2\).

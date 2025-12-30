@@ -9,7 +9,7 @@ L^G \;=\; \{\,x\in L : \sigma(x)=x \text{ for all } \sigma\in G\,\}.
 \]
 It is a subfield of \(L\). In {{< knowl id="galois-extension" text="Galois" >}} settings, fixed fields of subgroups are exactly the {{< knowl id="intermediate-field" text="intermediate fields" >}} (see {{< knowl id="galois-correspondence" text="Galois correspondence" >}} and {{< knowl id="artins-theorem-fixed-fields" text="Artin's theorem on fixed fields" >}}).
 
-**See also.** {{< knowl id="group-action" text="group action" >}} (automorphisms act on field elements).
+**See also.** {{< knowl id="group-action" section="algebra-groups" text="group action" >}} (automorphisms act on field elements).
 
 **Examples.**
 1. If \(G=\langle\text{conjugation}\rangle\le \mathrm{Aut}(\mathbb{C})\), then \(\mathbb{C}^G=\mathbb{R}\).

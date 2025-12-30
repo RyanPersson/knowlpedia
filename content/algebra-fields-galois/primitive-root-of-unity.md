@@ -7,11 +7,11 @@ description: "A root of unity ζ with multiplicative order exactly n (i.e., ζ^n
 \[
 \zeta^n=1 \quad\text{and}\quad \zeta^d\neq 1 \text{ for every } 1\le d<n.
 \]
-Equivalently, \(\zeta\) generates the cyclic subgroup of all \(n\)-th roots of unity in \(L^\times\) (compare {{< knowl id="cyclic-subgroup" text="cyclic subgroups" >}} and {{< knowl id="finite-field-multiplicative-group-cyclic" text="cyclicity of finite-field units" >}}).
+Equivalently, \(\zeta\) generates the cyclic subgroup of all \(n\)-th roots of unity in \(L^\times\) (compare {{< knowl id="cyclic-subgroup" section="algebra-groups" text="cyclic subgroups" >}} and {{< knowl id="finite-field-multiplicative-group-cyclic" text="cyclicity of finite-field units" >}}).
 
 Primitive \(n\)-th roots are precisely the roots of the {{< knowl id="cyclotomic-polynomial" text="cyclotomic polynomial" >}} \(\Phi_n(x)\).
 
-**See also.** {{< knowl id="cyclotomic-extension" text="cyclotomic extension" >}}, {{< knowl id="order-divides-group-order" text="order divides group order" >}}.
+**See also.** {{< knowl id="cyclotomic-extension" text="cyclotomic extension" >}}, {{< knowl id="order-divides-group-order" section="algebra-groups" text="order divides group order" >}}.
 
 **Examples.**
 1. In \(\mathbb{C}\), \(\zeta_n=e^{2\pi i/n}\) is a primitive \(n\)-th root of unity.

@@ -3,7 +3,7 @@ title: "Elementary divisor theorem"
 description: "Over a PID, a finitely generated module decomposes into primary cyclic summands."
 ---
 
-**Elementary divisor theorem**: Let \(R\) be a {{< knowl id="pid" text="PID" >}} and let \(M\) be a finitely generated \(R\)-module. Then there exist \(r\ge 0\) and a finite multiset of prime powers \(\{p_i^{e_i}\}\subset R\) such that
+**Elementary divisor theorem**: Let \(R\) be a {{< knowl id="pid" section="algebra-rings" text="PID" >}} and let \(M\) be a finitely generated \(R\)-module. Then there exist \(r\ge 0\) and a finite multiset of prime powers \(\{p_i^{e_i}\}\subset R\) such that
 \[
 M \;\cong\; R^{\,r}\;\oplus\;\bigoplus_i R/(p_i^{e_i}),
 \]

@@ -3,7 +3,7 @@ title: "Bimodule"
 description: "A module with commuting left and right actions by (possibly different) rings."
 ---
 
-Let $R,S$ be {{< knowl id="ring" text="rings" >}}. An **$(R,S)$-bimodule** is an abelian group $M$ that is simultaneously a left {{< knowl id="module" text="module" >}} over $R$ and a right module over $S$, such that the actions are compatible:
+Let $R,S$ be {{< knowl id="ring" section="algebra-rings" text="rings" >}}. An **$(R,S)$-bimodule** is an abelian group $M$ that is simultaneously a left {{< knowl id="module" text="module" >}} over $R$ and a right module over $S$, such that the actions are compatible:
 for all $r\in R$, $s\in S$, and $m\in M$, one has $(rm)s=r(ms)$.
 
 Bimodules are the natural setting for many constructions (e.g. balanced products) and are the input for the {{< knowl id="tensor-product" text="tensor product" >}}, where compatibility of left/right actions is essential.

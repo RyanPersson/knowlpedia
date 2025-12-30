@@ -10,7 +10,7 @@ description: "For a finite extension L/K, the discriminant det(Tr(α_i α_j)) of
 \det\!\big(\mathrm{Tr}_{L/K}(\alpha_i\alpha_j)\big)_{1\le i,j\le n}
 \;\in\; K,
 \]
-where \(\mathrm{Tr}_{L/K}\) is the {{< knowl id="trace-field" text="field trace" >}} and \(\det\) is the {{< knowl id="determinant" text="determinant" >}}.
+where \(\mathrm{Tr}_{L/K}\) is the {{< knowl id="trace-field" text="field trace" >}} and \(\det\) is the {{< knowl id="determinant" section="shared-linear-algebra" text="determinant" >}}.
 
 Under a change of basis by a matrix \(M\in \mathrm{GL}_n(K)\), the discriminant scales by \((\det M)^2\). In particular, whether the discriminant is zero or nonzero does not depend on the chosen basis (for separable extensions it is nonzero).
 

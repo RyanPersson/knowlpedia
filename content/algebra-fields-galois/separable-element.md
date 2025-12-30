@@ -3,7 +3,7 @@ title: "Separable element"
 description: "An algebraic element whose minimal polynomial has no repeated roots."
 ---
 
-**Definition.** Let \(L/K\) be a {{< knowl id="field-extension" text="field extension" >}} and let \(\alpha\in L\) be {{< knowl id="algebraic-element" text="algebraic over K" >}}. The element \(\alpha\) is **separable over \(K\)** if its {{< knowl id="minimal-polynomial-field" text="minimal polynomial" >}} \(m_\alpha(x)\in K[x]\) has **distinct roots** in a splitting field (equivalently, \(m_\alpha\) has no repeated root).
+**Definition.** Let \(L/K\) be a {{< knowl id="field-extension" text="field extension" >}} and let \(\alpha\in L\) be {{< knowl id="algebraic-element" text="algebraic over K" >}}. The element \(\alpha\) is **separable over \(K\)** if its {{< knowl id="minimal-polynomial-field" section="algebra-rings" text="minimal polynomial" >}} \(m_\alpha(x)\in K[x]\) has **distinct roots** in a splitting field (equivalently, \(m_\alpha\) has no repeated root).
 
 A standard criterion is: \(\alpha\) is separable iff \(\gcd(m_\alpha, m_\alpha')=1\) in \(K[x]\), where \(m_\alpha'\) is the formal derivative.
 

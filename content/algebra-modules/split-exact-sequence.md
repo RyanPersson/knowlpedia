@@ -7,7 +7,7 @@ A short exact sequence
 \[
 0 \to A \xrightarrow{i} B \xrightarrow{p} C \to 0
 \]
-(see {{< knowl id="short-exact-sequence" text="short exact sequence" >}}) **splits** if there exists a homomorphism $s:C\to B$ with $p\circ s=\mathrm{id}_C$ (a section), or equivalently a homomorphism $r:B\to A$ with $r\circ i=\mathrm{id}_A$ (a retraction), where $\mathrm{id}$ is the {{< knowl id="identity-function" text="identity" >}} map. In this case one has an isomorphism $B\cong A\oplus C$ as in {{< knowl id="direct-sum-modules" text="direct sums" >}}; a standard proof is the {{< knowl id="splitting-lemma" text="splitting lemma" >}}.
+(see {{< knowl id="short-exact-sequence" text="short exact sequence" >}}) **splits** if there exists a homomorphism $s:C\to B$ with $p\circ s=\mathrm{id}_C$ (a section), or equivalently a homomorphism $r:B\to A$ with $r\circ i=\mathrm{id}_A$ (a retraction), where $\mathrm{id}$ is the {{< knowl id="identity-function" section="shared-foundations" text="identity" >}} map. In this case one has an isomorphism $B\cong A\oplus C$ as in {{< knowl id="direct-sum-modules" text="direct sums" >}}; a standard proof is the {{< knowl id="splitting-lemma" text="splitting lemma" >}}.
 
 Split exactness is the precise condition that the extension carries no “twisting”: $B$ is just a direct sum of the ends.
 

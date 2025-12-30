@@ -6,7 +6,7 @@ description: "An element α is algebraic over K if it satisfies a nonzero polyno
 **Definition.** Let \(L/K\) be a {{< knowl id="field-extension" text="field extension" >}} and let \(\alpha\in L\). The element \(\alpha\) is **algebraic over \(K\)** if there exists a nonzero polynomial \(f(x)\in K[x]\) such that \(f(\alpha)=0\).  
 If no such nonzero polynomial exists, \(\alpha\) is {{< knowl id="transcendental-element" text="transcendental over K" >}}.
 
-Among all polynomials in \(K[x]\) vanishing at \(\alpha\), there is a unique monic one of minimal degree: the {{< knowl id="minimal-polynomial-field" text="minimal polynomial" >}} \(m_\alpha(x)\), which is {{< knowl id="irreducible-polynomial" text="irreducible" >}} in \(K[x]\).
+Among all polynomials in \(K[x]\) vanishing at \(\alpha\), there is a unique monic one of minimal degree: the {{< knowl id="minimal-polynomial-field" section="algebra-rings" text="minimal polynomial" >}} \(m_\alpha(x)\), which is {{< knowl id="irreducible-polynomial" section="algebra-rings" text="irreducible" >}} in \(K[x]\).
 
 **See also.** {{< knowl id="simple-extension" text="simple extension" >}}, {{< knowl id="algebraic-extension" text="algebraic extension" >}}.
 

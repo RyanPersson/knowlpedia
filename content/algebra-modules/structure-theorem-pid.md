@@ -3,7 +3,7 @@ title: "Structure theorem for finitely generated modules over a PID"
 description: "A finitely generated module over a PID splits as a free part plus cyclic torsion factors."
 ---
 
-**Structure theorem (f.g. modules over a PID)**: Let \(R\) be a {{< knowl id="pid" text="principal ideal domain" >}} and let \(M\) be a {{< knowl id="finitely-generated-module" text="finitely generated module" >}} over \(R\). Then there exist an integer \(r\ge 0\) and nonzero elements \(d_1,\dots,d_t\in R\) with \(d_1\mid d_2\mid \cdots \mid d_t\) such that
+**Structure theorem (f.g. modules over a PID)**: Let \(R\) be a {{< knowl id="pid" section="algebra-rings" text="principal ideal domain" >}} and let \(M\) be a {{< knowl id="finitely-generated-module" text="finitely generated module" >}} over \(R\). Then there exist an integer \(r\ge 0\) and nonzero elements \(d_1,\dots,d_t\in R\) with \(d_1\mid d_2\mid \cdots \mid d_t\) such that
 \[
 M \;\cong\; R^{\,r}\;\oplus\;\bigoplus_{i=1}^t R/(d_i),
 \]

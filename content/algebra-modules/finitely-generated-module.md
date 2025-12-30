@@ -7,7 +7,7 @@ A left $R$-{{< knowl id="module" text="module" >}} $M$ is **finitely generated**
 \[
 m=r_1m_1+\cdots+r_nm_n
 \]
-for some $r_1,\dots,r_n\in R$. Equivalently, there is a {{< knowl id="surjective-function" text="surjective" >}} homomorphism $R^n\to M$, so $M$ is a quotient of a {{< knowl id="free-module" text="free module" >}} of finite rank.
+for some $r_1,\dots,r_n\in R$. Equivalently, there is a {{< knowl id="surjective-function" section="analysis" text="surjective" >}} homomorphism $R^n\to M$, so $M$ is a quotient of a {{< knowl id="free-module" text="free module" >}} of finite rank.
 
 The case $n=1$ recovers {{< knowl id="cyclic-module" text="cyclic modules" >}}. Finiteness hypotheses are central for structure theorems (e.g. over a PID) and for Noetherian conditions.
 

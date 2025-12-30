@@ -13,4 +13,4 @@ This is the same statement as {{< knowl id="finite-field-multiplicative-group-cy
 2. In \(\mathbb{F}_7\), \(3\) is primitive: \(3^k\) for \(k=1,\dots,6\) runs through all nonzero residues mod \(7\).
 3. In \(\mathbb{F}_8\), \(\mathbb{F}_8^\times\) has order \(7\) (prime), hence is cyclic; any element \(\ne 1\) generates.
 
-**Related.** {{< knowl id="cyclic-subgroup" text="cyclic groups" >}}, {{< knowl id="finite-field-existence-uniqueness" text="finite field structure" >}}.
+**Related.** {{< knowl id="cyclic-subgroup" section="algebra-groups" text="cyclic groups" >}}, {{< knowl id="finite-field-existence-uniqueness" text="finite field structure" >}}.

@@ -3,7 +3,7 @@ title: "Normal extension"
 description: "An algebraic extension in which irreducible polynomials with one root split completely."
 ---
 
-**Definition.** Let \(L/K\) be an {{< knowl id="algebraic-extension" text="algebraic extension" >}}. The extension \(L/K\) is **normal** if every {{< knowl id="irreducible-polynomial" text="irreducible" >}} polynomial \(f(x)\in K[x]\) that has at least one root in \(L\) actually **splits completely** into linear factors over \(L\).
+**Definition.** Let \(L/K\) be an {{< knowl id="algebraic-extension" text="algebraic extension" >}}. The extension \(L/K\) is **normal** if every {{< knowl id="irreducible-polynomial" section="algebra-rings" text="irreducible" >}} polynomial \(f(x)\in K[x]\) that has at least one root in \(L\) actually **splits completely** into linear factors over \(L\).
 
 Equivalently, \(L\) is a {{< knowl id="splitting-field" text="splitting field" >}} of some family of polynomials in \(K[x]\). (In many common situations, \(L\) is the splitting field of a single polynomial.)
 

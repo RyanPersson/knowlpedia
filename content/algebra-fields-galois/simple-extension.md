@@ -9,7 +9,7 @@ L = K(\alpha),
 \]
 the smallest subfield of \(L\) containing \(K\) and \(\alpha\). One also says “\(L\) is obtained from \(K\) by adjoining \(\alpha\)”.
 
-If \(\alpha\) is {{< knowl id="algebraic-element" text="algebraic" >}} over \(K\), then \(K(\alpha)\cong K[x]/(m_\alpha(x))\) where \(m_\alpha\) is the {{< knowl id="minimal-polynomial-field" text="minimal polynomial" >}} of \(\alpha\).
+If \(\alpha\) is {{< knowl id="algebraic-element" text="algebraic" >}} over \(K\), then \(K(\alpha)\cong K[x]/(m_\alpha(x))\) where \(m_\alpha\) is the {{< knowl id="minimal-polynomial-field" section="algebra-rings" text="minimal polynomial" >}} of \(\alpha\).
 
 **See also.** {{< knowl id="fg-field-extension" text="finitely generated field extension" >}}, {{< knowl id="transcendental-element" text="transcendental element" >}}.
 

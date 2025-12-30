@@ -13,9 +13,9 @@ the sequence
 \]
 is exact, where \(\otimes_R\) is the {{< knowl id="tensor-product" text="tensor product" >}}. Equivalently, the functor \(-\otimes_R M\) is exact (it is always right-exact, so flatness is precisely left-exactness).
 
-Flatness is weaker than projectivity: every {{< knowl id="projective-module" text="projective module" >}} is flat (see {{< knowl id="projective-implies-flat" text="projective implies flat" >}}), and every {{< knowl id="free-module" text="free module" >}} is flat. Over a {{< knowl id="commutative-ring" text="commutative ring" >}}, flatness controls base change and localization.
+Flatness is weaker than projectivity: every {{< knowl id="projective-module" text="projective module" >}} is flat (see {{< knowl id="projective-implies-flat" text="projective implies flat" >}}), and every {{< knowl id="free-module" text="free module" >}} is flat. Over a {{< knowl id="commutative-ring" section="algebra-rings" text="commutative ring" >}}, flatness controls base change and localization.
 
 **Examples:**
 - Any free \(R\)-module is flat.
 - If \(R\) is commutative and \(S\subseteq R\) is multiplicative, then the localization \(S^{-1}R\) is flat as an \(R\)-module.
-- Over a {{< knowl id="pid" text="PID" >}}, every {{< knowl id="torsion-free-module" text="torsion-free module" >}} is flat.
+- Over a {{< knowl id="pid" section="algebra-rings" text="PID" >}}, every {{< knowl id="torsion-free-module" text="torsion-free module" >}} is flat.

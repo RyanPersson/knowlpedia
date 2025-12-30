@@ -3,7 +3,7 @@ title: "Quotient module"
 description: "The module obtained by collapsing a submodule to zero."
 ---
 
-Let $M$ be a left $R$-module and let $N\le M$ be a {{< knowl id="submodule" text="submodule" >}}. Define an {{< knowl id="equivalence-relation" text="equivalence relation" >}} on $M$ by $m\sim m'$ iff $m-m'\in N$. The **quotient module** $M/N$ is the {{< knowl id="quotient-set" text="quotient set" >}} of equivalence classes, written $m+N$, with operations
+Let $M$ be a left $R$-module and let $N\le M$ be a {{< knowl id="submodule" text="submodule" >}}. Define an {{< knowl id="equivalence-relation" section="analysis" text="equivalence relation" >}} on $M$ by $m\sim m'$ iff $m-m'\in N$. The **quotient module** $M/N$ is the {{< knowl id="quotient-set" section="shared-foundations" text="quotient set" >}} of equivalence classes, written $m+N$, with operations
 \[
 (m+N)+(m'+N)=(m+m')+N,\qquad r(m+N)=(rm)+N.
 \]

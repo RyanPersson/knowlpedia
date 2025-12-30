@@ -7,7 +7,7 @@ Given a family of $R$-{{< knowl id="module" text="modules" >}} $(M_i)_{i\in I}$,
 \[
 \prod_{i\in I} M_i=\{(m_i)_{i\in I}: m_i\in M_i\},
 \]
-with coordinatewise addition and scalar multiplication. As a set it is the {{< knowl id="cartesian-product" text="Cartesian product" >}}, and it satisfies the categorical product universal property: giving a homomorphism $X\to \prod_i M_i$ is equivalent to giving compatible homomorphisms $X\to M_i$ for all $i$.
+with coordinatewise addition and scalar multiplication. As a set it is the {{< knowl id="cartesian-product" section="analysis" text="Cartesian product" >}}, and it satisfies the categorical product universal property: giving a homomorphism $X\to \prod_i M_i$ is equivalent to giving compatible homomorphisms $X\to M_i$ for all $i$.
 
 For infinite $I$, the product is strictly larger than the {{< knowl id="direct-sum-modules" text="direct sum" >}} because it allows infinitely many nonzero coordinates.
 

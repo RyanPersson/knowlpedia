@@ -13,4 +13,4 @@ Graded modules are the natural linear objects over a {{< knowl id="graded-ring" 
 
 **Examples:**
 - Any graded ring \(R\) is a graded \(R\)-module over itself, with the same decomposition \(R=\bigoplus R_n\).
-- If \(R\) is graded and \(I\subseteq R\) is a homogeneous {{< knowl id="ideal" text="ideal" >}}, then \(R/I\) is a graded module (and graded ring) with \((R/I)_n = R_n/(I\cap R_n)\).
+- If \(R\) is graded and \(I\subseteq R\) is a homogeneous {{< knowl id="ideal" section="algebra-rings" text="ideal" >}}, then \(R/I\) is a graded module (and graded ring) with \((R/I)_n = R_n/(I\cap R_n)\).

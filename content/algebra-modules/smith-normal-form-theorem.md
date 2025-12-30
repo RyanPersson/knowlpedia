@@ -3,7 +3,7 @@ title: "Smith normal form theorem"
 description: "A matrix over a PID can be diagonalized with divisibility conditions on the diagonal."
 ---
 
-**Smith normal form theorem**: Let \(R\) be a {{< knowl id="pid" text="PID" >}} and let \(A\) be an \(m\times n\) matrix with entries in \(R\). Then there exist invertible matrices \(U\in \mathrm{GL}_m(R)\) and \(V\in \mathrm{GL}_n(R)\) such that
+**Smith normal form theorem**: Let \(R\) be a {{< knowl id="pid" section="algebra-rings" text="PID" >}} and let \(A\) be an \(m\times n\) matrix with entries in \(R\). Then there exist invertible matrices \(U\in \mathrm{GL}_m(R)\) and \(V\in \mathrm{GL}_n(R)\) such that
 \[
 UAV=\mathrm{diag}(d_1,\dots,d_r,0,\dots,0),
 \]

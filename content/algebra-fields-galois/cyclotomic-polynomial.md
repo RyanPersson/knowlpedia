@@ -13,7 +13,7 @@ A fundamental factorization identity is
 \[
 x^n-1 \;=\; \prod_{d\mid n}\Phi_d(x).
 \]
-Over \(\mathbb{Q}\), \(\Phi_n(x)\) is {{< knowl id="irreducible-polynomial" text="irreducible" >}}, and its degree is \(\varphi(n)\) (Euler totient).
+Over \(\mathbb{Q}\), \(\Phi_n(x)\) is {{< knowl id="irreducible-polynomial" section="algebra-rings" text="irreducible" >}}, and its degree is \(\varphi(n)\) (Euler totient).
 
 **See also.** {{< knowl id="cyclotomic-extension" text="cyclotomic extension" >}}, {{< knowl id="splitting-field" text="splitting field" >}}.
 

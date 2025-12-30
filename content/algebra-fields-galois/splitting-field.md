@@ -10,7 +10,7 @@ description: "The smallest extension of K over which a polynomial f ∈ K[x] fac
 
 Splitting fields are unique up to \(K\)-isomorphism (see {{< knowl id="splitting-field-existence-uniqueness" text="existence and uniqueness of splitting fields" >}}).
 
-**See also.** {{< knowl id="normal-extension" text="normal extension" >}}, {{< knowl id="galois-extension" text="Galois extension" >}}, {{< knowl id="polynomial-ring" text="polynomial ring" >}}.
+**See also.** {{< knowl id="normal-extension" text="normal extension" >}}, {{< knowl id="galois-extension" text="Galois extension" >}}, {{< knowl id="polynomial-ring" section="algebra-rings" text="polynomial ring" >}}.
 
 **Examples.**
 1. For \(f(x)=x^2-2\in\mathbb{Q}[x]\), the splitting field is \(\mathbb{Q}(\sqrt2)\).

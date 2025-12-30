@@ -9,7 +9,7 @@ For every field \(K\), there exists an extension field \(\overline{K}\) such tha
 1. \(\overline{K}/K\) is an {{< knowl id="algebraic-extension" text="algebraic extension" >}}, and  
 2. \(\overline{K}\) is {{< knowl id="algebraic-closure" text="algebraically closed" >}}.
 
-Such a field \(\overline{K}\) is called an **algebraic closure** of \(K\). Standard proofs use {{< knowl id="zorns-lemma" text="Zorn's lemma" >}} (hence {{< knowl id="axiom-of-choice" text="choice" >}}).
+Such a field \(\overline{K}\) is called an **algebraic closure** of \(K\). Standard proofs use {{< knowl id="zorns-lemma" section="shared-foundations" text="Zorn's lemma" >}} (hence {{< knowl id="axiom-of-choice" section="shared-foundations" text="choice" >}}).
 
 **Examples.**
 1. An algebraic closure of \(\mathbb{R}\) is \(\mathbb{C}\) (every complex number satisfies a quadratic over \(\mathbb{R}\)).

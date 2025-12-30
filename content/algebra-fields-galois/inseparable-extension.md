@@ -5,7 +5,7 @@ description: "An algebraic extension that is not separable; occurs only in chara
 
 **Definition.** An {{< knowl id="algebraic-extension" text="algebraic extension" >}} \(L/K\) is **inseparable** if it is not a {{< knowl id="separable-extension" text="separable extension" >}}, i.e. if some element of \(L\) is not {{< knowl id="separable-element" text="separable over K" >}}.
 
-Inseparability can occur only in characteristic \(p>0\) (see {{< knowl id="characteristic-zero-or-prime" text="characteristic" >}}). A common special case is a **purely inseparable** extension, where every element \(\alpha\in L\) satisfies \(\alpha^{p^n}\in K\) for some \(n\).
+Inseparability can occur only in characteristic \(p>0\) (see {{< knowl id="characteristic-zero-or-prime" section="algebra-rings" text="characteristic" >}}). A common special case is a **purely inseparable** extension, where every element \(\alpha\in L\) satisfies \(\alpha^{p^n}\in K\) for some \(n\).
 
 **See also.** {{< knowl id="perfect-field" text="perfect field" >}}, {{< knowl id="frobenius-endomorphism" text="Frobenius endomorphism" >}}.
 

@@ -7,7 +7,7 @@ description: "A bijective field homomorphism σ: L → L; these form a group und
 
 Given a subfield \(K\subseteq L\), the automorphisms that fix \(K\) pointwise form the {{< knowl id="galois-group" text="Galois group" >}} \(\mathrm{Gal}(L/K)\).
 
-**See also.** {{< knowl id="bijective-function" text="bijective functions" >}}, {{< knowl id="field-embedding" text="field embeddings" >}}.
+**See also.** {{< knowl id="bijective-function" section="analysis" text="bijective functions" >}}, {{< knowl id="field-embedding" text="field embeddings" >}}.
 
 **Examples.**
 1. Complex conjugation \(a+bi\mapsto a-bi\) is a nontrivial automorphism of \(\mathbb{C}\) fixing \(\mathbb{R}\).

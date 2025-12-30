@@ -15,4 +15,4 @@ is a {{< knowl id="group" section="algebra-groups" text="group" >}} that is {{< 
 2. \(\mathbb{F}_7^\times\) is cyclic of order \(6\); \(3\) generates because its powers give all nonzero residues mod \(7\).
 3. \(\mathbb{F}_8^\times\) has order \(7\), hence is cyclic (every group of prime order is cyclic).
 
-**Related.** {{< knowl id="cyclic-subgroup" text="cyclic subgroups" >}}, {{< knowl id="finite-field-existence-uniqueness" text="finite fields exist uniquely" >}}.
+**Related.** {{< knowl id="cyclic-subgroup" section="algebra-groups" text="cyclic subgroups" >}}, {{< knowl id="finite-field-existence-uniqueness" text="finite fields exist uniquely" >}}.

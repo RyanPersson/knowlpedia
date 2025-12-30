@@ -7,11 +7,11 @@ Let $M$ be a left $R$-{{< knowl id="module" text="module" >}}. The **annihilator
 \[
 \operatorname{ann}_R(M)=\{r\in R: rM=0\}.
 \]
-It equals the {{< knowl id="intersection" text="intersection" >}} of the elementwise annihilators:
+It equals the {{< knowl id="intersection" section="analysis" text="intersection" >}} of the elementwise annihilators:
 \[
 \operatorname{ann}_R(M)=\bigcap_{m\in M}\operatorname{ann}_R(m),
 \]
-where $\operatorname{ann}_R(m)$ is the {{< knowl id="annihilator-element" text="annihilator of an element" >}}. For a left module, $\operatorname{ann}_R(M)$ is a {{< knowl id="two-sided-ideal" text="two-sided ideal" >}}, since it is stable under multiplication on both sides by arbitrary ring elements.
+where $\operatorname{ann}_R(m)$ is the {{< knowl id="annihilator-element" text="annihilator of an element" >}}. For a left module, $\operatorname{ann}_R(M)$ is a {{< knowl id="two-sided-ideal" section="algebra-rings" text="two-sided ideal" >}}, since it is stable under multiplication on both sides by arbitrary ring elements.
 
 The annihilator measures faithfulness: $M$ is faithful iff $\operatorname{ann}_R(M)=0$.
 

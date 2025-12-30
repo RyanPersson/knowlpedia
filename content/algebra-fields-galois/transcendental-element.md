@@ -9,7 +9,7 @@ f(\alpha)\neq 0 \quad \text{for every nonzero } f(x)\in K[x].
 \]
 Equivalently, \(\alpha\) is **not** {{< knowl id="algebraic-element" text="algebraic over K" >}}.
 
-If \(t\) is transcendental over \(K\), the field \(K(t)\) of rational functions behaves like a “field of fractions” of the polynomial ring \(K[t]\) (compare {{< knowl id="fraction-field" text="fraction fields" >}}).
+If \(t\) is transcendental over \(K\), the field \(K(t)\) of rational functions behaves like a “field of fractions” of the polynomial ring \(K[t]\) (compare {{< knowl id="fraction-field" section="algebra-rings" text="fraction fields" >}}).
 
 **See also.** {{< knowl id="transcendental-extension" text="transcendental extension" >}}, {{< knowl id="fg-field-extension" text="finitely generated extension" >}}.
 

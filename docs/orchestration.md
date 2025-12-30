@@ -73,6 +73,32 @@ Also structure the _index.md with:
 
 See `content/algebra-modules/_index.md` for a good example.
 
+### 5. Cross-Section Links MUST Include `section` Parameter
+
+**CRITICAL**: When linking to a knowl in a *different* content section, you MUST specify the `section` parameter. The shortcode defaults to the current page's section.
+
+**Same section** (section parameter optional):
+```markdown
+{{< knowl id="field-extension" text="field extension" >}}
+```
+
+**Different section** (section parameter REQUIRED):
+```markdown
+{{< knowl id="vector-space" section="shared-linear-algebra" text="vector space" >}}
+{{< knowl id="ring" section="algebra-rings" text="ring" >}}
+{{< knowl id="group" section="algebra-groups" text="group" >}}
+```
+
+**Section directory mapping:**
+- `shared-foundations` - basic set theory, logic, functions
+- `shared-linear-algebra` - vector spaces, linear maps, matrices, eigenvalues
+- `algebra-groups` - groups, subgroups, homomorphisms, actions
+- `algebra-rings` - rings, ideals, fields, polynomials
+- `algebra-modules` - modules, exact sequences, tensor products
+- `algebra-fields-galois` - field extensions, Galois theory
+
+The batch prompt MUST tell GPT which section each prerequisite slug belongs to so it can generate correct cross-links.
+
 ## Complete Workflow
 
 ### Step 1: Extract Slugs from decomposition.md
@@ -93,39 +119,60 @@ slugs = [s[:-3] for s in re.findall(slug_pattern, section)]
 print(f"Found {len(slugs)} slugs")
 ```
 
-### Step 2: Gather Prerequisite Slugs
+### Step 2: Gather Prerequisite Slugs WITH Section Info
 
-The *Depends on* line in decomposition.md tells you which modules to include as cross-linking references.
+The *Depends on* line in decomposition.md tells you which modules to include. **You must track which section each slug belongs to.**
 
 ```python
-# Get slugs from prerequisite content directories
-prereq_slugs = []
-for prereq_dir in ["content/algebra-rings", "content/algebra-groups", ...]:
-    if os.path.exists(prereq_dir):
-        prereq_slugs += [f[:-3] for f in os.listdir(prereq_dir) 
-                         if f.endswith('.md') and f != '_index.md']
+# Build slug -> section mapping for all prerequisites
+prereq_sections = {
+    "shared-foundations": [],
+    "shared-linear-algebra": [],
+    "algebra-groups": [],
+    "algebra-rings": [],
+    "algebra-modules": [],
+    # Add more as needed
+}
+
+for section, slugs_list in prereq_sections.items():
+    dir_path = f"content/{section}"
+    if os.path.exists(dir_path):
+        prereq_sections[section] = [f[:-3] for f in os.listdir(dir_path)
+                                     if f.endswith('.md') and f != '_index.md']
 ```
 
-### Step 3: Create Batch Prompt Files
+### Step 3: Create Batch Prompt Files (with section info)
 
 Split slugs into batches of **20-25** (not 30 - smaller batches are faster and more reliable).
+
+**CRITICAL**: The prompt must tell GPT which section each prerequisite belongs to, so it generates correct `section="..."` parameters.
 
 ```python
 batch_size = 20  # Smaller batches = faster completion
 batches = [slugs[i:i+batch_size] for i in range(0, len(slugs), batch_size)]
+
+# Format prereqs with section info
+prereqs_formatted = ""
+for section, section_slugs in prereq_sections.items():
+    if section_slugs:
+        prereqs_formatted += f"\n**{section}**: {', '.join(section_slugs)}"
 
 prompt_template = '''You are creating knowls (short definition/theorem cards) for a math blog.
 
 For each slug below, generate a markdown file with:
 1. YAML front matter with `title` and `description`
 2. A clear statement of the definition/theorem
-3. Cross-links using Hugo shortcode: {{</* knowl id="other-slug" text="display text" */>}}
+3. Cross-links using Hugo shortcode (see syntax below)
 4. 2-3 concrete examples where applicable
 
-**Available slugs for cross-linking (from prerequisite modules):**
+**CROSS-LINK SYNTAX:**
+- For slugs in the CURRENT module: `{{</* knowl id="slug" text="display" */>}}`
+- For slugs in OTHER modules: `{{</* knowl id="slug" section="section-name" text="display" */>}}`
+
+**Available slugs by section (use section parameter when linking):**
 {prereqs}
 
-**Current module slugs (can also cross-link):**
+**Current module ({current_section}) slugs (no section parameter needed):**
 {current}
 
 **Generate knowls for these slugs:**
@@ -139,7 +186,7 @@ title: "Title"
 description: "One-line description"
 ---
 
-Content with {{</* knowl id="..." text="..." */>}} links...
+Content with cross-links...
 ```
 '''
 
