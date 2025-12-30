@@ -3,11 +3,11 @@ title: "Cokernel"
 description: "The quotient of the codomain by the image of a module homomorphism."
 ---
 
-Let $f:M\to N$ be a {{</* knowl id="module-homomorphism" text="module homomorphism" */>}}. The **cokernel** of $f$ is the {{</* knowl id="quotient-module" text="quotient module" */>}}
+Let $f:M\to N$ be a {{< knowl id="module-homomorphism" text="module homomorphism" >}}. The **cokernel** of $f$ is the {{< knowl id="quotient-module" text="quotient module" >}}
 \[
 \operatorname{coker}(f)=N/\operatorname{im}(f),
 \]
-where $\operatorname{im}(f)$ is the {{</* knowl id="image-module" text="image" */>}} of $f$. It comes with a canonical surjection $N\to \operatorname{coker}(f)$, and one always has an exact tail
+where $\operatorname{im}(f)$ is the {{< knowl id="image-module" text="image" >}} of $f$. It comes with a canonical surjection $N\to \operatorname{coker}(f)$, and one always has an exact tail
 \[
 M \xrightarrow{\,f\,} N \to \operatorname{coker}(f) \to 0.
 \]

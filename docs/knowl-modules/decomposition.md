@@ -472,70 +472,70 @@ Field extensions and Galois theory.
 *Depends on:* `algebra-rings`, `algebra-groups`
 
 **Definitions:**
-- Field extension → `field-extension.md`
-- Intermediate field → `intermediate-field.md`
-- Degree of a field extension → `degree-of-extension.md`
-- Simple field extension → `simple-extension.md`
-- Tower of fields → `tower-of-fields.md`
-- Algebraic element → `algebraic-element.md`
-- Transcendental element → `transcendental-element.md`
-- Algebraic extension → `algebraic-extension.md`
-- Transcendental extension → `transcendental-extension.md`
-- Finitely generated field extension → `fg-field-extension.md`
-- Splitting field → `splitting-field.md`
-- Algebraic closure → `algebraic-closure.md`
-- Normal extension → `normal-extension.md`
-- Separable element → `separable-element.md`
-- Separable extension → `separable-extension.md`
-- Inseparable extension → `inseparable-extension.md`
-- Perfect field → `perfect-field.md`
-- Galois extension → `galois-extension.md`
-- Galois group → `galois-group.md`
-- Fixed field → `fixed-field.md`
-- Field embedding → `field-embedding.md`
-- Field automorphism → `field-automorphism.md`
-- Trace (field extension) → `trace-field.md`
-- Norm (field extension) → `norm-field.md`
-- Discriminant (field extension) → `discriminant-field.md`
-- Finite field → `finite-field.md`
-- Frobenius endomorphism → `frobenius-endomorphism.md`
-- Cyclotomic polynomial → `cyclotomic-polynomial.md`
-- Primitive root of unity → `primitive-root-of-unity.md`
-- Cyclotomic extension → `cyclotomic-extension.md`
+✓ - Field extension → `field-extension.md`
+✓ - Intermediate field → `intermediate-field.md`
+✓ - Degree of a field extension → `degree-of-extension.md`
+✓ - Simple field extension → `simple-extension.md`
+✓ - Tower of fields → `tower-of-fields.md`
+✓ - Algebraic element → `algebraic-element.md`
+✓ - Transcendental element → `transcendental-element.md`
+✓ - Algebraic extension → `algebraic-extension.md`
+✓ - Transcendental extension → `transcendental-extension.md`
+✓ - Finitely generated field extension → `fg-field-extension.md`
+✓ - Splitting field → `splitting-field.md`
+✓ - Algebraic closure → `algebraic-closure.md`
+✓ - Normal extension → `normal-extension.md`
+✓ - Separable element → `separable-element.md`
+✓ - Separable extension → `separable-extension.md`
+✓ - Inseparable extension → `inseparable-extension.md`
+✓ - Perfect field → `perfect-field.md`
+✓ - Galois extension → `galois-extension.md`
+✓ - Galois group → `galois-group.md`
+✓ - Fixed field → `fixed-field.md`
+✓ - Field embedding → `field-embedding.md`
+✓ - Field automorphism → `field-automorphism.md`
+✓ - Trace (field extension) → `trace-field.md`
+✓ - Norm (field extension) → `norm-field.md`
+✓ - Discriminant (field extension) → `discriminant-field.md`
+✓ - Finite field → `finite-field.md`
+✓ - Frobenius endomorphism → `frobenius-endomorphism.md`
+✓ - Cyclotomic polynomial → `cyclotomic-polynomial.md`
+✓ - Primitive root of unity → `primitive-root-of-unity.md`
+✓ - Cyclotomic extension → `cyclotomic-extension.md`
 
 **Theorems:**
-- Tower law (degree formula) → `tower-law.md`
-- Existence and uniqueness of splitting fields → `splitting-field-existence-uniqueness.md`
-- Existence of algebraic closures → `algebraic-closure-existence.md`
-- Primitive element theorem → `primitive-element-theorem.md`
-- Fundamental theorem of symmetric polynomials → `fundamental-theorem-symmetric-polynomials.md`
-- Fundamental theorem of Galois theory → `fundamental-theorem-galois-theory.md`
-- Artin's theorem on fixed fields → `artins-theorem-fixed-fields.md`
-- Existence and uniqueness of finite fields → `finite-field-existence-uniqueness.md`
-- Cyclicity of multiplicative group of finite field → `finite-field-multiplicative-group-cyclic.md`
-- Galois group of finite field is cyclic (Frobenius) → `finite-field-galois-group-cyclic.md`
+✓ - Tower law (degree formula) → `tower-law.md`
+✓ - Existence and uniqueness of splitting fields → `splitting-field-existence-uniqueness.md`
+✓ - Existence of algebraic closures → `algebraic-closure-existence.md`
+✓ - Primitive element theorem → `primitive-element-theorem.md`
+✓ - Fundamental theorem of symmetric polynomials → `fundamental-theorem-symmetric-polynomials.md`
+✓ - Fundamental theorem of Galois theory → `fundamental-theorem-galois-theory.md`
+✓ - Artin's theorem on fixed fields → `artins-theorem-fixed-fields.md`
+✓ - Existence and uniqueness of finite fields → `finite-field-existence-uniqueness.md`
+✓ - Cyclicity of multiplicative group of finite field → `finite-field-multiplicative-group-cyclic.md`
+✓ - Galois group of finite field is cyclic (Frobenius) → `finite-field-galois-group-cyclic.md`
 
 **Lemmas:**
-- Dedekind's independence lemma → `dedekind-independence-lemma.md`
-- Separable polynomial has distinct roots → `separable-distinct-roots.md`
-- Separability preserved under towers → `separability-towers.md`
-- Normality = being a splitting field → `normality-splitting-field.md`
+✓ - Dedekind's independence lemma → `dedekind-independence-lemma.md`
+✓ - Separable polynomial has distinct roots → `separable-distinct-roots.md`
+✓ - Separability preserved under towers → `separability-towers.md`
+✓ - Normality = being a splitting field → `normality-splitting-field.md`
 
 **Propositions:**
-- Finite extension over perfect field is separable → `finite-extension-perfect-separable.md`
-- Finite fields are perfect → `finite-fields-perfect.md`
-- Separable + normal ⇔ Galois → `separable-normal-galois.md`
-- Trace/norm in towers → `trace-norm-towers.md`
-- Splitting field degree bounds → `splitting-field-degree-bounds.md`
+✓ - Finite extension over perfect field is separable → `finite-extension-perfect-separable.md`
+✓ - Finite fields are perfect → `finite-fields-perfect.md`
+✓ - Separable + normal ⇔ Galois → `separable-normal-galois.md`
+✓ - Trace/norm in towers → `trace-norm-towers.md`
+✓ - Splitting field degree bounds → `splitting-field-degree-bounds.md`
 
 **Corollaries:**
-- Uniqueness of splitting fields up to K-isomorphism → `splitting-field-uniqueness.md`
-- Uniqueness of algebraic closures → `algebraic-closure-uniqueness.md`
-- Galois correspondence (subgroups ↔ intermediate fields) → `galois-correspondence.md`
-- |Gal(L/K)| = [L:K] for Galois extensions → `galois-degree-equals-group-order.md`
-- Finite field Galois groups are cyclic → `finite-field-galois-cyclic.md`
-- Existence and uniqueness of 𝔽_{p^n} → `finite-field-existence.md`
-- Multiplicative group of finite field is cyclic → `finite-field-multiplicative-cyclic.md`
+✓ - Uniqueness of splitting fields up to K-isomorphism → `splitting-field-uniqueness.md`
+✓ - Uniqueness of algebraic closures → `algebraic-closure-uniqueness.md`
+✓ - Galois correspondence (subgroups ↔ intermediate fields) → `galois-correspondence.md`
+✓ - |Gal(L/K)| = [L:K] for Galois extensions → `galois-degree-equals-group-order.md`
+✓ - Finite field Galois groups are cyclic → `finite-field-galois-cyclic.md`
+✓ - Existence and uniqueness of 𝔽_{p^n} → `finite-field-existence.md`
+✓ - Multiplicative group of finite field is cyclic → `finite-field-multiplicative-cyclic.md`
 
 ---
 

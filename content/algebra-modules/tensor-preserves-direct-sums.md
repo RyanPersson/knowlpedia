@@ -12,4 +12,4 @@ induced by the inclusions $N_i\to\bigoplus_{i\in I}N_i$ is an isomorphism. Likew
 \Bigl(\bigoplus_{i\in I} M_i\Bigr)\otimes_R N \cong \bigoplus_{i\in I}(M_i\otimes_R N).
 \]
 
-This is a basic compatibility of the {{</* knowl id="tensor-product" text="tensor product" */>}} with the {{</* knowl id="direct-sum-modules" text="direct sum" */>}}, and can be viewed as a special case of the {{</* knowl id="tensor-hom-adjunction" text="Tensor–Hom adjunction" */>}}.
+This is a basic compatibility of the {{< knowl id="tensor-product" text="tensor product" >}} with the {{< knowl id="direct-sum-modules" text="direct sum" >}}, and can be viewed as a special case of the {{< knowl id="tensor-hom-adjunction" text="Tensor–Hom adjunction" >}}.

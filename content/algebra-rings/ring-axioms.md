@@ -3,7 +3,7 @@ title: "Ring axioms"
 description: "Axioms defining a ring as an abelian group under addition with associative multiplication distributing over addition."
 ---
 
-The **ring axioms** specify a set \(R\) equipped with two {{< knowl id="binary-operation" text="binary operations" >}} \(+\) and \(\cdot\) such that:
+The **ring axioms** specify a set \(R\) equipped with two {{< knowl id="binary-operation" section="shared-foundations" text="binary operations" >}} \(+\) and \(\cdot\) such that:
 
 1. \((R,+)\) is an {{< knowl id="abelian-group" section="algebra-groups" text="abelian group" >}} (with identity element \(0\)).
 2. Multiplication is associative: \((ab)c=a(bc)\) for all \(a,b,c\in R\).

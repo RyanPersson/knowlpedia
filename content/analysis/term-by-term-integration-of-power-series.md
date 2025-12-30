@@ -17,9 +17,7 @@ F'(x)=f(x).
 $
 Equivalently, for $x$ with $|x-x_0|<R$,
 $
-\int_{x_0}^{x} f(t)\,dt
-=
-\sum_{n=0}^\infty \frac{a_n}{n+1}(x-x_0)^{n+1}.
+\int_{x_0}^{x} f(t)\,dt = \sum_{n=0}^\infty \frac{a_n}{n+1}(x-x_0)^{n+1}.
 $
 
 This result provides an explicit antiderivative of a power {{< knowl id="series" text="series" >}} inside its disk/interval of convergence and is used to compute integrals and derive expansions.

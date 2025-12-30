@@ -3,7 +3,7 @@ title: "Annihilator ideal"
 description: "The set of ring elements that kill a given subset under multiplication."
 ---
 
-Let $R$ be a ring and let $S\subseteq R$ be a {{< knowl id="subset" text="subset" >}}. The **left annihilator** of $S$ is
+Let $R$ be a ring and let $S\subseteq R$ be a {{< knowl id="subset" section="shared-foundations" text="subset" >}}. The **left annihilator** of $S$ is
 \[
 \operatorname{Ann}_\ell(S)=\{r\in R : rs=0 \text{ for all } s\in S\},
 \]

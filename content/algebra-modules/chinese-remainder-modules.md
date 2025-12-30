@@ -9,4 +9,4 @@ M\Big/\Bigl(\bigcap_{j=1}^n I_j M\Bigr)\longrightarrow \bigoplus_{j=1}^n M/I_j M
 \]
 is an isomorphism of $R$-modules. In particular, if $I+J=R$ then $M/(IM\cap JM)\cong M/IM\oplus M/JM$.
 
-This is the module-level consequence of the {{</* knowl id="chinese-remainder-theorem" text="Chinese remainder theorem" */>}} for pairwise comaximal {{</* knowl id="ideal" text="ideals" */>}} in a {{</* knowl id="commutative-ring" text="commutative ring" */>}}, expressed as an isomorphism of {{</* knowl id="quotient-module" text="quotient modules" */>}} into a {{</* knowl id="direct-sum-modules" text="direct sum" */>}}.
+This is the module-level consequence of the {{< knowl id="chinese-remainder-theorem" text="Chinese remainder theorem" >}} for pairwise comaximal {{< knowl id="ideal" text="ideals" >}} in a {{< knowl id="commutative-ring" text="commutative ring" >}}, expressed as an isomorphism of {{< knowl id="quotient-module" text="quotient modules" >}} into a {{< knowl id="direct-sum-modules" text="direct sum" >}}.

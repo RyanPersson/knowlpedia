@@ -3,11 +3,11 @@ title: "Artinian module"
 description: "A module satisfying the descending chain condition on submodules."
 ---
 
-An $R$-module $M$ is **Artinian** if it satisfies the descending chain condition (DCC) on {{</* knowl id="submodule" text="submodules" */>}}: for every chain
+An $R$-{{< knowl id="module" text="module" >}} $M$ is **Artinian** if it satisfies the descending chain condition (DCC) on {{< knowl id="submodule" text="submodules" >}}: for every chain
 \[
 N_1 \supseteq N_2 \supseteq N_3 \supseteq \cdots
 \]
-there exists $k$ such that $N_k=N_{k+1}=\cdots$. For many classes of modules, Artinianity is equivalent to having finite length; compare {{</* knowl id="length-module" text="length" */>}}.
+there exists $k$ such that $N_k=N_{k+1}=\cdots$. For many classes of modules, Artinianity is equivalent to having finite length; compare {{< knowl id="length-module" text="length" >}}.
 
 Artinian modules are “finite from below” in their submodule lattice and are the setting for induction on minimal submodules.
 

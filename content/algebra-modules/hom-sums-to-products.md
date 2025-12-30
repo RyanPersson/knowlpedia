@@ -8,4 +8,4 @@ description: "Hom out of a direct sum canonically identifies with the product of
 \operatorname{Hom}_R\Bigl(\bigoplus_{i\in I} M_i,\,N\Bigr)\;\cong\;\prod_{i\in I}\operatorname{Hom}_R(M_i,N).
 \]
 
-This expresses the {{</* knowl id="hom-module" text="Hom functor" */>}} as converting a {{</* knowl id="direct-sum-modules" text="direct sum" */>}} in the source into a {{</* knowl id="direct-product-modules" text="direct product" */>}} of hom-sets, complementing how {{</* knowl id="tensor-product" text="tensor product" */>}} behaves with sums.
+This expresses the {{< knowl id="hom-module" text="Hom functor" >}} as converting a {{< knowl id="direct-sum-modules" text="direct sum" >}} in the source into a {{< knowl id="direct-product-modules" text="direct product" >}} of hom-sets, complementing how {{< knowl id="tensor-product" text="tensor product" >}} behaves with sums.

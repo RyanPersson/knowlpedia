@@ -3,11 +3,11 @@ title: "Exact sequence of modules"
 description: "A sequence of module homomorphisms where each image equals the next kernel."
 ---
 
-An **exact sequence of modules** is a sequence of modules and {{</* knowl id="module-homomorphism" text="module homomorphisms" */>}}
+An **exact sequence of modules** is a sequence of modules and {{< knowl id="module-homomorphism" text="module homomorphisms" >}}
 \[
 \cdots \to M_{i-1}\xrightarrow{d_{i-1}} M_i \xrightarrow{d_i} M_{i+1}\to \cdots
 \]
-such that for every $i$ one has $\operatorname{im}(d_{i-1})=\ker(d_i)$, where the kernel and image are taken in the sense of {{</* knowl id="kernel-module" text="kernels" */>}} and {{</* knowl id="image-module" text="images" */>}}. A convenient checklist formulation is given in {{</* knowl id="exactness-via-kernels-images" text="exactness via kernels/images" */>}}.
+such that for every $i$ one has $\operatorname{im}(d_{i-1})=\ker(d_i)$, where the kernel and image are taken in the sense of {{< knowl id="kernel-module" text="kernels" >}} and {{< knowl id="image-module" text="images" >}}. A convenient checklist formulation is given in {{< knowl id="exactness-via-kernels-images" text="exactness via kernels/images" >}}.
 
 Exact sequences package algebraic information: injectivity, surjectivity, quotients, and splitting phenomena are all phrased as exactness conditions.
 

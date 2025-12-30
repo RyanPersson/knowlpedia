@@ -13,4 +13,4 @@ the induced sequence
 \]
 is exact.
 
-A standard proof uses that {{</* knowl id="projective-module" text="projective modules" */>}} are direct summands of {{</* knowl id="free-module" text="free modules" */>}}, and that {{</* knowl id="tensor-product" text="tensoring" */>}} preserves exactness for free modules and respects direct summands, yielding {{</* knowl id="flat-module" text="flatness" */>}}.
+A standard proof uses that {{< knowl id="projective-module" text="projective modules" >}} are direct summands of {{< knowl id="free-module" text="free modules" >}}, and that {{< knowl id="tensor-product" text="tensoring" >}} preserves exactness for free modules and respects direct summands, yielding {{< knowl id="flat-module" text="flatness" >}}.

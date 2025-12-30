@@ -9,4 +9,4 @@ description: "A sequence is exact at a term precisely when the incoming image eq
 \]
 is exact at $M_i$ if and only if $\operatorname{im}(d_{i-1})=\ker(d_i)$.
 
-This rewrites {{</* knowl id="exact-sequence-modules" text="exactness" */>}} purely in terms of {{</* knowl id="kernel-module" text="kernels" */>}} and {{</* knowl id="image-module" text="images" */>}}, and is used constantly for {{</* knowl id="short-exact-sequence" text="short exact sequences" */>}}.
+This rewrites {{< knowl id="exact-sequence-modules" text="exactness" >}} purely in terms of {{< knowl id="kernel-module" text="kernels" >}} and {{< knowl id="image-module" text="images" >}}, and is used constantly for {{< knowl id="short-exact-sequence" text="short exact sequences" >}}.

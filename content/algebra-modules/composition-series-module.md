@@ -3,11 +3,11 @@ title: "Composition series"
 description: "A finite chain of submodules with simple successive quotients."
 ---
 
-A **composition series** of an $R$-module $M$ is a finite chain of {{</* knowl id="submodule" text="submodules" */>}}
+A **composition series** of an $R$-{{< knowl id="module" text="module" >}} $M$ is a finite chain of {{< knowl id="submodule" text="submodules" >}}
 \[
 0=M_0 \subset M_1 \subset \cdots \subset M_n = M
 \]
-such that each factor $M_i/M_{i-1}$ is a {{</* knowl id="simple-module" text="simple module" */>}} (a simple quotient in the sense of {{</* knowl id="quotient-module" text="quotient modules" */>}}). The integer $n$ is the length of the series and, when a composition series exists, is an invariant of $M$ (Jordan–Hölder), recorded as the module {{</* knowl id="length-module" text="length" */>}}.
+such that each factor $M_i/M_{i-1}$ is a {{< knowl id="simple-module" text="simple module" >}} (a simple quotient in the sense of {{< knowl id="quotient-module" text="quotient modules" >}}). The integer $n$ is the length of the series and, when a composition series exists, is an invariant of $M$ (Jordan–Hölder), recorded as the module {{< knowl id="length-module" text="length" >}}.
 
 Composition series exist exactly for modules of finite length and provide a canonical way to “factor” modules into simple pieces.
 

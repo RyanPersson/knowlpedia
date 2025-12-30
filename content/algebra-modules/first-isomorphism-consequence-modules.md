@@ -9,4 +9,4 @@ description: "For a homomorphism f, the induced map M/ker(f) → im(f) is an iso
 \]
 is a well-defined isomorphism of $R$-modules.
 
-This is the usual “image–kernel” form of the {{</* knowl id="first-isomorphism-theorem-modules" text="first isomorphism theorem for modules" */>}}, relating {{</* knowl id="quotient-module" text="quotient modules" */>}} to {{</* knowl id="kernel-module" text="kernels" */>}} and {{</* knowl id="image-module" text="images" */>}}.
+This is the usual “image–kernel” form of the {{< knowl id="first-isomorphism-theorem-modules" text="first isomorphism theorem for modules" >}}, relating {{< knowl id="quotient-module" text="quotient modules" >}} to {{< knowl id="kernel-module" text="kernels" >}} and {{< knowl id="image-module" text="images" >}}.

@@ -1,510 +1,407 @@
 ---
-title: "Real Analysis Knowls"
-description: ""
+title: "Real Analysis"
+description: "Definitions, theorems, and proofs from real analysis"
 ---
 
-Click any term below to expand its definition. Definitions link to related concepts which can be expanded nested up to 2 levels deep.
-
-<!--
-# Real Analysis Knowl Tracking
-
-This page tracks the completion status of all knowls in the Real Analysis (Baby Rudin style) collection.
-
-- [x] = Completed
-- [ ] = Not yet generated
+Click any term to expand its definition inline. Nested terms can be expanded up to 2 levels deep.
 
 ---
 
-## Definitions
+## Order and Completeness
 
-### Logic, sets, and functions
-- [x] set
-- [x] subset
-- [x] proper-subset
-- [x] empty-set
-- [x] union
-- [x] intersection
-- [x] set-difference
-- [x] complement
-- [x] symmetric-difference
-- [x] power-set
-- [x] cartesian-product
-- [x] ordered-pair
-- [x] indexed-family-of-sets
-- [x] characteristic-function-indicator-function
-- [x] function-map
-- [x] domain
-- [x] codomain
-- [x] image-range
-- [x] preimage-inverse-image
-- [x] restriction-of-a-function
-- [x] composition-of-functions
-- [x] injective-function
-- [x] surjective-function
-- [x] bijective-function
-- [x] inverse-function
-- [x] relation
-- [x] equivalence-relation
-- [x] equivalence-class
-- [x] partition
-- [x] partial-order
-- [x] total-order-linear-order
+The ordered field structure of ℝ and completeness properties.
 
-### Ordered field structure and completeness (ℝ, ℂ)
-- [x] upper-bound
-- [x] lower-bound
-- [x] supremum
-- [x] infimum
-- [x] maximum
-- [x] minimum
-- [x] bounded-above
-- [x] bounded-below
-- [x] bounded-set
-- [x] real-numbers-r
-- [x] complex-numbers-c
-- [x] complex-conjugate
-- [x] absolute-value-on-r
-- [x] modulus-on-c
+### Definitions
+- {{< knowl id="supremum" text="Supremum (least upper bound)" >}}
+- {{< knowl id="infimum" text="Infimum (greatest lower bound)" >}}
+- {{< knowl id="maximum" text="Maximum" >}}
+- {{< knowl id="minimum" text="Minimum" >}}
+- {{< knowl id="bounded-above" text="Bounded above" >}}
+- {{< knowl id="bounded-below" text="Bounded below" >}}
+- {{< knowl id="bounded-set" text="Bounded set" >}}
+- {{< knowl id="real-numbers-r" text="Real numbers ℝ" >}}
+- {{< knowl id="complex-numbers-c" text="Complex numbers ℂ" >}}
+- {{< knowl id="complex-conjugate" text="Complex conjugate" >}}
+- {{< knowl id="absolute-value-on-r" text="Absolute value on ℝ" >}}
+- {{< knowl id="modulus-on-c" text="Modulus on ℂ" >}}
 
-### Euclidean spaces and linear algebraic primitives
-- [x] euclidean-space-rk
-- [x] euclidean-norm
-- [x] inner-product-on-rk
-- [x] orthogonality
-- [x] linear-map
-- [x] operator-norm
+### Axioms
+- {{< knowl id="field-axioms" text="Field axioms" >}}
+- {{< knowl id="order-axioms" text="Order axioms" >}}
+- {{< knowl id="completeness-axiom-of-r" text="Completeness axiom of ℝ" >}}
 
-### Metric spaces and basic topology
-- [x] metric
-- [x] metric-space
-- [x] open-ball
-- [x] closed-ball
-- [x] sphere-metric-sphere
-- [x] neighborhood
-- [x] open-set
-- [x] closed-set
-- [x] interior
-- [x] closure
-- [x] boundary
-- [x] limit-point-accumulation-point-cluster-point
-- [x] isolated-point
-- [x] derived-set
-- [x] dense-subset
-- [x] diameter
+### Theorems
+- {{< knowl id="least-upper-bound-theorem" text="Least upper bound theorem" >}}
+- {{< knowl id="greatest-lower-bound-theorem" text="Greatest lower bound theorem" >}}
+- {{< knowl id="archimedean-property-of-r" text="Archimedean property of ℝ" >}}
+- {{< knowl id="density-of-q-in-r" text="Density of ℚ in ℝ" >}}
+- {{< knowl id="density-of-r-minus-q-in-r" text="Density of ℝ \\ ℚ in ℝ" >}}
+- {{< knowl id="nested-interval-theorem" text="Nested interval theorem" >}}
 
-### Completeness, sequences, and subsequences
-- [x] convergent-sequence
-- [x] limit-of-a-sequence
-- [x] bounded-sequence
-- [x] monotone-sequence
-- [x] subsequence
-- [x] limit-superior-lim-sup
-- [x] limit-inferior-lim-inf
-- [x] cauchy-sequence
-- [x] complete-metric-space
+### Lemmas
+- {{< knowl id="supremum-approximation-lemma" text="Supremum approximation lemma" >}}
 
-### Infinite series (numbers)
-- [x] series
-- [x] partial-sums
-- [x] convergent-series
-- [x] divergent-series
-- [x] absolutely-convergent-series
-- [x] conditionally-convergent-series
-- [x] rearrangement-of-a-series
-- [x] cauchy-product
-
-### Limits and continuity of functions (metric-space setting)
-- [x] limit-of-a-function-at-a-point
-- [x] one-sided-limit
-- [x] limit-of-a-function-at-infinity
-- [x] continuity-at-a-point
-- [x] continuity-on-a-set
-- [x] uniform-continuity
-- [x] lipschitz-continuity
-- [x] holder-continuity
-- [x] isometry
-- [x] homeomorphism
-
-### Compactness and connectedness
-- [x] compact-set
-- [x] sequentially-compact-set
-- [x] totally-bounded-set
-- [x] connected-set
-- [x] separated-sets
-- [x] connected-component
-- [x] path
-- [x] path-connected-set
-- [x] interval
-- [x] curve
-
-### Category notions (built from topology)
-- [x] dense-set
-- [x] nowhere-dense-set
-- [x] meager-set
-- [x] residual-set
-- [x] baire-space
-
-### One-variable differentiation
-- [x] differentiability-one-variable
-- [x] difference-quotient
-- [x] derivative
-- [x] right-derivative-left-derivative
-- [x] differentiability-on-an-interval
-- [x] higher-derivatives
-- [x] class-ck-function-one-variable
-- [x] critical-point
-- [x] local-maximum-local-minimum
-- [x] global-maximum-global-minimum
-- [x] taylor-polynomial
-- [x] remainder-term-in-taylors-theorem
-
-### Riemann integration (and variants) on intervals
-- [x] step-function
-- [x] partition-of-an-interval
-- [x] refinement-of-a-partition
-- [x] mesh-of-a-partition
-- [x] upper-sum-riemann
-- [x] lower-sum-riemann
-- [x] tagged-partition
-- [x] riemann-sum
-- [x] riemann-integrable-function
-- [x] riemann-integral
-- [x] oscillation-of-a-function
-- [x] set-of-measure-zero-in-rk
-- [x] jordan-content
-- [x] riemann-stieltjes-integral
-- [x] integrator-function
-
-### Sequences/series of functions and equicontinuity
-- [x] pointwise-convergence
-- [x] uniform-convergence-of-a-sequence-of-functions
-- [x] uniform-cauchy-sequence-of-functions
-- [x] uniform-convergence-on-compact-sets
-- [x] series-of-functions
-- [x] uniform-convergence-of-a-series-of-functions
-- [x] equicontinuity
-- [x] equicontinuous-family
-- [x] pointwise-bounded-family
-- [x] uniformly-bounded-family
-
-### Multivariable differentiation and calculus
-- [x] partial-derivative
-- [x] mixed-partial-derivative
-- [x] directional-derivative
-- [x] gradient
-- [x] jacobian-matrix
-- [x] jacobian-determinant
-- [x] hessian-matrix
-- [x] total-derivative-frechet-derivative
-- [x] differentiable-map
-- [x] class-ck-map
-- [ ] diffeomorphism
-- [ ] implicitly-defined-function
-- [ ] regular-point-critical-point-multivariable
-- [ ] regular-value-critical-value-multivariable
-
-### Fixed point theory and contractions
-- [x] fixed-point
-- [x] contraction-mapping
-
-### Compactness in function spaces
-- [x] relatively-compact-set
-
-### Multiple integration and transformations
-- [ ] multiple-riemann-integral-over-a-rectangle
-- [ ] iterated-integral
-- [ ] change-of-variables-for-multiple-integrals
-
-### Optimization with constraints
-- [ ] constraint-set
-- [ ] lagrange-multiplier-condition
+### Propositions
+- {{< knowl id="uniqueness-of-supremum-infimum" text="Uniqueness of supremum and infimum" >}}
+- {{< knowl id="algebraic-properties-sup-inf" text="Basic algebraic properties of sup and inf" >}}
+- {{< knowl id="completeness-equivalences" text="Completeness equivalences" >}}
 
 ---
 
-## Axioms
-- [ ] principle-of-mathematical-induction
-- [ ] field-axioms
-- [ ] order-axioms
-- [ ] completeness-axiom-of-r
+## Metric Spaces and Topology
+
+Metric spaces and point-set topology in the metric context.
+
+### Definitions
+- {{< knowl id="metric" text="Distance (metric)" >}}
+- {{< knowl id="metric-space" text="Metric space" >}}
+- {{< knowl id="open-ball" text="Open ball" >}}
+- {{< knowl id="closed-ball" text="Closed ball" >}}
+- {{< knowl id="sphere-metric-sphere" text="Sphere" >}}
+- {{< knowl id="neighborhood" text="Neighborhood" >}}
+- {{< knowl id="open-set" text="Open set" >}}
+- {{< knowl id="closed-set" text="Closed set" >}}
+- {{< knowl id="interior" text="Interior" >}}
+- {{< knowl id="closure" text="Closure" >}}
+- {{< knowl id="boundary" text="Boundary" >}}
+- {{< knowl id="limit-point-accumulation-point-cluster-point" text="Limit point (accumulation point)" >}}
+- {{< knowl id="isolated-point" text="Isolated point" >}}
+- {{< knowl id="derived-set" text="Derived set" >}}
+- {{< knowl id="dense-subset" text="Dense subset" >}}
+- {{< knowl id="diameter" text="Diameter" >}}
+
+### Theorems
+- {{< knowl id="open-sets-form-a-topology" text="Open sets form a topology" >}}
+- {{< knowl id="closed-sets-are-complements-of-open-sets" text="Closed sets are complements of open sets" >}}
+- {{< knowl id="sequential-characterization-of-closure" text="Sequential characterization of closure" >}}
+- {{< knowl id="sequential-characterization-of-closed-sets" text="Sequential characterization of closed sets" >}}
+
+### Lemmas
+- {{< knowl id="triangle-inequality" text="Triangle inequality" >}}
+- {{< knowl id="reverse-triangle-inequality" text="Reverse triangle inequality" >}}
 
 ---
 
-## Theorems
+## Sequences and Series
 
-### Discrete foundations
-- [ ] well-ordering-principle-for-n
+Sequences, series, and convergence in ℝ and ℝ^k.
 
-### Completeness and order properties of ℝ
-- [ ] least-upper-bound-theorem
-- [ ] greatest-lower-bound-theorem
-- [ ] archimedean-property-of-r
-- [ ] density-of-q-in-r
-- [ ] density-of-r-minus-q-in-r
+### Definitions
+- {{< knowl id="convergent-sequence" text="Convergent sequence" >}}
+- {{< knowl id="limit-of-a-sequence" text="Limit of a sequence" >}}
+- {{< knowl id="bounded-sequence" text="Bounded sequence" >}}
+- {{< knowl id="monotone-sequence" text="Monotone sequence" >}}
+- {{< knowl id="subsequence" text="Subsequence" >}}
+- {{< knowl id="limit-superior-lim-sup" text="Limit superior (lim sup)" >}}
+- {{< knowl id="limit-inferior-lim-inf" text="Limit inferior (lim inf)" >}}
+- {{< knowl id="cauchy-sequence" text="Cauchy sequence" >}}
+- {{< knowl id="complete-metric-space" text="Complete metric space" >}}
+- {{< knowl id="series" text="Series" >}}
+- {{< knowl id="partial-sums" text="Partial sums" >}}
+- {{< knowl id="convergent-series" text="Convergent series" >}}
+- {{< knowl id="divergent-series" text="Divergent series" >}}
+- {{< knowl id="absolutely-convergent-series" text="Absolutely convergent series" >}}
+- {{< knowl id="conditionally-convergent-series" text="Conditionally convergent series" >}}
+- {{< knowl id="rearrangement-of-a-series" text="Rearrangement of a series" >}}
+- {{< knowl id="cauchy-product" text="Cauchy product" >}}
 
-### Core convergence theorems in ℝ and ℝ^k
-- [ ] nested-interval-theorem
-- [ ] monotone-convergence-theorem
-- [ ] cauchy-criterion-for-convergence-in-rk
-- [ ] bolzano-weierstrass-theorem
-- [ ] algebra-of-limits-for-sequences
-- [ ] squeeze-theorem
+### Theorems
+- {{< knowl id="monotone-convergence-theorem" text="Monotone convergence theorem" >}}
+- {{< knowl id="cauchy-criterion-for-convergence-in-rk" text="Cauchy criterion for convergence" >}}
+- {{< knowl id="bolzano-weierstrass-theorem" text="Bolzano–Weierstrass theorem" >}}
+- {{< knowl id="algebra-of-limits-for-sequences" text="Algebra of limits for sequences" >}}
+- {{< knowl id="squeeze-theorem" text="Squeeze theorem" >}}
+- {{< knowl id="absolute-convergence-implies-convergence" text="Absolute convergence implies convergence" >}}
+- {{< knowl id="comparison-test" text="Comparison test" >}}
+- {{< knowl id="limit-comparison-test" text="Limit comparison test" >}}
+- {{< knowl id="ratio-test" text="Ratio test" >}}
+- {{< knowl id="root-test" text="Root test" >}}
+- {{< knowl id="integral-test" text="Integral test" >}}
+- {{< knowl id="cauchy-condensation-test" text="Cauchy condensation test" >}}
+- {{< knowl id="alternating-series-test" text="Alternating series test" >}}
+- {{< knowl id="dirichlet-test" text="Dirichlet test" >}}
+- {{< knowl id="abel-test" text="Abel test" >}}
+- {{< knowl id="rearrangement-theorem-for-absolutely-convergent-series" text="Rearrangement theorem (absolutely convergent)" >}}
+- {{< knowl id="riemann-rearrangement-theorem" text="Riemann rearrangement theorem" >}}
+- {{< knowl id="mertens-theorem-on-cauchy-products" text="Mertens theorem" >}}
 
-### Series tests and structural results
-- [ ] absolute-convergence-implies-convergence
-- [ ] comparison-test
-- [ ] limit-comparison-test
-- [ ] ratio-test
-- [ ] root-test
-- [ ] integral-test
-- [ ] cauchy-condensation-test
-- [ ] alternating-series-test
-- [ ] dirichlet-test
-- [ ] abel-test
-- [ ] rearrangement-theorem-for-absolutely-convergent-series
-- [ ] riemann-rearrangement-theorem
-- [ ] mertens-theorem-on-cauchy-products
+### Lemmas
+- {{< knowl id="monotone-subsequence-lemma" text="Monotone subsequence lemma" >}}
+- {{< knowl id="basic-properties-of-lim-sup-and-lim-inf" text="Basic properties of lim sup and lim inf" >}}
+- {{< knowl id="uniqueness-of-limits" text="Uniqueness of limits" >}}
+- {{< knowl id="convergent-sequence-is-cauchy" text="A convergent sequence is Cauchy" >}}
+- {{< knowl id="every-cauchy-sequence-is-bounded" text="Every Cauchy sequence is bounded" >}}
 
-### Metric-space topology
-- [ ] open-sets-form-a-topology
-- [ ] closed-sets-are-complements-of-open-sets
-- [ ] sequential-characterization-of-closure
-- [ ] sequential-characterization-of-closed-sets
-- [ ] continuity-via-sequences
-- [ ] continuity-via-open-sets
-
-### Baire-category and completeness phenomena
-- [ ] cantor-intersection-theorem
-- [ ] baire-category-theorem
-
-### Fixed point theorems
-- [x] banach-fixed-point-theorem
-
-### Compactness and its consequences
-- [ ] sequential-compactness-equals-compactness
-- [ ] finite-intersection-property-theorem
-- [ ] lebesgue-number-lemma
-- [ ] compactness-implies-completeness
-- [ ] compactness-implies-total-boundedness
-- [x] compact-iff-complete-totally-bounded
-- [ ] continuous-image-of-compact-set-is-compact
-- [ ] extreme-value-theorem
-- [ ] heine-cantor-theorem
-- [ ] continuous-bijection-from-compact-homeomorphism-criterion
-
-### Compactness in Euclidean spaces
-- [ ] heine-borel-theorem
-
-### Connectedness and intermediate value structure
-- [ ] continuous-image-of-connected-set-is-connected
-- [ ] connected-subsets-of-r-are-intervals
-- [ ] intermediate-value-theorem
-
-### One-variable differential calculus
-- [ ] rolles-theorem
-- [ ] mean-value-theorem
-- [ ] cauchy-mean-value-theorem
-- [ ] fixed-sign-of-derivative-implies-monotonicity
-- [ ] taylors-theorem-with-remainder
-- [ ] darboux-theorem
-- [ ] inverse-function-theorem-one-variable
-- [ ] lhopitals-rule
-
-### Riemann integration on [a,b] (and Riemann–Stieltjes)
-- [ ] existence-of-riemann-integral-for-continuous-functions
-- [ ] riemann-integrability-of-monotone-functions
-- [ ] riemann-integrability-of-functions-with-finitely-many-discontinuities
-- [ ] lebesgue-criterion-for-riemann-integrability
-- [ ] mean-value-theorem-for-integrals
-- [ ] fundamental-theorem-of-calculus-part-i
-- [ ] fundamental-theorem-of-calculus-part-ii
-- [ ] substitution-rule-for-one-variable-riemann-integrals
-- [ ] riemann-stieltjes-integrability-theorem
-- [ ] integration-by-parts-riemann-stieltjes
-
-### Sequences/series of functions
-- [ ] uniform-limit-theorem-for-continuity
-- [ ] weierstrass-m-test
-- [ ] uniform-convergence-and-integration-theorem
-- [ ] uniform-convergence-and-differentiation-theorem
-- [ ] dinis-theorem
-
-### Approximation theorems
-- [ ] weierstrass-approximation-theorem
-- [ ] stone-weierstrass-theorem
-
-### Function space compactness
-- [x] completeness-of-ck
-- [x] arzela-ascoli-theorem
-
-### Power series
-- [ ] cauchy-hadamard-theorem
-- [ ] uniform-convergence-of-power-series-on-compact-subsets
-- [ ] term-by-term-differentiation-of-power-series
-- [ ] term-by-term-integration-of-power-series
-- [ ] abels-theorem
-
-### Multivariable calculus and analysis on ℝ^k
-- [ ] differentiability-implies-continuity
-- [ ] chain-rule-multivariable
-- [ ] mean-value-inequality-multivariable
-- [ ] sufficient-condition-for-differentiability
-- [ ] schwarz-clairaut-theorem
-- [ ] taylors-theorem-in-several-variables
-- [ ] inverse-function-theorem-rk
-- [ ] implicit-function-theorem
-
-### Multiple integration and transformations
-- [ ] fubini-theorem-for-riemann-integrals
-- [ ] change-of-variables-formula-for-multiple-integrals
-
-### Constrained optimization
-- [ ] lagrange-multipliers-theorem
+### Corollaries
+- {{< knowl id="bounded-sequence-has-convergent-subsequence" text="Every bounded sequence in ℝ^k has a convergent subsequence" >}}
+- {{< knowl id="convergent-series-terms-go-to-zero" text="A convergent series has terms tending to 0" >}}
 
 ---
 
-## Lemmas
+## Continuity
 
-### Order/completeness auxiliary facts
-- [ ] supremum-approximation-lemma
+Limits and continuity of functions.
 
-### Sequence/subsequence tools
-- [ ] monotone-subsequence-lemma
-- [ ] basic-properties-of-lim-sup-and-lim-inf
+### Definitions
+- {{< knowl id="limit-of-a-function-at-a-point" text="Limit of a function at a point" >}}
+- {{< knowl id="one-sided-limit" text="One-sided limit" >}}
+- {{< knowl id="limit-of-a-function-at-infinity" text="Limit at infinity" >}}
+- {{< knowl id="continuity-at-a-point" text="Continuity at a point" >}}
+- {{< knowl id="continuity-on-a-set" text="Continuity on a set" >}}
+- {{< knowl id="uniform-continuity" text="Uniform continuity" >}}
+- {{< knowl id="lipschitz-continuity" text="Lipschitz continuity" >}}
+- {{< knowl id="holder-continuity" text="Hölder continuity" >}}
+- {{< knowl id="isometry" text="Isometry" >}}
+- {{< knowl id="homeomorphism" text="Homeomorphism" >}}
 
-### Norm/metric inequalities
-- [ ] triangle-inequality
-- [ ] reverse-triangle-inequality
-- [ ] cauchy-schwarz-inequality
+### Theorems
+- {{< knowl id="continuity-via-sequences" text="Continuity via sequences" >}}
+- {{< knowl id="continuity-via-open-sets" text="Continuity via open sets" >}}
 
-### Metric convergence facts
-- [ ] uniqueness-of-limits
-- [ ] convergent-sequence-is-cauchy
-- [ ] every-cauchy-sequence-is-bounded
-
-### Compactness-related routine lemmas
-- [ ] compactness-implies-boundedness
-- [ ] compactness-implies-closedness
-- [ ] closed-subset-of-compact-set-is-compact
-- [ ] finite-subcover-lemma
-- [ ] lebesgue-number-lemma-auxiliary-refinement
-- [ ] compactness-of-graphs-lemma
-
-### Uniform convergence routine lemmas
-- [ ] uniform-convergence-implies-uniform-cauchy
-- [ ] uniform-cauchy-implies-uniform-convergence
-- [ ] uniform-convergence-preserves-boundedness
-- [ ] uniform-convergence-implies-convergence-of-sup-norms
-- [ ] equicontinuity-pointwise-convergence-dense-set-lemma
-- [x] equicontinuity-pointwise-bounded-uniform-bounded
-
-### Riemann / Riemann–Stieltjes technical lemmas
-- [x] refinement-lemma-for-upper-and-lower-sums
-- [x] oscillation-criterion-lemma
-- [x] additivity-and-linearity-lemmas-for-riemann-integrals
-- [x] bounded-variation-jordan-decomposition-lemma
-
-### Multivariable differentiability auxiliaries
-- [x] mean-value-estimate-lemma-for-differentiable-maps
-- [x] determinant-nonvanishing-implies-local-invertibility-lemma
+### Propositions
+- {{< knowl id="equivalent-definitions-continuity" text="Equivalent definitions of continuity" >}}
+- {{< knowl id="uniform-continuity-implies-continuity" text="Uniform continuity implies continuity" >}}
+- {{< knowl id="uniform-continuity-preserves-cauchy" text="Uniform continuity preserves Cauchy sequences" >}}
 
 ---
 
-## Propositions
+## Compactness and Connectedness
 
-### Sup/inf and completeness equivalences
-- [x] uniqueness-of-supremum-and-infimum
-- [x] basic-algebraic-properties-of-sup-and-inf
-- [x] completeness-equivalences
+Compactness and connectedness in metric spaces.
 
-### Equivalent formulations of continuity and related stability properties
-- [x] equivalent-definitions-of-continuity-in-metric-spaces
-- [x] uniform-continuity-implies-continuity
-- [x] uniform-continuity-preserves-cauchy-sequences
+### Definitions
+- {{< knowl id="compact-set" text="Compact set" >}}
+- {{< knowl id="sequentially-compact-set" text="Sequentially compact set" >}}
+- {{< knowl id="totally-bounded-set" text="Totally bounded set" >}}
+- {{< knowl id="connected-set" text="Connected set" >}}
+- {{< knowl id="separated-sets" text="Separated sets" >}}
+- {{< knowl id="connected-component" text="Connected component" >}}
+- {{< knowl id="path" text="Path" >}}
+- {{< knowl id="path-connected-set" text="Path-connected set" >}}
+- {{< knowl id="interval" text="Interval" >}}
+- {{< knowl id="curve" text="Curve" >}}
+- {{< knowl id="nowhere-dense-set" text="Nowhere dense set" >}}
+- {{< knowl id="meager-set" text="Meager set" >}}
+- {{< knowl id="residual-set" text="Residual set" >}}
+- {{< knowl id="baire-space" text="Baire space" >}}
 
-### Euclidean/product structure propositions
-- [x] convergence-in-product-metric-spaces
+### Theorems
+- {{< knowl id="sequential-compactness-equals-compactness" text="Sequential compactness equals compactness" >}}
+- {{< knowl id="finite-intersection-property-theorem" text="Finite intersection property theorem" >}}
+- {{< knowl id="lebesgue-number-lemma" text="Lebesgue number lemma" >}}
+- {{< knowl id="compactness-implies-completeness" text="Compactness implies completeness" >}}
+- {{< knowl id="compactness-implies-total-boundedness" text="Compactness implies total boundedness" >}}
+- {{< knowl id="compact-iff-complete-totally-bounded" text="Compact iff complete and totally bounded" >}}
+- {{< knowl id="continuous-image-of-compact-set-is-compact" text="Continuous image of compact set is compact" >}}
+- {{< knowl id="extreme-value-theorem" text="Extreme value theorem" >}}
+- {{< knowl id="heine-cantor-theorem" text="Heine–Cantor theorem" >}}
+- {{< knowl id="continuous-bijection-from-compact-homeomorphism-criterion" text="Continuous bijection from compact is homeomorphism" >}}
+- {{< knowl id="heine-borel-theorem" text="Heine–Borel theorem" >}}
+- {{< knowl id="continuous-image-of-connected-set-is-connected" text="Continuous image of connected set is connected" >}}
+- {{< knowl id="connected-subsets-of-r-are-intervals" text="Connected subsets of ℝ are intervals" >}}
+- {{< knowl id="intermediate-value-theorem" text="Intermediate value theorem" >}}
+- {{< knowl id="cantor-intersection-theorem" text="Cantor intersection theorem" >}}
+- {{< knowl id="baire-category-theorem" text="Baire category theorem" >}}
+- {{< knowl id="banach-fixed-point-theorem" text="Banach fixed point theorem" >}}
+- {{< knowl id="arzela-ascoli-theorem" text="Arzelà–Ascoli theorem" >}}
 
-### Compactness and connectedness criteria in ℝ^k and ℝ
-- [x] compactness-criteria-in-rk
-- [x] connectedness-criteria-in-r
-- [x] continuous-functions-on-compact-sets-are-bounded
-- [x] continuous-functions-map-compact-sets-to-closed-and-bounded-sets
+### Lemmas
+- {{< knowl id="compactness-implies-boundedness" text="Compactness implies boundedness" >}}
+- {{< knowl id="compactness-implies-closedness" text="Compactness implies closedness" >}}
+- {{< knowl id="closed-subset-of-compact-set-is-compact" text="Closed subset of compact is compact" >}}
 
-### One-variable differentiation rules and consequences
-- [x] differentiability-rules
-- [x] derivative-zero-implies-constant-on-an-interval
-- [x] f-prime-bounded-implies-f-uniformly-continuous
-
-### Riemann / Riemann–Stieltjes integrability closure properties
-- [x] riemann-integrability-implies-boundedness
-- [x] if-f-is-riemann-integrable-then-absolute-f-is-integrable
-- [x] closure-properties-of-riemann-integrable-functions
-- [x] composition-preserves-riemann-integrability
-- [x] linearity-in-integrator-for-riemann-stieltjes
-- [x] uniform-limit-of-integrable-functions-is-integrable
-- [x] term-by-term-integration-differentiation-propositions
-
-### Compactness/totally-bounded rephrasings
-- [ ] equivalence-of-compactness-and-sequential-compactness
-- [x] total-boundedness-characterization-via-epsilon-nets
-- [x] totally-bounded-cauchy-subsequence
-
-### Multivariable differentiability and extrema tests
-- [x] differentiability-criteria-via-remainder-estimates
-- [x] second-derivative-tests
-- [ ] sufficient-conditions-for-constrained-extrema
-
----
-
-## Corollaries
-
-### Consequences of Bolzano–Weierstrass / compactness in ℝ^k
-- [x] every-bounded-infinite-subset-of-rk-has-a-limit-point
-- [x] every-bounded-sequence-in-rk-has-a-convergent-subsequence
-
-### Consequences of series convergence/absolute convergence
-- [x] convergent-series-has-terms-tending-to-zero
-- [x] absolute-convergence-implies-cauchy-criterion
-
-### Consequences of uniform convergence
-- [x] uniform-convergence-implies-pointwise-convergence
-- [x] uniform-limit-of-continuous-functions-is-continuous
-
-### Consequences of compactness + continuity
-- [x] continuous-function-on-compact-set-is-bounded
-- [x] continuous-function-on-compact-set-attains-max-and-min
-- [x] continuous-function-on-compact-set-is-uniformly-continuous
-- [x] image-of-compact-connected-set-is-compact-interval
-
-### Consequences of IVT / MVT / Rolle
-- [x] intermediate-value-property-for-continuous-functions
-- [x] f-prime-positive-implies-f-strictly-increasing
-- [x] f-prime-zero-implies-f-constant
-
-### Consequences of the FTC and integration identities
-- [x] newton-leibniz-formula
-- [x] integration-by-parts-for-riemann-integrals
-
-### Standard "packaged" corollaries from uniform convergence theorems
-- [x] weierstrass-m-test-implies-uniform-convergence-and-continuity-integrability
-- [x] uniform-convergence-uniform-boundedness-interchange-limit-and-integral
-
-### Power series and smoothness corollaries
-- [x] power-series-represent-analytic-functions
-
-### Multivariable calculus corollaries
-- [x] equality-of-mixed-partials-under-c2
-- [x] local-diffeomorphism-corollary
-- [x] existence-of-local-implicit-function-parameterizations
-- [x] change-of-variables-preserves-integrability
+### Corollaries
+- {{< knowl id="continuous-on-compact-is-bounded" text="Continuous function on compact is bounded" >}}
+- {{< knowl id="continuous-attains-max-min-compact" text="Continuous function on compact attains max and min" >}}
+- {{< knowl id="heine-cantor-corollary" text="Continuous function on compact is uniformly continuous" >}}
 
 ---
 
-## Summary
+## One-Variable Differentiation
 
-**Total items in list:** ~280
+### Definitions
+- {{< knowl id="differentiability-one-variable" text="Differentiability at a point" >}}
+- {{< knowl id="difference-quotient" text="Difference quotient" >}}
+- {{< knowl id="derivative" text="Derivative" >}}
+- {{< knowl id="right-derivative-left-derivative" text="Right/left derivative" >}}
+- {{< knowl id="higher-derivatives" text="Higher derivatives" >}}
+- {{< knowl id="class-ck-function-one-variable" text="Class C^k function" >}}
+- {{< knowl id="critical-point" text="Critical point" >}}
+- {{< knowl id="local-maximum-local-minimum" text="Local maximum / local minimum" >}}
+- {{< knowl id="global-maximum-global-minimum" text="Global maximum / global minimum" >}}
+- {{< knowl id="taylor-polynomial" text="Taylor polynomial" >}}
+- {{< knowl id="remainder-term-in-taylors-theorem" text="Remainder term in Taylor's theorem" >}}
 
-**Completed:** 221 (all definitions through multivariable differentiation basics + lemmas, propositions, corollaries batch + category/Baire/fixed-point/Arzelà–Ascoli batch)
+### Theorems
+- {{< knowl id="rolles-theorem" text="Rolle's theorem" >}}
+- {{< knowl id="mean-value-theorem" text="Mean value theorem" >}}
+- {{< knowl id="cauchy-mean-value-theorem" text="Cauchy mean value theorem" >}}
+- {{< knowl id="fixed-sign-of-derivative-implies-monotonicity" text="Fixed sign of derivative implies monotonicity" >}}
+- {{< knowl id="taylors-theorem-with-remainder" text="Taylor's theorem with remainder" >}}
+- {{< knowl id="darboux-theorem" text="Darboux theorem" >}}
+- {{< knowl id="inverse-function-theorem-one-variable" text="Inverse function theorem (1D)" >}}
+- {{< knowl id="lhopitals-rule" text="L'Hôpital's rule" >}}
 
-**Remaining:** ~59 (remaining definitions, axioms, theorems)
--->
+### Propositions
+- {{< knowl id="differentiation-rules-one-variable" text="Differentiability rules" >}}
+- {{< knowl id="derivative-zero-implies-constant" text="Derivative zero implies constant" >}}
+- {{< knowl id="bounded-derivative-implies-uniform-continuity" text="Bounded derivative implies uniformly continuous" >}}
+
+### Corollaries
+- {{< knowl id="positive-derivative-strictly-increasing" text="f′ > 0 implies strictly increasing" >}}
+- {{< knowl id="zero-derivative-constant-corollary" text="f′ = 0 implies constant" >}}
+
+---
+
+## Riemann Integration
+
+Riemann and Riemann–Stieltjes integration.
+
+### Definitions
+- {{< knowl id="step-function" text="Step function" >}}
+- {{< knowl id="partition-of-an-interval" text="Partition of an interval" >}}
+- {{< knowl id="refinement-of-a-partition" text="Refinement" >}}
+- {{< knowl id="mesh-of-a-partition" text="Mesh of partition" >}}
+- {{< knowl id="upper-sum-riemann" text="Upper sum" >}}
+- {{< knowl id="lower-sum-riemann" text="Lower sum" >}}
+- {{< knowl id="tagged-partition" text="Tagged partition" >}}
+- {{< knowl id="riemann-sum" text="Riemann sum" >}}
+- {{< knowl id="riemann-integrable-function" text="Riemann integrable function" >}}
+- {{< knowl id="riemann-integral" text="Riemann integral" >}}
+- {{< knowl id="oscillation-of-a-function" text="Oscillation of a function" >}}
+- {{< knowl id="set-of-measure-zero-in-rk" text="Set of measure zero" >}}
+- {{< knowl id="jordan-content" text="Jordan content" >}}
+- {{< knowl id="riemann-stieltjes-integral" text="Riemann–Stieltjes integral" >}}
+- {{< knowl id="integrator-function" text="Integrator function" >}}
+
+### Theorems
+- {{< knowl id="existence-of-riemann-integral-for-continuous-functions" text="Existence of Riemann integral for continuous functions" >}}
+- {{< knowl id="riemann-integrability-of-monotone-functions" text="Riemann integrability of monotone functions" >}}
+- {{< knowl id="riemann-integrability-of-functions-with-finitely-many-discontinuities" text="Riemann integrability with finitely many discontinuities" >}}
+- {{< knowl id="lebesgue-criterion-for-riemann-integrability" text="Lebesgue criterion for Riemann integrability" >}}
+- {{< knowl id="mean-value-theorem-for-integrals" text="Mean value theorem for integrals" >}}
+- {{< knowl id="fundamental-theorem-of-calculus-part-i" text="Fundamental theorem of calculus (Part I)" >}}
+- {{< knowl id="fundamental-theorem-of-calculus-part-ii" text="Fundamental theorem of calculus (Part II)" >}}
+- {{< knowl id="substitution-rule-for-one-variable-riemann-integrals" text="Substitution rule" >}}
+- {{< knowl id="riemann-stieltjes-integrability-theorem" text="Riemann–Stieltjes integrability theorem" >}}
+- {{< knowl id="integration-by-parts-riemann-stieltjes" text="Integration by parts (R-S)" >}}
+
+### Lemmas
+- {{< knowl id="refinement-lemma-upper-lower-sums" text="Refinement lemma for upper/lower sums" >}}
+- {{< knowl id="oscillation-criterion-lemma" text="Oscillation criterion lemma" >}}
+- {{< knowl id="additivity-linearity-riemann-integral" text="Additivity and linearity lemmas" >}}
+
+### Propositions
+- {{< knowl id="riemann-integrability-implies-boundedness" text="Riemann integrability implies boundedness" >}}
+- {{< knowl id="absolute-value-preserves-integrability" text="|f| integrable if f integrable" >}}
+- {{< knowl id="algebra-of-riemann-integrable-functions" text="Closure properties (sums, products)" >}}
+
+### Corollaries
+- {{< knowl id="newton-leibniz-formula" text="Newton–Leibniz formula" >}}
+
+---
+
+## Function Sequences and Series
+
+Sequences and series of functions, uniform convergence, power series.
+
+### Definitions
+- {{< knowl id="pointwise-convergence" text="Pointwise convergence" >}}
+- {{< knowl id="uniform-convergence-of-a-sequence-of-functions" text="Uniform convergence" >}}
+- {{< knowl id="uniform-cauchy-sequence-of-functions" text="Uniform Cauchy sequence of functions" >}}
+- {{< knowl id="uniform-convergence-on-compact-sets" text="Uniform convergence on compact sets" >}}
+- {{< knowl id="series-of-functions" text="Series of functions" >}}
+- {{< knowl id="equicontinuity" text="Equicontinuity" >}}
+
+### Theorems
+- {{< knowl id="uniform-limit-theorem-for-continuity" text="Uniform limit theorem for continuity" >}}
+- {{< knowl id="weierstrass-m-test" text="Weierstrass M-test" >}}
+- {{< knowl id="uniform-convergence-and-integration-theorem" text="Uniform convergence and integration theorem" >}}
+- {{< knowl id="uniform-convergence-and-differentiation-theorem" text="Uniform convergence and differentiation theorem" >}}
+- {{< knowl id="dinis-theorem" text="Dini's theorem" >}}
+- {{< knowl id="weierstrass-approximation-theorem" text="Weierstrass approximation theorem" >}}
+- {{< knowl id="stone-weierstrass-theorem" text="Stone–Weierstrass theorem" >}}
+- {{< knowl id="cauchy-hadamard-theorem" text="Cauchy–Hadamard theorem" >}}
+- {{< knowl id="uniform-convergence-of-power-series-on-compact-subsets" text="Uniform convergence of power series on compact subsets" >}}
+- {{< knowl id="term-by-term-differentiation-of-power-series" text="Term-by-term differentiation of power series" >}}
+- {{< knowl id="term-by-term-integration-of-power-series" text="Term-by-term integration of power series" >}}
+- {{< knowl id="abels-theorem" text="Abel's theorem" >}}
+- {{< knowl id="completeness-of-ck" text="Completeness of C(K)" >}}
+
+### Lemmas
+- {{< knowl id="uniform-convergence-implies-uniform-cauchy" text="Uniform convergence implies uniform Cauchy" >}}
+- {{< knowl id="uniform-cauchy-implies-uniform-convergence" text="Uniform Cauchy implies uniform convergence" >}}
+- {{< knowl id="uniform-convergence-preserves-boundedness" text="Uniform convergence preserves boundedness" >}}
+
+### Corollaries
+- {{< knowl id="uniform-convergence-implies-pointwise" text="Uniform convergence implies pointwise" >}}
+- {{< knowl id="uniform-limit-of-continuous-is-continuous" text="Uniform limit of continuous is continuous" >}}
+- {{< knowl id="power-series-analytic-on-disk" text="Power series are analytic on disk of convergence" >}}
+
+---
+
+## Multivariable Calculus
+
+Multivariable differentiation and integration.
+
+### Definitions
+- {{< knowl id="partial-derivative" text="Partial derivative" >}}
+- {{< knowl id="mixed-partial-derivative" text="Mixed partial derivative" >}}
+- {{< knowl id="directional-derivative" text="Directional derivative" >}}
+- {{< knowl id="gradient" text="Gradient" >}}
+- {{< knowl id="jacobian-matrix" text="Jacobian matrix" >}}
+- {{< knowl id="jacobian-determinant" text="Jacobian determinant" >}}
+- {{< knowl id="hessian-matrix" text="Hessian matrix" >}}
+- {{< knowl id="total-derivative-frechet-derivative" text="Total derivative (Fréchet derivative)" >}}
+- {{< knowl id="differentiable-map" text="Differentiable map" >}}
+- {{< knowl id="class-ck-map" text="Class C^k map" >}}
+- {{< knowl id="diffeomorphism" text="Diffeomorphism" >}}
+- {{< knowl id="implicitly-defined-function" text="Implicitly defined function" >}}
+- {{< knowl id="regular-point-critical-point-multivariable" text="Regular point / critical point" >}}
+- {{< knowl id="regular-value-critical-value-multivariable" text="Regular value / critical value" >}}
+- {{< knowl id="multiple-riemann-integral-over-a-rectangle" text="Multiple integral over a rectangle" >}}
+- {{< knowl id="iterated-integral" text="Iterated integral" >}}
+- {{< knowl id="change-of-variables-for-multiple-integrals" text="Change of variables" >}}
+- {{< knowl id="constraint-set" text="Constraint set" >}}
+- {{< knowl id="lagrange-multiplier-condition" text="Lagrange multiplier condition" >}}
+
+### Theorems
+- {{< knowl id="differentiability-implies-continuity" text="Differentiability implies continuity" >}}
+- {{< knowl id="chain-rule-multivariable" text="Chain rule (multivariable)" >}}
+- {{< knowl id="mean-value-inequality-multivariable" text="Mean value inequality" >}}
+- {{< knowl id="sufficient-condition-for-differentiability" text="C^1 implies differentiable" >}}
+- {{< knowl id="schwarz-clairaut-theorem" text="Schwarz (Clairaut) theorem" >}}
+- {{< knowl id="taylors-theorem-in-several-variables" text="Taylor's theorem (several variables)" >}}
+- {{< knowl id="inverse-function-theorem-rk" text="Inverse function theorem (ℝ^k)" >}}
+- {{< knowl id="implicit-function-theorem" text="Implicit function theorem" >}}
+- {{< knowl id="fubini-theorem-for-riemann-integrals" text="Fubini theorem (Riemann)" >}}
+- {{< knowl id="change-of-variables-formula-for-multiple-integrals" text="Change of variables formula" >}}
+- {{< knowl id="lagrange-multipliers-theorem" text="Lagrange multipliers theorem" >}}
+
+### Lemmas
+- {{< knowl id="mean-value-estimate-lemma" text="Mean value estimate lemma" >}}
+
+### Corollaries
+- {{< knowl id="c2-implies-equal-mixed-partials" text="Equality of mixed partials under C^2" >}}
+- {{< knowl id="local-diffeomorphism-corollary" text="Local diffeomorphism corollary" >}}
+- {{< knowl id="local-implicit-function-parameterization" text="Implicit function parameterization corollary" >}}
+
+---
+
+## Additional Topics
+
+### Fixed Point Theory
+- {{< knowl id="fixed-point" text="Fixed point" >}}
+- {{< knowl id="contraction-mapping" text="Contraction mapping" >}}
+
+### Euclidean Space Structure
+- {{< knowl id="euclidean-space-rk" text="Euclidean space ℝ^k" >}}
+- {{< knowl id="euclidean-norm" text="Euclidean norm" >}}
+- {{< knowl id="inner-product-on-rk" text="Inner product on ℝ^k" >}}
+- {{< knowl id="cauchy-schwarz-inequality" text="Cauchy–Schwarz inequality" >}}
+
+### Function Space Topics
+- {{< knowl id="equicontinuous-family" text="Equicontinuous family" >}}
+- {{< knowl id="pointwise-bounded-family" text="Pointwise bounded family" >}}
+- {{< knowl id="uniformly-bounded-family" text="Uniformly bounded family" >}}
+- {{< knowl id="relatively-compact-set" text="Relatively compact set" >}}

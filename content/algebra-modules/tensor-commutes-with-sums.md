@@ -9,4 +9,4 @@ M\otimes_R\Bigl(\bigoplus_{i\in I}N_i\Bigr)\longrightarrow \bigoplus_{i\in I}(M\
 \]
 is an isomorphism, and for any directed system $\{N_i\}$ the canonical map $\varinjlim_i(M\otimes_R N_i)\to M\otimes_R(\varinjlim_i N_i)$ is an isomorphism.
 
-Formally this follows from the {{</* knowl id="tensor-hom-adjunction" text="Tensor–Hom adjunction" */>}} (tensoring is a left adjoint), and the direct-sum case recovers {{</* knowl id="tensor-preserves-direct-sums" text="tensor product preserves direct sums" */>}} for {{</* knowl id="direct-sum-modules" text="direct sums" */>}}.
+Formally this follows from the {{< knowl id="tensor-hom-adjunction" text="Tensor–Hom adjunction" >}} (tensoring is a left adjoint), and the direct-sum case recovers {{< knowl id="tensor-preserves-direct-sums" text="tensor product preserves direct sums" >}} for {{< knowl id="direct-sum-modules" text="direct sums" >}}.

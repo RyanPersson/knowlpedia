@@ -11,6 +11,6 @@ is surjective with kernel \(\bigcap_{i=1}^n I_i\) (the {{< knowl id="intersectio
 \[
 R/\bigcap_{i=1}^n I_i \ \cong\ \prod_{i=1}^n R/I_i
 \]
-of {{< knowl id="quotient-ring" text="quotient rings" >}}. The right-hand side is the ring structure on the {{< knowl id="cartesian-product" text="cartesian product" >}} given componentwise.
+of {{< knowl id="quotient-ring" text="quotient rings" >}}. The right-hand side is the ring structure on the {{< knowl id="cartesian-product" section="shared-foundations" text="cartesian product" >}} given componentwise.
 
 **Proof sketch** *(major case \(n=2\))*: If \(I+J=R\), choose \(a\in I\), \(b\in J\) with \(a+b=1\). Given residues \((\bar x,\bar y)\in R/I\times R/J\), the element \(r:=xb+ya\) maps to \((\bar x,\bar y)\), proving surjectivity. Kernel elements are exactly those in both ideals, giving \(\ker=\,I\cap J\). The general \(n\)-case follows by induction.
