@@ -3,7 +3,7 @@ title: "Field trace"
 description: "For a finite extension L/K, Tr_{L/K}(α) is the trace of multiplication-by-α as a K-linear map."
 ---
 
-**Definition.** Let \(L/K\) be a finite {{</* knowl id="field-extension" text="field extension" */>}} with \(n=[L:K]\). For \(\alpha\in L\), define the \(K\)-linear map
+**Definition.** Let \(L/K\) be a finite {{< knowl id="field-extension" text="field extension" >}} with \(n=[L:K]\). For \(\alpha\in L\), define the \(K\)-linear map
 \[
 m_\alpha : L \to L,\qquad x \mapsto \alpha x.
 \]
@@ -11,11 +11,11 @@ The **trace** of \(\alpha\) from \(L\) to \(K\) is
 \[
 \mathrm{Tr}_{L/K}(\alpha) \;=\; \mathrm{tr}(m_\alpha)\in K,
 \]
-the ordinary {{</* knowl id="trace" text="trace" */>}} of this linear operator.
+the ordinary {{< knowl id="trace" text="trace" >}} of this linear operator.
 
-The trace is \(K\)-linear and interacts with towers via {{</* knowl id="trace-norm-towers" text="trace in towers" */>}}.
+The trace is \(K\)-linear and interacts with towers via {{< knowl id="trace-norm-towers" text="trace in towers" >}}.
 
-**See also.** {{</* knowl id="norm-field" text="field norm" */>}}, {{</* knowl id="degree-of-extension" text="degree of extension" */>}}.
+**See also.** {{< knowl id="norm-field" text="field norm" >}}, {{< knowl id="degree-of-extension" text="degree of extension" >}}.
 
 **Examples.**
 1. In \(L=\mathbb{Q}(\sqrt d)\) with \(\mathrm{char}(K)\neq 2\), \(\mathrm{Tr}_{L/\mathbb{Q}}(a+b\sqrt d)=2a\).

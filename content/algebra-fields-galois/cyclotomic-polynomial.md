@@ -7,15 +7,15 @@ description: "The monic polynomial Φ_n(x) whose roots are the primitive n-th ro
 \[
 \Phi_n(x)=\prod_{\zeta}(x-\zeta),
 \]
-where the product runs over all {{</* knowl id="primitive-root-of-unity" text="primitive n-th roots of unity" */>}} \(\zeta\) in a fixed algebraic closure.
+where the product runs over all {{< knowl id="primitive-root-of-unity" text="primitive n-th roots of unity" >}} \(\zeta\) in a fixed algebraic closure.
 
 A fundamental factorization identity is
 \[
 x^n-1 \;=\; \prod_{d\mid n}\Phi_d(x).
 \]
-Over \(\mathbb{Q}\), \(\Phi_n(x)\) is {{</* knowl id="irreducible-polynomial" text="irreducible" */>}}, and its degree is \(\varphi(n)\) (Euler totient).
+Over \(\mathbb{Q}\), \(\Phi_n(x)\) is {{< knowl id="irreducible-polynomial" text="irreducible" >}}, and its degree is \(\varphi(n)\) (Euler totient).
 
-**See also.** {{</* knowl id="cyclotomic-extension" text="cyclotomic extension" */>}}, {{</* knowl id="splitting-field" text="splitting field" */>}}.
+**See also.** {{< knowl id="cyclotomic-extension" text="cyclotomic extension" >}}, {{< knowl id="splitting-field" text="splitting field" >}}.
 
 **Examples.**
 1. \(\Phi_1(x)=x-1\), \(\Phi_2(x)=x+1\).

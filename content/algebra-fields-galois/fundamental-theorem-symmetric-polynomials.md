@@ -4,7 +4,7 @@ description: "Every symmetric polynomial is a polynomial in the elementary symme
 ---
 
 **Theorem.**  
-Let \(R\) be a {{</* knowl id="commutative-ring" text="commutative ring" */>}} and consider \(R[x_1,\dots,x_n]\) (a {{</* knowl id="polynomial-ring" text="polynomial ring" */>}}). A polynomial \(f\in R[x_1,\dots,x_n]\) is **symmetric** if it is invariant under every permutation of the variables.  
+Let \(R\) be a {{< knowl id="commutative-ring" text="commutative ring" >}} and consider \(R[x_1,\dots,x_n]\) (a {{< knowl id="polynomial-ring" text="polynomial ring" >}}). A polynomial \(f\in R[x_1,\dots,x_n]\) is **symmetric** if it is invariant under every permutation of the variables.  
 
 Then every symmetric polynomial \(f\) can be written uniquely as
 \[
@@ -20,4 +20,4 @@ e_1=\sum_i x_i,\quad e_2=\sum_{i<j}x_ix_j,\ \dots,\ e_n=x_1\cdots x_n.
 2. For \(n=3\), \(x_1^2+x_2^2+x_3^2 = e_1^2 - 2e_2\).
 3. For \(n=2\), \(x_1^3+x_2^3 = (x_1+x_2)^3 - 3(x_1+x_2)(x_1x_2)= e_1^3-3e_1e_2\).
 
-**Related.** {{</* knowl id="field" text="fields" */>}}, {{</* knowl id="fundamental-theorem-galois-theory" text="fundamental theorem of Galois theory" */>}}.
+**Related.** {{< knowl id="field" section="algebra-rings" text="fields" >}}, {{< knowl id="fundamental-theorem-galois-theory" text="fundamental theorem of Galois theory" >}}.

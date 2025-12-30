@@ -3,11 +3,11 @@ title: "Field embedding"
 description: "An injective field homomorphism φ: K → L."
 ---
 
-**Definition.** A **field embedding** is an injective homomorphism of fields \(\varphi:K\to L\) (preserving \(1\)). Equivalently, it is a {{</* knowl id="ring-monomorphism" text="ring monomorphism" */>}} between fields, hence also an {{</* knowl id="injective-function" text="injective function" */>}}.
+**Definition.** A **field embedding** is an injective homomorphism of fields \(\varphi:K\to L\) (preserving \(1\)). Equivalently, it is a {{< knowl id="ring-monomorphism" text="ring monomorphism" >}} between fields, hence also an {{< knowl id="injective-function" text="injective function" >}}.
 
-Any {{</* knowl id="field-extension" text="field extension" */>}} \(L/K\) can be presented as an embedding \(K\hookrightarrow L\); after identifying \(K\) with its image, we write \(K\subseteq L\).
+Any {{< knowl id="field-extension" text="field extension" >}} \(L/K\) can be presented as an embedding \(K\hookrightarrow L\); after identifying \(K\) with its image, we write \(K\subseteq L\).
 
-**See also.** {{</* knowl id="field-automorphism" text="field automorphism" */>}}, {{</* knowl id="simple-extension" text="simple extension" */>}}.
+**See also.** {{< knowl id="field-automorphism" text="field automorphism" >}}, {{< knowl id="simple-extension" text="simple extension" >}}.
 
 **Examples.**
 1. The inclusion \(\mathbb{Q}\hookrightarrow \mathbb{R}\) is a field embedding.

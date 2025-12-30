@@ -7,11 +7,11 @@ description: "In characteristic p>0, the map Fr(x)=x^p is a ring homomorphism; o
 \[
 \mathrm{Fr}:K\to K,\qquad \mathrm{Fr}(x)=x^p.
 \]
-It is a ring homomorphism because \((x+y)^p=x^p+y^p\) in characteristic \(p\). For fields it is always injective; it is surjective exactly when \(K\) is {{</* knowl id="perfect-field" text="perfect" */>}}.
+It is a ring homomorphism because \((x+y)^p=x^p+y^p\) in characteristic \(p\). For fields it is always injective; it is surjective exactly when \(K\) is {{< knowl id="perfect-field" text="perfect" >}}.
 
-On a finite field \(\mathbb{F}_{p^n}\), Frobenius is an automorphism and generates the {{</* knowl id="galois-group" text="Galois group" */>}} of \(\mathbb{F}_{p^n}/\mathbb{F}_p\).
+On a finite field \(\mathbb{F}_{p^n}\), Frobenius is an automorphism and generates the {{< knowl id="galois-group" text="Galois group" >}} of \(\mathbb{F}_{p^n}/\mathbb{F}_p\).
 
-**See also.** {{</* knowl id="field-automorphism" text="field automorphism" */>}}, {{</* knowl id="finite-field" text="finite field" */>}}.
+**See also.** {{< knowl id="field-automorphism" text="field automorphism" >}}, {{< knowl id="finite-field" text="finite field" >}}.
 
 **Examples.**
 1. On \(\mathbb{F}_p\), Frobenius is the identity map since \(x^p=x\) for all \(x\in\mathbb{F}_p\).

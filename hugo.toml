@@ -79,3 +79,9 @@ theme = 'PaperMod'
     url = "/algebra-modules/"
     parent = "algebra"
     weight = 3
+  [[menu.main]]
+    identifier = "algebra-fields-galois"
+    name = "Fields & Galois"
+    url = "/algebra-fields-galois/"
+    parent = "algebra"
+    weight = 4
