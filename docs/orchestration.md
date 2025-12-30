@@ -143,7 +143,11 @@ for section, slugs_list in prereq_sections.items():
 
 ### Step 3: Create Batch Prompt Files (with section info)
 
-Split slugs into batches of **20-25** (not 30 - smaller batches are faster and more reliable).
+**Batch sizing rules:**
+- **Max 20 slugs per batch** (smaller = faster, more reliable)
+- ** Aim for 6 batches in parallel** (oracle-parallel limit)
+- If a module has >120 slugs, run additional batches after the first 6 complete
+- **Only one Claude Code agent should run oracle batches at a time** (oracle doesn't support concurrent batch sets)
 
 **CRITICAL**: The prompt must tell GPT which section each prerequisite belongs to, so it generates correct `section="..."` parameters.
 
