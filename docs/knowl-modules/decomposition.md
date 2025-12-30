@@ -369,100 +369,100 @@ Module theory over rings.
 *Depends on:* `algebra-rings`, `shared-linear-algebra`
 
 **Definitions:**
-- Module (left/right) → `module.md`
-- Bimodule → `bimodule.md`
-- Submodule → `submodule.md`
-- Quotient module → `quotient-module.md`
-- Module homomorphism → `module-homomorphism.md`
-- Kernel (module homomorphism) → `kernel-module.md`
-- Image (module homomorphism) → `image-module.md`
-- Cokernel (module) → `cokernel-module.md`
-- Exact sequence of modules → `exact-sequence-modules.md`
-- Short exact sequence → `short-exact-sequence.md`
-- Split exact sequence → `split-exact-sequence.md`
-- Direct sum of modules → `direct-sum-modules.md`
-- Direct product of modules → `direct-product-modules.md`
-- Cyclic module → `cyclic-module.md`
-- Finitely generated module → `finitely-generated-module.md`
-- Free module → `free-module.md`
-- Basis (of a free module) → `basis-module.md`
-- Rank (of a free module) → `rank-module.md`
-- Torsion element → `torsion-element.md`
-- Torsion module → `torsion-module.md`
-- Torsion-free module → `torsion-free-module.md`
-- Annihilator of an element → `annihilator-element.md`
-- Annihilator of a module → `annihilator-module.md`
-- Simple module → `simple-module.md`
-- Semisimple module → `semisimple-module.md`
-- Composition series (module) → `composition-series-module.md`
-- Length (Jordan–Hölder length) → `length-module.md`
-- Noetherian module → `noetherian-module.md`
-- Artinian module → `artinian-module.md`
-- Projective module → `projective-module.md`
-- Injective module → `injective-module.md`
-- Flat module → `flat-module.md`
-- Tensor product of modules → `tensor-product.md`
-- Bilinear map → `bilinear-map.md`
-- Universal property of tensor product → `tensor-product-universal-property.md`
-- Hom module → `hom-module.md`
-- Dual module → `dual-module.md`
-- Tensor–Hom adjunction data → `tensor-hom-adjunction.md`
-- Algebra over a commutative ring → `algebra-over-ring.md`
-- Algebra homomorphism → `algebra-homomorphism.md`
-- Tensor product of algebras → `tensor-product-algebras.md`
-- Graded ring → `graded-ring.md`
-- Graded module → `graded-module.md`
-- Filtered ring → `filtered-ring.md`
-- Associated graded ring → `associated-graded-ring.md`
+✓ - Module (left/right) → `module.md`
+✓ - Bimodule → `bimodule.md`
+✓ - Submodule → `submodule.md`
+✓ - Quotient module → `quotient-module.md`
+✓ - Module homomorphism → `module-homomorphism.md`
+✓ - Kernel (module homomorphism) → `kernel-module.md`
+✓ - Image (module homomorphism) → `image-module.md`
+✓ - Cokernel (module) → `cokernel-module.md`
+✓ - Exact sequence of modules → `exact-sequence-modules.md`
+✓ - Short exact sequence → `short-exact-sequence.md`
+✓ - Split exact sequence → `split-exact-sequence.md`
+✓ - Direct sum of modules → `direct-sum-modules.md`
+✓ - Direct product of modules → `direct-product-modules.md`
+✓ - Cyclic module → `cyclic-module.md`
+✓ - Finitely generated module → `finitely-generated-module.md`
+✓ - Free module → `free-module.md`
+✓ - Basis (of a free module) → `basis-module.md`
+✓ - Rank (of a free module) → `rank-module.md`
+✓ - Torsion element → `torsion-element.md`
+✓ - Torsion module → `torsion-module.md`
+✓ - Torsion-free module → `torsion-free-module.md`
+✓ - Annihilator of an element → `annihilator-element.md`
+✓ - Annihilator of a module → `annihilator-module.md`
+✓ - Simple module → `simple-module.md`
+✓ - Semisimple module → `semisimple-module.md`
+✓ - Composition series (module) → `composition-series-module.md`
+✓ - Length (Jordan–Hölder length) → `length-module.md`
+✓ - Noetherian module → `noetherian-module.md`
+✓ - Artinian module → `artinian-module.md`
+✓ - Projective module → `projective-module.md`
+✓ - Injective module → `injective-module.md`
+✓ - Flat module → `flat-module.md`
+✓ - Tensor product of modules → `tensor-product.md`
+✓ - Bilinear map → `bilinear-map.md`
+✓ - Universal property of tensor product → `tensor-product-universal-property.md`
+✓ - Hom module → `hom-module.md`
+✓ - Dual module → `dual-module.md`
+✓ - Tensor–Hom adjunction data → `tensor-hom-adjunction.md`
+✓ - Algebra over a commutative ring → `algebra-over-ring.md`
+✓ - Algebra homomorphism → `algebra-homomorphism.md`
+✓ - Tensor product of algebras → `tensor-product-algebras.md`
+✓ - Graded ring → `graded-ring.md`
+✓ - Graded module → `graded-module.md`
+✓ - Filtered ring → `filtered-ring.md`
+✓ - Associated graded ring → `associated-graded-ring.md`
 
 **Axioms:**
-- Module axioms → `module-axioms.md`
-- Vector space axioms → `vector-space-axioms.md`
+✓ - Module axioms → `module-axioms.md`
+✓ - Vector space axioms → `vector-space-axioms.md`
 
 **Theorems:**
-- First isomorphism theorem (modules) → `first-isomorphism-theorem-modules.md`
-- Second isomorphism theorem (modules) → `second-isomorphism-theorem-modules.md`
-- Third isomorphism theorem (modules) → `third-isomorphism-theorem-modules.md`
-- Correspondence theorem (modules) → `correspondence-theorem-modules.md`
-- Structure theorem for f.g. modules over PID → `structure-theorem-pid.md`
-- Elementary divisor theorem → `elementary-divisor-theorem.md`
-- Smith normal form theorem → `smith-normal-form-theorem.md`
-- Rational canonical form theorem → `rational-canonical-form-theorem.md`
-- Jordan canonical form theorem → `jordan-canonical-form-theorem.md`
-- Krull–Schmidt–Azumaya theorem → `krull-schmidt-azumaya-theorem.md`
+✓ - First isomorphism theorem (modules) → `first-isomorphism-theorem-modules.md`
+✓ - Second isomorphism theorem (modules) → `second-isomorphism-theorem-modules.md`
+✓ - Third isomorphism theorem (modules) → `third-isomorphism-theorem-modules.md`
+✓ - Correspondence theorem (modules) → `correspondence-theorem-modules.md`
+✓ - Structure theorem for f.g. modules over PID → `structure-theorem-pid.md`
+✓ - Elementary divisor theorem → `elementary-divisor-theorem.md`
+✓ - Smith normal form theorem → `smith-normal-form-theorem.md`
+✓ - Rational canonical form theorem → `rational-canonical-form-theorem.md`
+✓ - Jordan canonical form theorem → `jordan-canonical-form-theorem.md`
+✓ - Krull–Schmidt–Azumaya theorem → `krull-schmidt-azumaya-theorem.md`
 
 **Lemmas:**
-- Splitting lemma → `splitting-lemma.md`
-- Projective iff every s.e.s. ending in it splits → `projective-ses-criterion.md`
-- Projective is direct summand of free → `projective-summand-of-free.md`
-- Baer's criterion (injectivity) → `baers-criterion.md`
-- Tensor product preserves direct sums → `tensor-preserves-direct-sums.md`
-- Tensor–Hom adjunction lemma → `tensor-hom-adjunction-lemma.md`
-- Universal property of quotient modules → `quotient-module-universal-property.md`
-- Kernels are submodules → `kernels-are-submodules.md`
+✓ - Splitting lemma → `splitting-lemma.md`
+✓ - Projective iff every s.e.s. ending in it splits → `projective-ses-criterion.md`
+✓ - Projective is direct summand of free → `projective-summand-of-free.md`
+✓ - Baer's criterion (injectivity) → `baers-criterion.md`
+✓ - Tensor product preserves direct sums → `tensor-preserves-direct-sums.md`
+✓ - Tensor–Hom adjunction lemma → `tensor-hom-adjunction-lemma.md`
+✓ - Universal property of quotient modules → `quotient-module-universal-property.md`
+✓ - Kernels are submodules → `kernels-are-submodules.md`
 
 **Propositions:**
-- Submodule criterion → `submodule-criterion.md`
-- Kernel and image are submodules → `kernel-image-submodules.md`
-- M/ker(f) ≅ im(f) → `first-isomorphism-consequence-modules.md`
-- Exactness via kernels and images → `exactness-via-kernels-images.md`
-- Direct sum universal property → `direct-sum-universal-property.md`
-- Free module universal property → `free-module-universal-property.md`
-- Tensor product universal property → `tensor-product-universal-property-prop.md`
-- Tensor commutes with direct limits/sums → `tensor-commutes-with-sums.md`
-- Hom turns sums into products → `hom-sums-to-products.md`
-- Projective ⇒ flat → `projective-implies-flat.md`
-- f.g. projective are locally free → `fg-projective-locally-free.md`
-- Semisimple ⇔ every submodule is direct summand → `semisimple-direct-summand.md`
-- Artinian + Noetherian ⇒ finite length → `artinian-noetherian-finite-length.md`
+✓ - Submodule criterion → `submodule-criterion.md`
+✓ - Kernel and image are submodules → `kernel-image-submodules.md`
+✓ - M/ker(f) ≅ im(f) → `first-isomorphism-consequence-modules.md`
+✓ - Exactness via kernels and images → `exactness-via-kernels-images.md`
+✓ - Direct sum universal property → `direct-sum-universal-property.md`
+✓ - Free module universal property → `free-module-universal-property.md`
+✓ - Tensor product universal property → `tensor-product-universal-property-prop.md`
+✓ - Tensor commutes with direct limits/sums → `tensor-commutes-with-sums.md`
+✓ - Hom turns sums into products → `hom-sums-to-products.md`
+✓ - Projective ⇒ flat → `projective-implies-flat.md`
+✓ - f.g. projective are locally free → `fg-projective-locally-free.md`
+✓ - Semisimple ⇔ every submodule is direct summand → `semisimple-direct-summand.md`
+✓ - Artinian + Noetherian ⇒ finite length → `artinian-noetherian-finite-length.md`
 
 **Corollaries:**
-- f.g. torsion-free over PID is free → `fg-torsion-free-pid-free.md`
-- Classification of f.g. abelian groups → `classification-fg-abelian-groups.md`
-- Rational canonical form from structure theorem → `rcf-from-structure-theorem.md`
-- Jordan canonical form from RCF → `jcf-from-rcf.md`
-- Smith normal form invariants → `smith-normal-form-invariants.md`
-- Chinese remainder for modules → `chinese-remainder-modules.md`
+✓ - f.g. torsion-free over PID is free → `fg-torsion-free-pid-free.md`
+✓ - Classification of f.g. abelian groups → `classification-fg-abelian-groups.md`
+✓ - Rational canonical form from structure theorem → `rcf-from-structure-theorem.md`
+✓ - Jordan canonical form from RCF → `jcf-from-rcf.md`
+✓ - Smith normal form invariants → `smith-normal-form-invariants.md`
+✓ - Chinese remainder for modules → `chinese-remainder-modules.md`
 
 ---
 

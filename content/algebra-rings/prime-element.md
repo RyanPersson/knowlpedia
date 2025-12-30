@@ -3,9 +3,9 @@ title: "Prime element"
 description: "A nonzero nonunit p such that p | ab implies p | a or p | b."
 ---
 
-Let $R$ be an {{</* knowl id="integral-domain" text="integral domain" */>}}. An element $p\in R$ is a **prime element** if $p\neq 0$, $p$ is not a unit, and whenever $p$ divides a product $ab$, then $p$ divides $a$ or $p$ divides $b$.
+Let $R$ be an {{< knowl id="integral-domain" text="integral domain" >}}. An element $p\in R$ is a **prime element** if $p\neq 0$, $p$ is not a unit, and whenever $p$ divides a product $ab$, then $p$ divides $a$ or $p$ divides $b$.
 
-Prime elements correspond to prime ideals: $p$ is prime if and only if the {{</* knowl id="principal-ideal" text="principal ideal" */>}} $(p)$ is a {{</* knowl id="prime-ideal" text="prime ideal" */>}}. Prime elements are always {{</* knowl id="irreducible-element" text="irreducible" */>}}, and in a UFD the converse holds.
+Prime elements correspond to prime ideals: $p$ is prime if and only if the {{< knowl id="principal-ideal" text="principal ideal" >}} $(p)$ is a {{< knowl id="prime-ideal" text="prime ideal" >}}. Prime elements are always {{< knowl id="irreducible-element" text="irreducible" >}}, and in a UFD the converse holds.
 
 **Examples:**
 - In $\mathbb{Z}$, an integer is prime (in the usual number-theoretic sense) exactly when it is a prime element.

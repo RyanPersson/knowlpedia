@@ -9,4 +9,4 @@ description: "A unital ring homomorphism sends invertible elements to invertible
 \]
 Equivalently, $\varphi$ restricts to a group homomorphism $R^\times\to S^\times$ on unit groups.
 
-For {{</* knowl id="unital-ring" text="unital rings" */>}}, any {{</* knowl id="ring-homomorphism" text="ring homomorphism" */>}} induces a homomorphism of the {{</* knowl id="group-of-units" text="group of units" */>}} by sending each {{</* knowl id="unit" text="unit" */>}} to its image. In particular, any {{</* knowl id="ring-isomorphism" text="ring isomorphism" */>}} identifies the unit groups of the two rings.
+For {{< knowl id="unital-ring" text="unital rings" >}}, any {{< knowl id="ring-homomorphism" text="ring homomorphism" >}} induces a homomorphism of the {{< knowl id="group-of-units" text="group of units" >}} by sending each {{< knowl id="unit" text="unit" >}} to its image. In particular, any {{< knowl id="ring-isomorphism" text="ring isomorphism" >}} identifies the unit groups of the two rings.

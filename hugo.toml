@@ -58,7 +58,24 @@ theme = 'PaperMod'
     url = "/shared-linear-algebra/"
     weight = 31
   [[menu.main]]
+    identifier = "algebra"
+    name = "Algebra"
+    weight = 32
+  [[menu.main]]
     identifier = "algebra-groups"
     name = "Groups"
     url = "/algebra-groups/"
-    weight = 32
+    parent = "algebra"
+    weight = 1
+  [[menu.main]]
+    identifier = "algebra-rings"
+    name = "Rings"
+    url = "/algebra-rings/"
+    parent = "algebra"
+    weight = 2
+  [[menu.main]]
+    identifier = "algebra-modules"
+    name = "Modules"
+    url = "/algebra-modules/"
+    parent = "algebra"
+    weight = 3

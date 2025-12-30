@@ -2,6 +2,24 @@
 <link rel="stylesheet" href="{{ "css/katex.min.css" | relURL }}">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/copy-tex.min.js" crossorigin="anonymous"></script>
 
+{{- /* Dropdown menu styles */ -}}
+<style>
+.header{overflow:visible !important}
+.nav{overflow:visible !important}
+.nav #menu{overflow:visible !important}
+.nav #menu .dropdown{position:relative}
+.nav #menu .dropdown-toggle{display:flex;align-items:center;gap:.25rem;cursor:pointer;font-size:inherit;color:var(--primary)}
+.nav #menu .dropdown-arrow{transition:transform .2s ease}
+.nav #menu .dropdown:hover .dropdown-arrow{transform:rotate(180deg)}
+.nav #menu .dropdown-menu{position:absolute;top:100%;left:0;min-width:140px;padding:.5rem 0;margin-top:.25rem;background:var(--theme);border:1px solid var(--border);border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.1);opacity:0;visibility:hidden;transition:opacity .2s ease,visibility .2s ease;z-index:1000;list-style:none}
+.nav #menu .dropdown:hover .dropdown-menu{opacity:1;visibility:visible}
+.nav #menu .dropdown-menu li{margin:0;padding:0}
+.nav #menu .dropdown-menu a{display:block;padding:.5rem 1rem;color:var(--primary);text-decoration:none;white-space:nowrap;font-size:14px}
+.nav #menu .dropdown-menu a:hover{background:var(--tertiary)}
+.nav #menu .dropdown-menu .active{font-weight:600}
+[data-theme="dark"] .nav #menu .dropdown-menu{box-shadow:0 4px 12px rgba(0,0,0,.3)}
+</style>
+
 {{- /* Knowls system - CSS inlined to eliminate render-blocking request */ -}}
 <style>
 .knowl{color:var(--primary);text-decoration:none;border-bottom:1px dotted var(--primary);cursor:pointer}
