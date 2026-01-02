@@ -299,3 +299,131 @@ jobs:
 
 - [ ] Form service: Formspree vs Formspark vs other?
 
+---
+
+## Repository Structure (Post-Refactor)
+
+This project uses a **submodule architecture** to separate content from infrastructure:
+
+```
+mathblog/                          ← This repo (pipeline + infrastructure)
+├── content/                       ← Git submodule → knowlpedia-content
+├── layouts/                       ← Hugo templates
+├── static/                        ← JS, CSS, fonts
+├── scripts/                       ← Automation scripts
+├── docs/                          ← Pipeline documentation
+└── tmp/                           ← Local working files (gitignored)
+
+knowlpedia-content/                ← Separate repo (generated knowls)
+├── algebra-groups/
+├── algebra-modules/
+├── analysis/
+├── geometry-bundles/
+└── ... (~1,500 knowl files)
+```
+
+**Why submodules?**
+- Iterate on the generation pipeline without affecting production content
+- Test regenerating knowls on a branch without losing good content
+- Clean separation of concerns
+
+---
+
+## Development Workflows
+
+### Fresh Clone (new machine or collaborator)
+
+```bash
+git clone --recurse-submodules git@github.com:RyanPersson/mathblog.git
+
+# Or if already cloned without submodules:
+git submodule update --init --recursive
+```
+
+### Working on Infrastructure (layouts, scripts, docs)
+
+Changes to pipeline code stay in the main mathblog repo:
+
+```bash
+# Edit layouts, static files, scripts, docs...
+git add .
+git commit -m "Update layouts"
+git push origin main
+```
+
+### Working on Content (generating/editing knowls)
+
+Content lives in the submodule. Work inside it:
+
+```bash
+cd content/
+git checkout -b test-regeneration    # Branch inside the content repo
+
+# Generate or edit knowls...
+# Delete and regenerate a section if needed:
+rm -rf algebra-groups/*
+# Run generation pipeline...
+
+# Test locally (from parent dir)
+cd ..
+hugo server
+
+# If results are good:
+cd content/
+git add . && git commit -m "Regenerated algebra-groups"
+git checkout main
+git merge test-regeneration
+git push
+
+# Update submodule reference in parent
+cd ..
+git add content
+git commit -m "Update content submodule"
+git push origin main
+
+# If results are bad - discard:
+cd content/
+git checkout main
+git branch -D test-regeneration
+```
+
+### Validating Knowl References
+
+Check for broken knowl links:
+
+```bash
+python3 scripts/validate-knowls.py
+```
+
+This scans all `{{< knowl id="..." section="..." >}}` references and reports any that point to non-existent files.
+
+### Local Development with Feedback System
+
+```bash
+# Terminal 1: Hugo server
+hugo server
+
+# Terminal 2: Feedback API (for upvote/downvote functionality)
+python3 scripts/feedback-api.py
+```
+
+---
+
+## Scripts Reference
+
+| Script | Purpose |
+|--------|---------|
+| `scripts/validate-knowls.py` | Check for broken knowl references |
+| `scripts/feedback-api.py` | Local feedback voting API (localhost only) |
+
+---
+
+## Reference Docs
+
+| Document | Purpose |
+|----------|---------|
+| `docs/orchestration.md` | Full knowl generation pipeline |
+| `docs/knowl-generation/` | Step-by-step generation workflow |
+| `docs/knowl-modules/decomposition.md` | Module specs and progress tracking |
+| `CLAUDE.md` | Quick reference for Claude agents |
+
