@@ -104,6 +104,16 @@ A **[term]** is [formal definition with LaTeX].
 This follows from {{< knowl id="parent-theorem" text="[parent theorem]" >}}.
 ```
 
+
+### Examples Guidelines
+
+Include examples ONLY if they are:
+- **Canonical**: The standard example everyone should know (e.g., $[0,1]$ for compact sets in $\mathbb{R}$)
+- **Illuminating**: Clarifies a subtle point or common misconception
+- **Contrasting**: A counterexample that sharpens the definition
+
+Omit the **Examples:** section entirely for straightforward concepts where the definition speaks for itself. Not every knowl needs examples.
+
 ---
 
 ## LINKING GUIDELINES
@@ -183,6 +193,7 @@ For each knowl, verify:
 - [ ] `description` is plain text
 - [ ] Shortcodes use `{{<` and `>}}`
 - [ ] No proof sketch sections
+- [ ] Examples are canonical/illuminating (or omitted if unnecessary)
 ```
 
 ## Usage

@@ -123,7 +123,7 @@ Use `prompt-template.md` as the base. Fill in:
 
 **Batch sizing:**
 - 20-25 slugs per batch (smaller = more reliable)
-- 6 batches max for parallel Oracle execution
+- Use 6 parallel batches (fewer only if there aren't enough slugs to fill 6)
 
 ```python
 batch_size = 20
@@ -212,7 +212,8 @@ print(f"Created {len(created)} files")
 
 ```python
 def fix_content(body):
-    # Fix triple braces
+    # CRITICAL: GPT almost always outputs triple braces despite instructions.
+    # This fix is REQUIRED for every batch.
     body = re.sub(r'\{\{\{<', r'{{<', body)
     body = re.sub(r'>\}\}\}', r'>}}', body)
 

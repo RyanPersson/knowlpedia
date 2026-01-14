@@ -145,7 +145,7 @@ for section, slugs_list in prereq_sections.items():
 
 **Batch sizing rules:**
 - **Max 20 slugs per batch** (smaller = faster, more reliable)
-- ** Aim for 6 batches in parallel** (oracle-parallel limit)
+- **Use 6 parallel batches** (fewer only if there aren't enough slugs to fill 6)
 - If a module has >120 slugs, run additional batches after the first 6 complete
 - **Only one Claude Code agent should run oracle batches at a time** (oracle doesn't support concurrent batch sets)
 
@@ -234,7 +234,7 @@ The prepare-batches.py script creates an `oracle-config.txt` file. Using config 
   --sessions-file /tmp/sessions.txt
 ```
 
-This runs up to 6 batches in parallel. **Each batch takes 20-40 minutes.**
+This runs 6 batches in parallel. **Each batch takes 20-40 minutes.**
 
 **Session outputs are saved to:** `~/.oracle/sessions/*/output.log`
 
@@ -334,6 +334,21 @@ print(f"Created {len(created)} files")
 ```
 
 **Verify file count matches expected slugs.** If count is low, check session logs for format variations.
+
+
+### Step 5.5: Fix Common Issues (REQUIRED)
+
+**CRITICAL:** GPT almost always outputs triple braces `{{{<` despite instructions. Run the fix script after every batch:
+
+```bash
+python3 scripts/fix-knowls.py content/NEW-SECTION/
+```
+
+This fixes:
+- Triple braces `{{{<` → `{{<`
+- Single braces `{<` → `{{<`
+- `.md` in knowl ids
+- LaTeX in YAML descriptions
 
 ### Step 6: Create _index.md (Structured with text parameter)
 
