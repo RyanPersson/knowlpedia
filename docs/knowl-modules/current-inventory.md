@@ -1782,6 +1782,46 @@ This document lists all knowls currently in the content directories.
 
 ---
 
+### `shale-paper` (34 knowls)
+
+
+**Definitions:** (34)
+- C*-Algebra of Field Observables 𝔄 → `cstar-algebra-observables.md`
+- Complex Structure Λ on K → `complex-structure-lambda.md`
+- Creation and Annihilation Operators → `creation-annihilation-operators.md`
+- Decomposition K = M ⊕ M → `lagrangian-decomposition-m-plus-m.md`
+- Determinant on I + Trace-Class → `fredholm-determinant-trace-log.md`
+- Duality Transform D (Segal) → `duality-transform-D.md`
+- Field Automorphism θ(T) from a Symplectic Map → `automorphism-thetaT.md`
+- Fock–Cook Quantization → `fock-cook-quantization.md`
+- Gaussian Measure on a Hilbert Space (Segal) → `gaussian-measure-hilbert-space.md`
+- Hilbert–Schmidt Operator → `hilbert-schmidt-operator.md`
+- Jacobian X(T) in Shale's Gaussian Setup → `jacobian-xT.md`
+- Kadison Transitivity (Used in §6) → `kadison-transitivity.md`
+- Polar Decomposition → `polar-decomposition.md`
+- Projective Unitary Representation → `projective-unitary-representation.md`
+- Radon–Nikodym Derivative → `radon-nikodym-derivative.md`
+- Restricted General Linear Group rGL(H) → `restricted-general-linear-group-rgl.md`
+- Restricted Symplectic Group rSp(K) → `restricted-symplectic-group-rspk.md`
+- Segal/Shale Representation 𝔘(T) on L₂(M,n) → `segal-unitary-representation-Ufrak.md`
+- Shale's Subgroups GL(H)₀, GL(H)₁, GL(H)₂ → `glh0-glh1-glh2.md`
+- Single Particle Structure Σ(H) → `single-particle-structure-sigma-h.md`
+- Spectral Theorem for Compact Selfadjoint Operators → `spectral-theorem-compact-selfadjoint.md`
+- State, Pure State, Regular State (CCR context) → `state-pure-regular.md`
+- Strong vs Weak Operator Topology → `operator-topologies-sot-wot.md`
+- Symmetric Fock Space S(H) → `symmetric-fock-space.md`
+- Symmetric Tensor Product (·)_s → `symmetric-tensor-product.md`
+- Symplectic Form → `symplectic-form.md`
+- Symplectic Group Sp(K) → `symplectic-group-spk.md`
+- Symplectic Hilbert Space (K,B) → `symplectic-hilbert-space.md`
+- Tame Function (Segal) → `tame-function.md`
+- Trace-Class Operator → `trace-class-operator.md`
+- Weak Continuity of a Representation → `weak-continuity.md`
+- Weyl CCR Quantization → `weyl-ccr-quantization.md`
+- Wiener Transform W → `wiener-transform.md`
+
+---
+
 ## Summary
 
 | Section | Knowls |
@@ -1803,4 +1843,5 @@ This document lists all knowls currently in the content directories.
 | lie-groups | 145 |
 | fiber-bundles | 277 |
 | langlands-letter | 34 |
-| **Total** | **1567** |
+| shale-paper | 34 |
+| **Total** | **1601** |

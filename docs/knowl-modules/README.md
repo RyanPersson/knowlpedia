@@ -41,7 +41,9 @@ content/
 ├── algebra-representation-theory/  # Representations, characters
 ├── algebra-category-theory/        # Categories, functors, Yoneda
 ├── lie-groups/            # Lie groups and algebras
-└── fiber-bundles/         # Fiber bundles, connections
+├── fiber-bundles/         # Fiber bundles, connections
+├── langlands-letter/      # Langlands letter annotations
+└── shale-paper/           # Shale's 1962 paper on free boson fields
 ```
 
 ## Shared Pools

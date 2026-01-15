@@ -157,3 +157,9 @@ theme = 'PaperMod'
     url = "/langlands-letter/"
     parent = "misc"
     weight = 3
+  [[menu.main]]
+    identifier = "shale-paper"
+    name = "Shale's Paper"
+    url = "/shale-paper/"
+    parent = "misc"
+    weight = 4
