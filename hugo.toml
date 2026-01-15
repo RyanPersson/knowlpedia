@@ -32,30 +32,59 @@ theme = 'PaperMod'
 
 # Menu
 [menu]
+  # Foundations dropdown
   [[menu.main]]
-    identifier = "analysis"
-    name = "Analysis"
-    url = "/analysis/"
-    weight = 15
-  [[menu.main]]
-    identifier = "convex-analysis"
-    name = "Convex Analysis"
-    url = "/convex-analysis/"
-    weight = 16
+    identifier = "foundations"
+    name = "Foundations"
+    weight = 10
   [[menu.main]]
     identifier = "shared-foundations"
-    name = "Foundations"
+    name = "Set Theory & Logic"
     url = "/shared-foundations/"
-    weight = 30
+    parent = "foundations"
+    weight = 1
   [[menu.main]]
     identifier = "linear-algebra"
     name = "Linear Algebra"
     url = "/linear-algebra/"
-    weight = 31
+    parent = "foundations"
+    weight = 2
+
+  # Analysis dropdown
+  [[menu.main]]
+    identifier = "analysis"
+    name = "Analysis"
+    weight = 20
+  [[menu.main]]
+    identifier = "real-analysis"
+    name = "Real Analysis"
+    url = "/real-analysis/"
+    parent = "analysis"
+    weight = 1
+  [[menu.main]]
+    identifier = "topology"
+    name = "Topology"
+    url = "/topology/"
+    parent = "analysis"
+    weight = 2
+  [[menu.main]]
+    identifier = "measure-theory"
+    name = "Measure Theory"
+    url = "/measure-theory/"
+    parent = "analysis"
+    weight = 3
+  [[menu.main]]
+    identifier = "convex-analysis"
+    name = "Convex Analysis"
+    url = "/convex-analysis/"
+    parent = "analysis"
+    weight = 4
+
+  # Algebra dropdown
   [[menu.main]]
     identifier = "algebra"
     name = "Algebra"
-    weight = 32
+    weight = 30
   [[menu.main]]
     identifier = "algebra-groups"
     name = "Groups"
@@ -87,8 +116,44 @@ theme = 'PaperMod'
     parent = "algebra"
     weight = 5
   [[menu.main]]
+    identifier = "algebra-homological"
+    name = "Homological Algebra"
+    url = "/algebra-homological/"
+    parent = "algebra"
+    weight = 6
+  [[menu.main]]
+    identifier = "algebra-representation-theory"
+    name = "Representation Theory"
+    url = "/algebra-representation-theory/"
+    parent = "algebra"
+    weight = 7
+  [[menu.main]]
     identifier = "algebra-category-theory"
     name = "Category Theory"
     url = "/algebra-category-theory/"
     parent = "algebra"
-    weight = 6
+    weight = 8
+
+  # Misc dropdown
+  [[menu.main]]
+    identifier = "misc"
+    name = "Misc"
+    weight = 40
+  [[menu.main]]
+    identifier = "lie-groups"
+    name = "Lie Groups"
+    url = "/lie-groups/"
+    parent = "misc"
+    weight = 1
+  [[menu.main]]
+    identifier = "fiber-bundles"
+    name = "Fiber Bundles"
+    url = "/fiber-bundles/"
+    parent = "misc"
+    weight = 2
+  [[menu.main]]
+    identifier = "langlands-letter"
+    name = "Langlands Letter"
+    url = "/langlands-letter/"
+    parent = "misc"
+    weight = 3

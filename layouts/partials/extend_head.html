@@ -53,3 +53,18 @@
 }
 </style>
 <script defer src="{{ "js/knowls.js" | relURL }}"></script>
+{{- if .Params.knowlsOpen }}
+<script>
+// Auto-expand all knowls on page load
+document.addEventListener('DOMContentLoaded', function() {
+  // Small delay to ensure knowls.js is ready
+  setTimeout(function() {
+    document.querySelectorAll('.knowl').forEach(function(knowl) {
+      if (knowl.getAttribute('aria-expanded') !== 'true') {
+        knowl.click();
+      }
+    });
+  }, 100);
+});
+</script>
+{{- end }}

@@ -37,7 +37,7 @@ class FeedbackHandler(BaseHTTPRequestHandler):
                 # Ensure research directory exists
                 os.makedirs(os.path.dirname(FEEDBACK_FILE), exist_ok=True)
 
-                # Append to feedback log
+                # Append to feedback log (tags applied separately via apply-feedback.py)
                 with open(FEEDBACK_FILE, 'a') as f:
                     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                     vote_symbol = '👍' if vote == 'up' else '👎'
@@ -45,12 +45,6 @@ class FeedbackHandler(BaseHTTPRequestHandler):
                     if note:
                         line += f" | {note}"
                     f.write(line + "\n")
-
-                # Add appropriate tag to the knowl file
-                knowl_path = os.path.join(CONTENT_DIR, section, f"{knowl_id}.md")
-                if os.path.exists(knowl_path):
-                    tag = 'upvoted' if vote == 'up' else 'needs-review'
-                    self.add_tag(knowl_path, tag)
 
                 self.send_response(200)
                 self.send_header('Access-Control-Allow-Origin', '*')
@@ -118,8 +112,7 @@ if __name__ == '__main__':
     server = HTTPServer(('localhost', port), FeedbackHandler)
     print(f"Feedback API running on http://localhost:{port}")
     print(f"Votes logged to {FEEDBACK_FILE}")
-    print(f"👍 Upvotes add 'upvoted' tag")
-    print(f"👎 Downvotes add 'needs-review' tag")
+    print(f"Run 'python3 scripts/apply-feedback.py' to apply tags to knowl files")
     try:
         server.serve_forever()
     except KeyboardInterrupt:

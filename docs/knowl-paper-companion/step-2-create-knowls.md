@@ -12,7 +12,7 @@ You will receive:
 
 ## Output Format
 
-For each concept (High and Medium priority), produce:
+For each concept, produce:
 
 ~~~markdown
 **`[slug].md`**

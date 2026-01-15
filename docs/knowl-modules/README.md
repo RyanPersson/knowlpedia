@@ -22,40 +22,56 @@ knowl-modules/
 └── source-abstract-algebra-500.md    # Original enumeration (graduate algebra)
 ```
 
+## Current Content Structure
+
+```
+content/
+├── shared-foundations/    # 58 knowls - Sets, functions, relations, orders
+├── linear-algebra/        # 27 knowls - Vector spaces, linear maps, eigenvalues
+├── real-analysis/         # 234 knowls - Sequences, continuity, differentiation, integration
+├── topology/              # 97 knowls - Metric spaces, compactness, connectedness
+├── measure-theory/        # 26 knowls - Lebesgue measure, integration
+├── convex-analysis/       # Convex sets/functions, separation theorems
+├── algebra-groups/        # Group theory through Sylow
+├── algebra-rings/         # Rings, ideals, PIDs, UFDs
+├── algebra-modules/       # Modules, tensor products
+├── algebra-fields-galois/ # Field extensions, Galois theory
+├── algebra-commutative/   # Localization, Noetherian rings
+├── algebra-homological/   # Chain complexes, Ext, Tor
+├── algebra-representation-theory/  # Representations, characters
+├── algebra-category-theory/        # Categories, functors, Yoneda
+├── lie-groups/            # Lie groups and algebras
+└── fiber-bundles/         # Fiber bundles, connections
+```
+
 ## Shared Pools
 
-| Pool | Description | Used By |
-|------|-------------|---------|
-| `shared-foundations` | Sets, functions, relations, orders | Everything |
-| `linear-algebra` | Vector spaces, linear maps, eigenvalues | Analysis, Algebra, many others |
+| Pool | Knowls | Description | Used By |
+|------|--------|-------------|---------|
+| `shared-foundations` | 58 | Sets, functions, relations, orders | Everything |
+| `linear-algebra` | 27 | Vector spaces, linear maps, eigenvalues | Analysis, Algebra, many others |
 
 ## Analysis Modules
 
-| Module | Depends On | Content |
-|--------|------------|---------|
-| `analysis-order-completeness` | foundations | Sup/inf, ℝ completeness |
-| `analysis-metric-topology` | order-completeness | Metric spaces, open/closed |
-| `analysis-sequences-series` | metric-topology | Convergence, series tests |
-| `analysis-continuity` | sequences-series | Limits, continuity, uniform |
-| `analysis-compactness-connectedness` | continuity | Compact, connected, Heine-Borel |
-| `analysis-differentiation-1d` | continuity | Derivatives, MVT, Taylor |
-| `analysis-riemann-integration` | differentiation-1d | Riemann integral, FTC |
-| `analysis-function-sequences` | riemann-integration | Uniform convergence, power series |
-| `analysis-multivariable` | linear-algebra, differentiation-1d | Partial derivatives, Jacobian, implicit function |
-| `convex-analysis` | linear-algebra, metric-topology | Convex sets/functions, separation, Hahn–Banach |
+| Module | Knowls | Content |
+|--------|--------|---------|
+| `real-analysis` | 234 | Sequences, series, continuity, differentiation, Riemann integration, multivariable |
+| `topology` | 97 | Metric spaces, open/closed sets, compactness, connectedness |
+| `measure-theory` | 26 | Lebesgue measure, measurable functions, integration |
+| `convex-analysis` | — | Convex sets/functions, separation, Hahn–Banach |
 
 ## Algebra Modules
 
-| Module | Depends On | Content |
-|--------|------------|---------|
-| `algebra-groups` | foundations | Group theory through Sylow |
-| `algebra-rings` | foundations, groups | Rings, ideals, PIDs, UFDs |
-| `algebra-modules` | rings, linear-algebra | Modules, tensor products, projective/injective |
-| `algebra-fields-galois` | rings, groups | Field extensions, Galois theory |
-| `algebra-commutative` | rings, modules | Localization, Noetherian, primary decomposition |
-| `algebra-homological` | modules, category-theory | Chain complexes, Ext, Tor |
-| `algebra-representation-theory` | groups, modules, linear-algebra | Representations, characters |
-| `algebra-category-theory` | foundations | Categories, functors, Yoneda |
+| Module | Content |
+|--------|---------|
+| `algebra-groups` | Group theory through Sylow |
+| `algebra-rings` | Rings, ideals, PIDs, UFDs |
+| `algebra-modules` | Modules, tensor products, projective/injective |
+| `algebra-fields-galois` | Field extensions, Galois theory |
+| `algebra-commutative` | Localization, Noetherian, primary decomposition |
+| `algebra-homological` | Chain complexes, Ext, Tor |
+| `algebra-representation-theory` | Representations, characters |
+| `algebra-category-theory` | Categories, functors, Yoneda |
 
 ## Occurrence Counts
 
@@ -68,61 +84,47 @@ Items with high counts should live in shared pools; items with ×1 are specific 
 
 ## Composing a Course
 
-To generate knowls for a specific course, combine modules:
+Each section is self-contained. Cross-references use the knowl shortcode with explicit section:
 
-**Example: Baby Rudin Analysis**
-```
-shared-foundations
-+ linear-algebra
-+ analysis-order-completeness
-+ analysis-metric-topology
-+ analysis-sequences-series
-+ analysis-continuity
-+ analysis-compactness-connectedness
-+ analysis-differentiation-1d
-+ analysis-riemann-integration
-+ analysis-function-sequences
-+ analysis-multivariable
+```hugo
+{{</* knowl id="vector-space" section="linear-algebra" text="vector space" */>}}
 ```
 
-**Example: First Graduate Algebra Course**
-```
-shared-foundations
-+ algebra-groups
-+ algebra-rings
-```
+**Example: Real Analysis Course**
+- `shared-foundations` — prerequisite definitions
+- `linear-algebra` — for multivariable topics
+- `real-analysis` — main content
+- `topology` — metric space foundations
 
-**Example: Second Graduate Algebra Course**
-```
-shared-foundations
-+ linear-algebra
-+ algebra-groups (already have, skip)
-+ algebra-rings (already have, skip)
-+ algebra-modules
-+ algebra-fields-galois
-```
+**Example: Graduate Algebra Course**
+- `shared-foundations` — prerequisite definitions
+- `linear-algebra` — for module theory
+- `algebra-groups`
+- `algebra-rings`
+- `algebra-modules`
+- `algebra-fields-galois`
 
 ## Avoiding Duplication
 
 When a knowl appears in multiple modules:
-1. It lives in the **shared pool** if high-occurrence
+1. It lives in the **shared pool** (`shared-foundations` or `linear-algebra`) if high-occurrence
 2. It lives in the **first module in dependency order** if lower-occurrence
-3. Later modules reference it but don't recreate it
+3. Later modules reference it via knowl shortcodes but don't recreate it
 
-The actual knowl files go in:
+Knowl files are organized in flat section directories:
 ```
-content/glossary/
-  shared/
+content/
+  shared-foundations/
     set.md
     function.md
     ...
-  analysis/
+  real-analysis/
     metric-space.md
     cauchy-sequence.md
     ...
-  algebra/
+  algebra-groups/
     group.md
-    ring.md
+    normal-subgroup.md
     ...
 ```
 
