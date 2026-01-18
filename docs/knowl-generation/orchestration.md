@@ -592,6 +592,93 @@ print(f"\n⚠️  Don't forget to create layouts/{section}/ !")
 - [ ] Verify file counts match expected
 - [ ] Test with `hugo server`
 
+## Advanced: Multi-Process Parallelization
+
+The oracle-parallel.sh script has a default cap of 6 concurrent agents per process. However, **multiple oracle-parallel processes can run concurrently** with no rate limiting observed.
+
+### Discovery
+
+During stat-mech prerequisite generation (Jan 2026), we tested running 12 agents simultaneously:
+- Phase 2: 4 agents (probability batches 7-10)
+- Phase 3: 2 agents (convex-analysis)
+- Phase 4: 2 agents (large-deviations)
+- Phase 5: 1 agent (asymptotics)
+- Phase 6: 1 agent (discrete-structures)
+- Phase 7: 2 agents (quantum-foundations)
+
+All 12 agents completed successfully with no throttling or failures.
+
+### How to Run Multi-Process
+
+Launch multiple oracle-parallel processes in background:
+
+```bash
+# Process 1: Phase 2 (4 agents)
+~/.oracle/oracle-parallel.sh \
+  -pf /tmp/phase2/batch7.md \
+  -pf /tmp/phase2/batch8.md \
+  -pf /tmp/phase2/batch9.md \
+  -pf /tmp/phase2/batch10.md \
+  --sessions-file /tmp/phase2/sessions.txt &
+
+# Process 2: Phase 3 (2 agents)
+~/.oracle/oracle-parallel.sh \
+  -pf /tmp/phase3/batch1.md \
+  -pf /tmp/phase3/batch2.md \
+  --sessions-file /tmp/phase3/sessions.txt &
+
+# ... more processes
+
+wait  # Wait for all to complete
+```
+
+### Optimal Batch Sizing
+
+Smaller batches (4-6 slugs) are more reliable than larger ones (20+ slugs):
+- Faster completion per batch
+- Lower risk of GPT losing context or producing malformed output
+- Easier to parse and validate results
+
+### Session Parsing Across Concurrent Processes
+
+When running multiple processes concurrently, sessions from different phases may interleave. Use the `--sessions-file` option to track which sessions belong to which phase.
+
+```python
+# Parse sessions file and extract knowls
+with open('/tmp/phase2/sessions.txt', 'r') as f:
+    sessions = [s.strip() for s in f.readlines()]
+
+for session in sessions:
+    path = f"~/.oracle/sessions/{session}/output.log"
+    # Parse and extract knowls...
+```
+
+### Common GPT Output Fixes
+
+GPT frequently produces malformed shortcodes despite clear instructions. Always run these fixes:
+
+```python
+def fix_content(body):
+    # Triple braces to double
+    body = re.sub(r'\{\{\{<', r'{{<', body)
+    body = re.sub(r'>\}\}\}', r'>}}', body)
+    # Single brace to double (most common issue)
+    body = re.sub(r'(?<!\{)\{< knowl', r'{{< knowl', body)
+    body = re.sub(r' >\}(?!\})', r' >}}', body)
+    # Wrong attribute name
+    body = re.sub(r'knowl slug=', r'knowl id=', body)
+    # Remove .md from ids
+    body = re.sub(r'knowl id="([a-z0-9-]+)\.md"', r'knowl id="\1"', body)
+    return body
+```
+
+### Results Summary (Stat-Mech Prerequisites, Jan 2026)
+
+- **108 knowls generated** across 7 phases in ~30 minutes
+- **12 concurrent agents** with no rate limiting
+- **5 new sections created**: probability, large-deviations, asymptotics, discrete-structures, quantum-foundations
+- **Batch size**: 4-6 slugs per batch
+
 ## Reference Files
 
 - Oracle docs: `~/docs/oracle-parallel-tasks.md`

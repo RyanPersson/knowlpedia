@@ -49,6 +49,12 @@ theme = 'PaperMod'
     url = "/linear-algebra/"
     parent = "foundations"
     weight = 2
+  [[menu.main]]
+    identifier = "discrete-structures"
+    name = "Discrete Structures"
+    url = "/discrete-structures/"
+    parent = "foundations"
+    weight = 3
 
   # Analysis dropdown
   [[menu.main]]
@@ -78,6 +84,60 @@ theme = 'PaperMod'
     name = "Convex Analysis"
     url = "/convex-analysis/"
     parent = "analysis"
+    weight = 4
+
+  # Probability dropdown
+  [[menu.main]]
+    identifier = "probability"
+    name = "Probability"
+    weight = 25
+  [[menu.main]]
+    identifier = "probability-theory"
+    name = "Probability Theory"
+    url = "/probability/"
+    parent = "probability"
+    weight = 1
+  [[menu.main]]
+    identifier = "large-deviations"
+    name = "Large Deviations"
+    url = "/large-deviations/"
+    parent = "probability"
+    weight = 2
+  [[menu.main]]
+    identifier = "asymptotics"
+    name = "Asymptotics"
+    url = "/asymptotics/"
+    parent = "probability"
+    weight = 3
+
+  # Statistical Mechanics dropdown
+  [[menu.main]]
+    identifier = "stat-mech-main"
+    name = "Stat Mech"
+    weight = 27
+  [[menu.main]]
+    identifier = "thermodynamics"
+    name = "Thermodynamics"
+    url = "/thermodynamics/"
+    parent = "stat-mech-main"
+    weight = 1
+  [[menu.main]]
+    identifier = "stat-mech"
+    name = "Classical Stat Mech"
+    url = "/stat-mech/"
+    parent = "stat-mech-main"
+    weight = 2
+  [[menu.main]]
+    identifier = "stat-mech-lattice"
+    name = "Lattice Models"
+    url = "/stat-mech-lattice/"
+    parent = "stat-mech-main"
+    weight = 3
+  [[menu.main]]
+    identifier = "stat-mech-quantum"
+    name = "Quantum Stat Mech"
+    url = "/stat-mech-quantum/"
+    parent = "stat-mech-main"
     weight = 4
 
   # Algebra dropdown
@@ -163,3 +223,9 @@ theme = 'PaperMod'
     url = "/shale-paper/"
     parent = "misc"
     weight = 4
+  [[menu.main]]
+    identifier = "quantum-foundations"
+    name = "Quantum Foundations"
+    url = "/quantum-foundations/"
+    parent = "misc"
+    weight = 5

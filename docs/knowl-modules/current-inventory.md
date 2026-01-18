@@ -1845,3 +1845,50 @@ This document lists all knowls currently in the content directories.
 | langlands-letter | 34 |
 | shale-paper | 34 |
 | **Total** | **1601** |
+
+---
+
+## New Knowls Added (2026-01-16)
+
+The following foundational knowls were added to fix broken cross-references.
+
+### `stat-mech` additions (6 knowls)
+
+**Definitions:**
+- Phase space (classical) → `phase-space-classical.md`
+- Hamiltonian function (classical) → `hamiltonian-function-classical.md`
+- Phase space volume element → `phase-space-volume-element.md`
+- Microstate (classical) → `microstate-classical.md`
+- Macrostate → `macrostate.md`
+- Microcanonical entropy density → `microcanonical-entropy-density.md`
+
+### `thermodynamics` additions (2 knowls)
+
+**Conventions:**
+- Canonical ensemble convention → `canonical-ensemble-convention.md`
+- Grand canonical ensemble convention → `grand-canonical-ensemble-convention.md`
+
+### `stat-mech-lattice` additions (1 knowl)
+
+**Definitions:**
+- Thermodynamic limit of pressure (lattice) → `thermodynamic-limit-pressure-lattice.md`
+
+### `lie-groups` foundational additions (15 knowls)
+
+**Definitions:**
+- Lie Group → `lie-group.md`
+- Lie Algebra → `lie-algebra.md`
+- Lie Algebra of a Lie Group → `lie-algebra-of-a-lie-group.md`
+- Lie Bracket → `lie-bracket.md`
+- Lie Subgroup → `lie-subgroup.md`
+- Lie Group Homomorphism → `lie-group-homomorphism.md`
+- Representation of a Lie Group → `representation-of-a-lie-group.md`
+- Representation of a Lie Algebra → `representation-of-a-lie-algebra.md`
+- Adjoint Action of a Lie Group → `adjoint-action-of-a-lie-group.md`
+- Adjoint Representation of a Lie Algebra → `adjoint-representation-of-a-lie-algebra.md`
+- Left Translation → `left-translation.md`
+- Right Translation → `right-translation.md`
+- Left-Invariant Vector Field → `left-invariant-vector-field.md`
+- Right-Invariant Vector Field → `right-invariant-vector-field.md`
+- Principal Homogeneous Space → `principal-homogeneous-space.md`
+

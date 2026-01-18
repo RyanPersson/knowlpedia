@@ -14,13 +14,14 @@ import sys
 
 def fix_content(content):
     """Fix common GPT output issues."""
-    # CRITICAL: Triple braces -> double braces (GPT does this almost every time)
-    content = re.sub(r'\{\{\{<', '{{<', content)
-    content = re.sub(r'>\}\}\}', '>}}', content)
+    # CRITICAL: Normalize to exactly double braces (GPT outputs triple or more)
+    # Match any shortcode with 2+ braces and normalize to exactly 2
+    content = re.sub(r'\{{2,}<', '{{<', content)
+    content = re.sub(r'>\}{2,}', '>}}', content)
     
-    # Single brace shortcodes
-    content = re.sub(r'\{< knowl', '{{< knowl', content)
-    content = re.sub(r' >\}', ' >}}', content)
+    # Single brace shortcodes (use lookahead/lookbehind to avoid matching already-double braces)
+    content = re.sub(r'(?<!\{)\{< knowl', '{{< knowl', content)
+    content = re.sub(r' >\}(?!\})', ' >}}', content)
     
     # Remove .md from knowl id references
     content = re.sub(r'knowl id="([a-z0-9-]+)\.md"', r'knowl id="\1"', content)
