@@ -46,12 +46,21 @@ mathblog/                          ← This repo (pipeline + infrastructure)
 - `scripts/validate-knowls.py` - Check for broken knowl references
 - `scripts/feedback-api.py` - Local feedback voting API
 
-## Knowl Usage
+## Knowl Links (NOT Hyperlinks)
+
+**Important:** A "knowl link" is NOT a markdown hyperlink. It's a Hugo shortcode that creates an expandable inline definition panel.
+
+- **Hyperlink:** `[text](/path/)` - navigates to another page
+- **Knowl link:** `{{</* knowl id="slug" section="section" text="display" */>}}` - expands inline to show definition
+
+When asked to create "knowl links" to content, use the shortcode syntax:
 
 ```markdown
 {{</* knowl id="vector-space" text="vector space" */>}}
 {{</* knowl id="ring" section="algebra-rings" text="ring" */>}}
 ```
+
+The `section` parameter is optional if the knowl is in the same section as the current file.
 
 ## Detailed Documentation
 

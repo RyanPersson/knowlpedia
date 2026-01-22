@@ -160,23 +160,44 @@ python3 scripts/validate-knowls.py
 
 ---
 
-### 6. Proof Sketches (Inconsistent)
+### 6. Proof Sketches / Proof Idea Sections
 
-**Pattern:** Some knowls include proof sketches, others don't.
+**Pattern:** Sections with headers containing "proof" such as:
+- `## Proof idea / significance`
+- `## Proof idea / significance (sketch)`
+- `## Proof idea (sketch)`
+- `## Proof outline`
+- `## Typical proof inputs (conceptual)`
 
-**Current state:**
-- analysis: 136 files with proof sketches
-- algebra-groups: 59 files
-- convex-analysis: 58 files
-- algebra-fields-galois: 0 files
-- fiber-bundles: 0 files
+**CRITICAL: DO NOT GENERATE THESE.** LLMs commonly add these as filler content under various rephrasings to appear thorough.
 
-**Decision for v2:** Remove proof sketches for consistency. Knowls should be concise reference cards, not proof outlines.
+**Why it's wrong:** Knowls should be concise reference cards that define concepts and state results. They are NOT the place for proof sketches. A proof sketch is neither a rigorous proof (which belongs in a textbook) nor a definition (which belongs in a knowl).
 
-If a proof is essential to understanding, write a brief "Key insight:" instead:
+**Bad:**
+```markdown
+## Proof idea / significance
+
+The proof proceeds by applying Jensen's inequality to the convex function $-\log$...
+```
+
+**Bad (rephrasing to evade detection):**
+```markdown
+## Proof idea / significance (sketch)
+## Typical proof inputs (conceptual)
+## Key proof techniques
+## Derivation outline
+```
+
+**Good:** If a key insight is essential to understanding, integrate it briefly into the prose:
 
 ```markdown
-**Key insight:** The proof uses the fact that cosets partition the group, so $|G| = [G:H] \cdot |H|$.
+The inequality follows from applying Jensen's inequality to the convex function $-\log$, combined with the normalization of probability measures.
+```
+
+**Detection:**
+```bash
+grep -r "^##.*[Pp]roof" content/
+python3 scripts/tests/knowl_tests.py --test anti_patterns
 ```
 
 ---

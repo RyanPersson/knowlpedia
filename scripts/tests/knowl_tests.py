@@ -184,6 +184,12 @@ ANTI_PATTERNS = [
      "Contains 'Related knowls' section - links should be woven into prose",
      "error"),
 
+    # Proof sketch sections are filler content - knowls should contain definitions/statements, not proof sketches
+    ("proof_sketch_section",
+     re.compile(r'^##\s*[Pp]roof\s*(idea|sketch|outline|inputs|strategy)', re.MULTILINE),
+     "Contains 'Proof idea/sketch' section - knowls should define concepts, not sketch proofs",
+     "error"),
+
     # CRITICAL: Knowl inside math delimiters causes HUGOSHORTCODE rendering errors
     # Matches \( ... {{< knowl ... on the same line (before closing \))
     ("knowl_in_inline_math",
@@ -219,6 +225,16 @@ ANTI_PATTERNS = [
     ("single_brace",
      re.compile(r'(?<!\{)\{<\s*knowl'),
      "Single opening brace in shortcode (should be double)",
+     "error"),
+
+    # Display math closing $$ immediately followed by prose (no blank line) causes rendering issues
+    # The closing $$ must be followed by a blank line before any prose text
+    # Valid: $$\n\nText continues...
+    # Invalid: $$\nText continues... (no blank line)
+    # Pattern: $$ followed by newline then a line starting with letter/bold/italic (prose indicators)
+    ("display_math_missing_blank_after",
+     re.compile(r'^[ \t]*[$][$][ \t]*\n[A-Za-z*_\[]', re.MULTILINE),
+     "Display math $$ must be followed by blank line - prose immediately after $$ causes rendering issues",
      "error"),
 
     ("latex_in_description",
@@ -257,6 +273,64 @@ def test_anti_patterns(section: str = None) -> TestResult:
                     )
 
     result.stats = dict(pattern_counts)
+    return result
+
+# ============================================================================
+# Test: Setext Headings Inside Math Blocks
+# ============================================================================
+
+# Setext underline: 0-3 spaces, one or more = or -, optional trailing whitespace
+SETEXT_H1_PATTERN = re.compile(r'^[ \t]{0,3}=+[ \t]*$')
+SETEXT_H2_PATTERN = re.compile(r'^[ \t]{0,3}-+[ \t]*$')
+
+def test_setext_in_math(section: str = None) -> TestResult:
+    """Detect setext heading patterns (lone = or -) inside $$...$$ blocks.
+
+    CommonMark interprets a line of only `=` or `-` as a setext heading underline,
+    which breaks Hugo's Goldmark passthrough extension for math blocks.
+
+    See: https://github.com/gohugoio/hugo-goldmark-extensions/issues/17
+    """
+    result = TestResult(name="setext_in_math", passed=True)
+
+    for md_file in get_knowl_files(section):
+        try:
+            content = md_file.read_text(encoding='utf-8')
+        except Exception:
+            continue
+
+        lines = content.split('\n')
+        in_math_block = False
+
+        for i, line in enumerate(lines, start=1):
+            stripped = line.strip()
+
+            # Track entry/exit from $$ blocks
+            if stripped == '$$':
+                in_math_block = not in_math_block
+                continue
+
+            # $$content$$ on same line doesn't toggle state
+            if stripped.startswith('$$') and stripped.endswith('$$') and len(stripped) > 4:
+                continue
+
+            # Check for setext patterns inside math blocks
+            if in_math_block:
+                if SETEXT_H1_PATTERN.match(line):
+                    result.add_issue(
+                        md_file,
+                        f"Setext H1 pattern (lone '=') inside $$...$$ block breaks math rendering. Fix: use '={{}}' or '\\mathrel{{=}}'",
+                        line=i,
+                        fixable=True
+                    )
+                elif SETEXT_H2_PATTERN.match(line):
+                    result.add_issue(
+                        md_file,
+                        f"Setext H2 pattern (lone '-') inside $$...$$ block may break math rendering. Fix: use '-{{}}' or '\\mathrel{{-}}'",
+                        line=i,
+                        fixable=True
+                    )
+
     return result
 
 # ============================================================================
@@ -578,18 +652,95 @@ def test_hugo_build(section: str = None) -> TestResult:
     return result
 
 # ============================================================================
+# Test: Hugo Server Health Check
+# ============================================================================
+
+import socket
+import urllib.request
+import urllib.error
+
+def test_server_health(section: str = None) -> TestResult:
+    """Check if Hugo dev server is running and responding.
+
+    This test verifies that the Hugo server on localhost:1313 is:
+    1. Accepting connections (port is open)
+    2. Returning valid HTTP responses
+
+    Run this as a final sanity check - changes can crash the server
+    even when other tests pass.
+    """
+    result = TestResult(name="server_health", passed=True)
+    port = 1313
+    host = "localhost"
+
+    # First check if port is open
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.settimeout(2)
+    try:
+        sock.connect((host, port))
+        sock.close()
+    except (socket.timeout, ConnectionRefusedError, OSError):
+        result.add_issue(
+            REPO_ROOT,
+            f"Hugo server not running on {host}:{port} - start with 'hugo server'",
+            severity="error"
+        )
+        result.stats["server_running"] = 0
+        return result
+
+    result.stats["server_running"] = 1
+
+    # Try to fetch the homepage
+    try:
+        req = urllib.request.Request(f"http://{host}:{port}/", headers={"User-Agent": "knowl-test"})
+        with urllib.request.urlopen(req, timeout=5) as response:
+            status = response.status
+            if status != 200:
+                result.add_issue(
+                    REPO_ROOT,
+                    f"Hugo server returned HTTP {status} for homepage",
+                    severity="error"
+                )
+            result.stats["http_status"] = status
+    except urllib.error.HTTPError as e:
+        result.add_issue(
+            REPO_ROOT,
+            f"Hugo server HTTP error: {e.code} {e.reason}",
+            severity="error"
+        )
+        result.stats["http_status"] = e.code
+    except urllib.error.URLError as e:
+        result.add_issue(
+            REPO_ROOT,
+            f"Hugo server connection failed: {e.reason}",
+            severity="error"
+        )
+        result.stats["http_status"] = 0
+    except Exception as e:
+        result.add_issue(
+            REPO_ROOT,
+            f"Hugo server check failed: {e}",
+            severity="error"
+        )
+        result.stats["http_status"] = 0
+
+    return result
+
+# ============================================================================
 # Test Registry
 # ============================================================================
 
 TESTS: Dict[str, Callable] = {
     "broken_references": test_broken_references,
     "anti_patterns": test_anti_patterns,
+    "setext_in_math": test_setext_in_math,
     "inventory_sync": test_inventory_sync,
     "frontmatter": test_frontmatter,
     "duplicates": test_duplicates,
     "orphans": test_orphans,
     "section_counts": test_section_counts,
     "hugo_build": test_hugo_build,
+    "server_health": test_server_health,
 }
 
 # ============================================================================

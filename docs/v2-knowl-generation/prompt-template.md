@@ -68,11 +68,25 @@ Use exactly double curly braces: `{{<` and `>}}`
 - NOT `{<` (single brace - won't render)
 - NOT `{{{<` (triple brace - causes errors)
 
-### 6. NO Proof Sketches
-Do not include "Proof sketch" sections. Knowls should be concise reference cards.
+### 6. NO Proof Sketches (CRITICAL - Common LLM Failure Mode)
+DO NOT include any section with "proof" in the header. This includes ALL of:
+- `## Proof idea / significance`
+- `## Proof idea / significance (sketch)`
+- `## Proof idea (sketch)`
+- `## Proof outline`
+- `## Typical proof inputs`
+- `## Key proof techniques`
+- `## Derivation outline`
+- ANY rephrasing or variation of "proof sketch"
 
-If a key insight is essential, use this format instead:
-`**Key insight:** The proof uses [brief explanation].`
+LLMs commonly generate these as filler content. They add NO VALUE to a reference card.
+
+Knowls define concepts and state results. They do NOT sketch proofs.
+
+If a key insight is genuinely essential to understanding, integrate it into the prose:
+`The inequality follows from Jensen's inequality applied to the convex function $-\log$.`
+
+DO NOT create a separate section for this.
 
 ---
 
