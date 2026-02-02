@@ -80,6 +80,13 @@
                 {{- end }}
             </div>
         </div>
+
+        <!-- Header Search -->
+        <div id="header-search-container">
+            <input type="search" id="header-search-input" placeholder="Search..." aria-label="Search" autocomplete="off">
+            <ul id="header-search-results"></ul>
+        </div>
+
         {{- $currentPage := . }}
         <ul id="menu">
             {{- range site.Menus.main }}
@@ -87,6 +94,7 @@
             {{- $page_url:= $currentPage.Permalink | absLangURL }}
             {{- $is_search := eq (site.GetPage .KeyName).Layout `search` }}
             {{- $has_children := .HasChildren }}
+            {{- if not $is_search }}
             <li{{ if $has_children }} class="dropdown"{{ end }}>
                 {{- if $has_children }}
                 <span class="dropdown-toggle">
@@ -130,6 +138,7 @@
                 </a>
                 {{- end }}
             </li>
+            {{- end }}
             {{- end }}
         </ul>
     </nav>

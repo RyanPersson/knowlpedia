@@ -3,6 +3,10 @@ languageCode = 'en-us'
 title = ''
 theme = 'PaperMod'
 
+# Enable JSON output for search index
+[outputs]
+  home = ["HTML", "RSS", "JSON"]
+
 # Build-time math rendering (KaTeX via transform.ToMath)
 [markup]
   [markup.goldmark]
@@ -229,3 +233,10 @@ theme = 'PaperMod'
     url = "/quantum-foundations/"
     parent = "misc"
     weight = 5
+
+  # Search
+  [[menu.main]]
+    identifier = "search"
+    name = "Search"
+    url = "/search/"
+    weight = 50

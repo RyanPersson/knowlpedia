@@ -2,6 +2,9 @@
 <link rel="stylesheet" href="{{ "css/katex.min.css" | relURL }}">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/copy-tex.min.js" crossorigin="anonymous"></script>
 
+{{- /* Header search (Pagefind loaded dynamically) */ -}}
+<script defer src="{{ "js/header-search.js" | relURL }}"></script>
+
 {{- /* Dropdown menu styles */ -}}
 <style>
 .header{overflow:visible !important}
@@ -18,6 +21,29 @@
 .nav #menu .dropdown-menu a:hover{background:var(--tertiary)}
 .nav #menu .dropdown-menu .active{font-weight:600}
 [data-theme="dark"] .nav #menu .dropdown-menu{box-shadow:0 4px 12px rgba(0,0,0,.3)}
+</style>
+
+{{- /* Header search styles */ -}}
+<style>
+#header-search-container{position:relative;display:flex;align-items:center}
+#header-search-input{width:180px;padding:.4rem .75rem;border:1px solid var(--border);border-radius:6px;background:var(--theme);color:var(--primary);font-size:14px;transition:border-color .2s,width .2s}
+#header-search-input:focus{outline:none;border-color:var(--primary);width:240px}
+#header-search-input::placeholder{color:var(--secondary)}
+#header-search-results{position:absolute;top:100%;right:0;min-width:320px;max-height:400px;overflow-y:auto;margin-top:.5rem;padding:0;background:var(--theme);border:1px solid var(--border);border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.15);list-style:none;display:none;z-index:1001}
+#header-search-results.active{display:block}
+#header-search-results li{margin:0;padding:0;border-bottom:1px solid var(--border)}
+#header-search-results li:last-child{border-bottom:none}
+#header-search-results a{display:block;padding:.75rem 1rem;color:var(--primary);text-decoration:none}
+#header-search-results a:hover,.header-search-focus{background:var(--tertiary)}
+#header-search-results .search-title{font-weight:600;margin-bottom:.25rem}
+#header-search-results .search-summary{font-size:.85rem;color:var(--secondary);overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+#header-search-results .search-no-results{padding:.75rem 1rem;color:var(--secondary);font-style:italic}
+[data-theme="dark"] #header-search-results{box-shadow:0 4px 12px rgba(0,0,0,.4)}
+@media(max-width:768px){
+#header-search-input{width:120px}
+#header-search-input:focus{width:160px}
+#header-search-results{min-width:280px;right:0}
+}
 </style>
 
 {{- /* Knowls system - CSS inlined to eliminate render-blocking request */ -}}
