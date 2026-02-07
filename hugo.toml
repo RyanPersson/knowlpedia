@@ -89,6 +89,12 @@ theme = 'PaperMod'
     url = "/convex-analysis/"
     parent = "analysis"
     weight = 4
+  [[menu.main]]
+    identifier = "analysis-general"
+    name = "Analysis"
+    url = "/analysis/"
+    parent = "analysis"
+    weight = 5
 
   # Probability dropdown
   [[menu.main]]
