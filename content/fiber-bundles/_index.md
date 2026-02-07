@@ -1,0 +1,290 @@
+---
+title: "Fiber Bundles"
+description: "Differential geometry of fiber bundles, principal bundles, and connections."
+build:
+  list: local
+---
+
+## Definitions
+
+- {{< knowl id="closed-differential-form" text="Closed Differential Form" >}}
+- {{< knowl id="cotangent-bundle" text="Cotangent Bundle" >}}
+- {{< knowl id="de-rham-cohomology-group" text="De Rham Cohomology Group" >}}
+- {{< knowl id="diffeomorphism" text="Diffeomorphism" >}}
+- {{< knowl id="differential-k-form" text="Differential K Form" >}}
+- {{< knowl id="differential-of-a-lie-group-homomorphism-lie-algebra-homomorphism" text="Differential Of A Lie Group Homomorphism Lie Algebra Homomorphism" >}}
+- {{< knowl id="differential-pushforward-of-a-smooth-map" text="Differential Pushforward Of A Smooth Map" >}}
+- {{< knowl id="exact-differential-form" text="Exact Differential Form" >}}
+- {{< knowl id="exponential-map-lie-group-exponential" text="Exponential Map Lie Group Exponential" >}}
+- {{< knowl id="exterior-derivative" text="Exterior Derivative" >}}
+- {{< knowl id="fiber-of-a-map-preimage-fiber" text="Fiber Of A Map Preimage Fiber" >}}
+- {{< knowl id="interior-product-contraction-x" text="Interior Product Contraction X" >}}
+- {{< knowl id="left-invariant-vector-field" text="Left Invariant Vector Field" >}}
+- {{< knowl id="left-translation-l-g" text="Left Translation L G" >}}
+- {{< knowl id="lie-algebra-of-a-lie-group" text="Lie Algebra Of A Lie Group" >}}
+- {{< knowl id="lie-bracket" text="Lie Bracket" >}}
+- {{< knowl id="lie-derivative-of-a-differential-form" text="Lie Derivative Of A Differential Form" >}}
+- {{< knowl id="lie-group" text="Lie Group" >}}
+- {{< knowl id="lie-group-homomorphism" text="Lie Group Homomorphism" >}}
+- {{< knowl id="lie-subgroup" text="Lie Subgroup" >}}
+- {{< knowl id="pullback-of-covectors" text="Pullback Of Covectors" >}}
+- {{< knowl id="pullback-of-differential-forms" text="Pullback Of Differential Forms" >}}
+- {{< knowl id="regular-value" text="Regular Value" >}}
+- {{< knowl id="right-invariant-vector-field" text="Right Invariant Vector Field" >}}
+- {{< knowl id="right-translation-r-g" text="Right Translation R G" >}}
+- {{< knowl id="smooth-atlas" text="Smooth Atlas" >}}
+- {{< knowl id="smooth-chart-coordinate-chart" text="Smooth Chart Coordinate Chart" >}}
+- {{< knowl id="smooth-embedding" text="Smooth Embedding" >}}
+- {{< knowl id="smooth-immersion" text="Smooth Immersion" >}}
+- {{< knowl id="smooth-manifold" text="Smooth Manifold" >}}
+- {{< knowl id="smooth-map" text="Smooth Map" >}}
+- {{< knowl id="smooth-submersion" text="Smooth Submersion" >}}
+- {{< knowl id="tangent-bundle" text="Tangent Bundle" >}}
+- {{< knowl id="tangent-space-at-a-point" text="Tangent Space At A Point" >}}
+- {{< knowl id="vector-field" text="Vector Field" >}}
+- {{< knowl id="wedge-product-of-differential-forms" text="Wedge Product Of Differential Forms" >}}
+---
+
+## Uncategorized
+
+- {{< knowl id="adjoint-action-of-a-lie-group" text="Adjoint action of a Lie group" >}}
+- {{< knowl id="adjoint-bundle-p-g-g-with-conjugation-action" text="Adjoint bundle" >}}
+- {{< knowl id="adjoint-representation-of-a-lie-algebra" text="Adjoint representation of a Lie algebra" >}}
+- {{< knowl id="ambrosesinger-curvature-span" text="Ambrose–Singer curvature span" >}}
+- {{< knowl id="ambrosesinger-holonomy-theorem" text="Ambrose–Singer holonomy theorem" >}}
+- {{< knowl id="associated-bundle" text="Associated bundle" >}}
+- {{< knowl id="associated-connection-theorem-a-principal-connection-induces-connections-on-all-associated-bundles" text="Associated connection theorem" >}}
+- {{< knowl id="associated-vector-bundle" text="Associated vector bundle" >}}
+- {{< knowl id="atiyah-algebroid-of-a-principal-bundle" text="Atiyah algebroid of a principal bundle" >}}
+- {{< knowl id="atiyah-sequence-tpgtm0" text="Atiyah sequence" >}}
+- {{< knowl id="basic-differential-form-on-a-principal-bundle" text="Basic differential form on a principal bundle" >}}
+- {{< knowl id="bundle-atlas" text="Bundle atlas" >}}
+- {{< knowl id="bundle-isomorphism" text="Bundle isomorphism" >}}
+- {{< knowl id="bundle-map" text="Bundle map" >}}
+- {{< knowl id="bundle-metric" text="Bundle metric" >}}
+- {{< knowl id="bundle-morphism" text="Bundle morphism" >}}
+- {{< knowl id="bundle-of-connections" text="Bundle of connections" >}}
+- {{< knowl id="bundle-of-orbits" text="Bundle of orbits" >}}
+- {{< knowl id="cartan-connection" text="Cartan connection" >}}
+- {{< knowl id="cartans-first-structure-equation" text="Cartan" >}}
+- {{< knowl id="cartans-second-structure-equation" text="Cartan" >}}
+- {{< knowl id="characteristic-class" text="Characteristic class" >}}
+- {{< knowl id="chern-character" text="Chern character via Chern–Weil theory" >}}
+- {{< knowl id="chern-class" text="Chern class via Chern–Weil theory" >}}
+- {{< knowl id="chernsimons-form" text="Chern–Simons form" >}}
+- {{< knowl id="chernsimons-gauge-transformation-behavior" text="Gauge transformation behavior of Chern–Simons forms" >}}
+- {{< knowl id="chernweil-form" text="Chern–Weil form" >}}
+- {{< knowl id="chernweil-theorem-p-is-closed-and-its-de-rham-class-is-independent-of-connection" text="Chern–Weil theorem" >}}
+- {{< knowl id="classification-theorem-principal-g-bundles-over-m-are-classified-by-homotopy-classes-mbg" text="Classification of principal G-bundles by homotopy classes of maps into BG" >}}
+- {{< knowl id="classifying-map-of-a-principal-bundle" text="Classifying map of a principal bundle" >}}
+- {{< knowl id="classifying-space-bg" text="Classifying space BG" >}}
+- {{< knowl id="clutching-function" text="Clutching function" >}}
+- {{< knowl id="coadjoint-action-of-a-lie-group" text="Coadjoint action of a Lie group" >}}
+- {{< knowl id="cocycle-condition-for-transition-functions" text="Cocycle condition for transition functions" >}}
+- {{< knowl id="complex-vector-bundle" text="Complex vector bundle" >}}
+- {{< knowl id="conjugation-action-of-a-lie-group-on-itself" text="Conjugation action of a Lie group on itself" >}}
+- {{< knowl id="connection-1-form-on-a-principal-bundle" text="Connection 1-form on a principal bundle" >}}
+- {{< knowl id="connection-on-a-vector-bundle" text="Connection on a vector bundle" >}}
+- {{< knowl id="construction-adjoint-bundle-ad" text="Adjoint bundle Ad(P)" >}}
+- {{< knowl id="construction-adjoint-lie-algebra-bundle-ad" text="Adjoint Lie algebra bundle ad(P)" >}}
+- {{< knowl id="construction-associated-bundle-p-g-f-from-a-left-g-space-f" text="Associated bundle from a principal bundle and a left G-space" >}}
+- {{< knowl id="construction-atiyah-algebroid-tpg-and-its-anchor-map-to-tm" text="Atiyah algebroid TP/G and its anchor" >}}
+- {{< knowl id="construction-change-of-connection-formula-for-characteristic-forms-p" text="Change of connection formula for Chern Weil characteristic forms" >}}
+- {{< knowl id="construction-connection-on-fr-induced-by-a-vector-bundle-connection" text="Construction: Connection on Fr(E) induced by a vector bundle connection (and conversely)" >}}
+- {{< knowl id="construction-curvature-of-an-induced-associated-connection-via-representation" text="Curvature of an induced associated connection via a representation" >}}
+- {{< knowl id="construction-frame-bundle-fr-of-a-vector-bundle-e" text="Construction: Frame bundle Fr(E) of a vector bundle E" >}}
+- {{< knowl id="construction-gauge-transformation-of-local-data-via-gug" text="Gauge transformation of local bundle data" >}}
+- {{< knowl id="construction-holonomy-element-from-parallel-transport-around-a-loop" text="Holonomy element from parallel transport around a loop" >}}
+- {{< knowl id="construction-horizontal-lift-of-curves-and-uniqueness-of-horizontal-lift" text="Horizontal lift of curves and uniqueness" >}}
+- {{< knowl id="construction-induced-connection-on-an-associated-bundle-using-horizontals" text="Induced connection on an associated bundle via horizontals" >}}
+- {{< knowl id="construction-induced-covariant-derivative-on-associated-vector-bundle-sections" text="Induced covariant derivative on sections of an associated vector bundle" >}}
+- {{< knowl id="construction-induced-map-on-associated-bundles-from-a-principal-bundle-morphism" text="Induced map on associated bundles" >}}
+- {{< knowl id="construction-local-trivialization-from-a-local-section" text="Construction: local trivialization from a local section" >}}
+- {{< knowl id="construction-parallel-transport-map-along-a-curve" text="Parallel transport map along a curve" >}}
+- {{< knowl id="construction-product-principal-bundle-when-defined" text="Product principal bundle (fiber product over the base)" >}}
+- {{< knowl id="construction-pullback-principal-bundle-fp-along-fnm" text="Construction: pullback principal bundle" >}}
+- {{< knowl id="construction-quotient-manifold-pg-for-a-free-proper-g-action" text="Construction: quotient manifold P/G for a free proper action" >}}
+- {{< knowl id="construction-reduction-of-structure-group-to-h-via-transition-functions-valued-in-h" text="Reduction of structure group via H-valued transition functions" >}}
+- {{< knowl id="construction-splitting-of-atiyah-sequence-from-a-principal-connection" text="Construction: Splitting of the Atiyah sequence from a principal connection" >}}
+- {{< knowl id="construction-transition-functions-g-iju-iu-jg-from-local-sections" text="Transition functions from local sections" >}}
+- {{< knowl id="convention-ad-p-g-g-uses-conjugation-action-gh-ghg-1" text="Convention: Ad(P) uses the conjugation action on G" >}}
+- {{< knowl id="convention-associated-bundles-use-a-left-g-action-on-the-fiber-f" text="Convention: associated bundles use a left action on the fiber" >}}
+- {{< knowl id="convention-fundamental-vector-field-x-is-defined-using-the-right-action" text="Convention: fundamental vector field uses the right action" >}}
+- {{< knowl id="convention-local-curvature-convention-f-da-aa" text="Convention: local curvature is F = dA + A wedge A" >}}
+- {{< knowl id="convention-manifolds-are-smooth-hausdorff-and-second-countable" text="Convention: manifolds are smooth, Hausdorff, and second countable" >}}
+- {{< knowl id="convention-principal-bundles-use-a-right-g-action-on-p" text="Convention: principal bundles use a right G-action on P" >}}
+- {{< knowl id="converse-triviality-criterion-trivial-principal-bundle-admits-a-global-section" text="Theorem: A trivial principal bundle admits a global section" >}}
+- {{< knowl id="corollary-chernweil-characteristic-classes-are-invariants-of-the-principal-bundle" text="Chern–Weil classes are independent of the connection" >}}
+- {{< knowl id="corollary-conn-gauge-is-a-well-defined-orbit-space" text="Gauge equivalence classes of connections form an orbit space" >}}
+- {{< knowl id="corollary-every-principal-g-bundle-over-a-smooth-manifold-admits-a-connection" text="Every principal bundle admits a connection" >}}
+- {{< knowl id="corollary-every-vector-bundle-over-a-smooth-manifold-admits-a-connection" text="Every vector bundle admits a connection" >}}
+- {{< knowl id="corollary-isomorphic-principal-bundles-have-identical-chernweil-characteristic-classes" text="Isomorphic principal bundles have the same Chern–Weil classes" >}}
+- {{< knowl id="counterexample-nontrivial-principal-bundle-admitting-no-global-section" text="Nontrivial principal bundle with no global section" >}}
+- {{< knowl id="covariant-derivative-of-a-section" text="Covariant derivative of a section" >}}
+- {{< knowl id="covariant-exterior-derivative-on-ad-valued-forms" text="Covariant exterior derivative on ad(P)-valued forms" >}}
+- {{< knowl id="curvature" text="Curvature" >}}
+- {{< knowl id="curvature-2-form-in-a-frame" text="Curvature 2-form in a frame" >}}
+- {{< knowl id="curvature-2-form-of-a-principal-connection" text="Curvature 2-form of a principal connection" >}}
+- {{< knowl id="curvature-of-a-vector-bundle-connection" text="Curvature of a vector bundle connection" >}}
+- {{< knowl id="differential-of-a-lie-group-homomorphism" text="Differential of a Lie group homomorphism" >}}
+- {{< knowl id="differential-of-a-smooth-map" text="Differential of a smooth map" >}}
+- {{< knowl id="dirac-monopole-connection-on-the-hopf-bundle" text="Dirac monopole connection on the Hopf bundle" >}}
+- {{< knowl id="direct-sum-vector-bundle" text="Direct sum vector bundle (Whitney sum)" >}}
+- {{< knowl id="dual-vector-bundle" text="Dual vector bundle" >}}
+- {{< knowl id="ehresmann-connection" text="Ehresmann connection" >}}
+- {{< knowl id="equivalence-of-cocycles" text="Equivalence of cocycles" >}}
+- {{< knowl id="equivalence-principal-connections-splittings-of-the-atiyah-sequence" text="Theorem: Principal connections are equivalent to splittings of the Atiyah sequence" >}}
+- {{< knowl id="equivalent-bundle-atlases" text="Equivalent bundle atlases" >}}
+- {{< knowl id="equivariant-cohomology" text="Equivariant cohomology (Cartan model)" >}}
+- {{< knowl id="equivariant-local-trivialization" text="Equivariant local trivialization" >}}
+- {{< knowl id="equivariant-map" text="Equivariant map" >}}
+- {{< knowl id="equivariant-map-pf-associated-to-a-section-of-p-g-f" text="Equivariant map associated to a section of an associated bundle" >}}
+- {{< knowl id="euler-class" text="Euler class via Chern–Weil theory" >}}
+- {{< knowl id="example-reduction-of-gl-structure-to-o-using-a-bundle-metric" text="Reducing a GL(n)-structure to O(n) using a bundle metric" >}}
+- {{< knowl id="existence-of-partitions-of-unity-on-paracompact-manifolds" text="Existence of partitions of unity on paracompact manifolds" >}}
+- {{< knowl id="existence-of-principal-connections-on-smooth-manifolds" text="Theorem: Existence of principal connections on smooth manifolds" >}}
+- {{< knowl id="existenceuniqueness-of-horizontal-lift-of-a-curve" text="Theorem: Existence and uniqueness of horizontal lifts of curves" >}}
+- {{< knowl id="exponential-map" text="Exponential map" >}}
+- {{< knowl id="extension-of-structure-group" text="Extension of structure group" >}}
+- {{< knowl id="exterior-covariant-derivative" text="Exterior covariant derivative" >}}
+- {{< knowl id="exterior-power-bundle" text="Exterior power bundle" >}}
+- {{< knowl id="fiber-of-a-map" text="Fiber of a map" >}}
+- {{< knowl id="fiber-preserving-map" text="Fiber-preserving map" >}}
+- {{< knowl id="fibered-manifold" text="Fibered manifold" >}}
+- {{< knowl id="flat-connection-a0-on-a-trivial-bundle" text="Flat connection on a trivial bundle" >}}
+- {{< knowl id="flat-principal-connection" text="Flat principal connection" >}}
+- {{< knowl id="flat-vector-bundle-connection" text="Flat vector bundle connection" >}}
+- {{< knowl id="frame-bundle-fr-of-a-manifold-m" text="Frame bundle of a manifold" >}}
+- {{< knowl id="frame-bundle-frame-bundle-of-a-rank-n-vector-bundle" text="Frame bundle of a rank-n vector bundle" >}}
+- {{< knowl id="free-action" text="Free action" >}}
+- {{< knowl id="gauge-group" text="Gauge group" >}}
+- {{< knowl id="gauge-transform-of-a-local-connection-form" text="Gauge transform of a local connection form" >}}
+- {{< knowl id="gauge-transformation" text="Gauge transformation" >}}
+- {{< knowl id="good-cover" text="Good cover" >}}
+- {{< knowl id="hermitian-metric" text="Hermitian metric" >}}
+- {{< knowl id="holonomy-algebra" text="Holonomy algebra" >}}
+- {{< knowl id="holonomy-group" text="Holonomy group" >}}
+- {{< knowl id="holonomy-reduction-principle" text="Holonomy reduction principle" >}}
+- {{< knowl id="holonomy-representation" text="Holonomy representation" >}}
+- {{< knowl id="homotopy-class-mbg" text="Homotopy class [M,BG]" >}}
+- {{< knowl id="hopf-fibration-s3s2-as-a-principal-u-bundle" text="Hopf fibration as a principal U(1)-bundle" >}}
+- {{< knowl id="horizontal-differential-form-on-a-principal-bundle" text="Horizontal differential form on a principal bundle" >}}
+- {{< knowl id="horizontal-distribution" text="Horizontal distribution" >}}
+- {{< knowl id="horizontal-lift-of-a-curve" text="Horizontal lift of a curve" >}}
+- {{< knowl id="horizontal-lift-of-a-tangent-vector" text="Horizontal lift of a tangent vector" >}}
+- {{< knowl id="horizontal-lift-of-a-vector-field" text="Horizontal lift of a vector field" >}}
+- {{< knowl id="horizontal-subbundle" text="Horizontal subbundle" >}}
+- {{< knowl id="integrable-horizontal-distribution" text="Integrable horizontal distribution" >}}
+- {{< knowl id="integrality-of-chern-classes" text="Integrality of Chern classes" >}}
+- {{< knowl id="interior-product" text="Interior product" >}}
+- {{< knowl id="invariant-differential-form" text="Invariant differential form" >}}
+- {{< knowl id="invariant-function" text="Invariant function" >}}
+- {{< knowl id="jet-bundle" text="Jet bundle (first jets of sections)" >}}
+- {{< knowl id="left-maurercartan-form" text="Left Maurer–Cartan form" >}}
+- {{< knowl id="left-translation" text="Left translation" >}}
+- {{< knowl id="leibniz-rule-for-a-connection" text="Leibniz rule for a connection" >}}
+- {{< knowl id="lemma-chernweil-forms-are-basic" text="Lemma: Chern–Weil forms are basic" >}}
+- {{< knowl id="lemma-covariant-exterior-derivative-preserves-tensoriality" text="Covariant exterior derivative preserves tensoriality" >}}
+- {{< knowl id="lemma-difference-of-two-principal-connections-is-tensorial" text="Difference of two principal connections is tensorial" >}}
+- {{< knowl id="lemma-local-curvature-transformation-law-fg-g-1fg" text="Lemma: local curvature transforms by conjugation" >}}
+- {{< knowl id="lemma-local-gauge-transformation-law-ag-g-1ag-g-1dg" text="Local gauge transformation law for a connection" >}}
+- {{< knowl id="lemma-maurercartan-equation-for-the-left-maurercartan-form" text="Maurer–Cartan equation for the left Maurer–Cartan form" >}}
+- {{< knowl id="levicivita-connection-connection" text="Levi–Civita connection as a principal O(n)-connection" >}}
+- {{< knowl id="lie-algebra" text="Lie algebra of a Lie group" >}}
+- {{< knowl id="lie-algebra-valued-k-form" text="Lie-algebra-valued k-form" >}}
+- {{< knowl id="lie-derivative" text="Lie derivative" >}}
+- {{< knowl id="local-connection-1-form" text="Local connection 1-form" >}}
+- {{< knowl id="local-curvature-2-form" text="Local curvature 2-form" >}}
+- {{< knowl id="local-curvature-formula-f-da-aa" text="Local curvature formula" >}}
+- {{< knowl id="local-frame-of-a-vector-bundle" text="Local frame of a vector bundle" >}}
+- {{< knowl id="local-gauge-transformation" text="Local gauge transformation" >}}
+- {{< knowl id="local-trivialization" text="Local trivialization" >}}
+- {{< knowl id="maurercartan-equation" text="Maurer–Cartan equation" >}}
+- {{< knowl id="moment-map" text="Moment map" >}}
+- {{< knowl id="naturality-of-chernweil-classes-under-pullback" text="Naturality of Chern–Weil classes under pullback" >}}
+- {{< knowl id="open-cover" text="Open cover" >}}
+- {{< knowl id="orbit-map" text="Orbit map" >}}
+- {{< knowl id="orbit-of-a-group-action" text="Orbit of a group action" >}}
+- {{< knowl id="orientation-of-a-real-vector-bundle" text="Orientation of a real vector bundle" >}}
+- {{< knowl id="oriented-frame" text="Oriented frame" >}}
+- {{< knowl id="orthonormal-frame-bundle-o-of-a-riemannian-manifold" text="Orthonormal frame bundle" >}}
+- {{< knowl id="orthonormal-frame-bundle-reduction-of-the-frame-bundle" text="Orthonormal frame bundle" >}}
+- {{< knowl id="paracompact-manifold" text="Paracompact manifold" >}}
+- {{< knowl id="paracompact-topological-space" text="Paracompact topological space" >}}
+- {{< knowl id="parallel-section-along-a-curve" text="Parallel section along a curve" >}}
+- {{< knowl id="parallel-transport" text="Parallel transport for an Ehresmann connection" >}}
+- {{< knowl id="parallel-transport-defines-a-g-equivariant-map-between-fibers" text="Theorem: Parallel transport defines a G-equivariant map between fibers" >}}
+- {{< knowl id="partition-of-unity-subordinate-to-an-open-cover" text="Partition of unity subordinate to an open cover" >}}
+- {{< knowl id="pontryagin-class" text="Pontryagin class via Chern–Weil theory" >}}
+- {{< knowl id="principal-action" text="Principal action" >}}
+- {{< knowl id="principal-bundle-automorphism" text="Principal bundle automorphism" >}}
+- {{< knowl id="principal-bundle-isomorphism" text="Principal bundle isomorphism" >}}
+- {{< knowl id="principal-bundle-morphism" text="Principal bundle morphism" >}}
+- {{< knowl id="principal-bundle-over-s1-defined-by-a-clutching-function" text="Principal bundle over S1 from a clutching function" >}}
+- {{< knowl id="principal-bundle-transition-function" text="Principal bundle transition function" >}}
+- {{< knowl id="principal-connection" text="Principal connection" >}}
+- {{< knowl id="principal-g-bundle" text="Principal G-bundle" >}}
+- {{< knowl id="principal-h-subbundle" text="Principal H-subbundle" >}}
+- {{< knowl id="principal-homogeneous-space" text="Principal homogeneous space (G-torsor)" >}}
+- {{< knowl id="proper-action" text="Proper action" >}}
+- {{< knowl id="proposition-flatness-implies-holonomy-depends-only-on-homotopy-class-of-loops" text="Flatness implies holonomy depends only on homotopy class of loops" >}}
+- {{< knowl id="proposition-flatness-implies-path-independence-on-simply-connected-domains" text="Flatness implies path-independence on simply connected domains" >}}
+- {{< knowl id="proposition-gauge-group-acts-on-conn-by-pullback" text="Gauge group action on connections by pullback" >}}
+- {{< knowl id="proposition-induced-connection-on-an-associated-vector-bundle-satisfies-the-leibniz-rule" text="Leibniz rule for induced connections on associated bundles" >}}
+- {{< knowl id="proposition-parallel-transport-respects-concatenation-of-paths" text="Parallel transport respects concatenation of paths" >}}
+- {{< knowl id="pullback" text="Pullback" >}}
+- {{< knowl id="pullback-bundle" text="Pullback bundle" >}}
+- {{< knowl id="pullback-functoriality-pullback-of-a-principal-bundle-is-a-principal-bundle" text="Theorem: Pullback of a principal bundle is a principal bundle" >}}
+- {{< knowl id="pullback-functoriality-pullback-of-a-principal-connection-is-a-principal-connection" text="Theorem: Pullback of a principal connection is a principal connection" >}}
+- {{< knowl id="pure-gauge-connection-ag-1dg-on-a-trivial-bundle" text="Pure gauge connection on a trivial bundle" >}}
+- {{< knowl id="quotient-manifold" text="Quotient manifold (for a free proper action)" >}}
+- {{< knowl id="quotient-space-of-an-action" text="Quotient space of an action (orbit space)" >}}
+- {{< knowl id="rank-of-a-vector-bundle" text="Rank of a vector bundle" >}}
+- {{< knowl id="reduction-by-cocycle-structure-group-reduces-to-h-iff-transition-functions-can-be-chosen-h-valued" text="Theorem: Reduction by cocycle (H-reduction iff H-valued transition functions exist)" >}}
+- {{< knowl id="reduction-of-structure-group" text="Reduction of structure group" >}}
+- {{< knowl id="representation-of-a-lie-algebra" text="Representation of a Lie algebra" >}}
+- {{< knowl id="representation-of-a-lie-group" text="Representation of a Lie group" >}}
+- {{< knowl id="reproduction-property-x" text="Reproduction property" >}}
+- {{< knowl id="restricted-holonomy-group" text="Restricted holonomy group" >}}
+- {{< knowl id="right-maurercartan-form" text="Right Maurer–Cartan form" >}}
+- {{< knowl id="right-principal-action" text="Right principal action" >}}
+- {{< knowl id="right-translation" text="Right translation" >}}
+- {{< knowl id="section-of-ad" text="Section of Ad(P)" >}}
+- {{< knowl id="smooth-action-of-a-lie-group-on-a-manifold" text="Smooth action of a Lie group on a manifold" >}}
+- {{< knowl id="smooth-chart" text="Smooth chart" >}}
+- {{< knowl id="smooth-fiber-bundle" text="Smooth fiber bundle" >}}
+- {{< knowl id="solder-form-on-the-frame-bundle" text="Solder form on the frame bundle" >}}
+- {{< knowl id="special-orthonormal-frame-bundle-reduction" text="Special orthonormal frame bundle" >}}
+- {{< knowl id="special-unitary-frame-bundle-reduction" text="Special unitary frame bundle" >}}
+- {{< knowl id="splitting-of-the-atiyah-sequence" text="Splitting of the Atiyah sequence" >}}
+- {{< knowl id="stabilizer" text="Stabilizer (isotropy subgroup)" >}}
+- {{< knowl id="symmetric-power-bundle" text="Symmetric power bundle" >}}
+- {{< knowl id="tangent-bundle-ts2-as-a-nontrivial-rank-2-real-vector-bundle" text="The tangent bundle of the 2-sphere is nontrivial" >}}
+- {{< knowl id="tensor-product-vector-bundle" text="Tensor product vector bundle" >}}
+- {{< knowl id="tfae-flat-principal-bundles-principal-g-bundle-pm" text="TFAE: Flat principal bundles (principal G-bundle with connection)" >}}
+- {{< knowl id="tfae-metric-compatible-connections-on-a-metric-vector-bundle" text="TFAE: Metric-compatible connections on a metric vector bundle" >}}
+- {{< knowl id="tfae-principal-connection-data-principal-g-bundle-pm" text="Equivalent descriptions of a principal connection" >}}
+- {{< knowl id="tfae-reduction-of-structure-group-to-hg-principal-g-bundle-pm" text="Equivalent conditions for reduction of structure group" >}}
+- {{< knowl id="tfae-tensorial-forms-vs-ad-valued-forms-principal-g-bundle-pm" text="Tensorial forms and ad(P)-valued forms" >}}
+- {{< knowl id="tfae-triviality-of-a-principal-g-bundle-principal-g-bundle-pm" text="Equivalent conditions for triviality of a principal bundle" >}}
+- {{< knowl id="tfae-vector-bundle-connections-via-frame-bundles-rank-n-vector-bundle-em" text="Connections on vector bundles via frame bundles" >}}
+- {{< knowl id="torsion-2-form" text="Torsion 2-form" >}}
+- {{< knowl id="transgression-form" text="Transgression form" >}}
+- {{< knowl id="transgression-theorem-p-p-is-exact" text="Transgression theorem (Chern–Simons)" >}}
+- {{< knowl id="transition-function" text="Transition function" >}}
+- {{< knowl id="transition-matrix-of-a-local-frame" text="Transition matrix of a local frame" >}}
+- {{< knowl id="trivial-fiber-bundle" text="Trivial fiber bundle" >}}
+- {{< knowl id="trivial-principal-bundle-criterion-global-section-principal-bundle-is-trivial" text="Theorem: Global section implies a principal bundle is trivial" >}}
+- {{< knowl id="trivial-principal-bundle-mgm" text="Trivial principal bundle" >}}
+- {{< knowl id="trivial-vector-bundle-mvm" text="Trivial vector bundle" >}}
+- {{< knowl id="typical-fiber" text="Typical fiber" >}}
+- {{< knowl id="unitary-frame-bundle-reduction" text="Unitary frame bundle" >}}
+- {{< knowl id="universal-principal-bundle-egbg" text="Universal principal bundle EG→BG" >}}
+- {{< knowl id="vector-bundle" text="Vector bundle" >}}
+- {{< knowl id="vector-bundle-morphism" text="Vector bundle morphism" >}}
+- {{< knowl id="vertical-subbundle" text="Vertical subbundle" >}}
+- {{< knowl id="vertical-tangent-space" text="Vertical tangent space" >}}
+- {{< knowl id="vertical-vector-field" text="Vertical vector field" >}}
+- {{< knowl id="yangmills-connection" text="Yang–Mills connection" >}}
+- {{< knowl id="yangmills-equation" text="Yang–Mills equation" >}}
+- {{< knowl id="yangmills-functional" text="Yang–Mills functional" >}}

@@ -1,0 +1,14 @@
+---
+title: "Thermodynamic state"
+description: "The macroscopic condition of a system specified by a complete set of state variables (typically in equilibrium)."
+---
+
+The **thermodynamic state** of a {{< knowl id="thermodynamic-system" text="thermodynamic system" >}} is its macroscopic condition at an instant, characterized (within a chosen level of description) by the values of a complete set of {{< knowl id="state-variable" text="state variables" >}} together with the relevant constraints (fixed boundary, fixed composition, specified external parameters, etc.).
+
+In classical thermodynamics one most often restricts attention to {{< knowl id="thermodynamic-equilibrium" text="equilibrium states" >}}, where macroscopic observables are time-independent and the system simultaneously satisfies {{< knowl id="thermal-equilibrium" text="thermal" >}}, {{< knowl id="mechanical-equilibrium" text="mechanical" >}}, and (when composition can change) {{< knowl id="chemical-equilibrium" text="chemical equilibrium" >}}. Many microscopic configurations (microstates) typically correspond to a single thermodynamic state because they share the same macroscopic state variables.
+
+**Physical interpretation and statistical mechanics.** In equilibrium statistical mechanics, an equilibrium thermodynamic state is represented by an ensemble: a {{< knowl id="probability-measure" section="probability" text="probability measure" >}} over microstates. Macroscopic observables are modeled as {{< knowl id="random-variable" section="probability" text="random variables" >}}, and their thermodynamic values correspond to {{< knowl id="expectation" section="probability" text="expectations" >}} (or other typical values) under that measure.
+
+**States and processes.** The set of admissible states forms a state space. A {{< knowl id="thermodynamic-process" text="thermodynamic process" >}} is a path through this space, while a {{< knowl id="cyclic-process" text="cyclic process" >}} is a closed path returning the system to the same state. A {{< knowl id="quasistatic-process" text="quasistatic process" >}} idealizes a process as a continuous sequence of equilibrium states, so state variables remain well-defined along the path.
+
+**State postulate (common form).** For a simple compressible single-component system of fixed composition, an equilibrium state can be specified by two independent state variables (for example, {{< knowl id="temperature-thermo" text="temperature" >}} and {{< knowl id="volume-thermo" text="volume" >}}, or {{< knowl id="pressure-thermo" text="pressure" >}} and temperature), together with an {{< knowl id="equation-of-state" text="equation of state" >}} and a {{< knowl id="fundamental-relation-energy" text="fundamental relation" >}}. Quantities determined solely by the state are {{< knowl id="state-function" text="state functions" >}}, while transfers such as heat and work are {{< knowl id="path-function" text="path functions" >}}.
