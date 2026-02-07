@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "knowl_prerequisites": {
+    "noether-normalization-lemma": [
+      "finitely-generated-algebra",
+      "integral-extension",
+      "krull-dimension"
+    ],
+    "prime-spectrum": [
+      "prime-ideal",
+      "commutative-ring"
+    ],
+    "localization-at-prime": [
+      "localization-ring",
+      "prime-ideal"
+    ]
+  },
+  "section_default_prerequisites": {
+    "algebra-commutative": [
+      "commutative-ring",
+      "ideal"
+    ],
+    "topology": [
+      "topological-space"
+    ]
+  }
+}

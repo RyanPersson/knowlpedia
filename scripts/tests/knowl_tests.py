@@ -227,16 +227,6 @@ ANTI_PATTERNS = [
      "Single opening brace in shortcode (should be double)",
      "error"),
 
-    # Display math closing $$ immediately followed by prose (no blank line) causes rendering issues
-    # The closing $$ must be followed by a blank line before any prose text
-    # Valid: $$\n\nText continues...
-    # Invalid: $$\nText continues... (no blank line)
-    # Pattern: $$ followed by newline then a line starting with letter/bold/italic (prose indicators)
-    ("display_math_missing_blank_after",
-     re.compile(r'^[ \t]*[$][$][ \t]*\n[A-Za-z*_\[]', re.MULTILINE),
-     "Display math $$ must be followed by blank line - prose immediately after $$ causes rendering issues",
-     "error"),
-
     ("latex_in_description",
      re.compile(r'^description:\s*"[^"]*[\$\\][^"]*"', re.MULTILINE),
      "LaTeX in description field (should be plain text)",

@@ -20,6 +20,17 @@
 # Windows
 Thumbs.db
 
+# Python cache
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+.venv/
+venv/
+
 # IDE/Editor/BuildProcess
 
 # Temporarily ignored content                                             
@@ -27,5 +38,6 @@ Thumbs.db
 /content/langlands-letter/letter/letter.md    
 
 /tmp/
+/.tmp/
 
 /.playwright-mcp/
