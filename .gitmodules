@@ -4,3 +4,4 @@
 [submodule "content"]
 	path = content
 	url = git@github.com:RyanPersson/knowlpedia-content.git
+	branch = main
