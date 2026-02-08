@@ -2,7 +2,7 @@
 
 **Created:** 2026-01-02
 **Status:** Ready to execute
-**Branch:** `refactoring-analysis` (in content submodule)
+**Branch:** `refactoring-analysis` (in this repo)
 
 ## Summary
 
@@ -23,7 +23,7 @@ We are reorganizing the monolithic `analysis` section (332 knowls) into topic-fo
 
 3. **Created proposed structure** in `docs/knowl-modules/proposed-analysis-reorg.md`
 
-4. **Created branch** `refactoring-analysis` in content submodule
+4. **Created branch** `refactoring-analysis` in this repo
 
 ## Key Files to Reference
 
@@ -98,7 +98,7 @@ hugo server
 ## Important Notes
 
 - **Hugo layouts:** The consolidated `layouts/_default/single.html` handles all sections dynamically - no per-section layouts needed
-- **Branch:** Work is on `refactoring-analysis` branch in content submodule
+- **Branch:** Work is on `refactoring-analysis` branch in this repo
 - **Cross-section links:** MUST include `section` parameter when linking to different sections
 - **Oracle workflow:** Use 6 parallel batches for any regeneration work
 

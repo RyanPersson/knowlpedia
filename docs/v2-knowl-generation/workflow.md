@@ -45,7 +45,7 @@ Complete step-by-step process for generating knowls using the improved workflow.
 ┌──────────────────────────────▼──────────────────────────────────┐
 │ 6. REVIEW & COMMIT                                               │
 │    Input: Validated files                                        │
-│    Output: Committed to content submodule                        │
+│    Output: Committed content changes in repo                     │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -311,21 +311,14 @@ Spot-check 5-10 knowls for:
 - Correct cross-links
 - Proper rendering
 
-### 6.2 Commit to Content Submodule
+### 6.2 Commit Content Changes
 
 ```bash
-cd content/
 git checkout -b add-SECTION-knowls
-git add SECTION/
+git add content/SECTION/
 git commit -m "Add SECTION knowls (N files)"
-git checkout main
-git merge add-SECTION-knowls
-git push
-
-cd ..
-git add content
-git commit -m "Update content submodule: add SECTION knowls"
-# User pushes manually
+git push -u origin add-SECTION-knowls
+# User handles merge/push policy
 ```
 
 ---

@@ -16,10 +16,7 @@ def repo_root_from_script(script_path: Path) -> Path:
 
 def default_content_root(repo_root: Path) -> Path:
     local_content = repo_root / "content"
-    sibling_corpus = repo_root.parent / "knowlpedia-content"
-    if any(local_content.glob("**/*.md")):
-        return local_content
-    return sibling_corpus if sibling_corpus.exists() else local_content
+    return local_content
 
 
 def list_markdown_files(content_root: Path) -> List[Path]:
@@ -192,4 +189,3 @@ def load_alias_map(alias_path: Path) -> Dict[str, str]:
 
 def sort_unique(items: Sequence[str]) -> List[str]:
     return sorted(set(items))
-

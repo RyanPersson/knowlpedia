@@ -5,14 +5,15 @@
 A mathematics blog built with Hugo, featuring:
 - **Build-time KaTeX rendering** - Math renders at build time, no client-side delay
 - **Knowl system** - Clickable terms that expand inline to show definitions (inspired by nLab)
-- **Submodule architecture** - Content (`knowlpedia-content`) separate from infrastructure (`mathblog`)
+- **Single-repo content layout** - Pipeline and content live together in this repo
+- **Theme submodule only** - `themes/PaperMod` is a submodule; `content/` is not
 - **GitHub Pages deployment** - Automated via GitHub Actions
 
 ## Quick Start
 
 ```bash
-# Clone with submodules
-git clone --recurse-submodules git@github.com:RyanPersson/mathblog.git
+# Clone repo
+git clone git@github.com:RyanPersson/mathblog.git
 
 # Start development server
 hugo server
@@ -30,7 +31,7 @@ python3 scripts/validate-knowls.py
 
 ```
 mathblog/                          ← This repo (pipeline + infrastructure)
-├── content/                       ← Git submodule → knowlpedia-content
+├── content/                       ← Tracked knowl corpus (in-repo)
 ├── layouts/                       ← Hugo templates (consolidated - works for all sections)
 ├── static/                        ← JS, CSS, fonts
 ├── scripts/                       ← Automation scripts
@@ -66,7 +67,7 @@ The `section` parameter is optional if the knowl is in the same section as the c
 
 See `IMPLEMENTATION.md` for:
 - Full development workflows (infrastructure vs content changes)
-- Submodule workflow for testing knowl regeneration
+- Knowl regeneration workflow
 - Technical implementation details
 
 See `docs/orchestration.md` for:

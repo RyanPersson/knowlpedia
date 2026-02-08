@@ -1,6 +1,6 @@
 {
   "allow_duplicate_slugs": false,
-  "content_root": "/home/ryan/anki/knowlpedia-root/knowlpedia-content",
+  "content_root": "/home/ryan/anki/knowlpedia-root/knowlpedia/content",
   "duplicate_slug_collisions": {},
   "entries": [
     {
@@ -58,6 +58,13 @@
       "section": "real-analysis",
       "slug": "abels-theorem",
       "title": "Abel's theorem"
+    },
+    {
+      "aliases": [],
+      "path": "analysis/absolute-continuity.md",
+      "section": "analysis",
+      "slug": "absolute-continuity",
+      "title": "Absolute continuity"
     },
     {
       "aliases": [],
@@ -14375,7 +14382,7 @@
       "title": "Zorn's lemma"
     }
   ],
-  "scan_fingerprint": "aa8193112130379823de5d95419bfe2d345f6381efd084ec461ac274b9b0bd59",
+  "scan_fingerprint": "ff569b09e395783dfd4195ce99476cff135f9003ed3f75fabd87c5ecc4e366e7",
   "schema_version": 1,
   "slug_to_entries": {
     "abel-test": [
@@ -14448,6 +14455,15 @@
         "section": "real-analysis",
         "slug": "abels-theorem",
         "title": "Abel's theorem"
+      }
+    ],
+    "absolute-continuity": [
+      {
+        "aliases": [],
+        "path": "analysis/absolute-continuity.md",
+        "section": "analysis",
+        "slug": "absolute-continuity",
+        "title": "Absolute continuity"
       }
     ],
     "absolute-convergence-implies-cauchy": [
@@ -32907,6 +32923,9 @@
     ],
     "abels-theorem": [
       "abels-theorem"
+    ],
+    "absolute-continuity": [
+      "absolute-continuity"
     ],
     "absolute-convergence-implies-cauchy": [
       "absolute-convergence-implies-cauchy"

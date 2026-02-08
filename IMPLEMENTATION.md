@@ -303,29 +303,25 @@ jobs:
 
 ## Repository Structure (Post-Refactor)
 
-This project uses a **submodule architecture** to separate content from infrastructure:
+This project keeps pipeline infrastructure and content in a single repository:
 
 ```
 mathblog/                          ← This repo (pipeline + infrastructure)
-├── content/                       ← Git submodule → knowlpedia-content
+├── content/                       ← Tracked knowl corpus
 ├── layouts/                       ← Hugo templates
 ├── static/                        ← JS, CSS, fonts
 ├── scripts/                       ← Automation scripts
 ├── docs/                          ← Pipeline documentation
 └── tmp/                           ← Local working files (gitignored)
-
-knowlpedia-content/                ← Separate repo (generated knowls)
-├── algebra-groups/
-├── algebra-modules/
-├── analysis/
-├── fiber-bundles/
-└── ... (~1,500 knowl files)
 ```
 
-**Why submodules?**
-- Iterate on the generation pipeline without affecting production content
-- Test regenerating knowls on a branch without losing good content
-- Clean separation of concerns
+`content/` is a normal tracked directory (not a submodule). The only submodule in
+normal use is `themes/PaperMod`, which is initialized for Hugo builds and previews.
+
+**Why single-repo content?**
+- Simpler branch/worktree workflows
+- Fewer cross-repo sync mistakes
+- Content and pipeline changes stay atomic
 
 ---
 
@@ -334,10 +330,7 @@ knowlpedia-content/                ← Separate repo (generated knowls)
 ### Fresh Clone (new machine or collaborator)
 
 ```bash
-git clone --recurse-submodules git@github.com:RyanPersson/mathblog.git
-
-# Or if already cloned without submodules:
-git submodule update --init --recursive
+git clone git@github.com:RyanPersson/mathblog.git
 ```
 
 ### Working on Infrastructure (layouts, scripts, docs)
@@ -353,36 +346,26 @@ git push origin main
 
 ### Working on Content (generating/editing knowls)
 
-Content lives in the submodule. Work inside it:
+Content lives in `content/` in this same repo:
 
 ```bash
-cd content/
-git checkout -b test-regeneration    # Branch inside the content repo
+git checkout -b test-regeneration
 
 # Generate or edit knowls...
 # Delete and regenerate a section if needed:
-rm -rf algebra-groups/*
+rm -rf content/algebra-groups/*
 # Run generation pipeline...
 
-# Test locally (from parent dir)
-cd ..
+# Test locally
 hugo server
 
 # If results are good:
-cd content/
-git add . && git commit -m "Regenerated algebra-groups"
-git checkout main
-git merge test-regeneration
-git push
-
-# Update submodule reference in parent
-cd ..
-git add content
-git commit -m "Update content submodule"
-git push origin main
+git add content/algebra-groups
+git commit -m "Regenerated algebra-groups"
+git push -u origin test-regeneration
 
 # If results are bad - discard:
-cd content/
+git restore --worktree --staged content/algebra-groups
 git checkout main
 git branch -D test-regeneration
 ```
@@ -426,4 +409,3 @@ python3 scripts/feedback-api.py
 | `docs/knowl-generation/` | Step-by-step generation workflow |
 | `docs/knowl-modules/decomposition.md` | Module specs and progress tracking |
 | `CLAUDE.md` | Quick reference for Claude agents |
-

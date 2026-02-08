@@ -19,7 +19,7 @@ Command:
 
 ```bash
 python3 scripts/build-knowl-index.py \
-  --content-root ../knowlpedia-content \
+  --content-root content \
   --output data/knowl-index.json
 ```
 

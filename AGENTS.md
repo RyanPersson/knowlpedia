@@ -8,13 +8,14 @@ Knowlpedia is the **pipeline + infrastructure repo** for producing mathematical 
 
 - Primary goal: build and improve the factory that generates/validates knowls.
 - Non-goal (by default): manually author large batches of knowl content.
-- Live corpus is in sibling repo: `../knowlpedia-content/`.
+- Live corpus is tracked in this repo under `content/`.
 
 ## 2) Repo Role in the 3-Repo System
 
 - `knowlpedia/` (this repo): workflow docs, prompt templates, scripts, Hugo infra.
-- `knowlpedia-content/`: generated/curated knowl markdown corpus used by site.
+- `content/`: generated/curated knowl markdown corpus used by site.
 - `leanknowl/`: R&D for deterministic Mathlib-aligned definition extraction.
+- `themes/PaperMod/`: Hugo theme submodule (initialized for builds; not edited by knowl-generation workflows).
 
 ## 3) Quick Orientation
 
@@ -99,4 +100,3 @@ python3 scripts/tests/knowl_tests.py --section algebra-groups
 - Keep edits small, testable, and script-first.
 - Preserve shortcode correctness and anti-pattern constraints.
 - If changing workflow docs, keep v2/v3 guidance internally consistent.
-

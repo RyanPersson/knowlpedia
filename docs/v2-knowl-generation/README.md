@@ -6,7 +6,7 @@ This is the improved knowl generation workflow, incorporating lessons learned fr
 
 1. **Anti-pattern prevention** - Explicit rules baked into prompts
 2. **Cross-section linking** - Mandatory `section` parameter for external references
-3. **Submodule workflow** - Content separated from infrastructure
+3. **Single-repo workflow** - Content and infrastructure versioned together
 4. **Consolidated layouts** - No per-section layout creation needed
 5. **Validation integration** - Automated broken link detection
 6. **Consistency standards** - Uniform style across all sections
@@ -41,7 +41,7 @@ These MUST be avoided in all generated knowls:
 3. Generate       → Create knowls with cross-links (parallel batches)
 4. Validate       → Check for anti-patterns and broken links
 5. Review         → Manual quality check
-6. Commit         → Push to content submodule
+6. Commit         → Commit section changes in-repo
 ```
 
 ## Repository Structure
@@ -50,12 +50,7 @@ These MUST be avoided in all generated knowls:
 mathblog/                          ← Pipeline repo
 ├── docs/v2-knowl-generation/      ← This workflow
 ├── scripts/validate-knowls.py     ← Validation script
-└── content/                       ← Submodule → knowlpedia-content
-
-content/ (submodule)
-├── algebra-groups/
-├── algebra-modules/
-└── [section]/*.md                 ← Generated knowls go here
+└── content/                       ← Tracked knowl corpus
 ```
 
 ## Getting Started
