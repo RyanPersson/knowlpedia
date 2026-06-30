@@ -1,0 +1,65 @@
+id = "linear-algebra/vector-space"
+title = "Vector space"
+kind = "definition"
+summary = "A set whose elements can be added and scaled by elements of a field."
+aliases = ["vector space", "vector spaces"]
+domains = ["linear algebra"]
+
+[core]
+source = "core.md"
+
+[[core.data]]
+id = "carrier"
+text = "A set V of vectors."
+refs = ["shared-foundations/set"]
+
+[[core.data]]
+id = "scalars"
+text = "A field F of scalars."
+refs = ["shared-foundations/field"]
+
+[[core.data]]
+id = "addition"
+text = "An addition operation + : V × V → V."
+refs = ["shared-foundations/binary-operation"]
+
+[[core.data]]
+id = "scalar-multiplication"
+text = "A scalar multiplication operation F × V → V."
+refs = ["shared-foundations/function"]
+
+[[core.axioms]]
+id = "additive-group"
+text = "V is an abelian group under addition."
+refs = ["algebra-groups/group"]
+
+[[core.axioms]]
+id = "distributivity"
+text = "Scalar multiplication distributes over vector addition and scalar addition."
+
+[[core.axioms]]
+id = "compatibility"
+text = "For scalars a,b and vector v, (ab)v = a(bv), and 1v = v."
+
+[[sections]]
+id = "examples"
+title = "Examples"
+kind = "examples"
+source = "examples.md"
+default_open = false
+
+[[sections]]
+id = "tfae"
+title = "Equivalent views"
+kind = "tfae"
+source = "tfae.toml"
+default_open = false
+
+[[relations]]
+type = "uses"
+target = "shared-foundations/field"
+
+[[relations]]
+type = "uses"
+target = "algebra-groups/group"
+

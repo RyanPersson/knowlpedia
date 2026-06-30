@@ -1,0 +1,296 @@
+:root {
+  color-scheme: light dark;
+  --bg: #fbfaf7;
+  --panel: #ffffff;
+  --panel-soft: #f0f5f2;
+  --ink: #1c2220;
+  --muted: #65706b;
+  --line: #cdd7d2;
+  --accent: #1f7a68;
+  --accent-soft: #dff2ec;
+  --warning: #9a5b10;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #111513;
+    --panel: #171d1a;
+    --panel-soft: #202822;
+    --ink: #edf2ee;
+    --muted: #aab7b0;
+    --line: #344139;
+    --accent: #66d2b7;
+    --accent-soft: #18382f;
+    --warning: #ffc46b;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 17px;
+  line-height: 1.58;
+}
+
+a {
+  color: var(--accent);
+}
+
+.page-shell {
+  width: min(100% - 32px, 940px);
+  margin: 0 auto;
+  padding: 32px 0 64px;
+}
+
+.page-header {
+  padding: 24px 0 18px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 24px;
+}
+
+.page-header h1 {
+  font-size: clamp(2rem, 7vw, 4rem);
+  line-height: 1;
+  margin: 0 0 12px;
+  letter-spacing: 0;
+}
+
+.kind,
+.breadcrumb,
+.summary,
+.uses,
+.proof-proves {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.kind {
+  margin: 0 0 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+}
+
+.core-section,
+.knowl-section,
+.relations {
+  border-bottom: 1px solid var(--line);
+  padding: 18px 0;
+}
+
+.knowl-section summary {
+  cursor: pointer;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  font-weight: 700;
+  font-size: 1.15rem;
+}
+
+.section-body {
+  padding: 6px 0 14px;
+}
+
+.semantic-block {
+  margin: 18px 0;
+  padding: 14px 18px;
+  background: var(--panel-soft);
+  border-left: 4px solid var(--accent);
+}
+
+.semantic-block h3 {
+  margin: 0 0 8px;
+}
+
+.semantic-block li + li,
+.proof-step + .proof-step {
+  margin-top: 8px;
+}
+
+.knowl {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px dotted currentColor;
+  cursor: pointer;
+}
+
+.knowl:hover,
+.knowl[aria-expanded="true"] {
+  border-bottom-style: solid;
+}
+
+.missing-knowl {
+  color: var(--warning);
+}
+
+.hidden,
+[hidden] {
+  display: none !important;
+}
+
+.knowl-panel {
+  margin: 16px 0;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--accent);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.knowl-content {
+  overflow: hidden;
+}
+
+.knowl-header {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: space-between;
+  padding: 9px 12px 9px 16px;
+  background: var(--panel-soft);
+  border-bottom: 1px solid var(--line);
+}
+
+.full-page-link {
+  margin-left: auto;
+  font-size: 0.9rem;
+}
+
+.knowl-close {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink);
+  font-size: 1.3rem;
+  cursor: pointer;
+}
+
+.knowl-body {
+  padding: 14px 18px 18px;
+}
+
+.loading,
+.error {
+  padding: 16px;
+  color: var(--muted);
+}
+
+.uses {
+  display: inline-block;
+  margin-left: 6px;
+}
+
+.definition-switcher {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0;
+}
+
+.switcher-tab {
+  min-height: 38px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink);
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.switcher-tab.active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+.tfae-item,
+.proof-step {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  padding: 12px 14px;
+  margin: 10px 0;
+}
+
+.tfae-item h4 {
+  margin: 0 0 8px;
+}
+
+.proof-assertion {
+  font-weight: 650;
+}
+
+.proof-justifications {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.justification {
+  font-size: 0.9rem;
+  color: var(--muted);
+  background: var(--panel-soft);
+  padding: 3px 8px;
+  border: 1px solid var(--line);
+}
+
+pre,
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+pre {
+  overflow-x: auto;
+  padding: 12px;
+  background: var(--panel-soft);
+}
+
+mjx-container {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+
+@media (max-width: 720px) {
+  body {
+    font-size: 16px;
+  }
+
+  .page-shell {
+    width: min(100% - 20px, 940px);
+    padding-top: 18px;
+  }
+
+  .page-header h1 {
+    font-size: clamp(2rem, 14vw, 3.2rem);
+  }
+
+  .knowl-panel {
+    width: calc(100vw - 20px);
+    margin-left: calc(50% - 50vw + 10px);
+    margin-right: calc(50% - 50vw + 10px);
+    border-left-width: 0;
+    border-top: 4px solid var(--accent);
+  }
+
+  .knowl-panel .knowl-panel {
+    width: auto;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .semantic-block,
+  .knowl-body {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .proof-justifications {
+    display: grid;
+  }
+}

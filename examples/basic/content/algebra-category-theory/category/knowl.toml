@@ -1,0 +1,58 @@
+id = "algebra-category-theory/category"
+title = "Category"
+kind = "definition"
+summary = "A structure of objects and morphisms with associative composition and identity morphisms."
+aliases = ["category", "categories"]
+domains = ["category theory"]
+
+[core]
+source = "core.md"
+
+[[core.data]]
+id = "objects"
+text = "A collection of objects."
+
+[[core.data]]
+id = "morphisms"
+text = "For objects X,Y, a collection Hom(X,Y) of morphisms X → Y."
+
+[[core.data]]
+id = "composition"
+text = "A composition operation Hom(Y,Z) × Hom(X,Y) → Hom(X,Z)."
+refs = ["shared-foundations/function"]
+
+[[core.data]]
+id = "identity"
+text = "For every object X, an identity morphism 1_X : X → X."
+
+[[core.axioms]]
+id = "associativity"
+text = "Composition is associative."
+
+[[core.axioms]]
+id = "unit"
+text = "Identity morphisms are left and right units for composition."
+
+[[sections]]
+id = "examples"
+title = "Examples"
+kind = "examples"
+source = "examples.md"
+default_open = false
+
+[[sections]]
+id = "relationship-view"
+title = "Relationship view"
+kind = "markdown"
+source = "relationships.md"
+default_open = false
+
+[[relations]]
+type = "uses"
+target = "shared-foundations/function"
+
+[[relations]]
+type = "alternate_definition_of"
+target = "algebra-groups/group"
+note = "A group is equivalently a one-object category in which every morphism is invertible."
+

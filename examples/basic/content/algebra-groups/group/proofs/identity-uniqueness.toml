@@ -1,0 +1,34 @@
+id = "identity-uniqueness"
+title = "The identity element is unique"
+proves = "algebra-groups/group#axiom.identity"
+summary = "Any two two-sided identity elements in a group are equal."
+
+[[steps]]
+id = "1"
+assertion = "Let e and e' be two identity elements for G."
+justifications = [
+  { type = "assumes", target = "algebra-groups/group#data.identity" }
+]
+
+[[steps]]
+id = "2"
+assertion = "Because e is a left identity, e · e' = e'."
+justifications = [
+  { type = "uses", target = "algebra-groups/group#axiom.identity" }
+]
+
+[[steps]]
+id = "3"
+assertion = "Because e' is a right identity, e · e' = e."
+justifications = [
+  { type = "uses", target = "algebra-groups/group#axiom.identity" }
+]
+
+[[steps]]
+id = "4"
+assertion = "Therefore e = e'."
+justifications = [
+  { type = "uses", target = "step:2" },
+  { type = "uses", target = "step:3" }
+]
+

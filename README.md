@@ -1,32 +1,42 @@
 # Knowl System Refactor
 
-This repo is a planning and prototype space for the next-generation knowl system.
-It is meant to grow beside the existing Knowlpedia repos, not replace them yet.
+This repo prototypes a goal-first architecture for a next-generation knowl
+system.
 
-## Existing Workspace Context
+The project is not defined by the current Knowlpedia implementation and not by
+LMFDB. It is defined by the intended goal: a portable semantic hypertext format
+for mathematical writing, with recursive knowls, structured proofs, TFAE views,
+relations, static publishing, mobile-friendly disclosure, and optional local
+automation tooling.
 
-Current sibling repos under `../`:
+## Current Prototype
 
-- `knowlpedia/`: Hugo infrastructure, knowl layouts, shortcode, validation scripts,
-  generation workflow docs, and a tracked content corpus.
-- `knowlpedia-content/`: large standalone markdown corpus. This is the full wiki-like
-  content body and should not be crawled casually by agents unless the task needs it.
-- `blog/`: a Hugo presentation sibling with a very similar structure to
-  `knowlpedia/`.
-- `leanknowl/`: R&D for deterministic extraction of flattened Mathlib definitions,
-  especially the idea that a canonical knowl definition should expose the minimal
-  axioms, while folded or structural characterizations belong in secondary views.
+This repo now contains a first working compiler/runtime prototype:
 
-Important existing implementation facts:
+```text
+examples/basic/              semantic source package
+packages/compiler/           Python compiler
+packages/schema/             prototype schema notes
+packages/static-runtime/     static browser runtime
+public/                      generated output, ignored by git
+```
 
-- Current knowl links are Hugo shortcodes like
-  `{{< knowl id="group" section="algebra-groups" text="group" >}}`.
-- The current frontend fetches ordinary section pages, extracts `.knowl-content`,
-  caches the result, and inserts it inline as a recursive foldout panel.
-- Full pages and inline knowls already share the same underlying rendered page.
-- Math is rendered at build time through Hugo's `transform.ToMath` / KaTeX path.
-- Validation currently focuses on broken shortcode references and known generation
-  anti-patterns.
+Build it with:
+
+```bash
+make build
+```
+
+Serve it locally with:
+
+```bash
+make serve
+```
+
+The generated site uses static HTML, static knowl fragments, JSON indexes, and an
+optional SQLite artifact.
+
+See `docs/prototype-status.md` for the current implementation status.
 
 ## Mission
 
@@ -71,6 +81,9 @@ In other words:
 
 This gives database-like query performance without requiring every professor,
 student, or static site owner to run a database server.
+
+See `docs/architecture-recommendation.md` for the goal-first architecture
+recommendation.
 
 ## Interaction Model
 
@@ -315,4 +328,3 @@ A mature compiler could emit:
 - How much Lean should be visible to ordinary readers?
 - Should the optional database artifact be SQLite, DuckDB, static JSON bundles,
   or multiple targets?
-

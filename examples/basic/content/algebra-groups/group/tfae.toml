@@ -1,0 +1,31 @@
+title = "Equivalent group definitions"
+hypotheses = ["G is a set with a binary operation."]
+
+[[items]]
+id = "axiomatic"
+label = "Axiomatic"
+statement = "G has an associative operation, a two-sided identity, and two-sided inverses."
+refs = ["algebra-groups/group#axiom.associativity", "algebra-groups/group#axiom.identity", "algebra-groups/group#axiom.inverse"]
+
+[[items]]
+id = "monoid-with-inverses"
+label = "Folded"
+statement = "G is a monoid in which every element has an inverse."
+refs = ["algebra-groups/monoid"]
+
+[[items]]
+id = "one-object-groupoid"
+label = "Categorical"
+statement = "G can be regarded as a one-object category in which every morphism is invertible."
+refs = ["algebra-category-theory/category"]
+
+[[implications]]
+from = "axiomatic"
+to = "monoid-with-inverses"
+proof = "Package the associativity and identity axioms as the monoid structure, then retain the inverse axiom."
+
+[[implications]]
+from = "monoid-with-inverses"
+to = "axiomatic"
+proof = "Unfold the monoid axioms and the assumption that every element is invertible."
+
