@@ -30,6 +30,26 @@ Display forms are emitted as block-level HTML. If `\[...\]` or `$$...$$` appears
 inside prose, the renderer splits the paragraph before and after the equation so
 the output does not contain invalid `<p><div class="math-display">...` markup.
 
+## TikZ And Diagram Rendering
+
+The compiler now recognizes diagram source before ordinary Markdown code-fence
+rendering. Supported source forms are:
+
+- fenced `tikz` or `tikzpicture` blocks
+- fenced `tikz-cd` or `tikzcd` blocks
+- fenced `cd` or `amscd` blocks
+- raw display math containing `\begin{tikzpicture}`, `\begin{tikzcd}`, or
+  `\begin{CD}`
+- raw `\begin{tikzpicture}` and `\begin{tikzcd}` block environments
+
+When a local TeX engine and SVG converter are available, diagrams render during
+compilation to inline SVG. The compiler currently looks for `tectonic` or
+`pdflatex`, plus `pdftocairo` or `dvisvgm`.
+
+When that toolchain is not available, diagrams degrade to a static source panel
+instead of broken KaTeX/MathJax output. Failed compiles render the source plus a
+truncated render log so an agent can repair the diagram.
+
 ## Recommended Production Direction
 
 Prefer build-time math rendering for the production static runtime.

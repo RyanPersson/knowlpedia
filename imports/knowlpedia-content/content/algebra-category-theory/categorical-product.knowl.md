@@ -26,17 +26,10 @@ hold (see [[algebra-category-theory/composition-category|composition]]).
 
 In diagram form:
 \[
-\begin{CD}
-& X @>\langle f,g\rangle>> A\times B \\
-@V f VV @VV \pi_1 V \\
-A &&
-\end{CD}
-\qquad
-\begin{CD}
-& X @>\langle f,g\rangle>> A\times B \\
-@V g VV @VV \pi_2 V \\
-B &&
-\end{CD}
+\begin{tikzcd}[column sep=large, row sep=large]
+& X \arrow[d, "{(f,g)}"] \arrow[dl, "f"'] \arrow[dr, "g"] & \\
+A & A\times B \arrow[l, "\pi_1"] \arrow[r, "\pi_2"'] & B
+\end{tikzcd}
 \]
 
 A product is unique up to unique [[algebra-category-theory/isomorphism-category|isomorphism]]: if \((P,\pi_1,\pi_2)\) and \((P',\pi_1',\pi_2')\) are both products of \(A,B\), there is a unique isomorphism \(P\cong P'\) compatible with projections.

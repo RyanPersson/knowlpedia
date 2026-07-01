@@ -18,6 +18,7 @@ import shutil
 import sqlite3
 import subprocess
 import sys
+import tempfile
 import tomllib
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -31,6 +32,7 @@ MATH_RE = re.compile(
     r"(?s)(\$\$(.+?)\$\$|\\\[(.+?)\\\]|\\\((.+?)\\\)|(?<!\\)\$(?!\s)(.+?)(?<!\\)\$)"
 )
 DISPLAY_MATH_RE = re.compile(r"(?s)(\\\[(.+?)\\\]|\$\$(.+?)\$\$)")
+DIAGRAM_ENV_RE = re.compile(r"\\begin\{(tikzpicture|tikzcd|CD)\}")
 AGENT_STATUS_RE = re.compile(r"^\d+[smhd]\d+[smhd]\s+·\s+gpt-[^·]+·.*[↑↓↻Δ]")
 OLD_HUGO_TOPIC_LINKS = [
     ("Analysis", "/analysis/"),
@@ -76,6 +78,190 @@ def find_katex_assets_dir() -> Path | None:
         if (assets_dir / "katex.min.css").is_file():
             return assets_dir
     return None
+
+
+def executable(name: str) -> str | None:
+    return shutil.which(name)
+
+
+def contains_diagram_environment(tex: str) -> bool:
+    return bool(DIAGRAM_ENV_RE.search(tex))
+
+
+def diagram_kind_from_fence(info: str) -> str | None:
+    normalized = info.strip().lower()
+    if normalized in {"tikz", "tikzpicture"}:
+        return "tikz"
+    if normalized in {"tikz-cd", "tikzcd"}:
+        return "tikz-cd"
+    if normalized in {"cd", "amscd"}:
+        return "cd"
+    return None
+
+
+def diagram_kind_from_begin(line: str) -> str | None:
+    if line.startswith(r"\begin{tikzpicture}"):
+        return "tikz"
+    if line.startswith(r"\begin{tikzcd}"):
+        return "tikz-cd"
+    return None
+
+
+def diagram_end_for_kind(kind: str) -> str:
+    if kind == "tikz-cd":
+        return r"\end{tikzcd}"
+    if kind == "cd":
+        return r"\end{CD}"
+    return r"\end{tikzpicture}"
+
+
+class DiagramRenderer:
+    def __init__(self) -> None:
+        self._converter = executable("dvisvgm") or executable("pdftocairo")
+        if self._converter and Path(self._converter).name == "dvisvgm" and executable("latex"):
+            self._engine = executable("latex")
+            self._engine_output = "dvi"
+        else:
+            self._engine = executable("tectonic") or executable("pdflatex")
+            self._engine_output = "pdf"
+        self._cache: dict[tuple[str, str], str] = {}
+
+    @property
+    def backend(self) -> str:
+        if self._engine and self._converter:
+            return "svg"
+        return "source"
+
+    def render(self, source: str, kind: str = "tikz") -> str:
+        source = source.strip()
+        cache_key = (kind, source)
+        if cache_key in self._cache:
+            return self._cache[cache_key]
+
+        rendered: str | None = None
+        if self._engine and self._converter:
+            rendered = self._render_svg(source, kind)
+
+        if rendered is None:
+            rendered = self._render_source(source, kind)
+        self._cache[cache_key] = rendered
+        return rendered
+
+    def _render_svg(self, source: str, kind: str) -> str | None:
+        with tempfile.TemporaryDirectory(prefix="knowl-diagram-") as tmp:
+            tmp_path = Path(tmp)
+            tex_path = tmp_path / "diagram.tex"
+            compiled_path = tmp_path / f"diagram.{self._engine_output}"
+            svg_path = tmp_path / "diagram.svg"
+            tex_path.write_text(self._document(source, kind), encoding="utf-8")
+
+            if self._engine and Path(self._engine).name == "tectonic":
+                command = [self._engine, "--outdir", str(tmp_path), str(tex_path)]
+            else:
+                command = [
+                    self._engine,
+                    "-halt-on-error",
+                    "-interaction=nonstopmode",
+                    tex_path.name,
+                ]
+            try:
+                compile_result = subprocess.run(
+                    command,
+                    cwd=tmp_path,
+                    text=True,
+                    capture_output=True,
+                    timeout=30,
+                    check=False,
+                )
+            except Exception as exc:
+                return self._render_error(source, kind, str(exc))
+
+            if compile_result.returncode != 0 or not compiled_path.is_file():
+                log = (compile_result.stdout + "\n" + compile_result.stderr).strip()
+                return self._render_error(source, kind, log)
+
+            try:
+                if self._converter and Path(self._converter).name == "dvisvgm":
+                    convert_command = [self._converter, "--bbox=min", str(compiled_path), "-o", str(svg_path)]
+                    if compiled_path.suffix == ".pdf":
+                        convert_command.insert(1, "--pdf")
+                else:
+                    convert_command = [self._converter, "-svg", str(compiled_path), str(svg_path)]
+                convert_result = subprocess.run(
+                    convert_command,
+                    cwd=tmp_path,
+                    text=True,
+                    capture_output=True,
+                    timeout=30,
+                    check=False,
+                )
+            except Exception as exc:
+                return self._render_error(source, kind, str(exc))
+
+            if convert_result.returncode != 0 or not svg_path.is_file():
+                log = (convert_result.stdout + "\n" + convert_result.stderr).strip()
+                return self._render_error(source, kind, log)
+
+            svg = svg_path.read_text(encoding="utf-8")
+            svg = re.sub(r"<\?xml[^>]*>\s*", "", svg).strip()
+            svg = re.sub(r"<!DOCTYPE[^>]*>\s*", "", svg).strip()
+            diagram_hash = hashlib.sha256(source.encode("utf-8")).hexdigest()[:12]
+            return (
+                f'<figure class="diagram diagram-svg diagram-{escape_attr(kind)}" '
+                f'data-diagram-hash="{diagram_hash}">'
+                f'<div class="diagram-frame">{svg}</div>'
+                "</figure>"
+            )
+
+    def _document(self, source: str, kind: str) -> str:
+        body = source
+        if kind == "tikz" and r"\begin{tikzpicture}" not in source:
+            body = "\\begin{tikzpicture}\n" + source + "\n\\end{tikzpicture}"
+        elif kind in {"tikz-cd", "tikzcd"} and r"\begin{tikzcd}" not in source:
+            body = "\\begin{tikzcd}\n" + source + "\n\\end{tikzcd}"
+        elif kind == "cd":
+            if r"\begin{CD}" not in source:
+                body = "\\begin{CD}\n" + source + "\n\\end{CD}"
+            if not body.lstrip().startswith((r"\[", "$$")):
+                body = "\\(\n\\displaystyle\n" + body + "\n\\)"
+
+        return "\n".join(
+            [
+                r"\documentclass[tikz,border=8pt]{standalone}",
+                r"\usepackage{amsmath,amssymb,amscd}",
+                r"\usepackage{tikz}",
+                r"\usepackage{tikz-cd}",
+                r"\usetikzlibrary{arrows.meta,calc,cd,decorations.pathmorphing,matrix,positioning}",
+                r"\begin{document}",
+                body,
+                r"\end{document}",
+                "",
+            ]
+        )
+
+    def _render_source(self, source: str, kind: str) -> str:
+        return (
+            f'<figure class="diagram diagram-source diagram-{escape_attr(kind)}">'
+            "<figcaption>Diagram source</figcaption>"
+            f"<pre><code>{html.escape(source)}</code></pre>"
+            "</figure>"
+        )
+
+    def _render_error(self, source: str, kind: str, log: str) -> str:
+        if not log:
+            log = "Diagram renderer failed without diagnostic output."
+        return (
+            f'<figure class="diagram diagram-error diagram-{escape_attr(kind)}">'
+            "<figcaption>Diagram render failed</figcaption>"
+            f"<pre><code>{html.escape(source)}</code></pre>"
+            "<details><summary>Render log</summary>"
+            f"<pre><code>{html.escape(log[-6000:])}</code></pre>"
+            "</details>"
+            "</figure>"
+        )
+
+
+DIAGRAM_RENDERER = DiagramRenderer()
 
 
 class MathRenderer:
@@ -132,6 +318,10 @@ class MathRenderer:
 
     def render(self, tex: str, display: bool) -> str:
         tex = tex.strip()
+        if display and contains_diagram_environment(tex):
+            kind = "cd" if "\\begin{CD}" in tex else "tikz-cd" if "\\begin{tikzcd}" in tex else "tikz"
+            return DIAGRAM_RENDERER.render(tex, kind)
+
         cache_key = (tex, display)
         if cache_key in self._cache:
             return self._cache[cache_key]
@@ -477,7 +667,21 @@ def render_markdown(markdown: str, registry: dict[str, Knowl]) -> str:
             i += 1
             continue
 
-        if stripped.startswith("```"):
+        code_fence = re.match(r"^```\s*([A-Za-z0-9_-]+)?", stripped)
+        if code_fence:
+            diagram_kind = diagram_kind_from_fence(code_fence.group(1) or "")
+            if diagram_kind:
+                close_list()
+                i += 1
+                diagram_lines = []
+                while i < len(lines) and not lines[i].strip().startswith("```"):
+                    diagram_lines.append(lines[i])
+                    i += 1
+                if i < len(lines):
+                    i += 1
+                out.append(DIAGRAM_RENDERER.render("\n".join(diagram_lines), diagram_kind))
+                continue
+
             close_list()
             in_code = True
             code_lines = []
@@ -507,6 +711,21 @@ def render_markdown(markdown: str, registry: dict[str, Knowl]) -> str:
             close_list()
             out.append(MATH_RENDERER.render(single_line_display.group(1) or single_line_display.group(2), display=True))
             i += 1
+            continue
+
+        raw_diagram_kind = diagram_kind_from_begin(stripped)
+        if raw_diagram_kind:
+            close_list()
+            diagram_lines = [line]
+            end_marker = diagram_end_for_kind(raw_diagram_kind)
+            i += 1
+            while i < len(lines):
+                diagram_lines.append(lines[i])
+                if lines[i].strip().startswith(end_marker):
+                    i += 1
+                    break
+                i += 1
+            out.append(DIAGRAM_RENDERER.render("\n".join(diagram_lines), raw_diagram_kind))
             continue
 
         heading = re.match(r"^(#{1,4})\s+(.+)$", stripped)

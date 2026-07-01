@@ -403,6 +403,54 @@ pre {
   background: var(--panel-soft);
 }
 
+.diagram {
+  margin: 1rem 0;
+  max-width: 100%;
+  overflow-x: auto;
+  text-align: center;
+  scrollbar-width: thin;
+}
+
+.diagram-frame {
+  display: inline-block;
+  max-width: 100%;
+}
+
+.diagram svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.diagram figcaption {
+  margin-bottom: 0.35rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+  text-align: left;
+}
+
+.diagram-source,
+.diagram-error {
+  padding: 12px;
+  border: 1px solid var(--line);
+  background: var(--panel-alt);
+  text-align: left;
+}
+
+.diagram-source pre,
+.diagram-error pre {
+  margin: 0;
+}
+
+.diagram-error figcaption,
+.diagram-error summary {
+  color: var(--warning);
+}
+
+.diagram-error details {
+  margin-top: 0.6rem;
+}
+
 mjx-container {
   overflow-x: auto;
   overflow-y: visible;

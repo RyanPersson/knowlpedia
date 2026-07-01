@@ -255,7 +255,11 @@ Serve the imported corpus:
 make serve-imported
 ```
 
-For any new long-running dev server on this Optiplex, prefer the host helper:
+For any new long-running dev server on this Optiplex, first check whether an
+existing persistent service already serves the changed artifact. For
+Knowlpedia imported/static preview changes, reuse the existing `8002` service
+instead of starting a second server. For unrelated new previews, prefer the host
+helper:
 
 ```bash
 devserver start <name> -- <command...>
@@ -282,6 +286,12 @@ shell process. See:
 ```text
 docs/preview-server-service.md
 ```
+
+When a future agent changes rendered pages or examples, its final Codex chat
+response should include a direct URL to the page that demonstrates the change,
+preferably the Tailscale URL when the user may open it from another machine. For
+changes visible in `public-imported/`, use the existing
+`http://100.69.17.72:8002/` preview rather than creating a new server.
 
 ## Current Full-Corpus Status
 

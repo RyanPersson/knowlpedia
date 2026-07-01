@@ -26,9 +26,12 @@ on:
 http://100.69.17.72:8002/
 ```
 
-This service is intentionally persistent. For new temporary development servers
-on the Optiplex, use the host helper documented in `/home/codex/.codex/AGENTS.md`
-instead:
+This service is intentionally persistent. Do not start a second Knowlpedia
+preview server for changes that are visible in `public-imported/`; rebuild that
+directory and link to the existing `8002` preview instead.
+
+For unrelated temporary development servers on the Optiplex, use the host helper
+documented in `/home/codex/.codex/AGENTS.md` instead:
 
 ```bash
 devserver start <name> -- <command...>
@@ -37,8 +40,16 @@ devserver logs -f <name>
 devserver stop <name>
 ```
 
-Use `devserver` for ordinary Codex/dev previews; keep this manually named
-service for the always-on Knowlpedia comparison preview.
+Use `devserver` for ordinary Codex/dev previews that are not covered by an
+existing persistent service; keep this manually named service for the always-on
+Knowlpedia comparison preview.
+
+## Agent Response Links
+
+When an agent changes rendered content, examples, or preview-visible behavior,
+the final Codex chat response should include a direct URL to the relevant page.
+Prefer the Tailscale URL when the page is meant to be opened from another
+machine, and include the exact path that demonstrates the change.
 
 ## Why The Old Server Went Down
 
