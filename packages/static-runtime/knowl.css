@@ -1,33 +1,76 @@
 :root {
   color-scheme: light dark;
-  --bg: #fbfaf7;
+  --bg: #ffffff;
   --panel: #ffffff;
-  --panel-soft: #f0f5f2;
+  --panel-alt: #f7f7f7;
+  --panel-soft: #eeeeee;
   --ink: #1c2220;
   --muted: #65706b;
-  --line: #cdd7d2;
-  --accent: #1f7a68;
-  --accent-soft: #dff2ec;
+  --line: #d6d6d6;
+  --accent: #222222;
+  --accent-soft: #f0f0f0;
+  --link: #1f7a68;
   --warning: #9a5b10;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #ffffff;
+  --panel: #ffffff;
+  --panel-alt: #f7f7f7;
+  --panel-soft: #eeeeee;
+  --ink: #1c2220;
+  --muted: #65706b;
+  --line: #d6d6d6;
+  --accent: #222222;
+  --accent-soft: #f0f0f0;
+  --link: #1f7a68;
+  --warning: #9a5b10;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #111513;
+  --panel: #171d1a;
+  --panel-alt: #202822;
+  --panel-soft: #2b332e;
+  --ink: #edf2ee;
+  --muted: #aab7b0;
+  --line: #344139;
+  --accent: #edf2ee;
+  --accent-soft: #202822;
+  --link: #66d2b7;
+  --warning: #ffc46b;
+}
+
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme]) {
     --bg: #111513;
     --panel: #171d1a;
-    --panel-soft: #202822;
+    --panel-alt: #202822;
+    --panel-soft: #2b332e;
     --ink: #edf2ee;
     --muted: #aab7b0;
     --line: #344139;
-    --accent: #66d2b7;
-    --accent-soft: #18382f;
+    --accent: #edf2ee;
+    --accent-soft: #202822;
+    --link: #66d2b7;
     --warning: #ffc46b;
   }
 }
 
 * {
   box-sizing: border-box;
+  animation: none !important;
+  scroll-behavior: auto !important;
+  transition: none !important;
+}
+
+*::before,
+*::after {
+  animation: none !important;
+  transition: none !important;
 }
 
 body {
@@ -39,7 +82,28 @@ body {
 }
 
 a {
-  color: var(--accent);
+  color: var(--link);
+}
+
+.theme-toggle {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 20;
+  min-width: 64px;
+  min-height: 36px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.theme-toggle:hover,
+.theme-toggle:focus-visible {
+  border-color: var(--accent);
+  outline: none;
 }
 
 .page-shell {
@@ -114,15 +178,79 @@ a {
 }
 
 .knowl {
-  color: var(--accent);
+  color: var(--ink);
   text-decoration: none;
-  border-bottom: 1px dotted currentColor;
+  border-bottom: 1px dotted var(--ink);
   cursor: pointer;
 }
 
 .knowl:hover,
 .knowl[aria-expanded="true"] {
   border-bottom-style: solid;
+}
+
+.knowl[aria-expanded="true"] {
+  font-weight: 600;
+}
+
+.index-section {
+  border-bottom: 1px solid var(--line);
+  padding: 18px 0;
+}
+
+.index-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.index-item {
+  padding: 10px 0;
+}
+
+.index-item + .index-item {
+  border-top: 1px solid var(--line);
+}
+
+.index-knowl {
+  font-weight: 700;
+}
+
+.index-item .summary {
+  display: block;
+  margin-top: 2px;
+}
+
+.index-item .knowl-panel {
+  margin-top: 10px;
+}
+
+.index-alt-link {
+  margin: 14px 0 0;
+}
+
+.home-content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.home-content h1 {
+  margin: 0 0 1.5rem;
+}
+
+.home-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.home-links li {
+  margin: 0.75rem 0;
+}
+
+.home-links a {
+  font-size: 1.1rem;
 }
 
 .missing-knowl {
@@ -135,45 +263,70 @@ a {
 }
 
 .knowl-panel {
-  margin: 16px 0;
+  margin: 1rem 0;
   background: var(--panel);
-  border: 1px solid var(--line);
-  border-left: 4px solid var(--accent);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  border: 0;
+  border-left: 3px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+  box-shadow: none;
+  overflow: hidden;
+}
+
+.knowl-depth-even {
+  background: var(--panel);
+}
+
+.knowl-depth-odd {
+  background: var(--panel-alt);
 }
 
 .knowl-content {
   overflow: hidden;
+  padding: 0;
+  position: relative;
 }
 
 .knowl-header {
-  min-height: 44px;
+  min-height: 0;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   justify-content: space-between;
-  padding: 9px 12px 9px 16px;
+  padding: 0.6rem 1rem;
   background: var(--panel-soft);
   border-bottom: 1px solid var(--line);
+}
+
+.knowl-header strong {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .full-page-link {
   margin-left: auto;
   font-size: 0.9rem;
+  color: var(--link);
 }
 
 .knowl-close {
-  width: 36px;
-  height: 36px;
-  border: 1px solid var(--line);
-  background: var(--panel);
+  width: auto;
+  height: auto;
+  border: none;
+  background: transparent;
   color: var(--ink);
   font-size: 1.3rem;
+  line-height: 1;
   cursor: pointer;
+  padding: 0 0.25rem;
 }
 
 .knowl-body {
-  padding: 14px 18px 18px;
+  padding: 1rem;
+}
+
+.knowl-body p:last-child {
+  margin-bottom: 0;
 }
 
 .loading,
@@ -252,8 +405,64 @@ pre {
 
 mjx-container {
   overflow-x: auto;
-  overflow-y: hidden;
+  overflow-y: visible;
   max-width: 100%;
+}
+
+mjx-container[display="true"] {
+  display: block;
+  width: 100%;
+  padding: 0.2rem 0;
+  scrollbar-width: thin;
+}
+
+.knowl-body mjx-container,
+.section-body mjx-container,
+.core-section mjx-container {
+  max-width: 100%;
+}
+
+.math-inline {
+  display: inline;
+  max-width: 100%;
+  overflow: visible;
+  vertical-align: baseline;
+  scrollbar-width: thin;
+}
+
+.math-inline math {
+  display: inline;
+}
+
+.math-display {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+  padding: 0.2rem 0;
+  text-align: center;
+  scrollbar-width: thin;
+}
+
+.math-display math {
+  display: inline-block;
+}
+
+.math-katex {
+  overflow-y: visible;
+}
+
+.math-katex .katex-display {
+  margin: 0.7em 0;
+}
+
+.math-katex .katex {
+  white-space: nowrap;
+}
+
+.math-render-error {
+  color: var(--warning);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
 @media (max-width: 720px) {
@@ -266,6 +475,14 @@ mjx-container {
     padding-top: 18px;
   }
 
+  .theme-toggle {
+    top: 8px;
+    right: 8px;
+    min-width: 58px;
+    min-height: 34px;
+    font-size: 0.85rem;
+  }
+
   .page-header h1 {
     font-size: clamp(2rem, 14vw, 3.2rem);
   }
@@ -275,7 +492,7 @@ mjx-container {
     margin-left: calc(50% - 50vw + 10px);
     margin-right: calc(50% - 50vw + 10px);
     border-left-width: 0;
-    border-top: 4px solid var(--accent);
+    border-top: 3px solid var(--accent);
   }
 
   .knowl-panel .knowl-panel {

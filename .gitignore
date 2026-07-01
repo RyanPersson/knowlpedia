@@ -1,4 +1,6 @@
 public/
+public-imported/
+.venv/
+tmp/
 *.pyc
 __pycache__/
-

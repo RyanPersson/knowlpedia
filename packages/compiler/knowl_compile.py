@@ -8,12 +8,15 @@ shape: typed source files become a validated graph, then static artifacts.
 from __future__ import annotations
 
 import argparse
+import atexit
 import hashlib
 import html
 import json
+import os
 import re
 import shutil
 import sqlite3
+import subprocess
 import sys
 import tomllib
 from dataclasses import dataclass, field
@@ -21,7 +24,171 @@ from pathlib import Path
 from typing import Any
 
 
-WIKILINK_RE = re.compile(r"\[\[([^\]|]+)(?:\|([^\]]+))?\]\]")
+WIKILINK_RE = re.compile(
+    r"\[\[([A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)+(?:#[^\]|]+)?)(?:\|([^\n]*?))?\]\]"
+)
+MATH_RE = re.compile(
+    r"(?s)(\$\$(.+?)\$\$|\\\[(.+?)\\\]|\\\((.+?)\\\)|(?<!\\)\$(?!\s)(.+?)(?<!\\)\$)"
+)
+DISPLAY_MATH_RE = re.compile(r"(?s)(\\\[(.+?)\\\]|\$\$(.+?)\$\$)")
+AGENT_STATUS_RE = re.compile(r"^\d+[smhd]\d+[smhd]\s+·\s+gpt-[^·]+·.*[↑↓↻Δ]")
+OLD_HUGO_TOPIC_LINKS = [
+    ("Analysis", "/analysis/"),
+    ("Convex Analysis", "/convex-analysis/"),
+    ("Foundations", "/shared-foundations/"),
+    ("Linear Algebra", "/linear-algebra/"),
+    ("Groups", "/algebra-groups/"),
+    ("Rings", "/algebra-rings/"),
+    ("Modules", "/algebra-modules/"),
+    ("Fields & Galois Theory", "/algebra-fields-galois/"),
+    ("Commutative Algebra", "/algebra-commutative/"),
+    ("Category Theory", "/algebra-category-theory/"),
+    ("Homological Algebra", "/algebra-homological/"),
+    ("Representation Theory", "/algebra-representation-theory/"),
+    ("Fiber Bundles", "/fiber-bundles/"),
+    ("Lie Groups", "/lie-groups/"),
+    ("Langlands Letter", "/langlands-letter/"),
+    ("Shale's Paper", "/shale-paper/"),
+    ("Posts", "/posts/"),
+]
+
+
+def find_vscode_node() -> Path | None:
+    for node in sorted(Path.home().glob(".vscode-server/cli/servers/*/server/node"), reverse=True):
+        if node.is_file():
+            return node
+    return None
+
+
+def find_katex_module() -> Path | None:
+    for module in sorted(Path.home().glob(".vscode-server/cli/servers/*/server/node_modules/katex/dist/katex.js"), reverse=True):
+        if module.is_file():
+            return module
+    return None
+
+
+def find_katex_assets_dir() -> Path | None:
+    repo_dir = Path(__file__).resolve().parents[2]
+    old_site_assets = repo_dir.parent / "knowlpedia" / "static" / "css"
+    if (old_site_assets / "katex.min.css").is_file():
+        return old_site_assets
+    for assets_dir in sorted(Path.home().glob(".vscode-server/cli/servers/*/server/node_modules/katex/dist"), reverse=True):
+        if (assets_dir / "katex.min.css").is_file():
+            return assets_dir
+    return None
+
+
+class MathRenderer:
+    def __init__(self) -> None:
+        self.backend = "tex"
+        self._worker: subprocess.Popen[str] | None = None
+        self._cache: dict[tuple[str, bool], str] = {}
+        self._convert = None
+        self._start_katex_worker()
+        if self.backend == "katex":
+            return
+
+        try:
+            from latex2mathml.converter import convert
+        except Exception:
+            return
+        else:
+            self.backend = "mathml"
+            self._convert = convert
+
+    def _start_katex_worker(self) -> None:
+        node = find_vscode_node()
+        katex_module = find_katex_module()
+        worker = Path(__file__).with_name("katex_worker.cjs")
+        if not node or not katex_module or not worker.is_file():
+            return
+
+        env = dict(os.environ)
+        env["KATEX_MODULE"] = str(katex_module)
+        try:
+            self._worker = subprocess.Popen(
+                [str(node), str(worker)],
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.DEVNULL,
+                text=True,
+                encoding="utf-8",
+                env=env,
+            )
+        except Exception:
+            self._worker = None
+            return
+        self.backend = "katex"
+        atexit.register(self.close)
+
+    def close(self) -> None:
+        if not self._worker:
+            return
+        try:
+            self._worker.terminate()
+        except Exception:
+            pass
+        self._worker = None
+
+    def render(self, tex: str, display: bool) -> str:
+        tex = tex.strip()
+        cache_key = (tex, display)
+        if cache_key in self._cache:
+            return self._cache[cache_key]
+
+        if self.backend == "katex":
+            rendered = self._render_katex(tex, display)
+            if rendered:
+                self._cache[cache_key] = rendered
+                return rendered
+
+        if self.backend != "mathml" or self._convert is None:
+            delimiter = "$$" if display else "$"
+            rendered = html.escape(f"{delimiter}{tex}{delimiter}")
+            self._cache[cache_key] = rendered
+            return rendered
+
+        try:
+            mathml = self._convert(tex, display="block" if display else "inline")
+        except Exception:
+            delimiter = "$$" if display else "$"
+            rendered = f'<span class="math-render-error">{html.escape(f"{delimiter}{tex}{delimiter}")}</span>'
+            self._cache[cache_key] = rendered
+            return rendered
+        class_name = "math-display" if display else "math-inline"
+        wrapper = "div" if display else "span"
+        rendered = f'<{wrapper} class="{class_name} math-mathml">{mathml}</{wrapper}>'
+        self._cache[cache_key] = rendered
+        return rendered
+
+    def _render_katex(self, tex: str, display: bool) -> str | None:
+        if not self._worker or not self._worker.stdin or not self._worker.stdout:
+            self.backend = "mathml" if self._convert else "tex"
+            return None
+        try:
+            self._worker.stdin.write(json.dumps({"tex": tex, "display": display}) + "\n")
+            self._worker.stdin.flush()
+            line = self._worker.stdout.readline()
+        except Exception:
+            self.close()
+            self.backend = "mathml" if self._convert else "tex"
+            return None
+        if not line:
+            self.close()
+            self.backend = "mathml" if self._convert else "tex"
+            return None
+        try:
+            payload = json.loads(line)
+        except json.JSONDecodeError:
+            return None
+        if "html" not in payload:
+            return None
+        class_name = "math-display math-katex" if display else "math-inline math-katex"
+        wrapper = "div" if display else "span"
+        return f'<{wrapper} class="{class_name}">{payload["html"]}</{wrapper}>'
+
+
+MATH_RENDERER = MathRenderer()
 
 
 @dataclass
@@ -83,6 +250,39 @@ def fragment_href(knowl_id: str) -> str:
 
 def escape_attr(value: str) -> str:
     return html.escape(value, quote=True)
+
+
+def protect_math(text: str) -> tuple[str, dict[str, str]]:
+    replacements: dict[str, str] = {}
+
+    def replace(match: re.Match[str]) -> str:
+        token = f"@@KNOWL_MATH_{len(replacements)}@@"
+        if match.group(2) is not None:
+            tex = match.group(2)
+            display = True
+        elif match.group(3) is not None:
+            tex = match.group(3)
+            display = True
+        elif match.group(4) is not None:
+            tex = match.group(4)
+            display = False
+        else:
+            tex = match.group(5)
+            display = False
+        replacements[token] = MATH_RENDERER.render(tex, display)
+        return token
+
+    return MATH_RE.sub(replace, text), replacements
+
+
+def restore_math(text: str, replacements: dict[str, str]) -> str:
+    for token, rendered in replacements.items():
+        text = text.replace(token, rendered)
+    return text
+
+
+def is_agent_status_line(line: str) -> bool:
+    return bool(AGENT_STATUS_RE.match(line.strip()))
 
 
 def parse_single_file(path: Path) -> Knowl:
@@ -205,6 +405,7 @@ def discover_knowls(content_dir: Path) -> list[Knowl]:
 
 
 def render_inline(text: str, registry: dict[str, Knowl]) -> str:
+    text, math_replacements = protect_math(text)
     escaped = html.escape(text)
 
     def replace_wikilink(match: re.Match[str]) -> str:
@@ -226,7 +427,23 @@ def render_inline(text: str, registry: dict[str, Knowl]) -> str:
     escaped = re.sub(r"`([^`]+)`", r"<code>\1</code>", escaped)
     escaped = re.sub(r"\*\*([^*]+)\*\*", r"<strong>\1</strong>", escaped)
     escaped = re.sub(r"\*([^*]+)\*", r"<em>\1</em>", escaped)
-    return escaped
+    return restore_math(escaped, math_replacements)
+
+
+def render_paragraph(text: str, registry: dict[str, Knowl]) -> str:
+    blocks: list[str] = []
+    cursor = 0
+    for match in DISPLAY_MATH_RE.finditer(text):
+        before = text[cursor : match.start()].strip()
+        if before:
+            blocks.append(f"<p>{render_inline(before, registry)}</p>")
+        blocks.append(MATH_RENDERER.render(match.group(2) or match.group(3), display=True))
+        cursor = match.end()
+
+    after = text[cursor:].strip()
+    if after:
+        blocks.append(f"<p>{render_inline(after, registry)}</p>")
+    return "\n".join(blocks)
 
 
 def render_markdown(markdown: str, registry: dict[str, Knowl]) -> str:
@@ -246,6 +463,9 @@ def render_markdown(markdown: str, registry: dict[str, Knowl]) -> str:
     while i < len(lines):
         line = lines[i]
         stripped = line.strip()
+        if is_agent_status_line(stripped):
+            i += 1
+            continue
 
         if in_code:
             if stripped.startswith("```"):
@@ -266,6 +486,26 @@ def render_markdown(markdown: str, registry: dict[str, Knowl]) -> str:
 
         if not stripped:
             close_list()
+            i += 1
+            continue
+
+        if stripped in {"\\[", "$$"}:
+            close_list()
+            delimiter = "\\]" if stripped == "\\[" else "$$"
+            i += 1
+            math_lines = []
+            while i < len(lines) and lines[i].strip() != delimiter:
+                math_lines.append(lines[i])
+                i += 1
+            if i < len(lines):
+                i += 1
+            out.append(MATH_RENDERER.render("\n".join(math_lines), display=True))
+            continue
+
+        single_line_display = re.match(r"^(?:\\\[(.+)\\\]|\$\$(.+)\$\$)$", stripped)
+        if single_line_display:
+            close_list()
+            out.append(MATH_RENDERER.render(single_line_display.group(1) or single_line_display.group(2), display=True))
             i += 1
             continue
 
@@ -332,13 +572,15 @@ def render_markdown(markdown: str, registry: dict[str, Knowl]) -> str:
                 not next_line
                 or next_line.startswith("#")
                 or next_line.startswith("```")
+                or next_line in {"\\[", "$$"}
+                or is_agent_status_line(next_line)
                 or re.match(r"^-\s+", next_line)
                 or re.match(r"^\d+\.\s+", next_line)
             ):
                 break
             paragraph.append(next_line)
             i += 1
-        out.append(f"<p>{render_inline(' '.join(paragraph), registry)}</p>")
+        out.append(render_paragraph(" ".join(paragraph), registry))
 
     if in_code:
         out.append("<pre><code>" + html.escape("\n".join(code_lines)) + "</code></pre>")
@@ -512,7 +754,62 @@ def render_knowl_core(knowl: Knowl, registry: dict[str, Knowl]) -> str:
     return "\n".join(body)
 
 
-def render_page(knowl: Knowl, registry: dict[str, Knowl], package: dict[str, Any]) -> str:
+def preload_template_targets(knowl: Knowl, registry: dict[str, Knowl]) -> list[str]:
+    targets: list[str] = []
+
+    def add(target: str) -> None:
+        base, _ = split_target(target)
+        if base in registry and base not in targets:
+            targets.append(base)
+
+    for target in wikilinks_in_text(knowl.core_markdown):
+        add(target)
+    for item in knowl.core_data + knowl.core_axioms:
+        for target in item.get("refs", []):
+            add(target)
+    for relation in knowl.relations:
+        add(relation["target"])
+    for section in knowl.sections:
+        if section.get("kind") == "tfae":
+            for item in section["payload"].get("items", []):
+                for target in item.get("refs", []):
+                    add(target)
+        elif section.get("kind") == "proof":
+            payload = section["payload"]
+            add(payload["proves"])
+            for step in payload.get("steps", []):
+                for justification in step.get("justifications", []):
+                    add(justification["target"])
+        else:
+            for target in wikilinks_in_text(section.get("markdown", "")):
+                add(target)
+
+    return targets
+
+
+def render_preload_templates(
+    knowl: Knowl,
+    registry: dict[str, Knowl],
+    fragment_cache: dict[str, str] | None = None,
+) -> str:
+    templates = []
+    for target in preload_template_targets(knowl, registry):
+        fragment_url = fragment_href(target)
+        fragment_html = fragment_cache[target] if fragment_cache else render_knowl_core(registry[target], registry)
+        templates.append(
+            f'<template data-knowl-fragment="{escape_attr(fragment_url)}">'
+            f"{fragment_html}"
+            "</template>"
+        )
+    return "\n".join(templates)
+
+
+def render_page(
+    knowl: Knowl,
+    registry: dict[str, Knowl],
+    package: dict[str, Any],
+    fragment_cache: dict[str, str] | None = None,
+) -> str:
     section_html = []
     for section in knowl.sections:
         open_attr = " open" if section.get("default_open") else ""
@@ -532,31 +829,60 @@ def render_page(knowl: Knowl, registry: dict[str, Knowl], package: dict[str, Any
                 f'<article class="knowl-page" data-knowl-id="{escape_attr(knowl.id)}">',
                 f'<header class="page-header"><p class="kind">{html.escape(knowl.kind)}</p><h1>{html.escape(knowl.title)}</h1><p>{html.escape(knowl.summary)}</p></header>',
                 '<section class="core-section" id="section.core">',
-                "<h2>Core</h2>",
                 render_markdown(knowl.core_markdown, registry),
                 render_structured_core(knowl, registry),
                 "</section>",
                 "\n".join(section_html),
                 render_relations(knowl, registry),
                 "</article>",
+                render_preload_templates(knowl, registry, fragment_cache),
                 "</main>",
             ]
         ),
     )
 
 
-def html_document(title: str, body: str) -> str:
+def html_document(title: str, body: str, preload_mode: str = "eager") -> str:
+    math_script = ""
+    if MATH_RENDERER.backend == "tex":
+        math_script = """  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\\\(', '\\\\)']],
+        displayMath: [['$$', '$$'], ['\\\\[', '\\\\]']],
+        processEscapes: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+"""
+    theme_script = """  <script>
+    (function () {
+      try {
+        var theme = localStorage.getItem("knowl-theme");
+        if (theme === "dark" || theme === "light") {
+          document.documentElement.dataset.theme = theme;
+        }
+      } catch (error) {}
+    }());
+  </script>"""
     return f"""<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{html.escape(title)}</title>
+{theme_script}
+  <link rel="stylesheet" href="/assets/katex.min.css">
   <link rel="stylesheet" href="/assets/knowl.css">
   <script defer src="/assets/knowl.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+{math_script.rstrip()}
 </head>
-<body>
+<body data-knowl-preload="{escape_attr(preload_mode)}">
+<button type="button" id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode" aria-pressed="false">Dark</button>
 {body}
 </body>
 </html>
@@ -574,18 +900,39 @@ def render_index(registry: dict[str, Knowl], package: dict[str, Any]) -> str:
         '<header class="page-header">',
         f'<p class="kind">knowl package</p><h1>{html.escape(package["title"])}</h1>',
         '<p>Generated from typed semantic source into static pages, fragments, and indexes.</p>',
+        '<p class="index-alt-link"><a href="/topics/">Old Hugo-style topics page</a></p>',
         "</header>",
     ]
     for group, knowls in sorted(grouped.items()):
-        parts.append(f"<section><h2>{html.escape(group.replace('-', ' ').title())}</h2><ul>")
+        parts.append(f'<section class="index-section"><h2>{html.escape(group.replace("-", " ").title())}</h2><ul class="index-list">')
         for knowl in sorted(knowls, key=lambda k: k.title.lower()):
             parts.append(
-                f'<li><a href="{escape_attr(target_href(knowl.id))}">{html.escape(knowl.title)}</a> '
+                f'<li class="index-item"><a class="knowl index-knowl" href="{escape_attr(target_href(knowl.id))}" '
+                f'data-knowl="{escape_attr(fragment_href(knowl.id))}" aria-expanded="false">{html.escape(knowl.title)}</a> '
                 f'<span class="summary">{html.escape(knowl.summary)}</span></li>'
             )
         parts.append("</ul></section>")
     parts.append("</main>")
-    return html_document(package["title"], "\n".join(parts))
+    return html_document(package["title"], "\n".join(parts), preload_mode="visible")
+
+
+def render_old_topics_page(package: dict[str, Any]) -> str:
+    links = "\n".join(
+        f'    <li><a href="{escape_attr(href)}">{html.escape(label)}</a></li>'
+        for label, href in OLD_HUGO_TOPIC_LINKS
+    )
+    body = "\n".join(
+        [
+            '<main class="home-content">',
+            "  <h1>Topics</h1>",
+            "",
+            '  <ul class="home-links">',
+            links,
+            "  </ul>",
+            "</main>",
+        ]
+    )
+    return html_document(f"Topics - {package['title']}", body, preload_mode="none")
 
 
 def validate(registry: dict[str, Knowl]) -> list[ValidationMessage]:
@@ -629,6 +976,55 @@ def validate(registry: dict[str, Knowl]) -> list[ValidationMessage]:
 
 def wikilinks_in_text(text: str) -> list[str]:
     return [match.group(1).strip() for match in WIKILINK_RE.finditer(text)]
+
+
+def collect_links(knowl: Knowl) -> list[dict[str, str]]:
+    links: list[dict[str, str]] = []
+
+    def add(target: str, source_part: str, link_type: str = "mentions") -> None:
+        links.append(
+            {
+                "source": knowl.id,
+                "source_part": source_part,
+                "type": link_type,
+                "target": target,
+            }
+        )
+
+    for target in wikilinks_in_text(knowl.core_markdown):
+        add(target, "core")
+    for item in knowl.core_data:
+        for target in item.get("refs", []):
+            add(target, f'data.{item["id"]}', "uses")
+    for item in knowl.core_axioms:
+        for target in item.get("refs", []):
+            add(target, f'axiom.{item["id"]}', "uses")
+    for relation in knowl.relations:
+        add(relation["target"], "relations", relation["type"])
+    for section in knowl.sections:
+        section_part = f'section.{section["id"]}'
+        if section.get("kind") == "tfae":
+            for item in section["payload"].get("items", []):
+                for target in item.get("refs", []):
+                    add(target, f'{section_part}.{item["id"]}', "uses")
+        elif section.get("kind") == "proof":
+            payload = section["payload"]
+            add(payload["proves"], f'{section_part}.{payload["id"]}', "proves")
+            for step in payload.get("steps", []):
+                for justification in step.get("justifications", []):
+                    add(justification["target"], f'{section_part}.{payload["id"]}.step.{step["id"]}', justification.get("type", "uses"))
+        else:
+            for target in wikilinks_in_text(section.get("markdown", "")):
+                add(target, section_part)
+    seen = set()
+    deduped = []
+    for link in links:
+        key = (link["source"], link["source_part"], link["type"], link["target"])
+        if key in seen:
+            continue
+        seen.add(key)
+        deduped.append(link)
+    return deduped
 
 
 def validate_target(
@@ -717,6 +1113,14 @@ def relations_json(registry: dict[str, Knowl]) -> list[dict[str, Any]]:
     return relations
 
 
+def links_json(registry: dict[str, Knowl]) -> list[dict[str, Any]]:
+    links = []
+    for knowl in registry.values():
+        for link in collect_links(knowl):
+            links.append(link)
+    return links
+
+
 def proofs_json(registry: dict[str, Knowl]) -> list[dict[str, Any]]:
     proofs = []
     for knowl in registry.values():
@@ -763,6 +1167,12 @@ def write_sqlite(path: Path, registry: dict[str, Knowl]) -> None:
               target text not null,
               note text
             );
+            create table links (
+              source text not null references knowls(id),
+              source_part text not null,
+              type text not null,
+              target text not null
+            );
             create table proof_steps (
               knowl_id text not null references knowls(id),
               proof_id text not null,
@@ -791,6 +1201,11 @@ def write_sqlite(path: Path, registry: dict[str, Knowl]) -> None:
                     "insert into relations values (?, ?, ?, ?)",
                     (knowl.id, relation["type"], relation["target"], relation.get("note")),
                 )
+            for link in collect_links(knowl):
+                conn.execute(
+                    "insert into links values (?, ?, ?, ?)",
+                    (link["source"], link["source_part"], link["type"], link["target"]),
+                )
             for section in knowl.sections:
                 if section.get("kind") == "proof":
                     payload = section["payload"]
@@ -811,8 +1226,23 @@ def copy_runtime_assets(out_dir: Path) -> None:
     for filename in ("knowl.css", "knowl.js"):
         shutil.copyfile(runtime_dir / filename, assets_dir / filename)
 
+    katex_assets = find_katex_assets_dir()
+    if not katex_assets:
+        (assets_dir / "katex.min.css").write_text("", encoding="utf-8")
+        return
 
-def write_site(package_dir: Path, out_dir: Path) -> int:
+    css_source = katex_assets / "katex.min.css"
+    if not css_source.is_file():
+        css_source = katex_assets / "katex.css"
+    if css_source.is_file():
+        shutil.copyfile(css_source, assets_dir / "katex.min.css")
+
+    fonts_source = katex_assets / "fonts"
+    if fonts_source.is_dir():
+        shutil.copytree(fonts_source, assets_dir / "fonts", dirs_exist_ok=True)
+
+
+def write_site(package_dir: Path, out_dir: Path, allow_validation_errors: bool = False) -> int:
     package_path = package_dir / "knowlpack.toml"
     package = read_toml(package_path)
     content_dir = package_dir / package.get("content_dir", "content")
@@ -830,15 +1260,21 @@ def write_site(package_dir: Path, out_dir: Path) -> int:
     out_dir.mkdir(parents=True)
     copy_runtime_assets(out_dir)
 
+    fragment_cache = {knowl.id: render_knowl_core(knowl, registry) for knowl in registry.values()}
+
     (out_dir / "index.html").write_text(render_index(registry, package), encoding="utf-8")
+    topics_path = out_dir / "topics" / "index.html"
+    topics_path.parent.mkdir(parents=True, exist_ok=True)
+    topics_path.write_text(render_old_topics_page(package), encoding="utf-8")
+
     for knowl in registry.values():
         page_path = out_dir / slug_to_relpath(knowl.id) / "index.html"
         page_path.parent.mkdir(parents=True, exist_ok=True)
-        page_path.write_text(render_page(knowl, registry, package), encoding="utf-8")
+        page_path.write_text(render_page(knowl, registry, package, fragment_cache), encoding="utf-8")
 
         fragment_path = out_dir / "fragments" / slug_to_relpath(knowl.id) / "core.html"
         fragment_path.parent.mkdir(parents=True, exist_ok=True)
-        fragment_path.write_text(render_knowl_core(knowl, registry), encoding="utf-8")
+        fragment_path.write_text(fragment_cache[knowl.id], encoding="utf-8")
 
         for section in knowl.sections:
             section_path = out_dir / "fragments" / slug_to_relpath(knowl.id) / "sections" / f'{section["id"]}.html'
@@ -847,6 +1283,7 @@ def write_site(package_dir: Path, out_dir: Path) -> int:
 
     write_json(out_dir / "indexes" / "registry.json", registry_json(registry))
     write_json(out_dir / "indexes" / "relations.json", relations_json(registry))
+    write_json(out_dir / "indexes" / "links.json", links_json(registry))
     write_json(out_dir / "indexes" / "proofs.json", proofs_json(registry))
     write_json(out_dir / "reports" / "validation.json", [msg.__dict__ for msg in messages])
     write_sqlite(out_dir / "indexes" / "knowls.sqlite", registry)
@@ -855,7 +1292,7 @@ def write_site(package_dir: Path, out_dir: Path) -> int:
     if messages:
         for msg in messages:
             print(f"{msg.severity.upper()}: {msg.source}: {msg.message}", file=sys.stderr)
-    if errors:
+    if errors and not allow_validation_errors:
         return 1
     return 0
 
@@ -864,8 +1301,13 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Compile a knowl package")
     parser.add_argument("package_dir", type=Path, help="Directory containing knowlpack.toml")
     parser.add_argument("--out", type=Path, default=Path("public"), help="Output directory")
+    parser.add_argument(
+        "--allow-validation-errors",
+        action="store_true",
+        help="Write artifacts and return success even when semantic validation reports errors",
+    )
     args = parser.parse_args()
-    return write_site(args.package_dir, args.out)
+    return write_site(args.package_dir, args.out, allow_validation_errors=args.allow_validation_errors)
 
 
 if __name__ == "__main__":

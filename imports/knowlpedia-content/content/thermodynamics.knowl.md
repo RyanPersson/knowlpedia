@@ -1,0 +1,117 @@
++++
+id = "thermodynamics"
+title = "Thermodynamics"
+kind = "section"
+summary = "Classical thermodynamic systems, quantities, and laws"
+aliases = ["thermodynamics"]
+domains = ["thermodynamics"]
+legacy_source_path = "thermodynamics/_index.md"
++++
+
+## Systems and Processes
+
+- [[thermodynamics/adiabatic-wall|Adiabatic wall]]
+- [[thermodynamics/chemical-equilibrium|Chemical equilibrium]]
+- [[thermodynamics/closed-system|Closed system]]
+- [[thermodynamics/cyclic-process|Cyclic process]]
+- [[thermodynamics/diathermal-wall|Diathermal wall]]
+- [[thermodynamics/irreversible-process|Irreversible process]]
+- [[thermodynamics/isolated-system|Isolated system]]
+- [[thermodynamics/mechanical-equilibrium|Mechanical equilibrium]]
+- [[thermodynamics/open-system|Open system]]
+- [[thermodynamics/path-function|Path function]]
+- [[thermodynamics/quasistatic-process|Quasistatic process]]
+- [[thermodynamics/reversible-process|Reversible process]]
+- [[thermodynamics/state-function|State function]]
+- [[thermodynamics/state-variable|State variable]]
+- [[thermodynamics/surroundings-environment|Surroundings and environment]]
+- [[thermodynamics/system-boundary|System boundary]]
+- [[thermodynamics/thermal-equilibrium|Thermal equilibrium]]
+- [[thermodynamics/thermal-reservoir|Thermal reservoir]]
+- [[thermodynamics/thermodynamic-equilibrium|Thermodynamic equilibrium]]
+- [[thermodynamics/thermodynamic-process|Thermodynamic process]]
+- [[thermodynamics/thermodynamic-state|Thermodynamic state]]
+- [[thermodynamics/thermodynamic-system|Thermodynamic system]]
+- [[thermodynamics/thermodynamic-limit-state-function|Thermodynamic-limit state function]]
+- [[thermodynamics/work-reservoir|Work reservoir]]
+
+## Quantities
+
+- [[thermodynamics/absolute-temperature-scale|Absolute temperature scale]]
+- [[thermodynamics/adiabatic-compressibility|Adiabatic compressibility]]
+- [[thermodynamics/corollary-carnot-absolute-temperature|Carnot theorem implies an absolute temperature scale]]
+- [[thermodynamics/chemical-potential-thermo|Chemical potential]]
+- [[thermodynamics/energy-density|Energy density]]
+- [[thermodynamics/enthalpy|Enthalpy]]
+- [[thermodynamics/entropy-density|Entropy density]]
+- [[thermodynamics/extensive-variable|Extensive variable]]
+- [[thermodynamics/gibbs-free-energy|Gibbs free energy]]
+- [[thermodynamics/grand-potential|Grand potential]]
+- [[thermodynamics/prop-grand-canonical-particle-number|Grand-canonical particle number identity]]
+- [[thermodynamics/heat-inexact-differential|Heat (inexact differential)]]
+- [[thermodynamics/heat-capacity-constant-pressure|Heat capacity at constant pressure]]
+- [[thermodynamics/heat-capacity-constant-volume|Heat capacity at constant volume]]
+- [[thermodynamics/helmholtz-free-energy|Helmholtz free energy]]
+- [[thermodynamics/intensive-variable|Intensive variable]]
+- [[thermodynamics/internal-energy-thermo|Internal energy]]
+- [[thermodynamics/isothermal-compressibility|Isothermal compressibility]]
+- [[thermodynamics/microcanonical-entropy-density|Microcanonical entropy density]]
+- [[thermodynamics/construction-microcanonical-entropy-density-of-states|Microcanonical entropy from the density of states]]
+- [[thermodynamics/number-density|Number density]]
+- [[thermodynamics/particle-number|Particle number]]
+- [[thermodynamics/pressure-thermo|Pressure]]
+- [[thermodynamics/pressure-volume-work-sign-convention|Pressure–volume work sign convention]]
+- [[thermodynamics/specific-quantity|Specific quantity]]
+- [[thermodynamics/thermal-expansion-coefficient|Thermal expansion coefficient]]
+- [[thermodynamics/thermodynamic-entropy|Thermodynamic entropy]]
+- [[thermodynamics/response-function-thermo|Thermodynamic response function]]
+- [[thermodynamics/temperature-thermo|Thermodynamic temperature]]
+- [[thermodynamics/volume-thermo|Volume]]
+- [[thermodynamics/work-inexact-differential|Work (inexact differential)]]
+- [[thermodynamics/work-sign-convention|Work sign convention]]
+
+## Structure
+
+- [[thermodynamics/prop-free-energy-convexity-temperature|Concavity of Helmholtz free energy in temperature]]
+- [[thermodynamics/energy-convexity-stability|Energy convexity and thermodynamic stability]]
+- [[thermodynamics/entropy-concavity-stability|Entropy Concavity and Stability]]
+- [[thermodynamics/prop-entropy-concavity-energy|Entropy is concave in energy (at fixed V,N)]]
+- [[thermodynamics/equation-of-state|Equation of state]]
+- [[thermodynamics/euler-relation-thermodynamics|Euler Relation in Thermodynamics]]
+- [[thermodynamics/thermodynamic-limit-pressure-existence|Existence of the thermodynamic limit of the pressure]]
+- [[thermodynamics/fundamental-relation-energy|Fundamental relation (energy representation)]]
+- [[thermodynamics/fundamental-relation-entropy|Fundamental relation (entropy representation)]]
+- [[thermodynamics/gibbs-duhem-relation|Gibbs–Duhem Relation]]
+- [[thermodynamics/gibbs-duhem-theorem|Gibbs–Duhem theorem]]
+- [[thermodynamics/homogeneous-function-degree-one|Homogeneous function of degree one]]
+- [[thermodynamics/maxwell-relation|Maxwell Relations]]
+- [[thermodynamics/maxwell-relations-theorem|Maxwell relations theorem]]
+- [[thermodynamics/tfae-thermodynamic-stability|TFAE: Thermodynamic Stability Criteria]]
+- [[thermodynamics/thermodynamic-stability|Thermodynamic Stability]]
+- [[thermodynamics/thermodynamic-limit|Thermodynamic limit]]
+- [[thermodynamics/thermodynamic-limit-pressure-lattice|Thermodynamic limit of the lattice pressure]]
+
+## Laws and Axioms
+
+- [[thermodynamics/additivity-postulate|Additivity postulate]]
+- [[thermodynamics/boltzmann-constant|Boltzmann constant]]
+- [[thermodynamics/clausius-inequality|Clausius inequality]]
+- [[thermodynamics/clausius-statement-second-law|Clausius statement of the second law]]
+- [[thermodynamics/clausius-theorem-entropy|Clausius theorem and entropy]]
+- [[thermodynamics/extensivity-postulate|Extensivity postulate]]
+- [[thermodynamics/first-law-thermodynamics|First law of thermodynamics]]
+- [[thermodynamics/inverse-temperature-beta|Inverse temperature β]]
+- [[thermodynamics/kelvin-planck-statement|Kelvin–Planck statement]]
+- [[thermodynamics/kelvin-planck-clausius-equivalence|Kelvin–Planck–Clausius equivalence]]
+- [[thermodynamics/second-law-thermodynamics|Second law of thermodynamics]]
+- [[thermodynamics/subadditivity-partition-function|Subadditivity of the Partition Function (up to boundary terms)]]
+- [[thermodynamics/superadditivity-entropy|Superadditivity of Entropy]]
+- [[thermodynamics/third-law-thermodynamics|Third law of thermodynamics]]
+- [[thermodynamics/zeroth-law-thermodynamics|Zeroth law of thermodynamics]]
+- [[thermodynamics/zeroth-law-equivalence|Zeroth-law equivalence]]
+
+## Conventions
+
+- [[thermodynamics/chemical-work-convention|Chemical work convention]]
+- [[thermodynamics/entropy-normalization-convention|Entropy normalization convention]]
+- [[thermodynamics/natural-units-convention|Natural units convention]]

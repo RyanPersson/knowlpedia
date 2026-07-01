@@ -1,0 +1,11 @@
+id = "org.knowlpedia.imported-content"
+title = "Imported Knowlpedia Content"
+version = "0.1.0"
+authors = ["Ryan Persson"]
+license = "unknown-imported"
+content_dir = "content"
+
+[outputs]
+static_site = true
+json_indexes = true
+sqlite = true
