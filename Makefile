@@ -1,25 +1,32 @@
 VENV_PYTHON := .venv/bin/python
+VENV_STAMP := .venv/.deps-installed
 NODE_MODULES_KATEX := node_modules/katex/dist/katex.js
 PYTHON ?= $(VENV_PYTHON)
 CONTENT_PACKAGE ?= ../knowlpedia-content
 LEGACY_CONTENT_SOURCE ?= ../knowlpedia-content-legacy
 LEGACY_IMPORT_OUT ?= imports/knowlpedia-content
+DIAGRAM_CACHE_DIR ?= .knowl-cache/diagrams
+DIAGRAM_SOURCE ?= ../knowlpedia-content/content/algebra-category-theory/tikz-lab-whiskering-coherence.knowl.md
+DIAGRAM_INDEX ?= 1
+DIAGRAM_PREVIEW_OUT ?= tmp/tikz-preview
+PAGE ?= algebra-category-theory/tikz-lab-whiskering-coherence
 PREVIEW_URL ?= http://127.0.0.1:8001
 PREVIEW_PATH ?= /algebra-groups/group/
 SCREENSHOT ?= tmp/screenshots/imported-group.png
 
 .PHONY: deps build serve clean screenshot-imported
 .PHONY: build-content serve-content import-legacy-content import-content
-.PHONY: build-imported serve-imported build-legacy-imported
+.PHONY: build-page preview-diagram build-imported serve-imported build-legacy-imported
 
-$(VENV_PYTHON): requirements.txt
+$(VENV_STAMP): requirements.txt
 	python3 -m venv .venv
 	$(VENV_PYTHON) -m pip install -r requirements.txt
+	touch $(VENV_STAMP)
 
 $(NODE_MODULES_KATEX): package.json package-lock.json
 	npm install
 
-deps: $(VENV_PYTHON) $(NODE_MODULES_KATEX)
+deps: $(VENV_STAMP) $(NODE_MODULES_KATEX)
 
 build: deps
 	$(PYTHON) packages/compiler/knowl_compile.py examples/basic --out public
@@ -28,7 +35,13 @@ serve: build
 	python3 -m http.server 8000 --directory public
 
 build-content: deps
-	$(PYTHON) packages/compiler/knowl_compile.py $(CONTENT_PACKAGE) --out public-imported --allow-validation-errors
+	$(PYTHON) packages/compiler/knowl_compile.py $(CONTENT_PACKAGE) --out public-imported --allow-validation-errors --diagram-cache-dir $(DIAGRAM_CACHE_DIR)
+
+build-page: deps
+	$(PYTHON) packages/compiler/knowl_compile.py $(CONTENT_PACKAGE) --out public-imported --allow-validation-errors --only $(PAGE) --diagram-cache-dir $(DIAGRAM_CACHE_DIR)
+
+preview-diagram: deps
+	$(PYTHON) packages/compiler/preview_diagram.py $(DIAGRAM_SOURCE) --index $(DIAGRAM_INDEX) --out $(DIAGRAM_PREVIEW_OUT) --diagram-cache-dir $(DIAGRAM_CACHE_DIR)
 
 serve-content: build-content
 	python3 -m http.server 8001 --directory public-imported

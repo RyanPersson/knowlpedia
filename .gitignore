@@ -1,6 +1,7 @@
 public/
 public-imported/
 imports/
+.knowl-cache/
 .venv/
 node_modules/
 tmp/

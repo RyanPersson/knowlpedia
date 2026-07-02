@@ -322,95 +322,93 @@ Important skill lessons:
 
 ### Current Build Loop
 
-The current full loop is:
+Normal refactor builds now compile directly from the sibling Knowlpack-format
+content repo:
 
 ```bash
-make build-imported
+make build-content
 ```
 
-That target runs:
+That target runs the compiler against:
 
 ```text
-make import-content
-packages/compiler/knowl_compile.py imports/knowlpedia-content --out public-imported --allow-validation-errors
+../knowlpedia-content -> public-imported
 ```
+
+The legacy importer remains available as an explicit one-off migration tool:
+
+```bash
+make import-legacy-content
+```
+
+Do not run the importer as part of ordinary editing. `imports/` is ignored and is
+scratch space.
+
+### Fast Iteration Commands
+
+1. Diagram-only preview.
+
+   ```bash
+   make preview-diagram \
+     DIAGRAM_SOURCE=../knowlpedia-content/content/algebra-category-theory/tikz-lab-whiskering-coherence.knowl.md \
+     DIAGRAM_INDEX=2
+   ```
+
+   This extracts one TikZ-like block from a source file and renders a tiny HTML
+   preview using the same `DiagramRenderer` as the compiler. It validates the
+   diagram render, not full page layout, knowl links, or page integration.
+
+2. Single-page compile.
+
+   ```bash
+   make build-page PAGE=algebra-category-theory/tikz-lab-whiskering-coherence
+   ```
+
+   The compiler still loads the full registry for link resolution and
+   validation, but it only rewrites the selected page, its core fragment, its
+   section fragments, and immediate preload fragments. Indexes and unrelated
+   preloaded fragments can be stale until a full build, so use this for local
+   iteration, not final verification.
+
+3. Persistent rendered-diagram cache.
+
+   `DiagramRenderer` caches rendered diagram HTML by a hash of the source, kind,
+   renderer backend, TeX wrapper, and toolchain paths. The default cache path is:
+
+   ```text
+   .knowl-cache/diagrams
+   ```
+
+   Override it with `DIAGRAM_CACHE_DIR=...` or compiler
+   `--diagram-cache-dir ...`. Use `--no-diagram-cache` to disable it for timing
+   or debugging.
 
 Measured locally on 2026-07-02:
 
 ```text
-make import-content: about 1.65s
-full imported compile: about 14.24s
+baseline full build before these changes:                 15.34s
+diagram-only preview, no persistent cache:                 0.61s
+single-page compile, no persistent cache:                  1.84s
+full build, cold persistent diagram cache:                14.08s
+full build, warm persistent diagram cache:                 3.17s
+single-page compile + warm persistent diagram cache:       0.27s
+diagram-only preview + warm persistent diagram cache:      0.10s
+make build-content, warm cache and dependency stamp:       3.11s
+make build-page, warm cache and dependency stamp:          0.24s
+make preview-diagram, warm cache and dependency stamp:     0.10s
 ```
 
-The bottleneck is the full static site compile, not the import step. The compiler
-currently discovers all knowls, validates globally, renders every core fragment,
-then writes every page, fragment, section fragment, JSON index, and SQLite index.
-
-### Fast Iteration Options Under Consideration
-
-1. Diagram-only preview tool.
-
-   Add a script that extracts one TikZ fence from a source file and renders only
-   that diagram using the same `DiagramRenderer` as the compiler. It should emit
-   a tiny HTML preview page or direct image artifact. This is the best immediate
-   feedback loop for TikZ geometry and should be close to instantaneous compared
-   to the full site build.
-
-   Tradeoff: validates the diagram render, not full page layout, knowl links, or
-   page integration.
-
-2. Single-page compile target.
-
-   Add compiler arguments such as:
-
-   ```bash
-   packages/compiler/knowl_compile.py imports/knowlpedia-content \
-     --out public-imported \
-     --only algebra-category-theory/tikz-lab-whiskering-coherence \
-     --allow-validation-errors
-   ```
-
-   The compiler would still load the full registry for link resolution, but only
-   rewrite the requested page and its fragments.
-
-   Tradeoff: indexes and unrelated preloaded fragments can be stale until a full
-   build. This is acceptable for local iteration, not final verification.
-
-3. Persistent rendered-diagram cache.
-
-   Cache rendered diagram HTML or PNG/SVG artifacts by a hash of the diagram
-   source, kind, renderer backend, and preamble version. The current diagram cache
-   is only in-process, so it is lost on every full compiler run.
-
-   Tradeoff: needs cache invalidation discipline when the TeX preamble,
-   renderer backend, CSS expectations, or output mode changes.
-
-4. Incremental compiler.
-
-   Track content hashes and rewrite only changed pages/fragments/indexes. This is
-   the most complete long-term solution, but it is more architectural work than
-   the preview tool or single-page target.
-
-5. Change source of truth from `knowlpedia-content` to refactor source.
-
-   This would remove or reduce the import step and avoid generated-source churn,
-   but it does not by itself solve the 14s compile bottleneck. It should be
-   considered a content/workflow migration decision, not a TikZ-speed fix.
-
-Recommended near-term sequence:
-
-1. Keep `knowlpedia-content` canonical for now.
-2. Add diagram-only preview for TikZ geometry iteration.
-3. Add single-page compile for page-level verification.
-4. Add persistent diagram cache.
-5. Run full `make build-imported` before commits or deployment checks.
+Run full `make build-content` before commits or deployment checks. Use
+`make preview-diagram` and `make build-page` during diagram/page iteration.
+Do not run full and single-page builds concurrently into the same output
+directory; both write `public-imported`.
 
 ### Import Folder Source-Of-Truth Question
 
-`imports/knowlpedia-content` is currently generated by
-`packages/importers/import_knowlpedia_content.py`, but it is also tracked in the
-refactor repo. This creates noise: every run from a changed `knowlpedia-content`
-branch can dirty many tracked generated files.
+`imports/knowlpedia-content` is generated by
+`packages/importers/import_knowlpedia_content.py`, but it is no longer tracked in
+the refactor repo. The sibling `knowlpedia-content` repo is the normal source of
+truth for refactor content on the `tikz-diagram-lab` branch.
 
 Current import transformation:
 
@@ -428,27 +426,11 @@ Current import transformation:
 - The importer does not infer structured axioms, examples, proofs, TFAE data, or
   relation metadata from prose.
 
-Decision guidance:
-
-- Do not edit `imports/knowlpedia-content` casually while the importer remains
-  active, because a future import will overwrite those edits.
-- If `knowlpedia-content` stays canonical, `imports/knowlpedia-content` should
-  probably be treated as generated output and ignored, or at least not committed
-  routinely. This requires deciding how deployment obtains imported artifacts.
-- If the refactor format becomes canonical, migrate content intentionally into a
-  non-generated source directory, for example `content/` or `content-imported/`,
-  then retire or demote the importer. Do not leave canonical content under a
-  directory named `imports` that a Makefile target deletes and regenerates.
-- Replacing `imports/knowlpedia-content` with the raw `knowlpedia-content`
-  directory directly is not a small Makefile change. The compiler currently
-  expects Knowlpack TOML front matter and `[[...]]` wikilinks, while the legacy
-  corpus uses Hugo front matter and Hugo shortcodes.
-
 Migration decision on 2026-07-02:
 
-The `tikz-diagram-lab` branch of the sibling `knowlpedia-content` repo is being
-migrated to the generated Knowlpack format and treated as the canonical local
-source for refactor work. Normal refactor builds should compile directly from
+The `tikz-diagram-lab` branch of the sibling `knowlpedia-content` repo was
+migrated to the generated Knowlpack format and is treated as the canonical local
+source for refactor work. Normal refactor builds compile directly from
 `../knowlpedia-content` into `public-imported`, without regenerating
 `imports/knowlpedia-content`.
 
@@ -456,11 +438,6 @@ The legacy importer remains useful as a one-off migration tool, but it should no
 longer run as part of the normal edit/build loop. Generated import output under
 `imports/` is ignored by the refactor repo so it can be used as scratch space
 without producing tracked churn.
-
-After this migration, optimize TikZ iteration by adding diagram-only preview,
-single-page compile, and a persistent diagram render cache. A source-of-truth
-change alone removes import churn but does not make the full static build
-instantaneous.
 
 For any new long-running dev server on this Optiplex, first check whether an
 existing persistent service already serves the changed artifact. For
@@ -593,26 +570,19 @@ Ignored generated output:
 ```text
 public/
 public-imported/
+imports/
+.knowl-cache/
 .venv/
 tmp/
 ```
 
-Important untracked source/output inputs at the moment:
+`imports/` is generated scratch space for the legacy importer. The canonical
+refactor-format corpus for current work is the sibling `../knowlpedia-content`
+repo, not anything under `imports/`.
 
-```text
-imports/
-packages/compiler/katex_worker.cjs
-packages/importers/
-requirements.txt
-docs/current-refactor-handoff.md
-docs/imported-content-status.md
-docs/math-rendering.md
-docs/performance-notes.md
-docs/preview-server-service.md
-```
-
-If the full imported source should be preserved in git, commit `imports/`. If
-the repo should stay small, regenerate it with `make build-imported` instead.
+The diagram cache under `.knowl-cache/` is intentionally local. It is keyed by
+diagram source, kind, TeX wrapper, renderer backend, and local toolchain paths,
+so it should not be committed.
 
 ## Work Remaining
 

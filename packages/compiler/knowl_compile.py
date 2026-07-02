@@ -141,6 +141,7 @@ class DiagramRenderer:
             self._engine = executable("tectonic") or executable("pdflatex")
             self._engine_output = "pdf"
         self._cache: dict[tuple[str, str], str] = {}
+        self._disk_cache_dir: Path | None = None
 
     @property
     def backend(self) -> str:
@@ -150,11 +151,22 @@ class DiagramRenderer:
             return "svg"
         return "source"
 
+    def configure_cache(self, cache_dir: Path | None) -> None:
+        self._disk_cache_dir = cache_dir
+        if self._disk_cache_dir:
+            self._disk_cache_dir.mkdir(parents=True, exist_ok=True)
+
     def render(self, source: str, kind: str = "tikz") -> str:
         source = source.strip()
         cache_key = (kind, source)
         if cache_key in self._cache:
             return self._cache[cache_key]
+
+        disk_cache_path = self._disk_cache_path(source, kind)
+        if disk_cache_path and disk_cache_path.is_file():
+            rendered = disk_cache_path.read_text(encoding="utf-8")
+            self._cache[cache_key] = rendered
+            return rendered
 
         rendered: str | None = None
         if self._png_engine and self._png_converter:
@@ -165,7 +177,28 @@ class DiagramRenderer:
         if rendered is None:
             rendered = self._render_source(source, kind)
         self._cache[cache_key] = rendered
+        if disk_cache_path and "diagram-error" not in rendered and "diagram-source" not in rendered:
+            disk_cache_path.parent.mkdir(parents=True, exist_ok=True)
+            disk_cache_path.write_text(rendered, encoding="utf-8")
         return rendered
+
+    def _disk_cache_path(self, source: str, kind: str) -> Path | None:
+        if not self._disk_cache_dir or self.backend == "source":
+            return None
+        payload = {
+            "version": 1,
+            "backend": self.backend,
+            "kind": kind,
+            "source": source,
+            "document": self._document(source, kind),
+            "png_engine": self._png_engine,
+            "png_converter": self._png_converter,
+            "engine": self._engine,
+            "engine_output": self._engine_output,
+            "converter": self._converter,
+        }
+        digest = hashlib.sha256(json.dumps(payload, sort_keys=True).encode("utf-8")).hexdigest()
+        return self._disk_cache_dir / self.backend / f"{digest}.html"
 
     def _render_png(self, source: str, kind: str) -> str | None:
         with tempfile.TemporaryDirectory(prefix="knowl-diagram-") as tmp:
@@ -1549,6 +1582,20 @@ def copy_runtime_assets(out_dir: Path) -> None:
 
 
 def write_site(package_dir: Path, out_dir: Path, allow_validation_errors: bool = False) -> int:
+    return write_site_for_ids(
+        package_dir,
+        out_dir,
+        only_ids=None,
+        allow_validation_errors=allow_validation_errors,
+    )
+
+
+def write_site_for_ids(
+    package_dir: Path,
+    out_dir: Path,
+    only_ids: set[str] | None = None,
+    allow_validation_errors: bool = False,
+) -> int:
     package_path = package_dir / "knowlpack.toml"
     package = read_toml(package_path)
     content_dir = package_dir / package.get("content_dir", "content")
@@ -1560,20 +1607,35 @@ def write_site(package_dir: Path, out_dir: Path, allow_validation_errors: bool =
 
     messages = validate(registry)
     errors = [msg for msg in messages if msg.severity == "error"]
+    if only_ids:
+        missing = sorted(only_ids - set(registry))
+        if missing:
+            for knowl_id in missing:
+                messages.append(ValidationMessage("error", knowl_id, "only target not found"))
+            errors = [msg for msg in messages if msg.severity == "error"]
 
-    if out_dir.exists():
+    if not only_ids and out_dir.exists():
         shutil.rmtree(out_dir)
-    out_dir.mkdir(parents=True)
+    out_dir.mkdir(parents=True, exist_ok=True)
     copy_runtime_assets(out_dir)
 
-    fragment_cache = {knowl.id: render_knowl_core(knowl, registry) for knowl in registry.values()}
+    if only_ids:
+        target_knowls = [registry[knowl_id] for knowl_id in sorted(only_ids) if knowl_id in registry]
+        fragment_cache: dict[str, str] = {}
+        for knowl in target_knowls:
+            fragment_cache[knowl.id] = render_knowl_core(knowl, registry)
+            for target in preload_template_targets(knowl, registry):
+                fragment_cache.setdefault(target, render_knowl_core(registry[target], registry))
+    else:
+        target_knowls = list(registry.values())
+        fragment_cache = {knowl.id: render_knowl_core(knowl, registry) for knowl in registry.values()}
 
-    (out_dir / "index.html").write_text(render_index(registry, package), encoding="utf-8")
-    topics_path = out_dir / "topics" / "index.html"
-    topics_path.parent.mkdir(parents=True, exist_ok=True)
-    topics_path.write_text(render_old_topics_page(package), encoding="utf-8")
+        (out_dir / "index.html").write_text(render_index(registry, package), encoding="utf-8")
+        topics_path = out_dir / "topics" / "index.html"
+        topics_path.parent.mkdir(parents=True, exist_ok=True)
+        topics_path.write_text(render_old_topics_page(package), encoding="utf-8")
 
-    for knowl in registry.values():
+    for knowl in target_knowls:
         page_path = out_dir / slug_to_relpath(knowl.id) / "index.html"
         page_path.parent.mkdir(parents=True, exist_ok=True)
         page_path.write_text(render_page(knowl, registry, package, fragment_cache), encoding="utf-8")
@@ -1587,14 +1649,17 @@ def write_site(package_dir: Path, out_dir: Path, allow_validation_errors: bool =
             section_path.parent.mkdir(parents=True, exist_ok=True)
             section_path.write_text(render_section(section, registry), encoding="utf-8")
 
-    write_json(out_dir / "indexes" / "registry.json", registry_json(registry))
-    write_json(out_dir / "indexes" / "relations.json", relations_json(registry))
-    write_json(out_dir / "indexes" / "links.json", links_json(registry))
-    write_json(out_dir / "indexes" / "proofs.json", proofs_json(registry))
-    write_json(out_dir / "reports" / "validation.json", [msg.__dict__ for msg in messages])
-    write_sqlite(out_dir / "indexes" / "knowls.sqlite", registry)
+    if not only_ids:
+        write_json(out_dir / "indexes" / "registry.json", registry_json(registry))
+        write_json(out_dir / "indexes" / "relations.json", relations_json(registry))
+        write_json(out_dir / "indexes" / "links.json", links_json(registry))
+        write_json(out_dir / "indexes" / "proofs.json", proofs_json(registry))
+        write_json(out_dir / "reports" / "validation.json", [msg.__dict__ for msg in messages])
+        write_sqlite(out_dir / "indexes" / "knowls.sqlite", registry)
+        print(f"Compiled {len(registry)} knowls into {out_dir}")
+    else:
+        print(f"Compiled {len(target_knowls)} selected knowls into {out_dir}")
 
-    print(f"Compiled {len(registry)} knowls into {out_dir}")
     if messages:
         for msg in messages:
             print(f"{msg.severity.upper()}: {msg.source}: {msg.message}", file=sys.stderr)
@@ -1612,8 +1677,32 @@ def main() -> int:
         action="store_true",
         help="Write artifacts and return success even when semantic validation reports errors",
     )
+    parser.add_argument(
+        "--only",
+        action="append",
+        default=[],
+        metavar="KNOWL_ID",
+        help="Rewrite only the selected knowl page and fragments. Index artifacts are left untouched.",
+    )
+    parser.add_argument(
+        "--diagram-cache-dir",
+        type=Path,
+        default=Path(".knowl-cache/diagrams"),
+        help="Directory for persistent rendered diagram cache entries",
+    )
+    parser.add_argument(
+        "--no-diagram-cache",
+        action="store_true",
+        help="Disable the persistent rendered diagram cache for this run",
+    )
     args = parser.parse_args()
-    return write_site(args.package_dir, args.out, allow_validation_errors=args.allow_validation_errors)
+    DIAGRAM_RENDERER.configure_cache(None if args.no_diagram_cache else args.diagram_cache_dir)
+    return write_site_for_ids(
+        args.package_dir,
+        args.out,
+        only_ids=set(args.only) or None,
+        allow_validation_errors=args.allow_validation_errors,
+    )
 
 
 if __name__ == "__main__":
