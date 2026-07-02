@@ -1,6 +1,7 @@
 public/
 public-imported/
 .venv/
+node_modules/
 tmp/
 *.pyc
 __pycache__/

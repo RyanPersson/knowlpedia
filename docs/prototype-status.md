@@ -14,6 +14,7 @@ packages/importers/          legacy corpus importer
 packages/schema/             prototype schema notes
 packages/static-runtime/     static browser runtime
 requirements.txt             build-time math fallback dependency
+package.json                 build-time KaTeX and browser-check dependencies
 public/                      generated output, ignored by git
 public-imported/             generated full-corpus output, ignored by git
 ```
@@ -115,9 +116,9 @@ was checked through Python's standard `sqlite3` module.
 ## Important Prototype Limits
 
 - Markdown rendering is intentionally minimal.
-- Math is rendered at build time with KaTeX when the local KaTeX module is
-  available. The generated HTML falls back to `latex2mathml`, then client-side
-  MathJax, when KaTeX is missing.
+- Math is rendered at build time with repo-local npm KaTeX when available. The
+  generated HTML falls back to `latex2mathml`, then client-side MathJax, when
+  KaTeX is missing.
 - TOML is used because it is available in the Python standard library. The
   architecture does not depend on TOML specifically.
 - The static runtime has template caching, eager page preloading, index

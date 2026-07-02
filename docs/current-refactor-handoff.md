@@ -136,19 +136,22 @@ Dependency:
 
 ```text
 requirements.txt
+package.json
+package-lock.json
 ```
 
-The prototype uses a local KaTeX install as the preferred build-time renderer
+The prototype uses the repo-local npm KaTeX install as the preferred build-time renderer
 through:
 
 ```text
 packages/compiler/katex_worker.cjs
 ```
 
-The compiler currently discovers KaTeX from the local VS Code server install
-when available, and copies KaTeX CSS/fonts into `public*/assets/`. If KaTeX is
-not available, it falls back to `latex2mathml==3.81.0`, then to escaped TeX plus
-client-side MathJax.
+Run `make deps` after cloning to create `.venv/` and install `node_modules/`.
+The compiler now checks `node_modules/katex/dist/katex.js` first, then falls
+back to older machine-local discovery paths, and copies KaTeX CSS/fonts into
+`public*/assets/`. If KaTeX is not available, it falls back to
+`latex2mathml==3.81.0`, then to escaped TeX plus client-side MathJax.
 
 This fixed the observed rendering failures where Markdown emphasis touched TeX
 characters before math rendering, such as formulas containing `*`.
@@ -444,8 +447,6 @@ the repo should stay small, regenerate it with `make build-imported` instead.
 
 ### Math Rendering
 
-- Package KaTeX explicitly instead of discovering it from the local VS Code
-  server install.
 - Compare `latex2mathml`, KaTeX, and MathJax-as-build-step on the full corpus.
 - Evaluate output size, mobile overflow, accessibility, copy/paste behavior, and
   fidelity on harder TeX examples.

@@ -55,7 +55,14 @@ OLD_HUGO_TOPIC_LINKS = [
 ]
 
 
-def find_vscode_node() -> Path | None:
+def repo_root() -> Path:
+    return Path(__file__).resolve().parents[2]
+
+
+def find_node() -> Path | None:
+    node = shutil.which("node")
+    if node:
+        return Path(node)
     for node in sorted(Path.home().glob(".vscode-server/cli/servers/*/server/node"), reverse=True):
         if node.is_file():
             return node
@@ -63,6 +70,9 @@ def find_vscode_node() -> Path | None:
 
 
 def find_katex_module() -> Path | None:
+    local_module = repo_root() / "node_modules" / "katex" / "dist" / "katex.js"
+    if local_module.is_file():
+        return local_module
     for module in sorted(Path.home().glob(".vscode-server/cli/servers/*/server/node_modules/katex/dist/katex.js"), reverse=True):
         if module.is_file():
             return module
@@ -70,7 +80,10 @@ def find_katex_module() -> Path | None:
 
 
 def find_katex_assets_dir() -> Path | None:
-    repo_dir = Path(__file__).resolve().parents[2]
+    repo_dir = repo_root()
+    local_assets = repo_dir / "node_modules" / "katex" / "dist"
+    if (local_assets / "katex.min.css").is_file():
+        return local_assets
     old_site_assets = repo_dir.parent / "knowlpedia" / "static" / "css"
     if (old_site_assets / "katex.min.css").is_file():
         return old_site_assets
@@ -283,7 +296,7 @@ class MathRenderer:
             self._convert = convert
 
     def _start_katex_worker(self) -> None:
-        node = find_vscode_node()
+        node = find_node()
         katex_module = find_katex_module()
         worker = Path(__file__).with_name("katex_worker.cjs")
         if not node or not katex_module or not worker.is_file():

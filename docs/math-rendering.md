@@ -4,10 +4,10 @@ Date: 2026-07-01
 
 ## Current Prototype State
 
-The prototype now renders math during compilation with KaTeX when the local
-KaTeX module is available. The generated pages and knowl fragments contain
-static KaTeX HTML plus MathML accessibility markup, and do not load MathJax in
-that mode.
+The prototype now renders math during compilation with the repo-local npm KaTeX
+module when available. The generated pages and knowl fragments contain static
+KaTeX HTML plus MathML accessibility markup, and do not load MathJax in that
+mode.
 
 This matters for the imported corpus because TeX must be protected before
 Markdown inline formatting runs. For example, `$*:S\times S\to S$` contains a
@@ -138,8 +138,9 @@ The Makefile default still points at the older ad hoc `8001` preview. The
 always-on systemd preview is on `8002`, so pass
 `PREVIEW_URL=http://127.0.0.1:8002` when checking the current service.
 
-Node Playwright is also installed globally and is now the preferred way to check
-interactive rendering and panel-opening behavior:
+Node Playwright is tracked in `package.json` and is the preferred way to check
+interactive rendering and panel-opening behavior. The OptiPlex also has a
+global install:
 
 ```text
 node v22.22.1
@@ -148,8 +149,9 @@ playwright 1.61.1
 @playwright/test 1.61.1
 ```
 
-Because Playwright is installed globally, direct Node scripts can import it with
-the absolute module path:
+For repo-local scripts after `make deps`, use `require("playwright")`. Because
+Playwright is also installed globally on the OptiPlex, one-off direct Node
+scripts can import it with the absolute module path:
 
 ```js
 const { chromium } = require("/usr/local/lib/node_modules/playwright");

@@ -1,4 +1,5 @@
 VENV_PYTHON := .venv/bin/python
+NODE_MODULES_KATEX := node_modules/katex/dist/katex.js
 PYTHON ?= $(VENV_PYTHON)
 PREVIEW_URL ?= http://127.0.0.1:8001
 PREVIEW_PATH ?= /algebra-groups/group/
@@ -11,7 +12,10 @@ $(VENV_PYTHON): requirements.txt
 	python3 -m venv .venv
 	$(VENV_PYTHON) -m pip install -r requirements.txt
 
-deps: $(VENV_PYTHON)
+$(NODE_MODULES_KATEX): package.json package-lock.json
+	npm install
+
+deps: $(VENV_PYTHON) $(NODE_MODULES_KATEX)
 
 build: deps
 	$(PYTHON) packages/compiler/knowl_compile.py examples/basic --out public

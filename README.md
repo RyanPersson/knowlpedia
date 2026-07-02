@@ -24,6 +24,7 @@ public/                      generated output, ignored by git
 Build it with:
 
 ```bash
+make deps
 make build
 ```
 
@@ -31,6 +32,18 @@ Serve it locally with:
 
 ```bash
 make serve
+```
+
+`make deps` installs the Python fallback renderer from `requirements.txt` and
+the local Node dependencies from `package-lock.json`, including KaTeX for
+build-time math rendering. For Playwright browser checks on a fresh machine,
+also run `npm run playwright:install`.
+
+TikZ diagram SVG output also requires system TeX tools such as `latex` and
+`dvisvgm`; on Debian/Ubuntu, install:
+
+```bash
+sudo apt install texlive-latex-base texlive-latex-extra texlive-pictures texlive-fonts-recommended dvisvgm
 ```
 
 The generated site uses static HTML, static knowl fragments, JSON indexes, and an

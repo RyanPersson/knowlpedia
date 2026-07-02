@@ -1,0 +1,19 @@
+{
+  "name": "knowl-system-refactor",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Static compiler/runtime prototype for the Knowlpedia refactor.",
+  "type": "commonjs",
+  "scripts": {
+    "build": "make build",
+    "build:imported": "make build-imported",
+    "deps": "make deps",
+    "playwright:install": "playwright install chromium"
+  },
+  "dependencies": {
+    "katex": "^0.16.22"
+  },
+  "devDependencies": {
+    "playwright": "^1.53.2"
+  }
+}
