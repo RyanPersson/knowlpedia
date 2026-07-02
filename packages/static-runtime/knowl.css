@@ -432,6 +432,7 @@ pre {
 .diagram-frame {
   display: inline-block;
   max-width: 100%;
+  isolation: isolate;
 }
 
 .diagram-svg .diagram-frame,
@@ -439,6 +440,34 @@ pre {
   background: #ffffff;
   color: #111111;
   padding: 0.55rem;
+}
+
+:root[data-theme="dark"] .diagram-svg .diagram-frame,
+:root[data-theme="dark"] .diagram-image .diagram-frame {
+  background: var(--bg);
+  color: var(--ink);
+  filter: none;
+}
+
+:root[data-theme="dark"] .diagram-svg .diagram-frame svg,
+:root[data-theme="dark"] .diagram-image .diagram-frame img {
+  filter: invert(1) hue-rotate(180deg);
+  mix-blend-mode: screen;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .diagram-svg .diagram-frame,
+  :root:not([data-theme]) .diagram-image .diagram-frame {
+    background: var(--bg);
+    color: var(--ink);
+    filter: none;
+  }
+
+  :root:not([data-theme]) .diagram-svg .diagram-frame svg,
+  :root:not([data-theme]) .diagram-image .diagram-frame img {
+    filter: invert(1) hue-rotate(180deg);
+    mix-blend-mode: screen;
+  }
 }
 
 .diagram svg,
