@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import atexit
+import base64
 import hashlib
 import html
 import json
@@ -130,6 +131,8 @@ def diagram_end_for_kind(kind: str) -> str:
 
 class DiagramRenderer:
     def __init__(self) -> None:
+        self._png_engine = executable("pdflatex")
+        self._png_converter = executable("gs")
         self._converter = executable("dvisvgm") or executable("pdftocairo")
         if self._converter and Path(self._converter).name == "dvisvgm" and executable("latex"):
             self._engine = executable("latex")
@@ -141,6 +144,8 @@ class DiagramRenderer:
 
     @property
     def backend(self) -> str:
+        if self._png_engine and self._png_converter:
+            return "image"
         if self._engine and self._converter:
             return "svg"
         return "source"
@@ -152,13 +157,82 @@ class DiagramRenderer:
             return self._cache[cache_key]
 
         rendered: str | None = None
-        if self._engine and self._converter:
+        if self._png_engine and self._png_converter:
+            rendered = self._render_png(source, kind)
+        elif self._engine and self._converter:
             rendered = self._render_svg(source, kind)
 
         if rendered is None:
             rendered = self._render_source(source, kind)
         self._cache[cache_key] = rendered
         return rendered
+
+    def _render_png(self, source: str, kind: str) -> str | None:
+        with tempfile.TemporaryDirectory(prefix="knowl-diagram-") as tmp:
+            tmp_path = Path(tmp)
+            tex_path = tmp_path / "diagram.tex"
+            pdf_path = tmp_path / "diagram.pdf"
+            png_path = tmp_path / "diagram.png"
+            tex_path.write_text(self._document(source, kind), encoding="utf-8")
+
+            try:
+                compile_result = subprocess.run(
+                    [
+                        self._png_engine,
+                        "-halt-on-error",
+                        "-interaction=nonstopmode",
+                        tex_path.name,
+                    ],
+                    cwd=tmp_path,
+                    text=True,
+                    capture_output=True,
+                    timeout=30,
+                    check=False,
+                )
+            except Exception as exc:
+                return self._render_error(source, kind, str(exc))
+
+            if compile_result.returncode != 0 or not pdf_path.is_file():
+                log = (compile_result.stdout + "\n" + compile_result.stderr).strip()
+                return self._render_error(source, kind, log)
+
+            try:
+                convert_result = subprocess.run(
+                    [
+                        self._png_converter,
+                        "-dSAFER",
+                        "-dBATCH",
+                        "-dNOPAUSE",
+                        "-sDEVICE=pngalpha",
+                        "-r220",
+                        "-dTextAlphaBits=4",
+                        "-dGraphicsAlphaBits=4",
+                        f"-sOutputFile={png_path}",
+                        str(pdf_path),
+                    ],
+                    cwd=tmp_path,
+                    text=True,
+                    capture_output=True,
+                    timeout=30,
+                    check=False,
+                )
+            except Exception as exc:
+                return self._render_error(source, kind, str(exc))
+
+            if convert_result.returncode != 0 or not png_path.is_file():
+                log = (convert_result.stdout + "\n" + convert_result.stderr).strip()
+                return self._render_error(source, kind, log)
+
+            diagram_hash = hashlib.sha256(source.encode("utf-8")).hexdigest()[:12]
+            encoded = base64.b64encode(png_path.read_bytes()).decode("ascii")
+            return (
+                f'<figure class="diagram diagram-image diagram-{escape_attr(kind)}" '
+                f'data-diagram-hash="{diagram_hash}">'
+                '<div class="diagram-frame">'
+                f'<img src="data:image/png;base64,{encoded}" alt="Rendered {escape_attr(kind)} diagram" loading="lazy">'
+                "</div>"
+                "</figure>"
+            )
 
     def _render_svg(self, source: str, kind: str) -> str | None:
         with tempfile.TemporaryDirectory(prefix="knowl-diagram-") as tmp:

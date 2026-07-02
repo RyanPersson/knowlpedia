@@ -416,8 +416,17 @@ pre {
   max-width: 100%;
 }
 
-.diagram svg {
+.diagram-svg .diagram-frame,
+.diagram-image .diagram-frame {
+  background: #ffffff;
+  color: #111111;
+  padding: 0.55rem;
+}
+
+.diagram svg,
+.diagram img {
   display: block;
+  min-width: min(100%, 12rem);
   max-width: 100%;
   height: auto;
 }
