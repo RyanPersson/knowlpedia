@@ -34,16 +34,38 @@ Serve it locally with:
 make serve
 ```
 
+Compile the migrated Knowlpedia corpus from the sibling Knowlpack-format content
+repo with:
+
+```bash
+make build-content
+```
+
+For fast TikZ/category-theory editing, use the narrowest loop that answers the
+current question:
+
+```bash
+make preview-diagram DIAGRAM_SOURCE=../knowlpedia-content/content/algebra-category-theory/tikz-lab-whiskering-coherence.knowl.md DIAGRAM_INDEX=2
+make build-page PAGE=algebra-category-theory/tikz-lab-whiskering-coherence
+make build-content
+```
+
+`preview-diagram` renders one TikZ-like block into `tmp/tikz-preview/`.
+`build-page` rewrites one page and its fragments into `public-imported`.
+`build-content` remains the full verification build. Rendered diagrams are
+cached under `.knowl-cache/diagrams`, which is intentionally ignored.
+
 `make deps` installs the Python fallback renderer from `requirements.txt` and
 the local Node dependencies from `package-lock.json`, including KaTeX for
 build-time math rendering. For Playwright browser checks on a fresh machine,
 also run `npm run playwright:install`.
 
-TikZ diagram SVG output also requires system TeX tools such as `latex` and
-`dvisvgm`; on Debian/Ubuntu, install:
+TikZ diagram output requires system TeX tools. On this macOS setup, the
+preferred browser-facing path is `pdflatex` plus Ghostscript PNG output. SVG
+fallbacks can use `latex`/`dvisvgm`; on Debian/Ubuntu, install:
 
 ```bash
-sudo apt install texlive-latex-base texlive-latex-extra texlive-pictures texlive-fonts-recommended dvisvgm
+sudo apt install texlive-latex-base texlive-latex-extra texlive-pictures texlive-fonts-recommended dvisvgm ghostscript
 ```
 
 The generated site uses static HTML, static knowl fragments, JSON indexes, and an

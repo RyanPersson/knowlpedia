@@ -59,6 +59,25 @@ The 2026-07-01 Playwright smoke checks also verified that:
 
 ## Measurements
 
+Local build-loop timings on the Mac desktop after the Knowlpack content
+migration and TikZ fast-path work:
+
+```text
+baseline full build before fast paths:            15.34s
+diagram preview, no persistent cache:             0.61s
+single-page compile, no persistent cache:         1.84s
+full build, cold persistent diagram cache:        14.08s
+full build, warm persistent diagram cache:         3.17s
+make build-content, warm cache:                    3.11s
+make build-page, warm cache:                       0.24s
+make preview-diagram, warm cache:                  0.10s
+```
+
+Use `make preview-diagram` while correcting one TikZ block, `make build-page
+PAGE=<knowl-id>` while checking page integration, and `make build-content` for
+commit/deploy verification. The persistent diagram cache lives under
+`.knowl-cache/diagrams` and is ignored by git.
+
 One local run on the Optiplex:
 
 ```text
