@@ -1,5 +1,6 @@
 public/
 public-imported/
+imports/
 .venv/
 node_modules/
 tmp/
