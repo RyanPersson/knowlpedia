@@ -1088,6 +1088,9 @@ def render_knowl_core(knowl: Knowl, registry: dict[str, Knowl]) -> str:
         render_markdown(knowl.core_markdown, registry),
         render_structured_core(knowl, registry),
         "</div>",
+        '<div class="knowl-footer">',
+        '<button type="button" class="knowl-close" aria-label="Close">&times;</button>',
+        "</div>",
         "</div>",
     ]
     return "\n".join(body)

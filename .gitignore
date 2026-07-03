@@ -2,6 +2,7 @@ public/
 public-imported/
 imports/
 .knowl-cache/
+.preview-server/
 .venv/
 node_modules/
 tmp/

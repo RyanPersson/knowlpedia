@@ -17,6 +17,7 @@ SCREENSHOT ?= tmp/screenshots/imported-group.png
 .PHONY: deps build serve clean screenshot-imported
 .PHONY: build-content serve-content import-legacy-content import-content
 .PHONY: build-page preview-diagram build-imported serve-imported build-legacy-imported
+.PHONY: preview-start preview-status preview-stop preview-restart preview-scan preview-adopt
 
 $(VENV_STAMP): requirements.txt
 	python3 -m venv .venv
@@ -45,6 +46,24 @@ preview-diagram: deps
 
 serve-content: build-content
 	python3 -m http.server 8001 --directory public-imported
+
+preview-start: build-content
+	$(PYTHON) scripts/preview_server.py start
+
+preview-status:
+	$(PYTHON) scripts/preview_server.py status --scan
+
+preview-stop:
+	$(PYTHON) scripts/preview_server.py stop
+
+preview-adopt:
+	$(PYTHON) scripts/preview_server.py adopt
+
+preview-restart: build-content
+	$(PYTHON) scripts/preview_server.py restart
+
+preview-scan:
+	$(PYTHON) scripts/preview_server.py scan
 
 import-legacy-content: deps
 	$(PYTHON) packages/importers/import_knowlpedia_content.py $(LEGACY_CONTENT_SOURCE) $(LEGACY_IMPORT_OUT)

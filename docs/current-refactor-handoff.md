@@ -458,6 +458,25 @@ Global guidance for this is in:
 /home/codex/.codex/AGENTS.md
 ```
 
+On the Mac desktop repo, use the project-local preview manager instead of
+starting raw `python3 -m http.server` processes:
+
+```bash
+make preview-status
+make preview-start
+make preview-stop
+make preview-adopt
+make preview-restart
+make preview-scan
+```
+
+The manager records the tracked local preview under `.preview-server/`, serves
+`public-imported/` on `http://127.0.0.1:8012/` by default, and refuses to start a
+second tracked preview if the tracked server or port is already active. Use
+`make preview-adopt` to track an already-running listener on the default port.
+Use `make preview-scan` before creating any ad hoc local server; it lists Python
+TCP listeners so stale servers from earlier Codex threads are visible.
+
 The latest preview server was exposed on the Tailscale network at:
 
 ```text
