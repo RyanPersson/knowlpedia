@@ -18,6 +18,7 @@ SCREENSHOT ?= tmp/screenshots/imported-group.png
 .PHONY: build-content serve-content import-legacy-content import-content
 .PHONY: build-page preview-diagram build-imported serve-imported build-legacy-imported
 .PHONY: preview-start preview-status preview-stop preview-restart preview-scan preview-adopt
+.PHONY: check-rendering check-rendering-content
 
 $(VENV_STAMP): requirements.txt
 	python3 -m venv .venv
@@ -64,6 +65,11 @@ preview-restart: build-content
 
 preview-scan:
 	$(PYTHON) scripts/preview_server.py scan
+
+check-rendering:
+	$(PYTHON) scripts/check_rendering_errors.py public-imported
+
+check-rendering-content: build-content check-rendering
 
 import-legacy-content: deps
 	$(PYTHON) packages/importers/import_knowlpedia_content.py $(LEGACY_CONTENT_SOURCE) $(LEGACY_IMPORT_OUT)

@@ -30,7 +30,7 @@ WIKILINK_RE = re.compile(
     r"\[\[([A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)+(?:#[^\]|]+)?)(?:\|([^\n]*?))?\]\]"
 )
 MATH_RE = re.compile(
-    r"(?s)(\$\$(.+?)\$\$|\\\[(.+?)\\\]|\\\((.+?)\\\)|(?<!\\)\$(?!\s)(.+?)(?<!\\)\$)"
+    r"(?s)(\$\$(.+?)\$\$|\\\[(.+?)\\\]|\\\((.+?)\\\)|(?<!\\)\$(?!\$)(.+?)(?<!\\)\$)"
 )
 DISPLAY_MATH_RE = re.compile(r"(?s)(\\\[(.+?)\\\]|\$\$(.+?)\$\$)")
 DIAGRAM_ENV_RE = re.compile(r"\\begin\{(tikzpicture|tikzcd|CD)\}")
@@ -579,10 +579,21 @@ def protect_math(text: str) -> tuple[str, dict[str, str]]:
         else:
             tex = match.group(5)
             display = False
+            if not looks_like_inline_math(tex):
+                return match.group(0)
         replacements[token] = MATH_RENDERER.render(tex, display)
         return token
 
     return MATH_RE.sub(replace, text), replacements
+
+
+def looks_like_inline_math(tex: str) -> bool:
+    stripped = tex.strip()
+    if not stripped:
+        return False
+    if re.search(r"\\.|[_^{}=<>+\-*/|]|[A-Za-z]\s*\d|\d\s*[A-Za-z]", stripped):
+        return True
+    return bool(re.fullmatch(r"[A-Za-z](?:[A-Za-z0-9,.\s]*[A-Za-z0-9])?", stripped))
 
 
 def restore_math(text: str, replacements: dict[str, str]) -> str:
@@ -813,9 +824,9 @@ def render_markdown(markdown: str, registry: dict[str, Knowl]) -> str:
             i += 1
             continue
 
-        if stripped in {"\\[", "$$"}:
+        if stripped in {"\\[", "$$", "$"}:
             close_list()
-            delimiter = "\\]" if stripped == "\\[" else "$$"
+            delimiter = "\\]" if stripped == "\\[" else stripped
             i += 1
             math_lines = []
             while i < len(lines) and lines[i].strip() != delimiter:
@@ -911,7 +922,7 @@ def render_markdown(markdown: str, registry: dict[str, Knowl]) -> str:
                 not next_line
                 or next_line.startswith("#")
                 or next_line.startswith("```")
-                or next_line in {"\\[", "$$"}
+                or next_line in {"\\[", "$$", "$"}
                 or is_agent_status_line(next_line)
                 or re.match(r"^-\s+", next_line)
                 or re.match(r"^\d+\.\s+", next_line)
@@ -1080,7 +1091,7 @@ def render_knowl_core(knowl: Knowl, registry: dict[str, Knowl]) -> str:
     body = [
         f'<div class="knowl-content" data-knowl-id="{escape_attr(knowl.id)}">',
         '<div class="knowl-header">',
-        f'<strong>{html.escape(knowl.title)}</strong>',
+        f'<strong>{render_inline(knowl.title, registry)}</strong>',
         f'<a class="full-page-link" href="{escape_attr(target_href(knowl.id))}">full page</a>',
         '<button type="button" class="knowl-close" aria-label="Close">&times;</button>',
         "</div>",
@@ -1169,7 +1180,7 @@ def render_page(
                 '<main class="page-shell">',
                 f'<nav class="breadcrumb"><a href="/">Index</a> / {html.escape(knowl.id)}</nav>',
                 f'<article class="knowl-page" data-knowl-id="{escape_attr(knowl.id)}">',
-                f'<header class="page-header"><p class="kind">{html.escape(knowl.kind)}</p><h1>{html.escape(knowl.title)}</h1><p>{html.escape(knowl.summary)}</p></header>',
+                f'<header class="page-header"><p class="kind">{html.escape(knowl.kind)}</p><h1>{render_inline(knowl.title, registry)}</h1><p>{render_inline(knowl.summary, registry)}</p></header>',
                 '<section class="core-section" id="section.core">',
                 render_markdown(knowl.core_markdown, registry),
                 render_structured_core(knowl, registry),
@@ -1250,8 +1261,8 @@ def render_index(registry: dict[str, Knowl], package: dict[str, Any]) -> str:
         for knowl in sorted(knowls, key=lambda k: k.title.lower()):
             parts.append(
                 f'<li class="index-item"><a class="knowl index-knowl" href="{escape_attr(target_href(knowl.id))}" '
-                f'data-knowl="{escape_attr(fragment_href(knowl.id))}" aria-expanded="false">{html.escape(knowl.title)}</a> '
-                f'<span class="summary">{html.escape(knowl.summary)}</span></li>'
+                f'data-knowl="{escape_attr(fragment_href(knowl.id))}" aria-expanded="false">{render_inline(knowl.title, registry)}</a> '
+                f'<span class="summary">{render_inline(knowl.summary, registry)}</span></li>'
             )
         parts.append("</ul></section>")
     parts.append("</main>")

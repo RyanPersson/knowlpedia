@@ -144,4 +144,4 @@ format. See `docs/imported-content-status.md`.
 ## Current Handoff
 
 For the latest implementation summary, commands, validation state, and remaining
-work, see `docs/current-refactor-handoff.md`.
+work, see `docs/handoff-current.md`.

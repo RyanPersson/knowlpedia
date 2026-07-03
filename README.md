@@ -72,9 +72,9 @@ The generated site uses static HTML, static knowl fragments, JSON indexes, and a
 optional SQLite artifact.
 
 See `docs/prototype-status.md` for the current implementation status.
-For the latest handoff summary, including imported corpus status, performance
-notes, validation counts, and remaining work, see
-`docs/current-refactor-handoff.md`.
+For the latest handoff summary, including imported corpus status, local preview
+commands, validation counts, and remaining work, see
+`docs/handoff-current.md`.
 
 ## Mission
 
