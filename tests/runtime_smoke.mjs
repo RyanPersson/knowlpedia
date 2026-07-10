@@ -41,10 +41,16 @@ try {
   await page.setViewportSize({ width: 390, height: 844 });
   const overflows = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
   if (overflows) throw new Error("The knowl page overflows at a mobile viewport");
-  const closeHeight = await panel.getByRole("button", { name: "Close", exact: true }).first().evaluate(
+  const closeHeight = await panel.getByRole("button", { name: /Collapse Scheme/i }).first().evaluate(
     (button) => button.getBoundingClientRect().height
   );
   if (closeHeight < 44) throw new Error("Mobile close target is smaller than 44 pixels");
+  const pageLinkBox = await panel.getByRole("link", { name: /Open Scheme as a full page/i }).first().evaluate(
+    (link) => ({ width: link.getBoundingClientRect().width, height: link.getBoundingClientRect().height })
+  );
+  if (pageLinkBox.width < 44 || pageLinkBox.height < 44) {
+    throw new Error("Mobile full-page target is smaller than 44 pixels");
+  }
 
   console.log("Runtime smoke test passed: search, nested sections, focus, Escape, and mobile layout.");
 } finally {

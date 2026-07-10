@@ -1260,13 +1260,21 @@ def render_section_title(title: str, registry: dict[str, Knowl]) -> str:
     return render_inline(WIKILINK_RE.sub(flatten, title), registry)
 
 
-def core_heading_for_kind(kind: str) -> str:
+def display_kind(kind: str) -> str:
+    """Return a reader-facing kind without exposing the generic storage type."""
+
+    return "" if kind.lower() == "knowl" else humanize_identifier(kind)
+
+
+def core_heading_for_kind(kind: str) -> str | None:
     normalized = kind.lower()
+    if normalized == "knowl":
+        return None
     if normalized in {"theorem", "lemma", "proposition", "corollary"}:
         return "Statement"
     if normalized == "example":
         return "Example"
-    return "Definition" if normalized in {"definition", "knowl"} else "Core idea"
+    return "Definition" if normalized == "definition" else "Core idea"
 
 
 def render_section_links(knowl: Knowl, registry: dict[str, Knowl]) -> str:
@@ -1282,34 +1290,28 @@ def render_section_links(knowl: Knowl, registry: dict[str, Knowl]) -> str:
         )
     return (
         '<nav class="knowl-section-links" aria-label="More about this concept">'
-        '<span class="section-links-label">Explore</span>'
         + "".join(buttons)
         + "</nav>"
     )
 
 
 def render_knowl_core(knowl: Knowl, registry: dict[str, Knowl]) -> str:
+    title_text = knowl.title
     body = [
-        f'<div class="knowl-content" data-knowl-id="{escape_attr(knowl.id)}">',
-        '<div class="knowl-header">',
-        '<div class="knowl-heading">',
-        f'<span class="knowl-kind">{html.escape(humanize_identifier(knowl.kind))}</span>',
-        f'<strong>{render_inline(knowl.title, registry)}</strong>',
-        "</div>",
-        f'<a class="full-page-link" href="{escape_attr(target_href(knowl.id))}">full page</a>',
-        '<button type="button" class="knowl-close" aria-label="Close">&times;</button>',
-        "</div>",
-        f'<p class="knowl-summary">{render_inline(knowl.summary, registry)}</p>',
+        f'<div class="knowl-content" data-knowl-id="{escape_attr(knowl.id)}" '
+        f'data-knowl-title="{escape_attr(title_text)}" data-knowl-kind="{escape_attr(display_kind(knowl.kind))}">',
         '<div class="knowl-body">',
         render_markdown(without_redundant_leading_h1(knowl.core_markdown), registry),
         render_structured_core(knowl, registry),
         "</div>",
+        '<div class="knowl-controls">',
         render_section_links(knowl, registry),
-        '<div class="knowl-section-slot" aria-live="polite"></div>',
-        '<div class="knowl-footer">',
-        f'<a class="footer-page-link" href="{escape_attr(target_href(knowl.id))}">Read the full page</a>',
-        '<button type="button" class="knowl-close knowl-close-text">Close</button>',
+        f'<a class="knowl-page-link" href="{escape_attr(target_href(knowl.id))}" '
+        f'aria-label="Open {escape_attr(title_text)} as a full page" title="Open full page">&#8599;</a>',
+        f'<button type="button" class="knowl-close" aria-label="Collapse {escape_attr(title_text)}" '
+        f'title="Collapse">&times;</button>',
         "</div>",
+        '<div class="knowl-section-slot" aria-live="polite"></div>',
         "</div>",
     ]
     return "\n".join(body)
@@ -1381,6 +1383,13 @@ def render_page(
             "</details>"
         )
 
+    kind = display_kind(knowl.kind)
+    kind_html = f'<p class="kind">{html.escape(kind)}</p>' if kind else ""
+    core_heading = core_heading_for_kind(knowl.kind)
+    core_heading_html = (
+        f'<h2 class="core-heading">{html.escape(core_heading)}</h2>' if core_heading else ""
+    )
+
     return html_document(
         title=f"{knowl.title} - {package['title']}",
         body="\n".join(
@@ -1388,9 +1397,9 @@ def render_page(
                 '<main class="page-shell" id="main-content">',
                 f'<nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">Knowlpedia</a><span aria-hidden="true">/</span><span>{html.escape(humanize_identifier(knowl.id.split("/", 1)[0]))}</span></nav>',
                 f'<article class="knowl-page" data-knowl-id="{escape_attr(knowl.id)}">',
-                f'<header class="page-header"><p class="kind">{html.escape(humanize_identifier(knowl.kind))}</p><h1>{render_inline(knowl.title, registry)}</h1><p class="page-summary">{render_inline(knowl.summary, registry)}</p></header>',
+                f'<header class="page-header">{kind_html}<h1>{render_inline(knowl.title, registry)}</h1><p class="page-summary">{render_inline(knowl.summary, registry)}</p></header>',
                 '<section class="core-section" id="section.core">',
-                f'<h2 class="core-heading">{html.escape(core_heading_for_kind(knowl.kind))}</h2>',
+                core_heading_html,
                 render_markdown(without_redundant_leading_h1(knowl.core_markdown), registry),
                 render_structured_core(knowl, registry),
                 "</section>",
@@ -1708,7 +1717,7 @@ def search_json(registry: dict[str, Knowl]) -> list[dict[str, Any]]:
         {
             "id": knowl.id,
             "title": knowl.title,
-            "kind": humanize_identifier(knowl.kind),
+            "kind": display_kind(knowl.kind) or "Concept",
             "summary": knowl.summary,
             "aliases": knowl.aliases,
             "domains": knowl.domains,

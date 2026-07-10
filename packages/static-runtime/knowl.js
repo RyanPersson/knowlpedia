@@ -165,8 +165,10 @@
   }
 
   function afterPanelRender(panel, trigger, keyboardOpen) {
-    const title = panel.querySelector(".knowl-heading strong");
-    panel.setAttribute("aria-label", title ? "Definition: " + title.textContent.trim() : "Expanded definition");
+    const content = panel.querySelector(".knowl-content");
+    const title = content?.dataset.knowlTitle || "Expanded concept";
+    const kind = content?.dataset.knowlKind;
+    panel.setAttribute("aria-label", kind ? kind + ": " + title : title);
     typeset(panel);
     observeKnowls(panel);
     if (keyboardOpen) {

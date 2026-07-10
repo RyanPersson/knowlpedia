@@ -87,18 +87,28 @@ class RenderContractTests(unittest.TestCase):
                 ],
             )
 
-    def test_fragment_contains_summary_and_section_disclosure(self) -> None:
+    def test_fragment_keeps_metadata_out_of_the_reading_flow(self) -> None:
         knowl = self.make_knowl()
         fragment = compiler.render_knowl_core(knowl, {knowl.id: knowl})
-        self.assertIn('class="knowl-summary"', fragment)
+        self.assertIn('data-knowl-title="Sample concept"', fragment)
+        self.assertNotIn('class="knowl-header"', fragment)
+        self.assertNotIn('class="knowl-summary"', fragment)
+        self.assertNotIn('class="knowl-footer"', fragment)
+        self.assertNotIn('section-links-label', fragment)
         self.assertIn('class="section-chip"', fragment)
         self.assertIn("/sections/examples.html", fragment)
+        self.assertEqual(fragment.count('class="knowl-page-link"'), 1)
+        self.assertEqual(fragment.count('class="knowl-close"'), 1)
 
     def test_registry_exposes_section_fragments(self) -> None:
         knowl = self.make_knowl()
         registry = compiler.registry_json({knowl.id: knowl})
         self.assertEqual(registry[knowl.id]["sections"][0]["id"], "examples")
         self.assertTrue(registry[knowl.id]["sections"][0]["fragment"].endswith("/sections/examples.html"))
+
+    def test_generic_knowl_kind_is_storage_metadata_not_reader_copy(self) -> None:
+        self.assertEqual(compiler.display_kind("knowl"), "")
+        self.assertIsNone(compiler.core_heading_for_kind("knowl"))
 
     def test_search_artifact_contains_aliases_and_summary(self) -> None:
         knowl = self.make_knowl()

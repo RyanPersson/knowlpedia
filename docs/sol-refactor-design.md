@@ -8,7 +8,7 @@ The `sol-refactor` branch turns the static compiler/runtime prototype into a mor
 
 1. **Keep the reader's place.** A linked term opens inline. Full-page navigation remains an ordinary link and works with modified click, context menus, and assistive technology.
 2. **Definition first.** The inline core contains the smallest sufficient statement. Motivation, examples, equivalent characterizations, warnings, history, and proofs are progressively disclosed.
-3. **Orientation before detail.** Every page and inline panel shows the title, semantic kind, and one-sentence summary before the core.
+3. **Metadata is not prose.** Titles, summaries, and semantic kinds support search, full pages, and assistive technology. Inline expansion does not repeat them around a self-contained core.
 4. **Local depth, bounded visual complexity.** Nested knowls remain recursive, but mobile panels stop accumulating indentation and Escape closes only the deepest open panel.
 5. **Fast by construction.** Core fragments are static, nearby links are preloaded, optional sections are fetched only when opened inline, and the search index is loaded only when search is requested.
 6. **No ornamental delay.** The interface contains no animations or transitions. State changes are immediate.
@@ -34,7 +34,9 @@ On the current corpus this exposes 2,257 optional sections across 1,289 of 2,143
 - A consistent sticky header provides home, search, and theme controls.
 - Search opens with `/` or Command/Ctrl+K and ranks exact title, prefix, alias, ID, and summary matches.
 - The global index is collapsed by mathematical area instead of rendering a 2,000-entry wall of text.
-- Inline panels show kind, title, summary, core, optional-section chips, and clear full-page/close actions.
+- Inline panels behave like inserted mathematical footnotes: the core appears immediately beside a quiet left rule, followed by optional-section labels and one full-page and one collapse control.
+- The generic storage kind `knowl` is not shown to readers. Generic full pages also omit the redundant `Definition` heading above a self-contained core.
+- Inline controls have no duplicated title, summary, `Explore` label, footer, or second full-page/close action.
 - Optional sections load into the existing panel rather than creating a second navigation context.
 - Keyboard-opened panels move focus to their close control; closing restores focus to the originating term.
 - Escape closes search first, then only the deepest inline knowl.
@@ -50,6 +52,7 @@ The algebraic-geometry foundation path was edited as a representative pedagogica
 - Sieve separates the core closure property from generated, pullback, and motivational sections.
 - Group scheme separates structural maps, functor-of-points language, actions, and warnings.
 - Relative Kähler differentials separates the universal property, concrete presentation, and geometric meaning.
+- Borel sigma-algebra keeps only its definition in the inline core; its relation to measurable spaces and examples are separately unfoldable.
 
 ## Verification
 
