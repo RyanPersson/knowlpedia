@@ -1,6 +1,6 @@
 VENV_PYTHON := .venv/bin/python
 VENV_STAMP := .venv/.deps-installed
-NODE_MODULES_KATEX := node_modules/katex/dist/katex.js
+NODE_MODULES_STAMP := node_modules/.deps-installed
 PYTHON ?= $(VENV_PYTHON)
 CONTENT_PACKAGE ?= ../knowlpedia-content
 LEGACY_CONTENT_SOURCE ?= ../knowlpedia-content-legacy
@@ -14,7 +14,7 @@ PREVIEW_URL ?= http://127.0.0.1:8001
 PREVIEW_PATH ?= /algebra-groups/group/
 SCREENSHOT ?= tmp/screenshots/imported-group.png
 
-.PHONY: deps build serve clean screenshot-imported
+.PHONY: deps build serve clean screenshot-imported test test-ui audit-sections
 .PHONY: build-content serve-content import-legacy-content import-content
 .PHONY: build-page preview-diagram build-imported serve-imported build-legacy-imported
 .PHONY: preview-start preview-status preview-stop preview-restart preview-scan preview-adopt
@@ -25,10 +25,20 @@ $(VENV_STAMP): requirements.txt
 	$(VENV_PYTHON) -m pip install -r requirements.txt
 	touch $(VENV_STAMP)
 
-$(NODE_MODULES_KATEX): package.json package-lock.json
+$(NODE_MODULES_STAMP): package.json package-lock.json
 	npm install
+	touch $(NODE_MODULES_STAMP)
 
-deps: $(VENV_STAMP) $(NODE_MODULES_KATEX)
+deps: $(VENV_STAMP) $(NODE_MODULES_STAMP)
+
+test:
+	$(PYTHON) -m unittest discover -s tests -p 'test_*.py'
+
+test-ui:
+	PREVIEW_URL=$(PREVIEW_URL) node tests/runtime_smoke.mjs
+
+audit-sections:
+	$(PYTHON) scripts/audit_section_split.py $(CONTENT_PACKAGE)/content
 
 build: deps
 	$(PYTHON) packages/compiler/knowl_compile.py examples/basic --out public

@@ -2,6 +2,7 @@
 
 Start here:
 
+- `sol-refactor-design.md` - reader experience, pedagogy, compiler, and runtime decisions on the experimental `sol-refactor` branch.
 - `handoff-current.md` - current operational handoff and remaining work.
 - `prototype-status.md` - prototype capabilities and limits.
 - `architecture-recommendation.md` - static-first architecture rationale.

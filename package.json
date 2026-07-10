@@ -8,7 +8,8 @@
     "build": "make build",
     "build:imported": "make build-imported",
     "deps": "make deps",
-    "playwright:install": "playwright install chromium"
+    "playwright:install": "playwright install chromium",
+    "test:ui": "node tests/runtime_smoke.mjs"
   },
   "dependencies": {
     "katex": "^0.16.22"
