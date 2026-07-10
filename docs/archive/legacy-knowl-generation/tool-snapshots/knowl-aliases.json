@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "aliases": {
+    "Noether normalization": "noether-normalization-lemma",
+    "Noether normalization theorem": "noether-normalization-lemma",
+    "UFD": "unique-factorization-domain",
+    "Hausdorff": "hausdorff-space",
+    "Nullstellensatz": "nullstellensatz-variety-correspondence",
+    "prime spectrum": "prime-spectrum",
+    "Spec R": "prime-spectrum",
+    "maximal spectrum": "maximal-spectrum",
+    "local ring at prime": "localization-at-prime"
+  }
+}

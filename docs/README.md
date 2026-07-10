@@ -19,3 +19,7 @@ Historical handoffs:
 
 - `archive/2026-07-01-refactor-handoff.md`
 - `archive/2026-07-02-ui-preview-handoff.md`
+
+Historical generation experiments:
+
+- `archive/legacy-knowl-generation/README.md` - explicitly noncanonical snapshots of earlier AI generation, linking, review, validation, and prompt-evolution experiments.
