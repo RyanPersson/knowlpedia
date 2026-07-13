@@ -56,6 +56,9 @@ OLD_HUGO_TOPIC_LINKS = [
     ("Posts", "/posts/"),
 ]
 
+# Temporary, site-wide visual QA controls. Set this to False for production builds.
+SHOW_TESTING_UI = True
+
 
 def repo_root() -> Path:
     return Path(__file__).resolve().parents[2]
@@ -523,6 +526,7 @@ class Knowl:
     core_axioms: list[dict[str, Any]] = field(default_factory=list)
     sections: list[dict[str, Any]] = field(default_factory=list)
     relations: list[dict[str, Any]] = field(default_factory=list)
+    knowls_open: bool = False
     anchors: set[str] = field(default_factory=set)
     content_hash: str = ""
 
@@ -788,6 +792,7 @@ def knowl_from_meta(
         core_axioms=list(core_meta.get("axioms", [])),
         sections=sections or [],
         relations=list(meta.get("relations", [])),
+        knowls_open=bool(meta.get("knowls_open", False)),
     )
     knowl.anchors.add("section.core")
     for item in knowl.core_data:
@@ -1373,6 +1378,7 @@ def render_page(
     package: dict[str, Any],
     fragment_cache: dict[str, str] | None = None,
 ) -> str:
+    knowls_open_attr = ' data-knowls-open="true"' if knowl.knowls_open else ""
     section_html = []
     for section in knowl.sections:
         open_attr = " open" if section.get("default_open") else ""
@@ -1396,7 +1402,7 @@ def render_page(
             [
                 '<main class="page-shell" id="main-content">',
                 f'<nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">Knowlpedia</a><span aria-hidden="true">/</span><span>{html.escape(humanize_identifier(knowl.id.split("/", 1)[0]))}</span></nav>',
-                f'<article class="knowl-page" data-knowl-id="{escape_attr(knowl.id)}">',
+                f'<article class="knowl-page" data-knowl-id="{escape_attr(knowl.id)}"{knowls_open_attr}>',
                 f'<header class="page-header">{kind_html}<h1>{render_inline(knowl.title, registry)}</h1><p class="page-summary">{render_inline(knowl.summary, registry)}</p></header>',
                 '<section class="core-section" id="section.core">',
                 core_heading_html,
@@ -1434,12 +1440,37 @@ def html_document(title: str, body: str, preload_mode: str = "eager") -> str:
     (function () {
       try {
         var theme = localStorage.getItem("knowl-theme");
-        if (theme === "dark" || theme === "light") {
-          document.documentElement.dataset.theme = theme;
+        var palette = localStorage.getItem("knowl-palette");
+        var palettes = ["current", "original", "washi", "sumi", "aizome"];
+        if (theme !== "dark" && theme !== "light") {
+          theme = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
         }
+        if (palettes.indexOf(palette) === -1) palette = "current";
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.dataset.palette = palette;
       } catch (error) {}
     }());
   </script>"""
+    testing_button = """
+    <button type="button" id="testing-open" class="header-action testing-trigger" aria-haspopup="dialog" aria-controls="testing-panel" aria-expanded="false"><span aria-hidden="true">◫</span><span class="testing-label">Testing</span></button>""" if SHOW_TESTING_UI else ""
+    testing_panel = """
+<aside id="testing-panel" class="testing-panel" role="dialog" aria-modal="false" aria-labelledby="testing-title" hidden>
+  <div class="testing-heading">
+    <div><p class="kind">Visual lab</p><h2 id="testing-title">Test site styles</h2></div>
+    <button type="button" id="testing-close" class="icon-button" aria-label="Close testing panel">&times;</button>
+  </div>
+  <p class="testing-intro">Compare temporary site-wide CSS settings. Your selection is saved in this browser.</p>
+  <fieldset class="testing-fieldset">
+    <legend>Color palette</legend>
+    <div class="palette-options" role="radiogroup" aria-label="Color palette">
+      <button type="button" class="palette-option" data-palette-value="current" role="radio" aria-checked="false"><span class="palette-swatch" aria-hidden="true"><i></i><i></i></span><span><strong>Current</strong><small>Pine green baseline</small></span></button>
+      <button type="button" class="palette-option" data-palette-value="original" role="radio" aria-checked="false"><span class="palette-swatch" aria-hidden="true"><i></i><i></i></span><span><strong>Original</strong><small>Pre-refactor PaperMod</small></span></button>
+      <button type="button" class="palette-option" data-palette-value="washi" role="radio" aria-checked="false"><span class="palette-swatch" aria-hidden="true"><i></i><i></i></span><span><strong>Washi</strong><small>Warm paper and charcoal</small></span></button>
+      <button type="button" class="palette-option" data-palette-value="sumi" role="radio" aria-checked="false"><span class="palette-swatch" aria-hidden="true"><i></i><i></i></span><span><strong>Sumi mist</strong><small>Cool ink and fog</small></span></button>
+      <button type="button" class="palette-option" data-palette-value="aizome" role="radio" aria-checked="false"><span class="palette-swatch" aria-hidden="true"><i></i><i></i></span><span><strong>Aizome</strong><small>Indigo mountain haze</small></span></button>
+    </div>
+  </fieldset>
+</aside>""" if SHOW_TESTING_UI else ""
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -1458,9 +1489,11 @@ def html_document(title: str, body: str, preload_mode: str = "eager") -> str:
   <a class="site-brand" href="/" aria-label="Knowlpedia home"><span class="brand-mark" aria-hidden="true">K</span><span>Knowlpedia</span></a>
   <div class="site-actions">
     <button type="button" id="search-open" class="header-action" aria-haspopup="dialog" aria-controls="search-dialog"><span aria-hidden="true">⌕</span><span>Search</span><kbd>⌘K</kbd></button>
+{testing_button}
     <button type="button" id="theme-toggle" class="header-action theme-toggle" aria-label="Use dark theme" aria-pressed="false"><span class="theme-icon" aria-hidden="true">◐</span><span class="theme-label">Dark</span></button>
   </div>
 </header>
+{testing_panel}
 <div id="search-dialog" class="search-dialog" role="dialog" aria-modal="true" aria-labelledby="search-title" hidden>
   <div class="search-surface">
     <div class="search-heading"><div><p class="kind">Find a concept</p><h2 id="search-title">Search Knowlpedia</h2></div><button type="button" id="search-close" class="icon-button" aria-label="Close search">&times;</button></div>
