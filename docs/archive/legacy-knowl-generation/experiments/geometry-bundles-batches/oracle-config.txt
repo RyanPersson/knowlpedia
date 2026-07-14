@@ -1,0 +1,15 @@
+-pf /Users/ryanpersson/anki/code/blog/tmp/geometry-bundles-batches/batch01.md
+-pf /Users/ryanpersson/anki/code/blog/tmp/geometry-bundles-batches/batch02.md
+-pf /Users/ryanpersson/anki/code/blog/tmp/geometry-bundles-batches/batch03.md
+-pf /Users/ryanpersson/anki/code/blog/tmp/geometry-bundles-batches/batch04.md
+-pf /Users/ryanpersson/anki/code/blog/tmp/geometry-bundles-batches/batch05.md
+-pf /Users/ryanpersson/anki/code/blog/tmp/geometry-bundles-batches/batch06.md
+-pf /Users/ryanpersson/anki/code/blog/tmp/geometry-bundles-batches/batch07.md
+-pf /Users/ryanpersson/anki/code/blog/tmp/geometry-bundles-batches/batch08.md
+-pf /Users/ryanpersson/anki/code/blog/tmp/geometry-bundles-batches/batch09.md
+-pf /Users/ryanpersson/anki/code/blog/tmp/geometry-bundles-batches/batch10.md
+-pf /Users/ryanpersson/anki/code/blog/tmp/geometry-bundles-batches/batch11.md
+-pf /Users/ryanpersson/anki/code/blog/tmp/geometry-bundles-batches/batch12.md
+-pf /Users/ryanpersson/anki/code/blog/tmp/geometry-bundles-batches/batch13.md
+-pf /Users/ryanpersson/anki/code/blog/tmp/geometry-bundles-batches/batch14.md
+-pf /Users/ryanpersson/anki/code/blog/tmp/geometry-bundles-batches/batch15.md
