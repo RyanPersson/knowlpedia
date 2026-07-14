@@ -592,21 +592,10 @@ def protect_math(text: str) -> tuple[str, dict[str, str]]:
         else:
             tex = match.group(5)
             display = False
-            if not looks_like_inline_math(tex):
-                return match.group(0)
         replacements[token] = MATH_RENDERER.render(tex, display)
         return token
 
     return MATH_RE.sub(replace, text), replacements
-
-
-def looks_like_inline_math(tex: str) -> bool:
-    stripped = tex.strip()
-    if not stripped:
-        return False
-    if re.search(r"\\.|[_^{}=<>+\-*/|]|[A-Za-z]\s*\d|\d\s*[A-Za-z]", stripped):
-        return True
-    return bool(re.fullmatch(r"[A-Za-z](?:[A-Za-z0-9,.\s]*[A-Za-z0-9])?", stripped))
 
 
 def restore_math(text: str, replacements: dict[str, str]) -> str:

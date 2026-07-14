@@ -56,6 +56,19 @@ class SingleFileSectionTests(unittest.TestCase):
 
 
 class RenderContractTests(unittest.TestCase):
+    def test_inline_dollar_math_is_deterministic(self) -> None:
+        for tex in ("1", "(0)", "k[x]", r"\mathbb{F}_q[[t]]"):
+            with self.subTest(tex=tex):
+                protected, replacements = compiler.protect_math(f"${tex}$")
+                self.assertEqual(protected, "@@KNOWL_MATH_0@@")
+                self.assertEqual(len(replacements), 1)
+
+    def test_power_series_brackets_inside_math_are_not_wikilinks(self) -> None:
+        rendered = compiler.render_inline(r"$\mathbb{F}_q[[t]]$", {})
+        self.assertIn('class="katex"', rendered)
+        self.assertNotIn('class="knowl"', rendered)
+        self.assertNotIn("$", rendered)
+
     def test_redundant_source_h1_is_removed_from_rendered_core(self) -> None:
         source = "# Document title\n\nFirst paragraph.\n\n## Section"
         self.assertEqual(
