@@ -1,1 +1,0 @@
-# Knowl test suite

@@ -1,0 +1,6 @@
+/Users/ryanpersson/anki/code/blog/tmp/v3-batches/stat-mech-batch1.md
+/Users/ryanpersson/anki/code/blog/tmp/v3-batches/stat-mech-batch2.md
+/Users/ryanpersson/anki/code/blog/tmp/v3-batches/stat-mech-batch3.md
+/Users/ryanpersson/anki/code/blog/tmp/v3-batches/stat-mech-batch4.md
+/Users/ryanpersson/anki/code/blog/tmp/v3-batches/stat-mech-lattice-batch1.md
+/Users/ryanpersson/anki/code/blog/tmp/v3-batches/thermodynamics-batch1.md

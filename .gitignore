@@ -1,44 +1,11 @@
-# Research notes (not for public repo)
-/research
-/.claude
-
-
-# Hugo build output
-/public/
-/.hugo_build.lock
-/resources/_gen/
-/static/pagefind/
-
-# macOS
-.DS_Store
-
-# Editor/IDE
-.idea/
-*.swp
-*.swo
-*~
-
-# Windows
-Thumbs.db
-
-# Python cache
-__pycache__/
-*.pyc
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
-.coverage
-coverage.xml
+public/
+public-imported/
+imports/
+.knowl-cache/
+.preview-server/
 .venv/
-venv/
-
-# IDE/Editor/BuildProcess
-
-# Temporarily ignored content                                             
-/content/convex-analysis/convex-lecture-notes.md                          
-/content/langlands-letter/letter/letter.md    
-
-/tmp/
-/.tmp/
-
-/.playwright-mcp/
+node_modules/
+tmp/
+*.pyc
+__pycache__/
+.DS_Store
