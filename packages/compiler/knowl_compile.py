@@ -577,7 +577,10 @@ def read_toml(path: Path) -> dict[str, Any]:
 
 
 def slug_to_relpath(knowl_id: str) -> Path:
-    return Path(*knowl_id.split("/"))
+    # Hugo lowercased legacy page paths. Keep generated URLs lowercase even
+    # when an imported knowl id contains notation-specific capitals, so old
+    # public URLs continue to resolve on GitHub Pages' case-sensitive host.
+    return Path(*(part.lower() for part in knowl_id.split("/")))
 
 
 def split_target(target: str) -> tuple[str, str | None]:

@@ -57,6 +57,21 @@ class SingleFileSectionTests(unittest.TestCase):
 
 
 class RenderContractTests(unittest.TestCase):
+    def test_generated_paths_preserve_legacy_lowercase_urls(self) -> None:
+        knowl_id = "shale-paper/segal-unitary-representation-Ufrak"
+        self.assertEqual(
+            compiler.slug_to_relpath(knowl_id),
+            Path("shale-paper/segal-unitary-representation-ufrak"),
+        )
+        self.assertEqual(
+            compiler.target_href(knowl_id),
+            "/shale-paper/segal-unitary-representation-ufrak/",
+        )
+        self.assertEqual(
+            compiler.fragment_href(knowl_id),
+            "/fragments/shale-paper/segal-unitary-representation-ufrak/core.html",
+        )
+
     def test_inline_dollar_math_is_deterministic(self) -> None:
         for tex in ("1", "(0)", "k[x]", r"\mathbb{F}_q[[t]]"):
             with self.subTest(tex=tex):
