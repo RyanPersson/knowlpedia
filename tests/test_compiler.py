@@ -5,6 +5,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 
 MODULE_PATH = Path(__file__).resolve().parents[1] / "packages" / "compiler" / "knowl_compile.py"
@@ -128,6 +129,32 @@ class RenderContractTests(unittest.TestCase):
         item = compiler.search_json({knowl.id: knowl})[0]
         self.assertEqual(item["aliases"], ["sample"])
         self.assertEqual(item["summary"], "A concise orientation sentence.")
+
+
+class PrebuiltDiagramTests(unittest.TestCase):
+    def test_prebuilt_diagram_is_used_without_local_tex_tools(self) -> None:
+        with tempfile.TemporaryDirectory() as directory, patch.object(compiler, "executable", return_value=None):
+            renderer = compiler.DiagramRenderer()
+            renderer.configure_prebuilt(Path(directory))
+            source = r"A \arrow[r] & B"
+            prebuilt_path = renderer._prebuilt_path(source, "tikz-cd")
+            assert prebuilt_path is not None
+            expected = '<figure class="diagram diagram-image">prebuilt</figure>'
+            prebuilt_path.write_text(expected, encoding="utf-8")
+            self.assertEqual(renderer.render(source, "tikz-cd"), expected)
+
+    def test_refresh_writes_portable_prebuilt_fragment(self) -> None:
+        with tempfile.TemporaryDirectory() as directory, patch.object(compiler, "executable", return_value=None):
+            renderer = compiler.DiagramRenderer()
+            renderer._png_engine = "pdflatex"
+            renderer._png_converter = "gs"
+            renderer._render_png = lambda source, kind: '<figure class="diagram diagram-image">fresh</figure>'
+            renderer.configure_prebuilt(Path(directory), refresh=True)
+            source = r"A \arrow[r] & B"
+            rendered = renderer.render(source, "tikz-cd")
+            prebuilt_path = renderer._prebuilt_path(source, "tikz-cd")
+            assert prebuilt_path is not None
+            self.assertEqual(prebuilt_path.read_text(encoding="utf-8"), rendered)
 
 
 if __name__ == "__main__":

@@ -59,6 +59,28 @@ class RenderedHtmlCheckerTests(unittest.TestCase):
         issues = self.scan('<a class="missing-knowl" href="/missing/">missing</a>')
         self.assertEqual([issue.kind for issue in issues], ["missing-knowl", "broken_local_link"])
 
+    def test_can_require_diagrams_to_be_prebuilt(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "index.html").write_text(
+                '<figure class="diagram diagram-source"><pre>source</pre></figure>',
+                encoding="utf-8",
+            )
+            issues = checker.scan_tree(root, require_rendered_diagrams=True)
+        self.assertEqual([issue.kind for issue in issues], ["diagram-source"])
+
+    def test_allows_only_the_documented_legacy_euler_shortcode(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            allowed = root / "posts" / "semigroup-quasigroup-structure" / "index.html"
+            allowed.parent.mkdir(parents=True)
+            allowed.write_text("<p>{{&lt; euler-diagram &gt;}}</p>", encoding="utf-8")
+            other = root / "posts" / "other" / "index.html"
+            other.parent.mkdir(parents=True)
+            other.write_text("<p>{{&lt; euler-diagram &gt;}}</p>", encoding="utf-8")
+            issues = checker.scan_tree(root)
+        self.assertEqual([issue.file for issue in issues], ["posts/other/index.html"])
+
     def test_fragment_only_mode_avoids_page_copies(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

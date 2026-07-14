@@ -53,11 +53,10 @@ OLD_HUGO_TOPIC_LINKS = [
     ("Lie Groups", "/lie-groups/"),
     ("Langlands Letter", "/langlands-letter/"),
     ("Shale's Paper", "/shale-paper/"),
-    ("Posts", "/posts/"),
 ]
 
-# Temporary, site-wide visual QA controls. Set this to False for production builds.
-SHOW_TESTING_UI = True
+# Temporary, site-wide visual QA controls. Production builds disable these.
+SHOW_TESTING_UI = os.environ.get("KNOWLPEDIA_SHOW_TESTING_UI", "1") != "0"
 
 
 def repo_root() -> Path:
@@ -146,6 +145,8 @@ class DiagramRenderer:
             self._engine_output = "pdf"
         self._cache: dict[tuple[str, str], str] = {}
         self._disk_cache_dir: Path | None = None
+        self._prebuilt_dir: Path | None = None
+        self._refresh_prebuilt = False
 
     @property
     def backend(self) -> str:
@@ -160,11 +161,31 @@ class DiagramRenderer:
         if self._disk_cache_dir:
             self._disk_cache_dir.mkdir(parents=True, exist_ok=True)
 
+    def configure_prebuilt(self, prebuilt_dir: Path | None, *, refresh: bool = False) -> None:
+        self._prebuilt_dir = prebuilt_dir
+        self._refresh_prebuilt = refresh
+        self._cache.clear()
+        if self._prebuilt_dir:
+            self._prebuilt_dir.mkdir(parents=True, exist_ok=True)
+
+    def disable_local_rendering(self) -> None:
+        self._png_engine = None
+        self._png_converter = None
+        self._engine = None
+        self._converter = None
+        self._cache.clear()
+
     def render(self, source: str, kind: str = "tikz") -> str:
         source = source.strip()
         cache_key = (kind, source)
         if cache_key in self._cache:
             return self._cache[cache_key]
+
+        prebuilt_path = self._prebuilt_path(source, kind)
+        if not self._refresh_prebuilt and prebuilt_path and prebuilt_path.is_file():
+            rendered = prebuilt_path.read_text(encoding="utf-8")
+            self._cache[cache_key] = rendered
+            return rendered
 
         disk_cache_path = self._disk_cache_path(source, kind)
         if disk_cache_path and disk_cache_path.is_file():
@@ -184,7 +205,26 @@ class DiagramRenderer:
         if disk_cache_path and "diagram-error" not in rendered and "diagram-source" not in rendered:
             disk_cache_path.parent.mkdir(parents=True, exist_ok=True)
             disk_cache_path.write_text(rendered, encoding="utf-8")
+        if (
+            self._refresh_prebuilt
+            and prebuilt_path
+            and "diagram-error" not in rendered
+            and "diagram-source" not in rendered
+        ):
+            prebuilt_path.write_text(rendered, encoding="utf-8")
         return rendered
+
+    def _prebuilt_path(self, source: str, kind: str) -> Path | None:
+        if not self._prebuilt_dir:
+            return None
+        payload = {
+            "version": 1,
+            "kind": kind,
+            "source": source,
+            "document": self._document(source, kind),
+        }
+        digest = hashlib.sha256(json.dumps(payload, sort_keys=True).encode("utf-8")).hexdigest()
+        return self._prebuilt_dir / f"{digest}.html"
 
     def _disk_cache_path(self, source: str, kind: str) -> Path | None:
         if not self._disk_cache_dir or self.backend == "source":
@@ -1974,8 +2014,30 @@ def main() -> int:
         action="store_true",
         help="Disable the persistent rendered diagram cache for this run",
     )
+    parser.add_argument(
+        "--prebuilt-diagram-dir",
+        type=Path,
+        default=Path("prebuilt/diagrams"),
+        help="Directory containing portable checked-in rendered diagram fragments",
+    )
+    parser.add_argument(
+        "--refresh-prebuilt-diagrams",
+        action="store_true",
+        help="Render diagrams locally and replace portable checked-in diagram fragments",
+    )
+    parser.add_argument(
+        "--prebuilt-only-diagrams",
+        action="store_true",
+        help="Disable local TeX rendering and use only portable prebuilt diagram fragments",
+    )
     args = parser.parse_args()
     DIAGRAM_RENDERER.configure_cache(None if args.no_diagram_cache else args.diagram_cache_dir)
+    DIAGRAM_RENDERER.configure_prebuilt(
+        args.prebuilt_diagram_dir,
+        refresh=args.refresh_prebuilt_diagrams,
+    )
+    if args.prebuilt_only_diagrams:
+        DIAGRAM_RENDERER.disable_local_rendering()
     return write_site_for_ids(
         args.package_dir,
         args.out,

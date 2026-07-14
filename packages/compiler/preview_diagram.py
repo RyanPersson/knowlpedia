@@ -137,6 +137,12 @@ def main() -> int:
         help="Directory for persistent rendered diagram cache entries",
     )
     parser.add_argument("--no-diagram-cache", action="store_true", help="Disable persistent diagram cache")
+    parser.add_argument(
+        "--prebuilt-diagram-dir",
+        type=Path,
+        default=Path("prebuilt/diagrams"),
+        help="Directory containing portable checked-in rendered diagram fragments",
+    )
     args = parser.parse_args()
 
     if args.index < 1:
@@ -147,6 +153,7 @@ def main() -> int:
         return 2
 
     DIAGRAM_RENDERER.configure_cache(None if args.no_diagram_cache else args.diagram_cache_dir)
+    DIAGRAM_RENDERER.configure_prebuilt(args.prebuilt_diagram_dir)
     diagrams = extract_diagrams(args.source.read_text(encoding="utf-8"))
     if not diagrams:
         print(f"No TikZ diagram blocks found in {args.source}", file=sys.stderr)

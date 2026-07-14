@@ -31,6 +31,10 @@ IGNORED_CLASSES = {
     "diagram-source",
 }
 ERROR_CLASSES = {"math-render-error", "diagram-error", "knowl-error", "missing-knowl"}
+ALLOWED_RAW_SHORTCODE_PATHS = {
+    "fragments/posts/semigroup-quasigroup-structure/core.html",
+    "posts/semigroup-quasigroup-structure/index.html",
+}
 LOCAL_TARGET_ATTRIBUTES = {"href", "src", "data-knowl", "data-section-url", "data-knowl-fragment"}
 KNOWL_TARGET_ATTRIBUTES = {"data-knowl", "data-section-url", "data-knowl-fragment"}
 HUGO_PLACEHOLDER_RE = re.compile(r"HUGOSHORTCODE\d+[A-Za-z0-9]*")
@@ -51,13 +55,14 @@ class Issue:
 
 
 class RenderedHtmlChecker(HTMLParser):
-    def __init__(self, path: Path, root: Path) -> None:
+    def __init__(self, path: Path, root: Path, *, require_rendered_diagrams: bool = False) -> None:
         super().__init__(convert_charrefs=True)
         self.path = path.resolve()
         self.root = root.resolve()
         self.issues: list[Issue] = []
         self._ignore_stack: list[bool] = []
         self._ignored_depth = 0
+        self._require_rendered_diagrams = require_rendered_diagrams
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         tag = tag.lower()
@@ -74,6 +79,8 @@ class RenderedHtmlChecker(HTMLParser):
 
         for class_name in sorted(classes.intersection(ERROR_CLASSES)):
             self._add_issue("error", class_name, f"<{tag} class=\"{class_name}\">")
+        if self._require_rendered_diagrams and "diagram-source" in classes:
+            self._add_issue("error", "diagram-source", f"<{tag} class=\"diagram-source\">")
 
         for name, value in attrs:
             if name in LOCAL_TARGET_ATTRIBUTES and value:
@@ -105,7 +112,12 @@ class RenderedHtmlChecker(HTMLParser):
             self._add_issue("error", "hugo_shortcode_placeholder", match.group(0))
 
         for match in SHORTCODE_RE.finditer(text):
-            self._add_issue("error", "raw_shortcode", match.group(0))
+            try:
+                relative_path = str(self.path.relative_to(self.root))
+            except ValueError:
+                relative_path = str(self.path)
+            if relative_path not in ALLOWED_RAW_SHORTCODE_PATHS:
+                self._add_issue("error", "raw_shortcode", match.group(0))
 
         for match in WIKILINK_RE.finditer(text):
             self._add_issue("error", "raw_wikilink", match.group(0))
@@ -187,8 +199,8 @@ def context(text: str, start: int, end: int, radius: int = 90) -> str:
     return normalize(text[max(0, start - radius) : min(len(text), end + radius)])
 
 
-def scan_file(path: Path, root: Path) -> list[Issue]:
-    checker = RenderedHtmlChecker(path, root)
+def scan_file(path: Path, root: Path, *, require_rendered_diagrams: bool = False) -> list[Issue]:
+    checker = RenderedHtmlChecker(path, root, require_rendered_diagrams=require_rendered_diagrams)
     try:
         checker.feed(path.read_text(encoding="utf-8", errors="ignore"))
     except Exception as exc:
@@ -204,13 +216,18 @@ def scan_file(path: Path, root: Path) -> list[Issue]:
     return checker.issues
 
 
-def scan_tree(root: Path, fragments_only: bool = False) -> list[Issue]:
+def scan_tree(
+    root: Path,
+    fragments_only: bool = False,
+    *,
+    require_rendered_diagrams: bool = False,
+) -> list[Issue]:
     issues: list[Issue] = []
     scan_root = root / "fragments" if fragments_only else root
     if not scan_root.exists():
         return issues
     for html_file in sorted(scan_root.rglob("*.html")):
-        issues.extend(scan_file(html_file, root))
+        issues.extend(scan_file(html_file, root, require_rendered_diagrams=require_rendered_diagrams))
     return issues
 
 
@@ -253,6 +270,11 @@ def main() -> int:
         action="store_true",
         help="Scan canonical knowl fragments only, avoiding copies embedded in pages and indexes.",
     )
+    parser.add_argument(
+        "--require-rendered-diagrams",
+        action="store_true",
+        help="Report source-panel diagram fallbacks as rendering errors",
+    )
     parser.add_argument("--max-issues", type=int, default=80, help="Maximum issues to print in text mode.")
     args = parser.parse_args()
 
@@ -261,7 +283,11 @@ def main() -> int:
         print(f"error: generated HTML directory does not exist: {root}", file=sys.stderr)
         return 2
 
-    issues = scan_tree(root, fragments_only=args.fragments_only)
+    issues = scan_tree(
+        root,
+        fragments_only=args.fragments_only,
+        require_rendered_diagrams=args.require_rendered_diagrams,
+    )
     if args.json:
         print(json.dumps([asdict(issue) for issue in issues], indent=2))
     else:

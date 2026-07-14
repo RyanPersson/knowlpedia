@@ -50,6 +50,27 @@ When that toolchain is not available, diagrams degrade to a static source panel
 instead of broken KaTeX/MathJax output. Failed compiles render the source plus a
 truncated render log so an agent can repair the diagram.
 
+Production builds use portable rendered fragments from `prebuilt/diagrams/`
+before consulting the machine-local cache or TeX toolchain. Refresh those small,
+checked-in fragments on a machine with the supported TeX tools:
+
+```bash
+make refresh-prebuilt-diagrams
+make check-rendering-content
+.venv/bin/python scripts/check_rendering_errors.py \
+  public-imported --require-rendered-diagrams
+```
+
+This keeps the GitHub Pages runner lightweight while ensuring that a missing
+prebuilt fragment fails production validation instead of silently publishing a
+diagram source panel. The portable cache key depends only on the normalized TeX
+document, diagram kind, and cache-format version; it does not encode local
+executable paths.
+
+GitHub Pages and other clean production runners should use `make
+build-production`. That target disables local TeX discovery, builds exclusively
+from the checked-in fragments, and requires every diagram to be rendered.
+
 ## Recommended Production Direction
 
 Prefer build-time math rendering for the production static runtime.
