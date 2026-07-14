@@ -20,9 +20,9 @@ version = "0.1.0"
 content_dir = "content"
 ```
 
-## Single-File Knowl
+## Knowl Source
 
-Use a `.knowl.md` file for compact concepts:
+Each knowl is one `.knowl.md` file with TOML front matter and Markdown body:
 
 ```markdown
 +++
@@ -34,21 +34,15 @@ aliases = ["set", "sets"]
 +++
 
 A **set** is ...
+
+## Examples
+
+A basic example belongs here.
 ```
 
-## Bundle Knowl
-
-Use a directory with `knowl.toml` for richer concepts:
-
-```text
-group/
-  knowl.toml
-  core.md
-  examples.md
-  tfae.toml
-  proofs/
-    identity-uniqueness.toml
-```
+Examples and other secondary material can follow the core body as level-two
+sections. The compiler turns those sections into addressable, unfoldable
+fragments without splitting one knowl across multiple source files.
 
 Important fields:
 
@@ -57,8 +51,6 @@ Important fields:
 - `kind`: `definition`, `theorem`, `lemma`, `example`, etc.
 - `summary`: one-line description
 - `aliases`: terms for future search/autolinking
-- `core`: canonical section
-- `sections`: optional unfoldable layers
 - `relations`: typed graph edges
 
 ## Wikilinks
@@ -71,4 +63,3 @@ Markdown uses explicit semantic links:
 ```
 
 The compiler validates the target id and anchor.
-

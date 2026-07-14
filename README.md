@@ -14,11 +14,11 @@ automation tooling.
 This repo now contains a first working compiler/runtime prototype:
 
 ```text
-examples/basic/              semantic source package
 packages/compiler/           Python compiler
 packages/schema/             prototype schema notes
 packages/static-runtime/     static browser runtime
-public/                      generated output, ignored by git
+../knowlpedia-content/       canonical semantic source package
+public-imported/             generated output, ignored by git
 ```
 
 Build it with:
@@ -34,8 +34,8 @@ Serve it locally with:
 make serve
 ```
 
-Compile the migrated Knowlpedia corpus from the sibling Knowlpack-format content
-repo with:
+`make build` compiles the sibling Knowlpack-format content repo. The explicit
+equivalent is:
 
 ```bash
 make build-content

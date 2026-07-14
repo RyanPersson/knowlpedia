@@ -11,6 +11,8 @@
   const maxPreloads = 6;
   let activePreloads = 0;
   let preloadObserver = null;
+  const pendingObservationRoots = new Set();
+  let observationTask = null;
   let searchData = null;
   let searchRequest = null;
   let searchReturnFocus = null;
@@ -144,6 +146,26 @@
     });
   }
 
+  function scheduleObserveKnowls(root) {
+    pendingObservationRoots.add(root);
+    if (observationTask !== null) return;
+
+    const flush = () => {
+      observationTask = null;
+      const roots = Array.from(pendingObservationRoots);
+      pendingObservationRoots.clear();
+      roots.forEach((pendingRoot) => {
+        if (pendingRoot === document || pendingRoot.isConnected) observeKnowls(pendingRoot);
+      });
+    };
+
+    if ("requestIdleCallback" in window) {
+      observationTask = window.requestIdleCallback(flush, { timeout: 500 });
+    } else {
+      observationTask = window.setTimeout(flush, 50);
+    }
+  }
+
   function loadInlineFragments() {
     document.querySelectorAll("template[data-knowl-fragment]").forEach((template) => {
       const url = template.dataset.knowlFragment;
@@ -173,7 +195,7 @@
     const kind = content?.dataset.knowlKind;
     panel.setAttribute("aria-label", kind ? kind + ": " + title : title);
     typeset(panel);
-    observeKnowls(panel);
+    scheduleObserveKnowls(panel);
     if (keyboardOpen) {
       const close = panel.querySelector(".knowl-close");
       if (close) close.focus({ preventScroll: true });
@@ -209,7 +231,7 @@
         panel.innerHTML = '<div class="loading" role="status">Loading definition…</div>';
         panel.innerHTML = await fetchFragment(trigger.dataset.knowl);
       }
-      afterPanelRender(panel, trigger, event.detail === 0);
+      afterPanelRender(panel, trigger, event.isTrusted && event.detail === 0);
     } catch (error) {
       panel.innerHTML = '<div class="error">This definition could not be loaded. <a href="' + trigger.href + '">Open its full page</a>.</div>';
     }
@@ -248,7 +270,7 @@
     try {
       section.innerHTML = await fetchFragment(button.dataset.sectionUrl);
       typeset(section);
-      observeKnowls(section);
+      scheduleObserveKnowls(section);
     } catch (error) {
       section.innerHTML = '<p class="error">This section could not be loaded.</p>';
     }

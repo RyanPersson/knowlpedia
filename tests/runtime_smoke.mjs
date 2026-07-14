@@ -105,7 +105,7 @@ try {
   await page.goto(`${baseUrl}/shared-foundations/real-numbers/`);
   await page.getByRole("link", { name: "rational numbers", exact: true }).first().click();
   const rationalPanel = page.locator(".knowl-panel").first();
-  await rationalPanel.getByRole("button", { name: "Examples", exact: true }).click();
+  await rationalPanel.getByRole("button", { name: "Remarks", exact: true }).click();
   await assertSectionMatchesOwner(
     rationalPanel.locator(":scope > .knowl-content > .knowl-section-slot > .knowl-inline-section")
   );

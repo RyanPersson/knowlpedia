@@ -122,35 +122,19 @@ not toward a particular backend database.
 
 The source format should be human-editable, git-friendly, and schema-validated.
 
-Support two authoring forms:
+Use one sectioned, single-file authoring form:
 
 ```text
-single-file knowl
-  compact concepts, lemmas, examples
-
-bundle knowl
-  larger objects with examples, proofs, TFAE, Lean data, citations, diagrams
+content/<domain>/<concept>.knowl.md
+  TOML front matter
+  core definition or statement
+  optional level-two sections for examples, remarks, and other layers
 ```
 
-Example single-file source:
+Example source:
 
 ```text
 content/shared-foundations/injective-function.knowl.md
-```
-
-Example bundle source:
-
-```text
-content/algebra-groups/group/
-  knowl.yaml
-  core.md
-  examples.md
-  tfae.yaml
-  relationships.yaml
-  proofs/
-    cayley-theorem.yaml
-  lean.yaml
-  sources.yaml
 ```
 
 The author-facing files can contain markdown and LaTeX, but the metadata and
@@ -217,7 +201,7 @@ The same graph should compile into multiple render targets:
 - static website
 - local authoring preview
 - printable notes
-- single-course bundle
+- offline course archive
 - machine-readable JSON
 - optional SQLite
 - future dynamic hosted app
@@ -436,7 +420,7 @@ energy.
 
 1. Define `knowlpack.yaml`.
 2. Define the normalized graph schema.
-3. Implement a compiler that reads single-file and bundle knowls.
+3. Implement a compiler that reads sectioned single-file knowls.
 4. Emit `registry.json`, `relations.json`, and static HTML fragments.
 5. Render the three test concepts as full pages and inline fragments.
 6. Add one structured proof and clickable justifications.
@@ -448,4 +432,3 @@ energy.
 Build a git-native semantic math object format with a strict compiler, static
 runtime, mobile-first disclosure UI, and optional database artifacts for local
 tooling and future hosted services.
-

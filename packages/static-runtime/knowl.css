@@ -758,6 +758,8 @@ kbd {
 
 .knowl-panel {
   --knowl-panel-background: var(--surface-subtle);
+  content-visibility: auto;
+  contain-intrinsic-size: auto 12rem;
   width: min(100%, 880px);
   margin: 0.4rem 0 0.65rem;
   border-left: 2px solid var(--accent);

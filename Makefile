@@ -40,11 +40,9 @@ test-ui:
 audit-sections:
 	$(PYTHON) scripts/audit_section_split.py $(CONTENT_PACKAGE)/content
 
-build: deps
-	$(PYTHON) packages/compiler/knowl_compile.py examples/basic --out public
+build: build-content
 
-serve: build
-	python3 -m http.server 8000 --directory public
+serve: serve-content
 
 build-content: deps
 	$(PYTHON) packages/compiler/knowl_compile.py $(CONTENT_PACKAGE) --out public-imported --allow-validation-errors --diagram-cache-dir $(DIAGRAM_CACHE_DIR)
@@ -98,4 +96,4 @@ screenshot-imported:
 	firefox --headless --screenshot $(abspath $(SCREENSHOT)) --window-size 1440,1200 $(PREVIEW_URL)$(PREVIEW_PATH)
 
 clean:
-	rm -rf public public-imported
+	rm -rf public-imported

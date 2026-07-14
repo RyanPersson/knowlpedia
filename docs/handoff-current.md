@@ -38,13 +38,13 @@ Install dependencies:
 make deps
 ```
 
-Build the small example package:
+Build the sibling content package:
 
 ```bash
 make build
 ```
 
-Build the full sibling content package:
+The explicit full-content target is equivalent:
 
 ```bash
 make build-content

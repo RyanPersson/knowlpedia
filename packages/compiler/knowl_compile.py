@@ -741,32 +741,6 @@ def parse_single_file(path: Path) -> Knowl:
     return knowl_from_meta(meta, path, core_markdown, sections=sections)
 
 
-def parse_bundle(path: Path) -> Knowl:
-    meta = read_toml(path)
-    bundle_dir = path.parent
-    core_meta = meta.get("core", {})
-    core_source = core_meta.get("source", "core.md")
-    core_markdown = (bundle_dir / core_source).read_text(encoding="utf-8").strip()
-
-    sections = []
-    for section in meta.get("sections", []):
-        section = dict(section)
-        source_name = section.get("source")
-        if not source_name:
-            raise ValueError(f"{path}: section {section.get('id')} is missing source")
-        source_path = bundle_dir / source_name
-        section["source_path"] = str(source_path)
-        if section.get("kind") == "tfae":
-            section["payload"] = read_toml(source_path)
-        elif section.get("kind") == "proof":
-            section["payload"] = read_toml(source_path)
-        else:
-            section["markdown"] = source_path.read_text(encoding="utf-8").strip()
-        sections.append(section)
-
-    return knowl_from_meta(meta, path, core_markdown, sections=sections)
-
-
 def knowl_from_meta(
     meta: dict[str, Any],
     source_path: Path,
@@ -842,8 +816,6 @@ def discover_knowls(content_dir: Path) -> list[Knowl]:
     knowls = []
     for path in sorted(content_dir.rglob("*.knowl.md")):
         knowls.append(parse_single_file(path))
-    for path in sorted(content_dir.rglob("knowl.toml")):
-        knowls.append(parse_bundle(path))
     return sorted(knowls, key=lambda k: k.id)
 
 
