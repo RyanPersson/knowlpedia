@@ -15,9 +15,11 @@ import sys
 from dataclasses import asdict, dataclass
 from html.parser import HTMLParser
 from pathlib import Path
+from urllib.parse import unquote, urlsplit
 
 
 IGNORED_TAGS = {"script", "style", "noscript", "svg", "math", "annotation", "pre", "code", "title"}
+VOID_TAGS = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"}
 IGNORED_CLASSES = {
     "katex",
     "katex-html",
@@ -28,23 +30,14 @@ IGNORED_CLASSES = {
     "math-mathml",
     "diagram-source",
 }
-ERROR_CLASSES = {"math-render-error", "diagram-error", "knowl-error"}
-IGNORED_FILES = {
-    # Legacy Hugo shortcode with interactive SVG/JS. Keep the content source
-    # intact until the shortcode is intentionally migrated into the refactor.
-    "posts/semigroup-quasigroup-structure/index.html",
-    "fragments/posts/semigroup-quasigroup-structure/core.html",
-}
-
+ERROR_CLASSES = {"math-render-error", "diagram-error", "knowl-error", "missing-knowl"}
+LOCAL_TARGET_ATTRIBUTES = {"href", "src", "data-knowl", "data-section-url", "data-knowl-fragment"}
+KNOWL_TARGET_ATTRIBUTES = {"data-knowl", "data-section-url", "data-knowl-fragment"}
 HUGO_PLACEHOLDER_RE = re.compile(r"HUGOSHORTCODE\d+[A-Za-z0-9]*")
 WIKILINK_RE = re.compile(r"\[\[(?:[A-Za-z0-9_.-]+/[^\]\n]+|[^\]\n]+\|[^\]\n]+)\]\]")
 SHORTCODE_RE = re.compile(r"\{\{<\s*[^>]+>\}\}")
 DISPLAY_DELIMITER_RE = re.compile(r"(\\\[|\\\]|\$\$)")
 INLINE_MATH_RE = re.compile(r"(?<!\\)\$(?!\$)([^$\n]{1,500}?)(?<!\\)\$")
-LATEX_SIGNAL_RE = re.compile(
-    r"(\\[A-Za-z]+|\\[{}]|[_^]\{?[A-Za-z0-9]+|[A-Za-z]\s*(?:[_^]\{?[A-Za-z0-9]+|\\)|"
-    r"\\(?:in|to|lhd|cdots|cong|subset|subseteq|triangleleft))"
-)
 RAW_LATEX_COMMAND_RE = re.compile(r"\\(?:lhd|cdots|triangleleft|cong|subseteq|mathbb|mathcal|frac|to|in)\b")
 
 
@@ -60,8 +53,8 @@ class Issue:
 class RenderedHtmlChecker(HTMLParser):
     def __init__(self, path: Path, root: Path) -> None:
         super().__init__(convert_charrefs=True)
-        self.path = path
-        self.root = root
+        self.path = path.resolve()
+        self.root = root.resolve()
         self.issues: list[Issue] = []
         self._ignore_stack: list[bool] = []
         self._ignored_depth = 0
@@ -73,13 +66,23 @@ class RenderedHtmlChecker(HTMLParser):
             if name == "class" and value:
                 classes.update(value.split())
 
-        ignored = tag in IGNORED_TAGS or bool(classes.intersection(IGNORED_CLASSES))
-        self._ignore_stack.append(ignored)
-        if ignored:
-            self._ignored_depth += 1
+        if tag not in VOID_TAGS:
+            ignored = tag in IGNORED_TAGS or bool(classes.intersection(IGNORED_CLASSES))
+            self._ignore_stack.append(ignored)
+            if ignored:
+                self._ignored_depth += 1
 
         for class_name in sorted(classes.intersection(ERROR_CLASSES)):
             self._add_issue("error", class_name, f"<{tag} class=\"{class_name}\">")
+
+        for name, value in attrs:
+            if name in LOCAL_TARGET_ATTRIBUTES and value:
+                self._check_local_target(name, value)
+
+    def handle_startendtag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        self.handle_starttag(tag, attrs)
+        if tag.lower() not in VOID_TAGS:
+            self.handle_endtag(tag)
 
     def handle_endtag(self, tag: str) -> None:
         tag = tag.lower()
@@ -108,18 +111,56 @@ class RenderedHtmlChecker(HTMLParser):
             self._add_issue("error", "raw_wikilink", match.group(0))
 
         for match in DISPLAY_DELIMITER_RE.finditer(text):
+            raw_math_spans.append((match.start(), match.end()))
             self._add_issue("error", "raw_display_math_delimiter", context(text, match.start(), match.end()))
 
         for match in INLINE_MATH_RE.finditer(text):
-            inner = match.group(1)
-            if LATEX_SIGNAL_RE.search(inner):
-                raw_math_spans.append((match.start(), match.end()))
-                self._add_issue("error", "raw_inline_math", context(text, match.start(), match.end()))
+            if any(match.start() < end and match.end() > start for start, end in raw_math_spans):
+                continue
+            raw_math_spans.append((match.start(), match.end()))
+            self._add_issue("error", "raw_inline_math", context(text, match.start(), match.end()))
+
+        for match in re.finditer(r"\$", text):
+            if any(start <= match.start() < end for start, end in raw_math_spans):
+                continue
+            self._add_issue("error", "raw_dollar", context(text, match.start(), match.end()))
 
         for match in RAW_LATEX_COMMAND_RE.finditer(text):
             if any(start <= match.start() < end for start, end in raw_math_spans):
                 continue
             self._add_issue("error", "raw_latex_command", context(text, match.start(), match.end()))
+
+    def _check_local_target(self, attribute: str, value: str) -> None:
+        parsed = urlsplit(value)
+        if parsed.scheme or parsed.netloc or value.startswith("//"):
+            return
+        if not parsed.path:
+            return
+
+        decoded_path = unquote(parsed.path)
+        if decoded_path.startswith("/"):
+            candidate = self.root / decoded_path.lstrip("/")
+        else:
+            candidate = self.path.parent / decoded_path
+
+        candidate = candidate.resolve()
+        try:
+            candidate.relative_to(self.root)
+        except ValueError:
+            self._add_issue("error", "local_target_outside_build", f'{attribute}="{value}"')
+            return
+
+        candidates = [candidate]
+        if decoded_path.endswith("/") or candidate.is_dir():
+            candidates.append(candidate / "index.html")
+        elif not candidate.suffix:
+            candidates.append(candidate / "index.html")
+
+        if any(path.is_file() for path in candidates):
+            return
+
+        kind = "broken_knowl_target" if attribute in KNOWL_TARGET_ATTRIBUTES else "broken_local_link"
+        self._add_issue("error", kind, f'{attribute}="{value}"')
 
     def _add_issue(self, severity: str, kind: str, snippet: str) -> None:
         line, _ = self.getpos()
@@ -163,11 +204,12 @@ def scan_file(path: Path, root: Path) -> list[Issue]:
     return checker.issues
 
 
-def scan_tree(root: Path) -> list[Issue]:
+def scan_tree(root: Path, fragments_only: bool = False) -> list[Issue]:
     issues: list[Issue] = []
-    for html_file in sorted(root.rglob("*.html")):
-        if html_file.relative_to(root).as_posix() in IGNORED_FILES:
-            continue
+    scan_root = root / "fragments" if fragments_only else root
+    if not scan_root.exists():
+        return issues
+    for html_file in sorted(scan_root.rglob("*.html")):
         issues.extend(scan_file(html_file, root))
     return issues
 
@@ -179,10 +221,14 @@ def print_text_report(issues: list[Issue], max_issues: int) -> None:
 
     print(f"Rendered HTML errors found: {len(issues)}")
     by_kind: dict[str, int] = {}
+    files_by_kind: dict[str, set[str]] = {}
     for issue in issues:
         by_kind[issue.kind] = by_kind.get(issue.kind, 0) + 1
+        files_by_kind.setdefault(issue.kind, set()).add(issue.file)
     for kind, count in sorted(by_kind.items()):
-        print(f"  {kind}: {count}")
+        affected = len(files_by_kind[kind])
+        noun = "file" if affected == 1 else "files"
+        print(f"  {kind}: {count} in {affected} {noun}")
 
     print()
     for issue in issues[:max_issues]:
@@ -202,6 +248,11 @@ def main() -> int:
         help="Generated HTML directory to scan, usually public-imported or public.",
     )
     parser.add_argument("--json", action="store_true", help="Emit JSON instead of a text report.")
+    parser.add_argument(
+        "--fragments-only",
+        action="store_true",
+        help="Scan canonical knowl fragments only, avoiding copies embedded in pages and indexes.",
+    )
     parser.add_argument("--max-issues", type=int, default=80, help="Maximum issues to print in text mode.")
     args = parser.parse_args()
 
@@ -210,7 +261,7 @@ def main() -> int:
         print(f"error: generated HTML directory does not exist: {root}", file=sys.stderr)
         return 2
 
-    issues = scan_tree(root)
+    issues = scan_tree(root, fragments_only=args.fragments_only)
     if args.json:
         print(json.dumps([asdict(issue) for issue in issues], indent=2))
     else:

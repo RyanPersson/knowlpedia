@@ -18,7 +18,7 @@ SCREENSHOT ?= tmp/screenshots/imported-group.png
 .PHONY: build-content serve-content import-legacy-content import-content
 .PHONY: build-page preview-diagram build-imported serve-imported build-legacy-imported
 .PHONY: preview-start preview-status preview-stop preview-restart preview-scan preview-adopt
-.PHONY: check-rendering check-rendering-content
+.PHONY: check-rendering check-rendering-knowls check-rendering-content
 
 $(VENV_STAMP): requirements.txt
 	python3 -m venv .venv
@@ -76,6 +76,9 @@ preview-scan:
 
 check-rendering:
 	$(PYTHON) scripts/check_rendering_errors.py public-imported
+
+check-rendering-knowls:
+	$(PYTHON) scripts/check_rendering_errors.py public-imported --fragments-only
 
 check-rendering-content: build-content check-rendering
 
