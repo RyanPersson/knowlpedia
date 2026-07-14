@@ -6,13 +6,13 @@ The `sol-refactor` branch turns the static compiler/runtime prototype into a mor
 
 ## Product principles
 
-1. **Keep the reader's place.** A linked term opens inline. Full-page navigation remains an ordinary link and works with modified click, context menus, and assistive technology.
+1. **Keep the reader's place.** A knowl term is an inline disclosure control, not a navigation link. If a full-page view is offered, it is a separate, explicitly labeled action and never the fallback behavior of the knowl trigger.
 2. **Definition first.** The inline core contains the smallest sufficient statement. Motivation, examples, equivalent characterizations, warnings, history, and proofs are progressively disclosed.
 3. **Metadata is not prose.** Titles, summaries, and semantic kinds support search, full pages, and assistive technology. Inline expansion does not repeat them around a self-contained core.
 4. **Local depth, bounded visual complexity.** Nested knowls remain recursive, but mobile panels stop accumulating indentation and Escape closes only the deepest open panel.
 5. **Fast by construction.** Core fragments are static, nearby links are preloaded, optional sections are fetched only when opened inline, and the search index is loaded only when search is requested.
 6. **No ornamental delay.** The interface contains no animations or transitions. State changes are immediate.
-7. **Accessibility is structural.** Native links and details elements remain primary controls; focus is restored after closing; search is modal and keyboard accessible; touch targets are at least 44 pixels at the mobile breakpoint; foreground colors meet WCAG AA contrast.
+7. **Accessibility is structural.** Knowl triggers expose disclosure state and keyboard behavior appropriate to expandable content; any navigation action is separate. Focus is restored after closing; search is modal and keyboard accessible; touch targets are at least 44 pixels at the mobile breakpoint; foreground colors meet WCAG AA contrast.
 
 ## Compiler changes
 

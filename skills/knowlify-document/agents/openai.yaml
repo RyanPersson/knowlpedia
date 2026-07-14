@@ -1,4 +1,0 @@
-interface:
-  display_name: "Knowlify Document"
-  short_description: "Integrate documents into expandable math knowls"
-  default_prompt: "Use $knowlify-document to integrate this mathematical document into Knowlpedia with expandable term definitions."

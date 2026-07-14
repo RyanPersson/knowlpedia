@@ -125,12 +125,15 @@ recommendation.
 
 ## Interaction Model
 
-The user experience should support both reading styles:
+The user experience should support both reading styles without conflating
+disclosure and navigation:
 
-- Inline mode: click a term to unfold the knowl in place; nested knowls unfold
-  recursively.
-- Page mode: open the knowl full page through a normal link affordance, modified
-  click, context menu, or a visible "full page" action.
+- Inline mode: activate a term to unfold the knowl in place; nested knowls
+  unfold recursively. A knowl trigger is an inline disclosure control, not a
+  hyperlink.
+- Page mode: when a full-page view is useful, expose it through a separate,
+  explicitly labeled action. Navigation must not be the fallback behavior of
+  the knowl trigger, including through modified click or a link context menu.
 - Deep mode: progressively unfold further folded sections by clicking such as examples,
   TFAE, categorical definitions, relationship graph, proof details, and Lean data.
 
@@ -349,8 +352,8 @@ A mature compiler could emit:
 2. Write a compiler that emits current-Hugo-compatible markdown or HTML so the
    new model can piggyback on the existing site.
 3. Add section-level fold/unfold rendering on full knowl pages.
-4. Add modified-click behavior so inline knowl triggers preserve normal link
-   affordances.
+4. Implement knowl triggers as disclosure controls, with any full-page action
+   exposed separately and non-JavaScript output preserving inline content.
 5. Build a relation registry and validate all knowl references against it.
 6. Test the result on mobile widths before expanding the corpus.
 

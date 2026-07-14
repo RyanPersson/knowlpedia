@@ -1,6 +1,6 @@
 # Legacy Knowlpedia Generation Experiments
 
-> **Historical and noncanonical.** These files preserve earlier AI-assisted knowl-generation experiments. They are evidence, not current instructions. Use the current `skills/knowlify-document/` workflow for new work.
+> **Historical and noncanonical.** These files preserve earlier AI-assisted knowl-generation experiments. They are evidence, not current instructions. Use the current `.agents/skills/knowlify-document/` workflow for new work.
 
 This archive was copied from the sibling `knowlpedia` repository on 2026-07-10. The source checkout was at commit `1bf7251d08020a3dc52beacdd17abe12c72a9c9b`. Source files were left in place; this is a preservation snapshot, not a destructive move.
 

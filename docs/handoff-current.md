@@ -178,8 +178,8 @@ migrated.
 
 - Add compiler tests for link conversion, math protection, validation, fragment
   generation, and SQLite emission.
-- Add runtime tests for panel insertion, cache/preload behavior, modified-click
-  navigation, and theme toggling.
+- Add runtime tests for panel insertion, cache/preload behavior, disclosure-only
+  knowl triggers, separate full-page actions, and theme toggling.
 - Add screenshot regression tests for tricky pages such as group, binary
   operation, abelian category, and algebra-commutative corollaries.
 

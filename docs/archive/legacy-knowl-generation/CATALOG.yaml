@@ -8,7 +8,7 @@ selection_scope: "Legacy AI knowl generation, extraction, linking, review, valid
 copied_files: 458
 approximate_size: "2.4 MiB"
 source_preserved: true
-canonical_guidance: "skills/knowlify-document/SKILL.md"
+canonical_guidance: ".agents/skills/knowlify-document/SKILL.md"
 
 collections:
   - id: generation-v1
