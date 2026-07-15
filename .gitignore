@@ -9,4 +9,11 @@ tmp/
 *.pyc
 __pycache__/
 .DS_Store
-./playwright-mcp
+
+# Local agent and browser-tool state is machine-specific.
+.agents/
+.claude/
+.playwright-mcp/
+
+# The refactored site no longer uses the legacy Hugo theme checkout.
+themes/

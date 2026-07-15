@@ -1,0 +1,10 @@
+2025-12-30 17:47:49 | geometry-bundles/test-with-note | testing the note feature
+2025-12-30 18:17:35 | geometry-bundles/construction-adjoint-lie-algebra-bundle-ad
+2025-12-30 23:20:41 | 👎 | analysis/basic-properties-of-lim-sup-and-lim-inf | See pasted error Basic properties of $\limsup$ and $\liminf$: Let $(a_n)$ be a real sequence and define $ s_n=\sup_{k\ge n} a_k,\qquad i_n=\inf_{k\ge n} a_k. $ Then:  $(s_n)$ is nonincreasing and $(i_n)$ is nondecreasing, the limits exist in the extended reals and $   \limsup_{n\to\infty} a_n=\lim_{n\to\infty} s_n,\qquad   \liminf_{n\to\infty} a_n=\lim_{n\to\infty} i_n,   $ always $\liminf a_n\le \limsup a_n$, if $\liminf a_n=\limsup a_n=L\in\mathbb{R}$, then $a_n\to L$, if $\ell=limsup  a_n$ is finite, then there exists a subsequence  $(a_{n_j})$ with $a_{n_j}\to \ell$ (and similarly for liminf ).  These facts package the "eventual upper and lower behavior" of a sequence and are used to analyze oscillation and subsequential limits. Examples:  For $a_n=(-1)^n$, $\limsup a_n=1$ and $\liminf a_n=-1$. For $a_n=1+\frac{(-1)^n}{n}$, $\limsup a_n=\liminf a_n=1$, hence $a_n\to 1$.
+2025-12-30 23:38:31 | 👎 | analysis/basic-properties-of-lim-sup-and-lim-inf | multiline latex equations and overusage of qquad
+2025-12-30 23:40:02 | 👎 | analysis/uniqueness-of-limits | proof sketch and "this lemme is a basic structural fact"
+2026-01-01 20:32:26 | 👎 | convex-analysis/set-operations-sum-scalar-multiple-difference | This needs to have multiple subknowls created
+2026-01-01 20:34:03 | 👍 | convex-analysis/parallel-subspace-to-an-affine-set-is
+2026-01-01 20:35:08 | 👎 | convex-analysis/properties-of-the-minkowski-functional-of-a-convex-set | Rendering errors "HAHAHUGOSHORTCODE2648s6HBHB
+2026-01-01 20:54:22 | 👍 | algebra-groups/group
+2026-01-01 20:56:30 | 👍 | algebra-groups/quotient-group | Great knowl!
