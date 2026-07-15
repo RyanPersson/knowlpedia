@@ -1,5 +1,0 @@
-/Users/ryanpersson/anki/code/blog/tmp/phase1-measure/batch1.md
-/Users/ryanpersson/anki/code/blog/tmp/phase1-measure/batch2.md
-/Users/ryanpersson/anki/code/blog/tmp/phase1-measure/batch3.md
-/Users/ryanpersson/anki/code/blog/tmp/phase1-measure/batch4.md
-/Users/ryanpersson/anki/code/blog/tmp/phase1-measure/batch5.md

@@ -3,8 +3,6 @@ VENV_STAMP := .venv/.deps-installed
 NODE_MODULES_STAMP := node_modules/.deps-installed
 PYTHON ?= $(VENV_PYTHON)
 CONTENT_PACKAGE ?= ../knowlpedia-content
-LEGACY_CONTENT_SOURCE ?= ../knowlpedia-content-legacy
-LEGACY_IMPORT_OUT ?= imports/knowlpedia-content
 DIAGRAM_CACHE_DIR ?= .knowl-cache/diagrams
 PREBUILT_DIAGRAM_DIR ?= prebuilt/diagrams
 DIAGRAM_SOURCE ?= ../knowlpedia-content/content/algebra-category-theory/tikz-lab-whiskering-coherence.knowl.md
@@ -13,11 +11,10 @@ DIAGRAM_PREVIEW_OUT ?= tmp/tikz-preview
 PAGE ?= algebra-category-theory/tikz-lab-whiskering-coherence
 PREVIEW_URL ?= http://127.0.0.1:8001
 PREVIEW_PATH ?= /algebra-groups/group/
-SCREENSHOT ?= tmp/screenshots/imported-group.png
+SCREENSHOT ?= tmp/screenshots/page.png
 
-.PHONY: deps build build-production serve clean screenshot-imported test test-ui audit-sections refresh-prebuilt-diagrams
-.PHONY: build-content serve-content import-legacy-content import-content
-.PHONY: build-page preview-diagram build-imported serve-imported build-legacy-imported
+.PHONY: deps build build-production serve clean screenshot test test-ui audit-sections refresh-prebuilt-diagrams
+.PHONY: build-content serve-content build-page preview-diagram
 .PHONY: preview-start preview-status preview-stop preview-restart preview-scan preview-adopt
 .PHONY: check-rendering check-rendering-knowls check-rendering-content
 
@@ -90,19 +87,7 @@ check-rendering-knowls:
 
 check-rendering-content: build-content check-rendering
 
-import-legacy-content: deps
-	$(PYTHON) packages/importers/import_knowlpedia_content.py $(LEGACY_CONTENT_SOURCE) $(LEGACY_IMPORT_OUT)
-
-import-content: import-legacy-content
-
-build-legacy-imported: import-legacy-content
-	$(PYTHON) packages/compiler/knowl_compile.py $(LEGACY_IMPORT_OUT) --out public-imported --allow-validation-errors
-
-build-imported: build-content
-
-serve-imported: serve-content
-
-screenshot-imported:
+screenshot:
 	mkdir -p tmp/screenshots
 	firefox --headless --screenshot $(abspath $(SCREENSHOT)) --window-size 1440,1200 $(PREVIEW_URL)$(PREVIEW_PATH)
 

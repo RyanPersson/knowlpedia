@@ -1,12 +1,11 @@
 {
-  "name": "knowl-system-refactor",
+  "name": "knowlpedia",
   "version": "0.1.0",
   "private": true,
-  "description": "Static compiler/runtime prototype for the Knowlpedia refactor.",
+  "description": "Static compiler and browser runtime for Knowlpedia.",
   "type": "commonjs",
   "scripts": {
     "build": "make build",
-    "build:imported": "make build-imported",
     "deps": "make deps",
     "playwright:install": "playwright install chromium",
     "test:ui": "node tests/runtime_smoke.mjs"

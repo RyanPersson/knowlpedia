@@ -1,11 +1,10 @@
-public/
 public-imported/
-imports/
 .knowl-cache/
 .preview-server/
 .venv/
 node_modules/
 tmp/
+docs/archive/
 *.pyc
 __pycache__/
 .DS_Store
@@ -14,6 +13,3 @@ __pycache__/
 .agents/
 .claude/
 .playwright-mcp/
-
-# The refactored site no longer uses the legacy Hugo theme checkout.
-themes/

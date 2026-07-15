@@ -5,9 +5,9 @@ sites.
 
 It supports:
 
-- normal links for full pages
 - click-to-expand inline knowls
-- modified-click or context menu for browser-native tab behavior
+- normal full-page navigation for modified clicks and context menus
+- a full-page fallback when an inline fragment cannot be loaded
 - recursive nested knowls
 - progressively disclosed, lazily loaded inline sections
 - close controls, focus restoration, and deepest-first Escape-to-close

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Compile a knowl package into static pages, fragments, and indexes.
 
-This is a deliberately small prototype compiler. It proves the architectural
-shape: typed source files become a validated graph, then static artifacts.
+Typed source files become a validated graph and a set of static publishing
+artifacts.
 """
 
 from __future__ import annotations

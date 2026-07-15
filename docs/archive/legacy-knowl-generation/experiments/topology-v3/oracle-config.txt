@@ -1,6 +1,0 @@
-/Users/ryanpersson/anki/code/blog/tmp/v3-topology/batch1.md
-/Users/ryanpersson/anki/code/blog/tmp/v3-topology/batch2.md
-/Users/ryanpersson/anki/code/blog/tmp/v3-topology/batch3.md
-/Users/ryanpersson/anki/code/blog/tmp/v3-topology/batch4.md
-/Users/ryanpersson/anki/code/blog/tmp/v3-topology/batch5.md
-/Users/ryanpersson/anki/code/blog/tmp/v3-topology/batch6.md
