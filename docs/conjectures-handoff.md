@@ -106,9 +106,15 @@ Useful review order:
 
 ## Generation pipeline
 
-The automation study is implemented in
-/home/codex/code/knowlpedia-root/leanknowl on branch conjectures.
-Its catalog scans all 835 Lean files, identifies all 1,170 open declarations in
-629 source files, renders one formal-source page per declaration, applies curated
-overrides, builds a complete manifest/index, and enforces structural gates before
-deployment. See CONJECTURE_PIPELINE.md and reports/full-corpus-results.md there.
+The maintained automation pipeline is implemented in
+/home/codex/code/knowlpedia-root/formal-conjectures-catalog/pipeline on branch
+`main`. Its ignored source checkout is at
+`../sources/formal-conjectures/`. The pipeline scans all 835 Lean files,
+identifies all 1,170 open declarations in 629 source files, renders one
+formal-source page per declaration, applies curated overrides, builds a complete
+manifest/index, and enforces structural gates before deployment. See
+`pipeline/CONJECTURE_PIPELINE.md` and
+`pipeline/reports/full-corpus-results.md` in that repository.
+
+The original implementation history remains in
+/home/codex/code/knowlpedia-root/leanknowl on branch `conjectures`.
