@@ -231,6 +231,103 @@ def scan_tree(
     return issues
 
 
+def check_build_profile(root: Path, required_profile: str) -> list[Issue]:
+    issues: list[Issue] = []
+    report_path = root / "reports" / "build.json"
+    try:
+        report = json.loads(report_path.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return [Issue("error", "missing_build_report", "reports/build.json", 1, "Build metadata is missing")]
+    except json.JSONDecodeError as exc:
+        return [Issue("error", "invalid_build_report", "reports/build.json", 1, str(exc))]
+
+    actual_profile = report.get("profile")
+    if actual_profile != required_profile:
+        issues.append(
+            Issue(
+                "error",
+                "wrong_build_profile",
+                "reports/build.json",
+                1,
+                f"expected {required_profile}, found {actual_profile}",
+            )
+        )
+
+    if required_profile != "production":
+        return issues
+
+    if report.get("development_knowl_ids"):
+        issues.append(
+            Issue(
+                "error",
+                "development_content_in_production",
+                "reports/build.json",
+                1,
+                ", ".join(report["development_knowl_ids"][:10]),
+            )
+        )
+    development_roots = [
+        item.get("path", "")
+        for item in report.get("content_roots", [])
+        if item.get("visibility") == "development"
+    ]
+    if development_roots:
+        issues.append(
+            Issue(
+                "error",
+                "development_root_in_production",
+                "reports/build.json",
+                1,
+                ", ".join(development_roots),
+            )
+        )
+
+    forbidden_paths = [root / "testing", root / "assets" / "knowl-testing.js"]
+    for path in forbidden_paths:
+        if path.exists():
+            issues.append(
+                Issue(
+                    "error",
+                    "testing_artifact_in_production",
+                    str(path.relative_to(root)),
+                    1,
+                    "Development-only artifact exists in production output",
+                )
+            )
+
+    forbidden_markup = ("id=\"testing-open\"", "id=\"testing-panel\"", "knowl-testing.js")
+    for html_file in sorted(root.rglob("*.html")):
+        source = html_file.read_text(encoding="utf-8", errors="ignore")
+        for marker in forbidden_markup:
+            if marker in source:
+                issues.append(
+                    Issue(
+                        "error",
+                        "testing_ui_in_production",
+                        str(html_file.relative_to(root)),
+                        1,
+                        marker,
+                    )
+                )
+                break
+        production_dataset = (
+            'data-knowlpedia-profile="production"',
+            'data-knowlpedia-development-content="false"',
+            'data-knowlpedia-testing-ui="false"',
+        )
+        if "<html" in source and any(marker not in source for marker in production_dataset):
+            issues.append(
+                Issue(
+                    "error",
+                    "wrong_html_profile",
+                    str(html_file.relative_to(root)),
+                    1,
+                    "Expected production profile and feature flags in the HTML dataset",
+                )
+            )
+    return issues
+
+
 def print_text_report(issues: list[Issue], max_issues: int) -> None:
     if not issues:
         print("No rendered HTML errors found.")
@@ -275,6 +372,11 @@ def main() -> int:
         action="store_true",
         help="Report source-panel diagram fallbacks as rendering errors",
     )
+    parser.add_argument(
+        "--require-profile",
+        choices=("development", "production"),
+        help="Require build metadata and reject artifacts that do not match this profile",
+    )
     parser.add_argument("--max-issues", type=int, default=80, help="Maximum issues to print in text mode.")
     args = parser.parse_args()
 
@@ -288,6 +390,8 @@ def main() -> int:
         fragments_only=args.fragments_only,
         require_rendered_diagrams=args.require_rendered_diagrams,
     )
+    if args.require_profile:
+        issues.extend(check_build_profile(root, args.require_profile))
     if args.json:
         print(json.dumps([asdict(issue) for issue in issues], indent=2))
     else:

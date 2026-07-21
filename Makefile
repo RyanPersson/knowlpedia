@@ -3,9 +3,10 @@ VENV_STAMP := .venv/.deps-installed
 NODE_MODULES_STAMP := node_modules/.deps-installed
 PYTHON ?= $(VENV_PYTHON)
 CONTENT_PACKAGE ?= ../knowlpedia-content
+KNOWLPEDIA_PROFILE ?= development
 DIAGRAM_CACHE_DIR ?= .knowl-cache/diagrams
 PREBUILT_DIAGRAM_DIR ?= prebuilt/diagrams
-DIAGRAM_SOURCE ?= ../knowlpedia-content/content/algebra-category-theory/tikz-lab-whiskering-coherence.knowl.md
+DIAGRAM_SOURCE ?= ../knowlpedia-content/testing/algebra-category-theory/tikz-lab-whiskering-coherence.knowl.md
 DIAGRAM_INDEX ?= 1
 DIAGRAM_PREVIEW_OUT ?= tmp/tikz-preview
 PAGE ?= algebra-category-theory/tikz-lab-whiskering-coherence
@@ -37,23 +38,24 @@ test-ui:
 
 audit-sections:
 	$(PYTHON) scripts/audit_section_split.py $(CONTENT_PACKAGE)/content
+	$(PYTHON) scripts/audit_section_split.py $(CONTENT_PACKAGE)/testing
 
 build: build-content
 
 serve: serve-content
 
 build-content: deps
-	$(PYTHON) packages/compiler/knowl_compile.py $(CONTENT_PACKAGE) --out public-imported --allow-validation-errors --diagram-cache-dir $(DIAGRAM_CACHE_DIR) --prebuilt-diagram-dir $(PREBUILT_DIAGRAM_DIR)
+	$(PYTHON) packages/compiler/knowl_compile.py $(CONTENT_PACKAGE) --profile $(KNOWLPEDIA_PROFILE) --out public-imported --allow-validation-errors --diagram-cache-dir $(DIAGRAM_CACHE_DIR) --prebuilt-diagram-dir $(PREBUILT_DIAGRAM_DIR)
 
 build-production: deps
-	KNOWLPEDIA_SHOW_TESTING_UI=0 $(PYTHON) packages/compiler/knowl_compile.py $(CONTENT_PACKAGE) --out public-imported --allow-validation-errors --no-diagram-cache --prebuilt-diagram-dir $(PREBUILT_DIAGRAM_DIR) --prebuilt-only-diagrams
-	$(PYTHON) scripts/check_rendering_errors.py public-imported --require-rendered-diagrams
+	$(PYTHON) packages/compiler/knowl_compile.py $(CONTENT_PACKAGE) --profile production --out public-imported --allow-validation-errors --no-diagram-cache --prebuilt-diagram-dir $(PREBUILT_DIAGRAM_DIR) --prebuilt-only-diagrams
+	$(PYTHON) scripts/check_rendering_errors.py public-imported --require-rendered-diagrams --require-profile production
 
 refresh-prebuilt-diagrams: deps
-	$(PYTHON) packages/compiler/knowl_compile.py $(CONTENT_PACKAGE) --out public-imported --allow-validation-errors --no-diagram-cache --prebuilt-diagram-dir $(PREBUILT_DIAGRAM_DIR) --refresh-prebuilt-diagrams
+	$(PYTHON) packages/compiler/knowl_compile.py $(CONTENT_PACKAGE) --profile development --out public-imported --allow-validation-errors --no-diagram-cache --prebuilt-diagram-dir $(PREBUILT_DIAGRAM_DIR) --refresh-prebuilt-diagrams
 
 build-page: deps
-	$(PYTHON) packages/compiler/knowl_compile.py $(CONTENT_PACKAGE) --out public-imported --allow-validation-errors --only $(PAGE) --diagram-cache-dir $(DIAGRAM_CACHE_DIR) --prebuilt-diagram-dir $(PREBUILT_DIAGRAM_DIR)
+	$(PYTHON) packages/compiler/knowl_compile.py $(CONTENT_PACKAGE) --profile $(KNOWLPEDIA_PROFILE) --out public-imported --allow-validation-errors --only $(PAGE) --diagram-cache-dir $(DIAGRAM_CACHE_DIR) --prebuilt-diagram-dir $(PREBUILT_DIAGRAM_DIR)
 
 preview-diagram: deps
 	$(PYTHON) packages/compiler/preview_diagram.py $(DIAGRAM_SOURCE) --index $(DIAGRAM_INDEX) --out $(DIAGRAM_PREVIEW_OUT) --diagram-cache-dir $(DIAGRAM_CACHE_DIR)

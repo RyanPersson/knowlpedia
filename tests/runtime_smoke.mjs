@@ -57,6 +57,14 @@ function contrastRatio(first, second) {
 try {
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
   await page.goto(`${baseUrl}/algebraic-geometry-foundations/g-torsor-on-a-site/`);
+  const buildConfig = await page.evaluate(() => window.KNOWLPEDIA_CONFIG);
+  if (buildConfig?.profile !== "development" || !buildConfig?.features?.testingUi) {
+    throw new Error("Local preview did not expose the development build configuration");
+  }
+  const dataset = await page.evaluate(() => ({ ...document.documentElement.dataset }));
+  if (dataset.knowlpediaProfile !== "development" || dataset.knowlpediaDevelopmentContent !== "true" || dataset.knowlpediaTestingUi !== "true") {
+    throw new Error("HTML dataset does not mirror the development profile configuration");
+  }
 
   await page.getByRole("button", { name: /Search/ }).click();
   const search = page.getByRole("searchbox", { name: "Search by name, alias, or description" });
@@ -64,6 +72,11 @@ try {
   const firstResult = page.locator(".search-result").first();
   if ((await firstResult.locator("strong").textContent()) !== "Étale topology") {
     throw new Error("Search did not rank Étale topology first");
+  }
+  await search.fill("introductory real analysis");
+  const testingResult = page.locator(".search-result").first();
+  if (!(await testingResult.locator(".testing-badge").isVisible())) {
+    throw new Error("Development-only search result is missing its Testing badge");
   }
   await search.press("Escape");
   if ((await page.evaluate(() => document.activeElement?.id)) !== "search-open") {
@@ -120,6 +133,9 @@ try {
   const testingTrigger = page.getByRole("button", { name: "Testing" });
   await testingTrigger.click();
   const testingPanel = page.getByRole("dialog", { name: "Test site styles" });
+  if (!(await testingPanel.getByRole("link", { name: "Browse development-only documents" }).isVisible())) {
+    throw new Error("Testing panel does not link to the development-only content hub");
+  }
   const paletteOptions = testingPanel.locator(".palette-option");
   if ((await paletteOptions.count()) !== 5) throw new Error("Testing panel does not expose all five palettes");
 

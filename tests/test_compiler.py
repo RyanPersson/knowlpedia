@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import sys
 import tempfile
 import unittest
@@ -14,6 +15,41 @@ assert SPEC and SPEC.loader
 compiler = importlib.util.module_from_spec(SPEC)
 sys.modules[SPEC.name] = compiler
 SPEC.loader.exec_module(compiler)
+
+
+def write_knowl(path: Path, knowl_id: str, title: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        "\n".join(
+            [
+                "+++",
+                f'id = "{knowl_id}"',
+                f'title = "{title}"',
+                'kind = "definition"',
+                f'summary = "Summary for {title}."',
+                f'aliases = ["{title}"]',
+                'domains = ["sample"]',
+                "+++",
+                "",
+                f"{title} body.",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+
+def write_package(root: Path) -> None:
+    (root / "knowlpack.toml").write_text(
+        "\n".join(
+            [
+                'id = "org.example.profile-test"',
+                'title = "Profile Test"',
+                'content_dir = "content"',
+                'development_content_dirs = ["testing"]',
+            ]
+        ),
+        encoding="utf-8",
+    )
 
 
 class SingleFileSectionTests(unittest.TestCase):
@@ -54,6 +90,101 @@ class SingleFileSectionTests(unittest.TestCase):
             "Core.\n\n## Example\nOne.\n\n## Example\nTwo."
         )
         self.assertEqual([section["id"] for section in sections], ["example", "example-2"])
+
+
+class BuildProfileTests(unittest.TestCase):
+    def test_profile_precedence_is_explicit_then_environment_then_development(self) -> None:
+        self.assertEqual(compiler.resolve_profile(environment={}).name, "development")
+        self.assertEqual(
+            compiler.resolve_profile(environment={"KNOWLPEDIA_PROFILE": "production"}).name,
+            "production",
+        )
+        self.assertEqual(
+            compiler.resolve_profile("development", {"KNOWLPEDIA_PROFILE": "production"}).name,
+            "development",
+        )
+        with self.assertRaisesRegex(ValueError, "Unknown Knowlpedia profile"):
+            compiler.resolve_profile(environment={"KNOWLPEDIA_PROFILE": "staging"})
+
+    def test_development_and_production_builds_use_different_content_roots(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_package(root)
+            write_knowl(root / "content" / "main.knowl.md", "sample/main", "Main")
+            write_knowl(root / "testing" / "draft.knowl.md", "sample/draft", "Draft")
+
+            development_out = root / "development-out"
+            production_out = root / "production-out"
+            self.assertEqual(
+                compiler.write_site(root, development_out, profile=compiler.BUILD_PROFILES["development"]),
+                0,
+            )
+            self.assertEqual(
+                compiler.write_site(root, production_out, profile=compiler.BUILD_PROFILES["production"]),
+                0,
+            )
+
+            development_registry = json.loads(
+                (development_out / "indexes" / "registry.json").read_text(encoding="utf-8")
+            )
+            production_registry = json.loads(
+                (production_out / "indexes" / "registry.json").read_text(encoding="utf-8")
+            )
+            self.assertEqual(development_registry["sample/draft"]["visibility"], "development")
+            self.assertEqual(set(development_registry), {"sample/main", "sample/draft"})
+            self.assertEqual(set(production_registry), {"sample/main"})
+            self.assertTrue((development_out / "testing" / "index.html").is_file())
+            self.assertFalse((production_out / "testing").exists())
+            self.assertTrue((development_out / "assets" / "knowl-testing.js").is_file())
+            self.assertFalse((production_out / "assets" / "knowl-testing.js").exists())
+            self.assertIn(
+                'data-knowlpedia-profile="development"',
+                (development_out / "index.html").read_text(encoding="utf-8"),
+            )
+            development_html = (development_out / "index.html").read_text(encoding="utf-8")
+            self.assertIn('data-knowlpedia-development-content="true"', development_html)
+            self.assertIn('data-knowlpedia-testing-ui="true"', development_html)
+            production_html = (production_out / "index.html").read_text(encoding="utf-8")
+            self.assertIn('data-knowlpedia-profile="production"', production_html)
+            self.assertIn('data-knowlpedia-development-content="false"', production_html)
+            self.assertIn('data-knowlpedia-testing-ui="false"', production_html)
+            self.assertNotIn('id="testing-open"', production_html)
+
+    def test_production_does_not_parse_malformed_testing_content(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_package(root)
+            write_knowl(root / "content" / "main.knowl.md", "sample/main", "Main")
+            malformed = root / "testing" / "broken.knowl.md"
+            malformed.parent.mkdir(parents=True)
+            malformed.write_text("+++\nthis is not toml = [\n+++\n", encoding="utf-8")
+            self.assertEqual(
+                compiler.write_site(
+                    root,
+                    root / "production-out",
+                    profile=compiler.BUILD_PROFILES["production"],
+                ),
+                0,
+            )
+            with self.assertRaises(Exception):
+                compiler.write_site(
+                    root,
+                    root / "development-out",
+                    profile=compiler.BUILD_PROFILES["development"],
+                )
+
+    def test_duplicate_ids_across_roots_fail_development_build(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_package(root)
+            write_knowl(root / "content" / "main.knowl.md", "sample/shared", "Main")
+            write_knowl(root / "testing" / "draft.knowl.md", "sample/shared", "Draft")
+            with self.assertRaisesRegex(ValueError, "Duplicate knowl ids: sample/shared"):
+                compiler.write_site(
+                    root,
+                    root / "development-out",
+                    profile=compiler.BUILD_PROFILES["development"],
+                )
 
 
 class RenderContractTests(unittest.TestCase):

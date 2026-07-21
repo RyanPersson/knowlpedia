@@ -55,8 +55,36 @@ OLD_HUGO_TOPIC_LINKS = [
     ("Shale's Paper", "/shale-paper/"),
 ]
 
-# Temporary, site-wide visual QA controls. Production builds disable these.
-SHOW_TESTING_UI = os.environ.get("KNOWLPEDIA_SHOW_TESTING_UI", "1") != "0"
+PROFILE_NAMES = ("development", "production")
+
+
+@dataclass(frozen=True)
+class BuildProfile:
+    name: str
+    include_development_content: bool
+    show_testing_ui: bool
+
+    @property
+    def features(self) -> dict[str, bool]:
+        return {
+            "developmentContent": self.include_development_content,
+            "testingUi": self.show_testing_ui,
+        }
+
+
+BUILD_PROFILES = {
+    "development": BuildProfile("development", True, True),
+    "production": BuildProfile("production", False, False),
+}
+
+
+def resolve_profile(explicit: str | None = None, environment: dict[str, str] | None = None) -> BuildProfile:
+    environment = os.environ if environment is None else environment
+    name = explicit or environment.get("KNOWLPEDIA_PROFILE") or "development"
+    if name not in BUILD_PROFILES:
+        choices = ", ".join(PROFILE_NAMES)
+        raise ValueError(f"Unknown Knowlpedia profile {name!r}; expected one of: {choices}")
+    return BUILD_PROFILES[name]
 
 
 def repo_root() -> Path:
@@ -567,6 +595,7 @@ class Knowl:
     sections: list[dict[str, Any]] = field(default_factory=list)
     relations: list[dict[str, Any]] = field(default_factory=list)
     knowls_open: bool = False
+    visibility: str = "production"
     anchors: set[str] = field(default_factory=set)
     content_hash: str = ""
 
@@ -844,11 +873,41 @@ def serializable_sections(sections: list[dict[str, Any]]) -> list[dict[str, Any]
     return result
 
 
-def discover_knowls(content_dir: Path) -> list[Knowl]:
+def discover_knowls(content_dir: Path, *, visibility: str = "production") -> list[Knowl]:
     knowls = []
     for path in sorted(content_dir.rglob("*.knowl.md")):
-        knowls.append(parse_single_file(path))
+        knowl = parse_single_file(path)
+        knowl.visibility = visibility
+        knowls.append(knowl)
     return sorted(knowls, key=lambda k: k.id)
+
+
+def package_content_roots(
+    package_dir: Path,
+    package: dict[str, Any],
+    profile: BuildProfile,
+) -> list[tuple[Path, str]]:
+    roots = [(package_dir / package.get("content_dir", "content"), "production")]
+    if profile.include_development_content:
+        configured = package.get("development_content_dirs", [])
+        if not isinstance(configured, list) or not all(isinstance(item, str) for item in configured):
+            raise ValueError("development_content_dirs must be a list of paths")
+        roots.extend((package_dir / item, "development") for item in configured)
+    return roots
+
+
+def discover_package_knowls(
+    package_dir: Path,
+    package: dict[str, Any],
+    profile: BuildProfile,
+) -> tuple[list[Knowl], list[tuple[Path, str]]]:
+    roots = package_content_roots(package_dir, package, profile)
+    knowls = [
+        knowl
+        for content_dir, visibility in roots
+        for knowl in discover_knowls(content_dir, visibility=visibility)
+    ]
+    return sorted(knowls, key=lambda knowl: knowl.id), roots
 
 
 def render_inline(text: str, registry: dict[str, Knowl]) -> str:
@@ -1308,7 +1367,8 @@ def render_knowl_core(knowl: Knowl, registry: dict[str, Knowl]) -> str:
     title_text = knowl.title
     body = [
         f'<div class="knowl-content" data-knowl-id="{escape_attr(knowl.id)}" '
-        f'data-knowl-title="{escape_attr(title_text)}" data-knowl-kind="{escape_attr(display_kind(knowl.kind))}">',
+        f'data-knowl-title="{escape_attr(title_text)}" data-knowl-kind="{escape_attr(display_kind(knowl.kind))}" '
+        f'data-knowl-visibility="{escape_attr(knowl.visibility)}">',
         '<div class="knowl-body">',
         render_markdown(without_redundant_leading_h1(knowl.core_markdown), registry),
         render_structured_core(knowl, registry),
@@ -1381,6 +1441,7 @@ def render_page(
     registry: dict[str, Knowl],
     package: dict[str, Any],
     fragment_cache: dict[str, str] | None = None,
+    profile: BuildProfile = BUILD_PROFILES["development"],
 ) -> str:
     knowls_open_attr = ' data-knowls-open="true"' if knowl.knowls_open else ""
     section_html = []
@@ -1399,6 +1460,12 @@ def render_page(
     core_heading_html = (
         f'<h2 class="core-heading">{html.escape(core_heading)}</h2>' if core_heading else ""
     )
+    development_banner = (
+        '<aside class="development-banner" role="note"><strong>Testing content</strong>'
+        '<span>This page is included in development previews and excluded from production.</span></aside>'
+        if knowl.visibility == "development"
+        else ""
+    )
 
     return html_document(
         title=f"{knowl.title} - {package['title']}",
@@ -1406,7 +1473,8 @@ def render_page(
             [
                 '<main class="page-shell" id="main-content">',
                 f'<nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">Knowlpedia</a><span aria-hidden="true">/</span><span>{html.escape(humanize_identifier(knowl.id.split("/", 1)[0]))}</span></nav>',
-                f'<article class="knowl-page" data-knowl-id="{escape_attr(knowl.id)}"{knowls_open_attr}>',
+                development_banner,
+                f'<article class="knowl-page" data-knowl-id="{escape_attr(knowl.id)}" data-knowl-visibility="{escape_attr(knowl.visibility)}"{knowls_open_attr}>',
                 f'<header class="page-header">{kind_html}<h1>{render_inline(knowl.title, registry)}</h1><p class="page-summary">{render_inline(knowl.summary, registry)}</p></header>',
                 '<section class="core-section" id="section.core">',
                 core_heading_html,
@@ -1420,10 +1488,16 @@ def render_page(
                 "</main>",
             ]
         ),
+        profile=profile,
     )
 
 
-def html_document(title: str, body: str, preload_mode: str = "eager") -> str:
+def html_document(
+    title: str,
+    body: str,
+    preload_mode: str = "eager",
+    profile: BuildProfile = BUILD_PROFILES["development"],
+) -> str:
     math_script = ""
     if MATH_RENDERER.backend == "tex":
         math_script = """  <script>
@@ -1440,23 +1514,36 @@ def html_document(title: str, body: str, preload_mode: str = "eager") -> str:
   </script>
   <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 """
+    profile_config = json.dumps(
+        {"profile": profile.name, "features": profile.features},
+        separators=(",", ":"),
+    ).replace("</", "<\\/")
+    config_script = f"""  <script>
+    (function () {{
+      var config = {profile_config};
+      config.features = Object.freeze(config.features);
+      window.KNOWLPEDIA_CONFIG = Object.freeze(config);
+    }}());
+  </script>"""
+    palette_script = """
+        var palette = localStorage.getItem("knowl-palette");
+        var palettes = ["current", "original", "washi", "sumi", "aizome"];
+        if (palettes.indexOf(palette) === -1) palette = "current";
+        document.documentElement.dataset.palette = palette;""" if profile.show_testing_ui else ""
     theme_script = """  <script>
     (function () {
       try {
         var theme = localStorage.getItem("knowl-theme");
-        var palette = localStorage.getItem("knowl-palette");
-        var palettes = ["current", "original", "washi", "sumi", "aizome"];
         if (theme !== "dark" && theme !== "light") {
           theme = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
         }
-        if (palettes.indexOf(palette) === -1) palette = "current";
         document.documentElement.dataset.theme = theme;
-        document.documentElement.dataset.palette = palette;
+__PALETTE_SCRIPT__
       } catch (error) {}
     }());
-  </script>"""
+  </script>""".replace("__PALETTE_SCRIPT__", palette_script)
     testing_button = """
-    <button type="button" id="testing-open" class="header-action testing-trigger" aria-haspopup="dialog" aria-controls="testing-panel" aria-expanded="false"><span aria-hidden="true">◫</span><span class="testing-label">Testing</span></button>""" if SHOW_TESTING_UI else ""
+    <button type="button" id="testing-open" class="header-action testing-trigger" aria-haspopup="dialog" aria-controls="testing-panel" aria-expanded="false"><span aria-hidden="true">◫</span><span class="testing-label">Testing</span></button>""" if profile.show_testing_ui else ""
     testing_panel = """
 <aside id="testing-panel" class="testing-panel" role="dialog" aria-modal="false" aria-labelledby="testing-title" hidden>
   <div class="testing-heading">
@@ -1464,6 +1551,7 @@ def html_document(title: str, body: str, preload_mode: str = "eager") -> str:
     <button type="button" id="testing-close" class="icon-button" aria-label="Close testing panel">&times;</button>
   </div>
   <p class="testing-intro">Compare temporary site-wide CSS settings. Your selection is saved in this browser.</p>
+  <p class="testing-content-link"><a href="/testing/">Browse development-only documents</a></p>
   <fieldset class="testing-fieldset">
     <legend>Color palette</legend>
     <div class="palette-options" role="radiogroup" aria-label="Color palette">
@@ -1474,17 +1562,20 @@ def html_document(title: str, body: str, preload_mode: str = "eager") -> str:
       <button type="button" class="palette-option" data-palette-value="aizome" role="radio" aria-checked="false"><span class="palette-swatch" aria-hidden="true"><i></i><i></i></span><span><strong>Aizome</strong><small>Indigo mountain haze</small></span></button>
     </div>
   </fieldset>
-</aside>""" if SHOW_TESTING_UI else ""
+</aside>""" if profile.show_testing_ui else ""
+    testing_script = '  <script defer src="/assets/knowl-testing.js"></script>' if profile.show_testing_ui else ""
     return f"""<!doctype html>
-<html lang="en">
+<html lang="en" data-knowlpedia-profile="{escape_attr(profile.name)}" data-knowlpedia-development-content="{str(profile.include_development_content).lower()}" data-knowlpedia-testing-ui="{str(profile.show_testing_ui).lower()}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{html.escape(title)}</title>
+{config_script}
 {theme_script}
   <link rel="stylesheet" href="/assets/katex.min.css">
   <link rel="stylesheet" href="/assets/knowl.css">
   <script defer src="/assets/knowl.js"></script>
+{testing_script}
 {math_script.rstrip()}
 </head>
 <body data-knowl-preload="{escape_attr(preload_mode)}">
@@ -1513,9 +1604,15 @@ def html_document(title: str, body: str, preload_mode: str = "eager") -> str:
 """
 
 
-def render_index(registry: dict[str, Knowl], package: dict[str, Any]) -> str:
+def render_index(
+    registry: dict[str, Knowl],
+    package: dict[str, Any],
+    profile: BuildProfile = BUILD_PROFILES["development"],
+) -> str:
     grouped: dict[str, list[Knowl]] = {}
     for knowl in registry.values():
+        if knowl.visibility != "production":
+            continue
         top = knowl.id.split("/", 1)[0]
         grouped.setdefault(top, []).append(knowl)
 
@@ -1541,10 +1638,48 @@ def render_index(registry: dict[str, Knowl], package: dict[str, Any]) -> str:
             )
         parts.append("</ul></details>")
     parts.append("</main>")
-    return html_document(package["title"], "\n".join(parts), preload_mode="visible")
+    return html_document(package["title"], "\n".join(parts), preload_mode="visible", profile=profile)
 
 
-def render_old_topics_page(package: dict[str, Any]) -> str:
+def render_testing_hub(
+    registry: dict[str, Knowl],
+    package: dict[str, Any],
+    profile: BuildProfile,
+) -> str:
+    testing_knowls = sorted(
+        (knowl for knowl in registry.values() if knowl.visibility == "development"),
+        key=lambda knowl: knowl.title.lower(),
+    )
+    items = []
+    for knowl in testing_knowls:
+        items.append(
+            '<li class="testing-index-item">'
+            f'<a href="{escape_attr(target_href(knowl.id))}">{html.escape(knowl.title)}</a>'
+            '<span class="testing-badge">Testing</span>'
+            f'<p>{html.escape(knowl.summary)}</p></li>'
+        )
+    body = "\n".join(
+        [
+            '<main class="page-shell testing-index" id="main-content">',
+            '<nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">Knowlpedia</a><span aria-hidden="true">/</span><span>Testing</span></nav>',
+            '<header class="page-header"><p class="kind">Development only</p><h1>Testing content</h1>',
+            '<p class="page-summary">Drafts, performance fixtures, and rendering labs included in local previews but excluded from production.</p></header>',
+            f'<ul class="testing-index-list">{"".join(items)}</ul>',
+            "</main>",
+        ]
+    )
+    return html_document(
+        f"Testing content - {package['title']}",
+        body,
+        preload_mode="none",
+        profile=profile,
+    )
+
+
+def render_old_topics_page(
+    package: dict[str, Any],
+    profile: BuildProfile = BUILD_PROFILES["development"],
+) -> str:
     links = "\n".join(
         f'    <li><a href="{escape_attr(href)}">{html.escape(label)}</a></li>'
         for label, href in OLD_HUGO_TOPIC_LINKS
@@ -1560,7 +1695,7 @@ def render_old_topics_page(package: dict[str, Any]) -> str:
             "</main>",
         ]
     )
-    return html_document(f"Topics - {package['title']}", body, preload_mode="none")
+    return html_document(f"Topics - {package['title']}", body, preload_mode="none", profile=profile)
 
 
 def validate(registry: dict[str, Knowl]) -> list[ValidationMessage]:
@@ -1731,6 +1866,7 @@ def registry_json(registry: dict[str, Knowl]) -> dict[str, Any]:
             "summary": knowl.summary,
             "aliases": knowl.aliases,
             "domains": knowl.domains,
+            "visibility": knowl.visibility,
             "href": target_href(knowl.id),
             "fragment": fragment_href(knowl.id),
             "anchors": sorted(knowl.anchors),
@@ -1759,6 +1895,7 @@ def search_json(registry: dict[str, Knowl]) -> list[dict[str, Any]]:
             "aliases": knowl.aliases,
             "domains": knowl.domains,
             "href": target_href(knowl.id),
+            "visibility": knowl.visibility,
         }
         for knowl in registry.values()
     ]
@@ -1879,12 +2016,14 @@ def write_sqlite(path: Path, registry: dict[str, Knowl]) -> None:
         conn.close()
 
 
-def copy_runtime_assets(out_dir: Path) -> None:
+def copy_runtime_assets(out_dir: Path, profile: BuildProfile) -> None:
     runtime_dir = Path(__file__).resolve().parents[1] / "static-runtime"
     assets_dir = out_dir / "assets"
     assets_dir.mkdir(parents=True, exist_ok=True)
     for filename in ("knowl.css", "knowl.js"):
         shutil.copyfile(runtime_dir / filename, assets_dir / filename)
+    if profile.show_testing_ui:
+        shutil.copyfile(runtime_dir / "knowl-testing.js", assets_dir / "knowl-testing.js")
 
     katex_assets = find_katex_assets_dir()
     if not katex_assets:
@@ -1902,12 +2041,18 @@ def copy_runtime_assets(out_dir: Path) -> None:
         shutil.copytree(fonts_source, assets_dir / "fonts", dirs_exist_ok=True)
 
 
-def write_site(package_dir: Path, out_dir: Path, allow_validation_errors: bool = False) -> int:
+def write_site(
+    package_dir: Path,
+    out_dir: Path,
+    allow_validation_errors: bool = False,
+    profile: BuildProfile = BUILD_PROFILES["development"],
+) -> int:
     return write_site_for_ids(
         package_dir,
         out_dir,
         only_ids=None,
         allow_validation_errors=allow_validation_errors,
+        profile=profile,
     )
 
 
@@ -1916,11 +2061,11 @@ def write_site_for_ids(
     out_dir: Path,
     only_ids: set[str] | None = None,
     allow_validation_errors: bool = False,
+    profile: BuildProfile = BUILD_PROFILES["development"],
 ) -> int:
     package_path = package_dir / "knowlpack.toml"
     package = read_toml(package_path)
-    content_dir = package_dir / package.get("content_dir", "content")
-    knowls = discover_knowls(content_dir)
+    knowls, content_roots = discover_package_knowls(package_dir, package, profile)
     registry = {knowl.id: knowl for knowl in knowls}
     if len(registry) != len(knowls):
         duplicates = sorted({knowl.id for knowl in knowls if sum(k.id == knowl.id for k in knowls) > 1})
@@ -1938,7 +2083,7 @@ def write_site_for_ids(
     if not only_ids and out_dir.exists():
         shutil.rmtree(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
-    copy_runtime_assets(out_dir)
+    copy_runtime_assets(out_dir, profile)
 
     if only_ids:
         target_knowls = [registry[knowl_id] for knowl_id in sorted(only_ids) if knowl_id in registry]
@@ -1951,15 +2096,19 @@ def write_site_for_ids(
         target_knowls = list(registry.values())
         fragment_cache = {knowl.id: render_knowl_core(knowl, registry) for knowl in registry.values()}
 
-        (out_dir / "index.html").write_text(render_index(registry, package), encoding="utf-8")
+        (out_dir / "index.html").write_text(render_index(registry, package, profile), encoding="utf-8")
         topics_path = out_dir / "topics" / "index.html"
         topics_path.parent.mkdir(parents=True, exist_ok=True)
-        topics_path.write_text(render_old_topics_page(package), encoding="utf-8")
+        topics_path.write_text(render_old_topics_page(package, profile), encoding="utf-8")
+        if profile.include_development_content:
+            testing_path = out_dir / "testing" / "index.html"
+            testing_path.parent.mkdir(parents=True, exist_ok=True)
+            testing_path.write_text(render_testing_hub(registry, package, profile), encoding="utf-8")
 
     for knowl in target_knowls:
         page_path = out_dir / slug_to_relpath(knowl.id) / "index.html"
         page_path.parent.mkdir(parents=True, exist_ok=True)
-        page_path.write_text(render_page(knowl, registry, package, fragment_cache), encoding="utf-8")
+        page_path.write_text(render_page(knowl, registry, package, fragment_cache, profile), encoding="utf-8")
 
         fragment_path = out_dir / "fragments" / slug_to_relpath(knowl.id) / "core.html"
         fragment_path.parent.mkdir(parents=True, exist_ok=True)
@@ -1977,6 +2126,24 @@ def write_site_for_ids(
         write_json(out_dir / "indexes" / "links.json", links_json(registry))
         write_json(out_dir / "indexes" / "proofs.json", proofs_json(registry))
         write_json(out_dir / "reports" / "validation.json", [msg.__dict__ for msg in messages])
+        write_json(
+            out_dir / "reports" / "build.json",
+            {
+                "profile": profile.name,
+                "features": profile.features,
+                "content_roots": [
+                    {
+                        "path": str(path.relative_to(package_dir)),
+                        "visibility": visibility,
+                    }
+                    for path, visibility in content_roots
+                ],
+                "knowl_count": len(registry),
+                "development_knowl_ids": sorted(
+                    knowl.id for knowl in registry.values() if knowl.visibility == "development"
+                ),
+            },
+        )
         write_sqlite(out_dir / "indexes" / "knowls.sqlite", registry)
         print(f"Compiled {len(registry)} knowls into {out_dir}")
     else:
@@ -1994,6 +2161,12 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Compile a knowl package")
     parser.add_argument("package_dir", type=Path, help="Directory containing knowlpack.toml")
     parser.add_argument("--out", type=Path, default=Path("public"), help="Output directory")
+    parser.add_argument(
+        "--profile",
+        choices=PROFILE_NAMES,
+        default=None,
+        help="Build profile. Defaults to KNOWLPEDIA_PROFILE, then development.",
+    )
     parser.add_argument(
         "--allow-validation-errors",
         action="store_true",
@@ -2034,6 +2207,10 @@ def main() -> int:
         help="Disable local TeX rendering and use only portable prebuilt diagram fragments",
     )
     args = parser.parse_args()
+    try:
+        profile = resolve_profile(args.profile)
+    except ValueError as exc:
+        parser.error(str(exc))
     DIAGRAM_RENDERER.configure_cache(None if args.no_diagram_cache else args.diagram_cache_dir)
     DIAGRAM_RENDERER.configure_prebuilt(
         args.prebuilt_diagram_dir,
@@ -2046,6 +2223,7 @@ def main() -> int:
         args.out,
         only_ids=set(args.only) or None,
         allow_validation_errors=args.allow_validation_errors,
+        profile=profile,
     )
 
 

@@ -6,8 +6,6 @@
   const preloadQueue = [];
   const observedKnowls = new WeakSet();
   const themeKey = "knowl-theme";
-  const paletteKey = "knowl-palette";
-  const palettes = ["current", "original", "washi", "sumi", "aizome"];
   const maxPreloads = 6;
   let activePreloads = 0;
   let preloadObserver = null;
@@ -16,7 +14,6 @@
   let searchData = null;
   let searchRequest = null;
   let searchReturnFocus = null;
-  let testingReturnFocus = null;
 
   function shouldUseNormalNavigation(event) {
     return event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey;
@@ -330,89 +327,6 @@
     applyTheme(nextTheme);
   }
 
-  function storedPalette() {
-    try {
-      const saved = localStorage.getItem(paletteKey);
-      return palettes.includes(saved) ? saved : null;
-    } catch (error) {
-      return null;
-    }
-  }
-
-  function effectivePalette() {
-    const active = document.documentElement.dataset.palette;
-    if (palettes.includes(active)) return active;
-    return storedPalette() || "current";
-  }
-
-  function applyPalette(palette) {
-    const next = palettes.includes(palette) ? palette : "current";
-    document.documentElement.dataset.palette = next;
-    document.querySelectorAll(".palette-option[data-palette-value]").forEach((button) => {
-      const selected = button.dataset.paletteValue === next;
-      button.setAttribute("aria-checked", selected ? "true" : "false");
-      button.tabIndex = selected ? 0 : -1;
-    });
-  }
-
-  function choosePalette(palette) {
-    const next = palettes.includes(palette) ? palette : "current";
-    try {
-      localStorage.setItem(paletteKey, next);
-    } catch (error) {}
-    applyPalette(next);
-  }
-
-  function openTesting() {
-    const panel = document.getElementById("testing-panel");
-    const trigger = document.getElementById("testing-open");
-    if (!panel || !trigger || !panel.hidden) return;
-    closeSearch();
-    testingReturnFocus = document.activeElement;
-    panel.hidden = false;
-    trigger.setAttribute("aria-expanded", "true");
-    const selected = panel.querySelector('.palette-option[aria-checked="true"]');
-    if (selected) selected.focus({ preventScroll: true });
-  }
-
-  function closeTesting(restoreFocus = true) {
-    const panel = document.getElementById("testing-panel");
-    const trigger = document.getElementById("testing-open");
-    if (!panel || panel.hidden) return false;
-    panel.hidden = true;
-    if (trigger) trigger.setAttribute("aria-expanded", "false");
-    if (restoreFocus && testingReturnFocus?.focus) testingReturnFocus.focus({ preventScroll: true });
-    return true;
-  }
-
-  function toggleTesting() {
-    const panel = document.getElementById("testing-panel");
-    if (!panel) return;
-    if (panel.hidden) openTesting();
-    else closeTesting();
-  }
-
-  function handlePaletteClick(event) {
-    const button = event.target.closest(".palette-option[data-palette-value]");
-    if (!button) return;
-    choosePalette(button.dataset.paletteValue);
-  }
-
-  function handlePaletteKeydown(event) {
-    if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(event.key)) return;
-    const buttons = Array.from(event.currentTarget.querySelectorAll(".palette-option[data-palette-value]"));
-    const current = buttons.indexOf(document.activeElement);
-    if (current < 0 || !buttons.length) return;
-    event.preventDefault();
-    let next = current;
-    if (event.key === "Home") next = 0;
-    else if (event.key === "End") next = buttons.length - 1;
-    else if (event.key === "ArrowLeft" || event.key === "ArrowUp") next = (current - 1 + buttons.length) % buttons.length;
-    else next = (current + 1) % buttons.length;
-    buttons[next].focus();
-    choosePalette(buttons[next].dataset.paletteValue);
-  }
-
   function normalizeSearchText(value) {
     return value.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
   }
@@ -482,6 +396,12 @@
       const meta = document.createElement("span");
       meta.className = "search-result-meta";
       meta.textContent = item.kind + " · " + item.id.split("/", 1)[0].replaceAll("-", " ");
+      if (item.visibility === "development") {
+        const badge = document.createElement("span");
+        badge.className = "testing-badge";
+        badge.textContent = "Testing";
+        meta.append(" · ", badge);
+      }
       const summary = document.createElement("span");
       summary.className = "search-result-summary";
       summary.textContent = item.summary;
@@ -496,7 +416,7 @@
     const input = document.getElementById("search-input");
     const status = document.getElementById("search-status");
     if (!dialog || !input || !dialog.hidden) return;
-    closeTesting();
+    if (window.KNOWLPEDIA_TESTING) window.KNOWLPEDIA_TESTING.close(false);
     searchReturnFocus = document.activeElement;
     dialog.hidden = false;
     document.body.classList.add("search-open");
@@ -546,27 +466,6 @@
     }
   }
 
-  function initTesting() {
-    applyPalette(effectivePalette());
-    const trigger = document.getElementById("testing-open");
-    const close = document.getElementById("testing-close");
-    const options = document.querySelector(".palette-options");
-    const panel = document.getElementById("testing-panel");
-    if (trigger) trigger.addEventListener("click", toggleTesting);
-    if (close) close.addEventListener("click", () => closeTesting());
-    if (options) {
-      options.addEventListener("click", handlePaletteClick);
-      options.addEventListener("keydown", handlePaletteKeydown);
-    }
-    if (panel) {
-      document.addEventListener("click", (event) => {
-        const themeToggle = document.getElementById("theme-toggle");
-        if (panel.hidden || panel.contains(event.target) || trigger?.contains(event.target) || themeToggle?.contains(event.target)) return;
-        closeTesting(false);
-      });
-    }
-  }
-
   function initSearch() {
     document.querySelectorAll("#search-open, [data-open-search]").forEach((button) => button.addEventListener("click", openSearch));
     const close = document.getElementById("search-close");
@@ -580,7 +479,6 @@
   function init() {
     loadInlineFragments();
     initTheme();
-    initTesting();
     initSearch();
     preloadForDocument();
     window.setTimeout(autoExpandKnowls, 0);
@@ -616,7 +514,7 @@
     }
     if (event.key === "Escape") {
       if (closeSearch()) return;
-      if (closeTesting()) return;
+      if (window.KNOWLPEDIA_TESTING && window.KNOWLPEDIA_TESTING.close()) return;
       const panels = document.querySelectorAll(".knowl-panel");
       if (panels.length) closePanel(panels[panels.length - 1], true);
     }

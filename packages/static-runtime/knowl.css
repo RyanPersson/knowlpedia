@@ -415,6 +415,16 @@ button {
   line-height: 1.45;
 }
 
+.testing-content-link {
+  margin: -0.35rem 0 1rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.testing-content-link a {
+  color: var(--link);
+}
+
 .testing-fieldset {
   min-width: 0;
   margin: 0;
@@ -556,6 +566,59 @@ kbd {
   margin-bottom: 1.8rem;
   padding: 0.6rem 0 1.8rem;
   border-bottom: 1px solid var(--line);
+}
+
+.development-banner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.75rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--warning);
+  border-radius: 0.55rem;
+  background: var(--warning-soft);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+}
+
+.development-banner strong,
+.testing-badge {
+  color: var(--warning);
+  font-weight: 820;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.testing-badge {
+  font-size: 0.68rem;
+}
+
+.testing-index-list {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.testing-index-item {
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 0.55rem;
+  background: var(--surface);
+}
+
+.testing-index-item > a {
+  margin-right: 0.55rem;
+  color: var(--link);
+  font-weight: 750;
+}
+
+.testing-index-item p {
+  margin: 0.35rem 0 0;
+  color: var(--muted);
+  font-size: 0.86rem;
 }
 
 .page-header h1 {
