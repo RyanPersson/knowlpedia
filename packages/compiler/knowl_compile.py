@@ -30,6 +30,7 @@ from typing import Any
 WIKILINK_RE = re.compile(
     r"\[\[([A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)+(?:#[^\]|]+)?)(?:\|([^\n]*?))?\]\]"
 )
+MARKDOWN_LINK_RE = re.compile(r"\[([^\]\n]+)\]\(([^)\n]+)\)")
 MATH_RE = re.compile(
     r"(?s)(\$\$(.+?)\$\$|\\\[(.+?)\\\]|\\\((.+?)\\\)|(?<!\\)\$(?!\$)(.+?)(?<!\\)\$)"
 )
@@ -870,6 +871,17 @@ def render_inline(text: str, registry: dict[str, Knowl]) -> str:
             f'{attrs} aria-expanded="false">{html.escape(label)}</a>'
         )
 
+    def replace_markdown_link(match: re.Match[str]) -> str:
+        label = html.unescape(match.group(1))
+        href = html.unescape(match.group(2)).strip()
+        if not (href.startswith("https://") or href.startswith("http://") or href.startswith("/")):
+            return match.group(0)
+        return (
+            f'<a class="page-link" href="{escape_attr(href)}">'
+            f"{html.escape(label)}</a>"
+        )
+
+    escaped = MARKDOWN_LINK_RE.sub(replace_markdown_link, escaped)
     escaped = WIKILINK_RE.sub(replace_wikilink, escaped)
     escaped = re.sub(r"`([^`]+)`", r"<code>\1</code>", escaped)
     escaped = re.sub(r"\*\*([^*]+)\*\*", r"<strong>\1</strong>", escaped)
