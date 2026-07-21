@@ -30,6 +30,7 @@ from typing import Any
 WIKILINK_RE = re.compile(
     r"\[\[([A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)+(?:#[^\]|]+)?)(?:\|([^\n]*?))?\]\]"
 )
+MARKDOWN_LINK_RE = re.compile(r"\[([^\]\n]+)\]\(([^)\n]+)\)")
 MATH_RE = re.compile(
     r"(?s)(\$\$(.+?)\$\$|\\\[(.+?)\\\]|\\\((.+?)\\\)|(?<!\\)\$(?!\$)(.+?)(?<!\\)\$)"
 )
@@ -85,6 +86,11 @@ def resolve_profile(explicit: str | None = None, environment: dict[str, str] | N
         choices = ", ".join(PROFILE_NAMES)
         raise ValueError(f"Unknown Knowlpedia profile {name!r}; expected one of: {choices}")
     return BUILD_PROFILES[name]
+
+# Small pages embed their direct knowl fragments for instant offline expansion.
+# Large indexes use the runtime's visible-link preloader and fetch fragments on
+# demand, avoiding multi-megabyte HTML pages and a request for every linked knowl.
+INLINE_PRELOAD_TEMPLATE_LIMIT = 64
 
 
 def repo_root() -> Path:
@@ -929,6 +935,17 @@ def render_inline(text: str, registry: dict[str, Knowl]) -> str:
             f'{attrs} aria-expanded="false">{html.escape(label)}</a>'
         )
 
+    def replace_markdown_link(match: re.Match[str]) -> str:
+        label = html.unescape(match.group(1))
+        href = html.unescape(match.group(2)).strip()
+        if not (href.startswith("https://") or href.startswith("http://") or href.startswith("/")):
+            return match.group(0)
+        return (
+            f'<a class="page-link" href="{escape_attr(href)}">'
+            f"{html.escape(label)}</a>"
+        )
+
+    escaped = MARKDOWN_LINK_RE.sub(replace_markdown_link, escaped)
     escaped = WIKILINK_RE.sub(replace_wikilink, escaped)
     escaped = re.sub(r"`([^`]+)`", r"<code>\1</code>", escaped)
     escaped = re.sub(r"\*\*([^*]+)\*\*", r"<strong>\1</strong>", escaped)
@@ -1423,9 +1440,13 @@ def render_preload_templates(
     knowl: Knowl,
     registry: dict[str, Knowl],
     fragment_cache: dict[str, str] | None = None,
+    targets: list[str] | None = None,
 ) -> str:
+    targets = targets if targets is not None else preload_template_targets(knowl, registry)
+    if len(targets) > INLINE_PRELOAD_TEMPLATE_LIMIT:
+        return ""
     templates = []
-    for target in preload_template_targets(knowl, registry):
+    for target in targets:
         fragment_url = fragment_href(target)
         fragment_html = fragment_cache[target] if fragment_cache else render_knowl_core(registry[target], registry)
         templates.append(
@@ -1444,6 +1465,8 @@ def render_page(
     profile: BuildProfile = BUILD_PROFILES["development"],
 ) -> str:
     knowls_open_attr = ' data-knowls-open="true"' if knowl.knowls_open else ""
+    preload_targets = preload_template_targets(knowl, registry)
+    preload_mode = "visible" if len(preload_targets) > INLINE_PRELOAD_TEMPLATE_LIMIT else "eager"
     section_html = []
     for section in knowl.sections:
         open_attr = " open" if section.get("default_open") else ""
@@ -1484,10 +1507,11 @@ def render_page(
                 "\n".join(section_html),
                 render_relations(knowl, registry),
                 "</article>",
-                render_preload_templates(knowl, registry, fragment_cache),
+                render_preload_templates(knowl, registry, fragment_cache, preload_targets),
                 "</main>",
             ]
         ),
+        preload_mode=preload_mode,
         profile=profile,
     )
 

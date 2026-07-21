@@ -216,6 +216,21 @@ class RenderContractTests(unittest.TestCase):
         self.assertNotIn('class="knowl"', rendered)
         self.assertNotIn("$", rendered)
 
+    def test_root_relative_markdown_link_is_navigation_only(self) -> None:
+        rendered = compiler.render_inline("[Index](/conjectures/generated/example/)", {})
+        self.assertIn('class="page-link"', rendered)
+        self.assertIn('href="/conjectures/generated/example/"', rendered)
+        self.assertNotIn("data-knowl", rendered)
+
+    def test_https_markdown_link_preserves_inline_code_label(self) -> None:
+        rendered = compiler.render_inline("[`source.lean`](https://example.com/source)", {})
+        self.assertIn('href="https://example.com/source"', rendered)
+        self.assertIn("<code>source.lean</code>", rendered)
+
+    def test_unsafe_markdown_link_is_not_activated(self) -> None:
+        rendered = compiler.render_inline("[bad](javascript:alert(1))", {})
+        self.assertNotIn("<a ", rendered)
+
     def test_redundant_source_h1_is_removed_from_rendered_core(self) -> None:
         source = "# Document title\n\nFirst paragraph.\n\n## Section"
         self.assertEqual(
@@ -275,6 +290,37 @@ class RenderContractTests(unittest.TestCase):
         item = compiler.search_json({knowl.id: knowl})[0]
         self.assertEqual(item["aliases"], ["sample"])
         self.assertEqual(item["summary"], "A concise orientation sentence.")
+
+    def test_large_knowl_index_uses_visible_lazy_loading_without_inline_templates(self) -> None:
+        targets = {
+            f"sample/target-{index}": compiler.Knowl(
+                id=f"sample/target-{index}",
+                title=f"Target {index}",
+                kind="definition",
+                summary="A target.",
+                aliases=[],
+                domains=["sample"],
+                source_path=Path(f"target-{index}.knowl.md"),
+                core_markdown="A target definition.",
+            )
+            for index in range(2)
+        }
+        index_knowl = compiler.Knowl(
+            id="sample/index",
+            title="Sample index",
+            kind="knowl",
+            summary="An index.",
+            aliases=[],
+            domains=["sample"],
+            source_path=Path("index.knowl.md"),
+            core_markdown=" ".join(f"[[{target}|Open]]" for target in targets),
+        )
+        registry = {index_knowl.id: index_knowl, **targets}
+        with patch.object(compiler, "INLINE_PRELOAD_TEMPLATE_LIMIT", 1):
+            rendered = compiler.render_page(index_knowl, registry, {"title": "Knowlpedia"})
+        self.assertIn('data-knowl-preload="visible"', rendered)
+        self.assertEqual(rendered.count('class="knowl"'), 2)
+        self.assertNotIn("<template data-knowl-fragment=", rendered)
 
 
 class PrebuiltDiagramTests(unittest.TestCase):
