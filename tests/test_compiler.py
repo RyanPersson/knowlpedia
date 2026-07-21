@@ -160,6 +160,37 @@ class RenderContractTests(unittest.TestCase):
         self.assertEqual(item["aliases"], ["sample"])
         self.assertEqual(item["summary"], "A concise orientation sentence.")
 
+    def test_large_knowl_index_uses_visible_lazy_loading_without_inline_templates(self) -> None:
+        targets = {
+            f"sample/target-{index}": compiler.Knowl(
+                id=f"sample/target-{index}",
+                title=f"Target {index}",
+                kind="definition",
+                summary="A target.",
+                aliases=[],
+                domains=["sample"],
+                source_path=Path(f"target-{index}.knowl.md"),
+                core_markdown="A target definition.",
+            )
+            for index in range(2)
+        }
+        index_knowl = compiler.Knowl(
+            id="sample/index",
+            title="Sample index",
+            kind="knowl",
+            summary="An index.",
+            aliases=[],
+            domains=["sample"],
+            source_path=Path("index.knowl.md"),
+            core_markdown=" ".join(f"[[{target}|Open]]" for target in targets),
+        )
+        registry = {index_knowl.id: index_knowl, **targets}
+        with patch.object(compiler, "INLINE_PRELOAD_TEMPLATE_LIMIT", 1):
+            rendered = compiler.render_page(index_knowl, registry, {"title": "Knowlpedia"})
+        self.assertIn('data-knowl-preload="visible"', rendered)
+        self.assertEqual(rendered.count('class="knowl"'), 2)
+        self.assertNotIn("<template data-knowl-fragment=", rendered)
+
 
 class PrebuiltDiagramTests(unittest.TestCase):
     def test_prebuilt_diagram_is_used_without_local_tex_tools(self) -> None:

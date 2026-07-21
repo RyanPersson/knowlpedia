@@ -59,6 +59,11 @@ OLD_HUGO_TOPIC_LINKS = [
 # Temporary, site-wide visual QA controls. Production builds disable these.
 SHOW_TESTING_UI = os.environ.get("KNOWLPEDIA_SHOW_TESTING_UI", "1") != "0"
 
+# Small pages embed their direct knowl fragments for instant offline expansion.
+# Large indexes use the runtime's visible-link preloader and fetch fragments on
+# demand, avoiding multi-megabyte HTML pages and a request for every linked knowl.
+INLINE_PRELOAD_TEMPLATE_LIMIT = 64
+
 
 def repo_root() -> Path:
     return Path(__file__).resolve().parents[2]
@@ -1375,9 +1380,13 @@ def render_preload_templates(
     knowl: Knowl,
     registry: dict[str, Knowl],
     fragment_cache: dict[str, str] | None = None,
+    targets: list[str] | None = None,
 ) -> str:
+    targets = targets if targets is not None else preload_template_targets(knowl, registry)
+    if len(targets) > INLINE_PRELOAD_TEMPLATE_LIMIT:
+        return ""
     templates = []
-    for target in preload_template_targets(knowl, registry):
+    for target in targets:
         fragment_url = fragment_href(target)
         fragment_html = fragment_cache[target] if fragment_cache else render_knowl_core(registry[target], registry)
         templates.append(
@@ -1395,6 +1404,8 @@ def render_page(
     fragment_cache: dict[str, str] | None = None,
 ) -> str:
     knowls_open_attr = ' data-knowls-open="true"' if knowl.knowls_open else ""
+    preload_targets = preload_template_targets(knowl, registry)
+    preload_mode = "visible" if len(preload_targets) > INLINE_PRELOAD_TEMPLATE_LIMIT else "eager"
     section_html = []
     for section in knowl.sections:
         open_attr = " open" if section.get("default_open") else ""
@@ -1428,10 +1439,11 @@ def render_page(
                 "\n".join(section_html),
                 render_relations(knowl, registry),
                 "</article>",
-                render_preload_templates(knowl, registry, fragment_cache),
+                render_preload_templates(knowl, registry, fragment_cache, preload_targets),
                 "</main>",
             ]
         ),
+        preload_mode=preload_mode,
     )
 
 
