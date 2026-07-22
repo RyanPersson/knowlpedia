@@ -51,7 +51,7 @@ jobs:
         working-directory: knowlpedia
         run: make test
 
-      - name: Build production site
+      - name: Build production site from GitHub content only
         working-directory: knowlpedia
         run: make build-production
 

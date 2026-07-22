@@ -3,6 +3,10 @@ VENV_STAMP := .venv/.deps-installed
 NODE_MODULES_STAMP := node_modules/.deps-installed
 PYTHON ?= $(VENV_PYTHON)
 CONTENT_PACKAGE ?= ../knowlpedia-content
+EXTRA_CONTENT_SOURCES ?= ../conjectures-catalog
+COMPOSED_CONTENT_PACKAGE ?= .knowl-cache/content-package
+PRODUCTION_CONTENT_PACKAGE ?= .knowl-cache/production-content-package
+CONTENT_SOURCE_ARGS = $(foreach source,$(EXTRA_CONTENT_SOURCES),--source $(source))
 KNOWLPEDIA_PROFILE ?= development
 DIAGRAM_CACHE_DIR ?= .knowl-cache/diagrams
 PREBUILT_DIAGRAM_DIR ?= prebuilt/diagrams
@@ -14,8 +18,8 @@ PREVIEW_URL ?= http://127.0.0.1:8001
 PREVIEW_PATH ?= /algebra-groups/group/
 SCREENSHOT ?= tmp/screenshots/page.png
 
-.PHONY: deps build build-production serve clean screenshot test test-ui audit-sections refresh-prebuilt-diagrams
-.PHONY: build-content serve-content build-page preview-diagram
+.PHONY: deps build build-production serve clean screenshot test test-ui test-local-sources-ui audit-sections refresh-prebuilt-diagrams
+.PHONY: compose-content compose-production-content build-content serve-content build-page preview-diagram
 .PHONY: preview-start preview-status preview-stop preview-restart preview-scan preview-adopt
 .PHONY: check-rendering check-rendering-knowls check-rendering-content
 
@@ -36,26 +40,37 @@ test:
 test-ui:
 	PREVIEW_URL=$(PREVIEW_URL) node tests/runtime_smoke.mjs
 
+test-local-sources-ui:
+	PREVIEW_URL=$(PREVIEW_URL) node tests/local_sources_smoke.mjs
+
 audit-sections:
 	$(PYTHON) scripts/audit_section_split.py $(CONTENT_PACKAGE)/content
-	$(PYTHON) scripts/audit_section_split.py $(CONTENT_PACKAGE)/testing
+	@if [ -d "$(CONTENT_PACKAGE)/testing" ]; then $(PYTHON) scripts/audit_section_split.py $(CONTENT_PACKAGE)/testing; fi
+
+compose-content:
+	$(PYTHON) scripts/compose_content.py --primary $(CONTENT_PACKAGE) $(CONTENT_SOURCE_ARGS) --out $(COMPOSED_CONTENT_PACKAGE)
+
+# Production deliberately composes only the GitHub-backed primary package. The
+# exact-source guard prevents local-only contributors from leaking into Pages.
+compose-production-content:
+	$(PYTHON) scripts/compose_content.py --primary $(CONTENT_PACKAGE) --out $(PRODUCTION_CONTENT_PACKAGE) --expect-source $(CONTENT_PACKAGE)
 
 build: build-content
 
 serve: serve-content
 
-build-content: deps
-	$(PYTHON) packages/compiler/knowl_compile.py $(CONTENT_PACKAGE) --profile $(KNOWLPEDIA_PROFILE) --out public-imported --allow-validation-errors --diagram-cache-dir $(DIAGRAM_CACHE_DIR) --prebuilt-diagram-dir $(PREBUILT_DIAGRAM_DIR)
+build-content: deps compose-content
+	$(PYTHON) packages/compiler/knowl_compile.py $(COMPOSED_CONTENT_PACKAGE) --profile $(KNOWLPEDIA_PROFILE) --out public-imported --allow-validation-errors --diagram-cache-dir $(DIAGRAM_CACHE_DIR) --prebuilt-diagram-dir $(PREBUILT_DIAGRAM_DIR)
 
-build-production: deps
-	$(PYTHON) packages/compiler/knowl_compile.py $(CONTENT_PACKAGE) --profile production --out public-imported --allow-validation-errors --no-diagram-cache --prebuilt-diagram-dir $(PREBUILT_DIAGRAM_DIR) --prebuilt-only-diagrams
+build-production: deps compose-production-content
+	$(PYTHON) packages/compiler/knowl_compile.py $(PRODUCTION_CONTENT_PACKAGE) --profile production --out public-imported --allow-validation-errors --no-diagram-cache --prebuilt-diagram-dir $(PREBUILT_DIAGRAM_DIR) --prebuilt-only-diagrams
 	$(PYTHON) scripts/check_rendering_errors.py public-imported --require-rendered-diagrams --require-profile production
 
-refresh-prebuilt-diagrams: deps
-	$(PYTHON) packages/compiler/knowl_compile.py $(CONTENT_PACKAGE) --profile development --out public-imported --allow-validation-errors --no-diagram-cache --prebuilt-diagram-dir $(PREBUILT_DIAGRAM_DIR) --refresh-prebuilt-diagrams
+refresh-prebuilt-diagrams: deps compose-content
+	$(PYTHON) packages/compiler/knowl_compile.py $(COMPOSED_CONTENT_PACKAGE) --profile development --out public-imported --allow-validation-errors --no-diagram-cache --prebuilt-diagram-dir $(PREBUILT_DIAGRAM_DIR) --refresh-prebuilt-diagrams
 
-build-page: deps
-	$(PYTHON) packages/compiler/knowl_compile.py $(CONTENT_PACKAGE) --profile $(KNOWLPEDIA_PROFILE) --out public-imported --allow-validation-errors --only $(PAGE) --diagram-cache-dir $(DIAGRAM_CACHE_DIR) --prebuilt-diagram-dir $(PREBUILT_DIAGRAM_DIR)
+build-page: deps compose-content
+	$(PYTHON) packages/compiler/knowl_compile.py $(COMPOSED_CONTENT_PACKAGE) --profile $(KNOWLPEDIA_PROFILE) --out public-imported --allow-validation-errors --only $(PAGE) --diagram-cache-dir $(DIAGRAM_CACHE_DIR) --prebuilt-diagram-dir $(PREBUILT_DIAGRAM_DIR)
 
 preview-diagram: deps
 	$(PYTHON) packages/compiler/preview_diagram.py $(DIAGRAM_SOURCE) --index $(DIAGRAM_INDEX) --out $(DIAGRAM_PREVIEW_OUT) --diagram-cache-dir $(DIAGRAM_CACHE_DIR)
@@ -95,3 +110,5 @@ screenshot:
 
 clean:
 	rm -rf public-imported
+	rm -rf $(COMPOSED_CONTENT_PACKAGE)
+	rm -rf $(PRODUCTION_CONTENT_PACKAGE)
