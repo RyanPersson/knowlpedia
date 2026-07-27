@@ -8,6 +8,9 @@ COMPOSED_CONTENT_PACKAGE ?= .knowl-cache/content-package
 PRODUCTION_CONTENT_PACKAGE ?= .knowl-cache/production-content-package
 CONTENT_SOURCE_ARGS = $(foreach source,$(EXTRA_CONTENT_SOURCES),--source $(source))
 KNOWLPEDIA_PROFILE ?= development
+REVIEW_BASE ?= develop
+REVIEW_HEAD ?= HEAD
+REVIEW_OUTPUT ?= public-imported/review/content-changes
 DIAGRAM_CACHE_DIR ?= .knowl-cache/diagrams
 PREBUILT_DIAGRAM_DIR ?= prebuilt/diagrams
 DIAGRAM_SOURCE ?= ../knowlpedia-content/testing/algebra-category-theory/tikz-lab-whiskering-coherence.knowl.md
@@ -21,7 +24,7 @@ SCREENSHOT ?= tmp/screenshots/page.png
 .PHONY: deps build build-production serve clean screenshot test test-ui test-local-sources-ui audit-sections refresh-prebuilt-diagrams
 .PHONY: compose-content compose-production-content build-content serve-content build-page preview-diagram
 .PHONY: preview-start preview-status preview-stop preview-restart preview-scan preview-adopt
-.PHONY: check-rendering check-rendering-knowls check-rendering-content
+.PHONY: check-rendering check-rendering-knowls check-rendering-content review-content
 
 $(VENV_STAMP): requirements.txt
 	python3 -m venv .venv
@@ -103,6 +106,20 @@ check-rendering-knowls:
 	$(PYTHON) scripts/check_rendering_errors.py public-imported --fragments-only
 
 check-rendering-content: build-content check-rendering
+
+# Render existing knowls before and after a feature branch for human review.
+# Production builds never invoke this target and reject review artifacts.
+review-content:
+	@test "$(KNOWLPEDIA_PROFILE)" = "development" || (echo "review-content is development-only" >&2; exit 1)
+	$(MAKE) build-content
+	$(PYTHON) scripts/generate_content_review.py \
+		--content-repo $(CONTENT_PACKAGE) \
+		--output $(REVIEW_OUTPUT) \
+		--left-ref $(REVIEW_BASE) \
+		--right-ref $(REVIEW_HEAD) \
+		--left-label "$(REVIEW_BASE) · existing" \
+		--right-label "$(REVIEW_HEAD) · proposed" \
+		--heading "Existing knowl changes"
 
 screenshot:
 	mkdir -p tmp/screenshots

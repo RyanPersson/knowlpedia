@@ -92,6 +92,26 @@ class RenderedHtmlCheckerTests(unittest.TestCase):
         self.assertEqual(len(issues), 1)
         self.assertEqual(issues[0].file, "fragments/sample/core.html")
 
+    def test_production_profile_rejects_review_artifacts(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            report = root / "reports" / "build.json"
+            report.parent.mkdir(parents=True)
+            report.write_text(
+                '{"profile":"production","content_roots":[],"development_knowl_ids":[]}',
+                encoding="utf-8",
+            )
+            review = root / "review" / "content-changes" / "index.html"
+            review.parent.mkdir(parents=True)
+            review.write_text("review", encoding="utf-8")
+
+            issues = checker.check_build_profile(root, "production")
+
+        self.assertIn(
+            ("testing_artifact_in_production", "review"),
+            [(issue.kind, issue.file) for issue in issues],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
