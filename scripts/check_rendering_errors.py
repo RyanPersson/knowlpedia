@@ -282,7 +282,11 @@ def check_build_profile(root: Path, required_profile: str) -> list[Issue]:
             )
         )
 
-    forbidden_paths = [root / "testing", root / "assets" / "knowl-testing.js"]
+    forbidden_paths = [
+        root / "testing",
+        root / "review",
+        root / "assets" / "knowl-testing.js",
+    ]
     for path in forbidden_paths:
         if path.exists():
             issues.append(

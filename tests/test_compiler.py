@@ -203,12 +203,31 @@ class RenderContractTests(unittest.TestCase):
             "/fragments/shale-paper/segal-unitary-representation-ufrak/core.html",
         )
 
-    def test_inline_dollar_math_is_deterministic(self) -> None:
-        for tex in ("1", "(0)", "k[x]", r"\mathbb{F}_q[[t]]"):
-            with self.subTest(tex=tex):
-                protected, replacements = compiler.protect_math(f"${tex}$")
+    def test_all_four_math_delimiters_are_supported(self) -> None:
+        forms = (
+            (r"\(x + y\)", False),
+            ("$x + y$", False),
+            (r"\[x + y\]", True),
+            ("$$x + y$$", True),
+        )
+        for source, display in forms:
+            with self.subTest(source=source):
+                protected, replacements = compiler.protect_math(source)
                 self.assertEqual(protected, "@@KNOWL_MATH_0@@")
                 self.assertEqual(len(replacements), 1)
+                rendered = next(iter(replacements.values()))
+                expected_class = "math-display" if display else "math-inline"
+                self.assertIn(expected_class, rendered)
+
+    def test_equivalent_delimiters_render_identically(self) -> None:
+        self.assertEqual(
+            compiler.render_inline(r"\(\mathbb{F}_q[[t]]\)", {}),
+            compiler.render_inline(r"$\mathbb{F}_q[[t]]$", {}),
+        )
+        self.assertEqual(
+            compiler.render_markdown("\\[x^2\\]", {}),
+            compiler.render_markdown("$$x^2$$", {}),
+        )
 
     def test_power_series_brackets_inside_math_are_not_wikilinks(self) -> None:
         rendered = compiler.render_inline(r"$\mathbb{F}_q[[t]]$", {})
