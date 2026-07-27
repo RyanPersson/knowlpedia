@@ -24,7 +24,7 @@ SCREENSHOT ?= tmp/screenshots/page.png
 .PHONY: deps build build-production serve clean screenshot test test-ui test-local-sources-ui audit-sections refresh-prebuilt-diagrams
 .PHONY: compose-content compose-production-content build-content serve-content build-page preview-diagram
 .PHONY: preview-start preview-status preview-stop preview-restart preview-scan preview-adopt
-.PHONY: check-rendering check-rendering-knowls check-rendering-content review-content
+.PHONY: check-rendering check-rendering-knowls check-rendering-content review-content normalize-math
 
 $(VENV_STAMP): requirements.txt
 	python3 -m venv .venv
@@ -120,6 +120,9 @@ review-content:
 		--left-label "$(REVIEW_BASE) · existing" \
 		--right-label "$(REVIEW_HEAD) · proposed" \
 		--heading "Existing knowl changes"
+
+normalize-math:
+	$(PYTHON) scripts/normalize_math_delimiters.py $(CONTENT_PACKAGE)/content $(CONTENT_PACKAGE)/testing
 
 screenshot:
 	mkdir -p tmp/screenshots
