@@ -250,6 +250,22 @@ class RenderContractTests(unittest.TestCase):
         rendered = compiler.render_inline("[bad](javascript:alert(1))", {})
         self.assertNotIn("<a ", rendered)
 
+    def test_pipe_table_renders_with_knowl_links_and_math(self) -> None:
+        target = self.make_knowl()
+        rendered = compiler.render_markdown(
+            "| Structure | Relation |\n"
+            "| --- | --- |\n"
+            "| [[sample/concept|Sample]] | A map $M\\to N$. |",
+            {target.id: target},
+        )
+        self.assertIn("<div class=\"table-scroll\"><table>", rendered)
+        self.assertEqual(rendered.count("<th>"), 2)
+        self.assertEqual(rendered.count("<td>"), 2)
+        self.assertIn("class=\"knowl\"", rendered)
+        self.assertIn(">Sample</a>", rendered)
+        self.assertIn("class=\"math-inline math-katex\"", rendered)
+        self.assertNotIn("<p>|", rendered)
+
     def test_redundant_source_h1_is_removed_from_rendered_core(self) -> None:
         source = "# Document title\n\nFirst paragraph.\n\n## Section"
         self.assertEqual(

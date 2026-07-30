@@ -969,6 +969,45 @@ def render_paragraph(text: str, registry: dict[str, Knowl]) -> str:
     return "\n".join(blocks)
 
 
+def split_markdown_table_row(line: str) -> list[str]:
+    # Split a pipe table row without treating wikilink label pipes as cells.
+    stripped = line.strip()
+    if stripped.startswith("|"):
+        stripped = stripped[1:]
+    if stripped.endswith("|"):
+        stripped = stripped[:-1]
+
+    cells: list[str] = []
+    cell: list[str] = []
+    wikilink_depth = 0
+    index = 0
+    while index < len(stripped):
+        pair = stripped[index : index + 2]
+        if pair == "[[":
+            wikilink_depth += 1
+            cell.append(pair)
+            index += 2
+            continue
+        if pair == "]]" and wikilink_depth:
+            wikilink_depth -= 1
+            cell.append(pair)
+            index += 2
+            continue
+        if stripped[index] == "|" and wikilink_depth == 0:
+            cells.append("".join(cell).strip())
+            cell = []
+        else:
+            cell.append(stripped[index])
+        index += 1
+    cells.append("".join(cell).strip())
+    return cells
+
+
+def is_markdown_table_separator(line: str) -> bool:
+    cells = split_markdown_table_row(line)
+    return bool(cells) and all(re.fullmatch(r":?-{3,}:?", cell) for cell in cells)
+
+
 def render_markdown(markdown: str, registry: dict[str, Knowl]) -> str:
     lines = markdown.splitlines()
     out: list[str] = []
@@ -1088,6 +1127,37 @@ def render_markdown(markdown: str, registry: dict[str, Knowl]) -> str:
             level = len(heading.group(1))
             out.append(f"<h{level}>{render_inline(heading.group(2), registry)}</h{level}>")
             i += 1
+            continue
+
+        if (
+            stripped.startswith("|")
+            and i + 1 < len(lines)
+            and is_markdown_table_separator(lines[i + 1])
+        ):
+            close_list()
+            headers = split_markdown_table_row(line)
+            i += 2
+            rows: list[list[str]] = []
+            while i < len(lines) and lines[i].strip().startswith("|"):
+                row = split_markdown_table_row(lines[i])
+                if len(row) != len(headers):
+                    break
+                rows.append(row)
+                i += 1
+            head_html = "".join(f"<th>{render_inline(cell, registry)}</th>" for cell in headers)
+            body_html = "".join(
+                "<tr>"
+                + "".join(f"<td>{render_inline(cell, registry)}</td>" for cell in row)
+                + "</tr>"
+                for row in rows
+            )
+            out.append(
+                "<div class=\"table-scroll\"><table><thead><tr>"
+                + head_html
+                + "</tr></thead><tbody>"
+                + body_html
+                + "</tbody></table></div>"
+            )
             continue
 
         bullet = re.match(r"^-\s+(.+)$", stripped)

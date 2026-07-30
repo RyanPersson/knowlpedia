@@ -687,6 +687,31 @@ kbd {
   margin-top: 0.42rem;
 }
 
+.table-scroll {
+  max-width: 100%;
+  margin: 0 0 1.25rem;
+  overflow-x: auto;
+}
+
+.table-scroll table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-scroll th,
+.table-scroll td {
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.table-scroll th {
+  background: var(--surface-subtle);
+  font-family: var(--font-ui);
+  font-weight: 750;
+}
+
 .knowl-section,
 .relations {
   border-top: 1px solid var(--line);
