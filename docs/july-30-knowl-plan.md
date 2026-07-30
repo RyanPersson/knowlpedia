@@ -27,7 +27,8 @@ No knowls were authored during this planning pass.
 - **SECTION**: include the topic inside the named parent; do not create a file.
 - **ALIAS**: add a genuine alternate name to the canonical existing or proposed
   record; do not create a file.
-- **DEFER**: useful enrichment, but outside the first dependency closure.
+- **ENRICH**: a standard related structure that follows the core batch and
+  brings its own required dependency closure.
 
 The identifiers below are reserved by this plan. Authors should not invent
 competing IDs without first updating this manifest.
@@ -140,9 +141,9 @@ replace finite-dimensional vector spaces by finite projective modules over a
 | FG22 | NEW | `formal-groups/formal-completion-at-identity` | construction | Bridge from Lie/algebraic groups; explain loss of global topology. |
 | FG23 | NEW | `formal-groups/positive-characteristic-warning` | comparison | Heights and \(p\)-structure obstruct tangent classification. |
 | FG24 | NEW | `formal-groups` | section/index | Subject navigation and convention record. |
-| FG25 | DEFER | `formal-groups/coordinate-hopf-algebra` | definition/equivalence | Continuous comultiplication and completed tensor product. |
-| FG26 | DEFER | `formal-groups/distribution-algebra` | theorem | Characteristic-zero comparison with \(U(\mathfrak g)\). |
-| FG27 | DEFER | `formal-groups/complete-filtered-lie-algebra-bch-group` | theorem | Pronilpotent generalization beyond the requested finite-dimensional case. |
+| FG25 | ENRICH | `formal-groups/coordinate-hopf-algebra` | definition/equivalence | Continuous comultiplication and completed tensor product. |
+| FG26 | ENRICH | `formal-groups/distribution-algebra` | theorem | Characteristic-zero comparison with \(U(\mathfrak g)\). |
+| FG27 | ENRICH | `formal-groups/complete-filtered-lie-algebra-bch-group` | theorem | Pronilpotent generalization beyond the requested finite-dimensional case. |
 
 ## Batch 2 — one-variable complex analysis
 
@@ -238,8 +239,8 @@ same convention.
 | LG18 | EXPAND | `lie-groups/special-linear-lie-algebra` | definition | Explicit \(\mathfrak{sl}_2(\mathbb C)_{\mathbb R}\) dimensions. |
 | LG19 | EXPAND | `lie-groups/lorentz-group` | definition | Link general group to \(SO^+(1,3)\), time orientation, and spin cover. |
 | LG20 | EXPAND | `lie-groups/spin-group` | definition | Preserve positive-definite core; link rather than silently absorb indefinite groups. |
-| LG21 | DEFER | `algebraic-geometry-foundations/weil-restriction` | definition | Explain relation to, but difference from, forgetting complex structure. |
-| LG22 | DEFER | `differential-geometry/hyperbolic-three-space` | definition | Additional \(PSL_2(\mathbb C)\) action and automorphic context. |
+| LG21 | ENRICH | `algebraic-geometry-foundations/weil-restriction` | definition | Explain relation to, but difference from, forgetting complex structure. |
+| LG22 | ENRICH | `differential-geometry/hyperbolic-three-space` | definition | Additional \(PSL_2(\mathbb C)\) action and automorphic context. |
 
 ## Batch 5 — super linear algebra, Clifford algebras, and spinors
 
@@ -290,9 +291,9 @@ identified but not merged.
 | SG09 | NEW | `supergeometry/super-harish-chandra-pair` | definition | Lie group, Lie superalgebra, compatible action. |
 | SG10 | NEW | `supergeometry/lie-supergroups-and-super-harish-chandra-pairs` | theorem | State the exact smooth/analytic category. |
 | SG11 | NEW | `supergeometry` | section/index | Subject navigation and model conventions. |
-| SG12 | DEFER | `mathematical-physics/supertranslation-algebra` | definition | Spinor bilinear as odd-odd bracket. |
-| SG13 | DEFER | `mathematical-physics/super-poincare-algebra` | definition | Supersymmetry extension of the Poincaré algebra. |
-| SG14 | DEFER | `supergeometry/super-minkowski-space` | definition | Physics superspace, distinct from a general superspace. |
+| SG12 | ENRICH | `mathematical-physics/supertranslation-algebra` | definition | Spinor bilinear as odd-odd bracket. |
+| SG13 | ENRICH | `mathematical-physics/super-poincare-algebra` | definition | Supersymmetry extension of the Poincaré algebra. |
+| SG14 | ENRICH | `supergeometry/super-minkowski-space` | definition | Physics superspace, distinct from a general superspace. |
 
 ## Batch 7 — Lorentzian operators and relativistic field equations
 
@@ -412,10 +413,10 @@ single-valued multiplication.
 | B06 | NEW | `algebraic-geometry-foundations/ordered-blueprint-with-unique-weak-inverses` | definition | Current title; legacy alias “pasteurized ordered blueprint.” |
 | B07 | NEW | `algebra-hyperstructures/comparison-map` | comparison/guide | Semirings, hyperrings, hyperfields, tropical objects, ordered blueprints. |
 | B08 | NEW | `algebra-hyperstructures` | section/index | Requested durable section and convention map. |
-| B09 | DEFER | `algebraic-geometry-foundations/pasteurization-of-ordered-blueprint` | construction | Reflection into unique-weak-inverse objects. |
-| B10 | DEFER | `algebra-hyperstructures/tract` | definition | Needed only for matroids over partial hyperstructures. |
-| B11 | DEFER | `algebra-hyperstructures/pasture` | definition | Version-sensitive; do not identify with every ordered blue field. |
-| B12 | DEFER | `algebraic-geometry-foundations/blue-scheme` | definition | Scheme-theoretic layer beyond the requested comparison. |
+| B09 | ENRICH | `algebraic-geometry-foundations/pasteurization-of-ordered-blueprint` | construction | Reflection into unique-weak-inverse objects. |
+| B10 | ENRICH | `algebra-hyperstructures/tract` | definition | Needed for matroids over partial hyperstructures. |
+| B11 | ENRICH | `algebra-hyperstructures/pasture` | definition | Version-sensitive; do not identify with every ordered blue field. |
+| B12 | ENRICH | `algebraic-geometry-foundations/blue-scheme` | definition | Scheme-theoretic layer built from blueprint spectra. |
 
 ## Batch 12 — rank-one Langlands context
 
@@ -433,13 +434,107 @@ undertaken only as its own expansion.
 | LAN06 | SECTION | `lie-groups/psl2-complex` | context section | Distinguish Möbius automorphism group, reductive group, and Langlands-dual roles. |
 | LAN07 | NEW | `algebraic-geometry-foundations/algebraic-curve` | definition | First dependency of a future general geometric-Langlands batch. |
 | LAN08 | NEW | `algebraic-geometry-foundations/smooth-projective-curve` | definition | Base curve \(X\). |
-| LAN09 | DEFER | `fiber-bundles/local-system` | definition | Dual-side local systems. |
-| LAN10 | DEFER | `algebraic-geometry-foundations/moduli-stack-of-g-bundles-on-a-curve` | definition | Automorphic-side \(\operatorname{Bun}_G(X)\). |
-| LAN11 | DEFER | `algebraic-geometry-foundations/d-module` | definition | Sheaf-theoretic automorphic side. |
-| LAN12 | DEFER | `langlands/hecke-eigensheaf` | definition | Requires Hecke correspondences. |
-| LAN13 | DEFER | `langlands/geometric-langlands-correspondence` | conjecture/theorem family | State categorical form only after LAN07–LAN12. |
-| LAN14 | DEFER | `langlands/projective-line-in-geometric-langlands` | context | Unramified sparsity and marked/ramified examples. |
-| LAN15 | DEFER | `langlands/ramified-geometric-langlands` | definition/program | Marked-point enrichment. |
+| LAN09 | ENRICH | `fiber-bundles/local-system` | definition | Dual-side local systems. |
+| LAN10 | ENRICH | `algebraic-geometry-foundations/moduli-stack-of-g-bundles-on-a-curve` | definition | Automorphic-side \(\operatorname{Bun}_G(X)\). |
+| LAN11 | ENRICH | `algebraic-geometry-foundations/d-module` | definition | Sheaf-theoretic automorphic side. |
+| LAN12 | ENRICH | `langlands/hecke-eigensheaf` | definition | Requires Hecke correspondences. |
+| LAN13 | ENRICH | `langlands/geometric-langlands-correspondence` | conjecture/theorem family | State categorical form after LAN07–LAN12. |
+| LAN14 | ENRICH | `langlands/projective-line-in-geometric-langlands` | context | Unramified sparsity and marked/ramified examples. |
+| LAN15 | ENRICH | `langlands/ramified-geometric-langlands` | definition/program | Marked-point enrichment. |
+
+## Authored enrichment and dependency closure
+
+All 19 records originally marked **ENRICH** in Batches 1, 4, 6, 11, and 12
+are part of the July 30 authored corpus; none remains deferred. During
+authorship, semantic deduplication and outbound-link review identified the
+following additional records. These are required parts of the expansion rather
+than an informal backlog.
+
+### Formal-group closure
+
+| Canonical ID | Title |
+|---|---|
+| `algebra-coalgebras/coalgebra` | Coalgebra |
+| `algebra-coalgebras/bialgebra` | Bialgebra |
+| `algebra-coalgebras/hopf-algebra` | Hopf algebra |
+| `algebra-topological/completed-tensor-product` | Completed tensor product |
+| `lie-groups/complete-filtered-lie-algebra` | Complete filtered Lie algebra |
+
+### Complex-analysis and Lorentz closure
+
+| Canonical ID | Title |
+|---|---|
+| `complex-analysis/entire-function` | Entire function |
+| `complex-analysis/holomorphic-germ` | Holomorphic germ |
+| `complex-analysis/monodromy-theorem` | Monodromy theorem |
+| `complex-analysis/normal-family` | Normal family |
+| `complex-analysis/rouche-theorem` | Rouché's theorem |
+| `complex-analysis/casorati-weierstrass-theorem` | Casorati–Weierstrass theorem |
+| `complex-analysis/great-picard-theorem` | Great Picard theorem |
+| `complex-analysis/rational-function` | Rational function |
+| `complex-analysis/generalized-circle` | Generalized circle |
+| `complex-analysis/anti-mobius-transformation` | Anti-Möbius transformation |
+| `complex-analysis/projective-connection` | Holomorphic projective connection |
+| `complex-analysis/logarithmic-derivative` | Logarithmic derivative |
+| `algebraic-geometry-foundations/finite-locally-free-morphism` | Finite locally free morphism |
+| `lie-groups/psl2c-action-on-hyperbolic-three-space` | \(PSL(2,\mathbb C)\) action on hyperbolic three-space |
+
+### Supergeometry and field-equation closure
+
+| Canonical ID | Title |
+|---|---|
+| `mathematical-physics/poincare-algebra` | Poincaré algebra |
+| `differential-geometry/globally-hyperbolic-spacetime` | Globally hyperbolic spacetime |
+
+### Hyperstructure enrichment and closure
+
+| Canonical ID | Title |
+|---|---|
+| `algebra-rings/idempotent-semifields-and-lattice-ordered-groups` | Idempotent semifields and lattice-ordered groups |
+| `algebra-hyperstructures/valuative-hyperfield` | Valuative hyperfield |
+| `algebra-hyperstructures/hyperfield-of-a-field-quotient` | Hyperfield of a field quotient |
+| `algebra-hyperstructures/stringent-hyperfield` | Stringent hyperfield |
+| `algebra-hyperstructures/partial-field` | Partial field |
+| `algebra-hyperstructures/partial-hyperfield` | Partial hyperfield |
+| `shared-foundations/lattice` | Lattice |
+| `algebra-groups/lattice-ordered-abelian-group` | Lattice-ordered abelian group |
+| `algebra-hyperstructures/integral-hyperring` | Integral hyperring |
+
+The proposed standalone “field as semifield and hyperfield” record was
+deduplicated into `algebra-hyperstructures/fields-semifields-and-hyperfields`
+as an alias and a categorical comparison section.
+
+### Blueprint closure
+
+| Canonical ID | Title |
+|---|---|
+| `algebraic-geometry-foundations/localization-of-blueprint` | Localization of a blueprint |
+| `algebraic-geometry-foundations/spectrum-of-blueprint` | Spectrum of a blueprint |
+| `algebraic-geometry-foundations/affine-blue-scheme` | Affine blue scheme |
+| `algebraic-geometry-foundations/ordered-blue-scheme` | Ordered blue scheme |
+| `algebraic-geometry-foundations/ordered-blue-field` | Ordered blue field |
+| `algebra-hyperstructures/idyll` | Idyll |
+
+### Geometric-Langlands closure
+
+| Canonical ID | Title |
+|---|---|
+| `algebraic-geometry-foundations/algebraic-stack` | Algebraic stack |
+| `algebraic-geometry-foundations/principal-g-bundle-on-scheme` | Principal \(G\)-bundle on a scheme |
+| `algebraic-geometry-foundations/quasi-coherent-sheaf` | Quasi-coherent sheaf |
+| `algebraic-geometry-foundations/sheaf-of-differential-operators` | Sheaf of differential operators |
+| `algebraic-geometry-foundations/pointed-algebraic-curve` | Pointed algebraic curve |
+| `langlands/g-local-system` | \(G\)-local system |
+| `langlands/moduli-stack-of-g-local-systems` | Moduli stack of \(G\)-local systems |
+| `langlands/ind-coherent-sheaves-with-nilpotent-singular-support` | Ind-coherent sheaves with nilpotent singular support |
+| `langlands/affine-grassmannian` | Affine Grassmannian |
+| `langlands/geometric-satake-equivalence` | Geometric Satake equivalence |
+| `langlands/hecke-modification` | Hecke modification |
+| `langlands/hecke-correspondence` | Hecke correspondence |
+| `langlands/hecke-functor` | Geometric Hecke functor |
+| `langlands/level-structure-on-g-bundle` | Level structure on a \(G\)-bundle |
+| `langlands/ramification-of-g-local-system` | Ramification of a \(G\)-local system |
+| `langlands` | Geometric Langlands subject index |
 
 ## Batch 13 — integration, indexing, and validation
 
@@ -513,12 +608,19 @@ practical sequence is:
 8. Batch 9 (symplectic, Hamiltonian, Kähler, and hyperkähler morphisms).
 9. Batch 10 (semirings, hyperrings, hyperfields, tropical algebra).
 10. Batch 11 (ordered blueprints and comparison map).
-11. Batch 12 core only (rank-one flag/Langlands context); keep the general
-    geometric-Langlands records deferred unless separately authorized.
-12. Batch 13 (index closure, interlinking, layered validation, visual review).
+11. Batch 12a (rank-one flag/Langlands context), followed by Batch 12b
+    (local systems, \(D\)-modules, \(\operatorname{Bun}_G\), Hecke
+    eigensheaves, and unramified/ramified geometric Langlands).
+12. Enrichment closure for coordinate Hopf algebras, distribution algebras,
+    filtered BCH groups, Weil restriction, hyperbolic \(3\)-space,
+    supersymmetry, tracts, pastures, pasteurization, and blue schemes.
+13. Batch 13 (index closure, interlinking, layered validation, visual review).
 
-Each session should end with its exact completed/deferred ID list added to the
-July 30 expansion index and to this plan.
+Each session should end with its exact completed ID list and any newly
+discovered dependency IDs added to the July 30 expansion index and to this
+plan. Newly discovered dependencies are deduplicated against the complete
+corpus before authorship and become required manifest entries rather than
+informal omissions.
 
 ## Authoring references to resolve conventions
 
