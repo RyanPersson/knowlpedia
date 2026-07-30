@@ -414,6 +414,35 @@ def extract_ref(content_repo: Path, ref: str, destination: Path) -> None:
         bundle.extractall(destination)
 
 
+def modified_knowl_paths(content_repo: Path, left_ref: str, right_ref: str) -> list[str]:
+    """Return knowl paths modified in place between two refs.
+
+    Added and deleted files cannot form a two-version comparison, so this
+    deliberately excludes them.
+    """
+
+    changed = git(
+        "diff",
+        "--diff-filter=M",
+        "--name-only",
+        "-z",
+        left_ref,
+        right_ref,
+        "--",
+        "content",
+        cwd=content_repo,
+    ).stdout
+    return [
+        path
+        for path in changed.decode().split("\0")
+        if path.endswith(".knowl.md")
+    ]
+
+
+def path_exists_at_ref(content_repo: Path, ref: str, path: str) -> bool:
+    return git("cat-file", "-e", f"{ref}:{path}", cwd=content_repo, check=False).returncode == 0
+
+
 def build_ref_comparison(
     content_repo: Path,
     output: Path,
@@ -425,27 +454,19 @@ def build_ref_comparison(
     heading: str,
 ) -> int:
     if paths_file:
-        paths = [
+        requested_paths = [
             line.strip()
             for line in paths_file.read_text(encoding="utf-8").splitlines()
             if line.strip().endswith(".knowl.md")
         ]
-    else:
-        changed = git(
-            "diff",
-            "--name-only",
-            "-z",
-            left_ref,
-            right_ref,
-            "--",
-            "content",
-            cwd=content_repo,
-        ).stdout
         paths = [
             path
-            for path in changed.decode().split("\0")
-            if path.endswith(".knowl.md")
+            for path in requested_paths
+            if path_exists_at_ref(content_repo, left_ref, path)
+            and path_exists_at_ref(content_repo, right_ref, path)
         ]
+    else:
+        paths = modified_knowl_paths(content_repo, left_ref, right_ref)
     with tempfile.TemporaryDirectory(prefix="knowl-review-ref-") as temp:
         right_tree = Path(temp)
         extract_ref(content_repo, right_ref, right_tree)
