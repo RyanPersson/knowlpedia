@@ -7,6 +7,7 @@ import argparse
 import difflib
 import html
 import io
+import json
 import re
 import subprocess
 import sys
@@ -35,6 +36,14 @@ class ReviewItem:
     old_knowl: compiler.Knowl
     current_knowl: compiler.Knowl
     filename: str
+
+
+@dataclass(frozen=True)
+class DiffPlanItem:
+    rank: int
+    path: str
+    changed_characters: int
+    chunk: int
 
 
 def git(*args: str, cwd: Path, check: bool = True) -> subprocess.CompletedProcess[bytes]:
@@ -78,6 +87,50 @@ def changed_character_count(old_text: str, current_text: str) -> int:
         in difflib.SequenceMatcher(None, old_text, current_text).get_opcodes()
         if operation != "equal"
     )
+
+
+def build_diff_plan(
+    comparisons: list[tuple[str, str, str]],
+    chunk_count: int,
+) -> list[DiffPlanItem]:
+    """Rank comparisons by size and greedily balance them across chunks."""
+
+    if chunk_count < 1:
+        raise ValueError("chunk_count must be at least 1")
+    ranked = sorted(
+        (
+            (changed_character_count(old_text, current_text), path)
+            for path, old_text, current_text in comparisons
+        ),
+        key=lambda entry: (-entry[0], entry[1]),
+    )
+    chunk_loads = [0] * min(chunk_count, max(1, len(ranked)))
+    plan = []
+    for rank, (changed_characters, path) in enumerate(ranked, start=1):
+        chunk_index = min(
+            range(len(chunk_loads)),
+            key=lambda index: (chunk_loads[index], index),
+        )
+        plan.append(
+            DiffPlanItem(
+                rank=rank,
+                path=path,
+                changed_characters=changed_characters,
+                chunk=chunk_index + 1,
+            )
+        )
+        chunk_loads[chunk_index] += changed_characters
+    return plan
+
+
+def write_diff_plan(plan: list[DiffPlanItem], destination: Path | None) -> None:
+    lines = [json.dumps(item.__dict__, sort_keys=True) for item in plan]
+    output = "\n".join(lines) + ("\n" if lines else "")
+    if destination:
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_text(output, encoding="utf-8")
+    else:
+        sys.stdout.write(output)
 
 
 def parse_text(text: str, label: str) -> compiler.Knowl:
@@ -416,14 +469,11 @@ def render_index(
 
 
 def build(content_repo: Path, output: Path) -> int:
-    changed = git("diff", "--name-only", "-z", "--", "content", cwd=content_repo).stdout
-    paths = [path for path in changed.decode().split("\0") if path.endswith(".knowl.md")]
-    substantive: list[tuple[str, str, str]] = []
-    for path in paths:
-        old = git("show", f"HEAD:{path}", cwd=content_repo).stdout.decode()
-        current = (content_repo / path).read_text(encoding="utf-8")
-        if normalize_delimiters(old) != normalize_delimiters(current):
-            substantive.append((path, old, current))
+    substantive = [
+        (path, old, current)
+        for path, old, current in comparison_sources(content_repo, None, None, None)
+        if normalize_delimiters(old) != normalize_delimiters(current)
+    ]
 
     current_knowls = compiler.discover_knowls(content_repo / "content")
     registry = {knowl.id: knowl for knowl in current_knowls}
@@ -495,6 +545,48 @@ def path_exists_at_ref(content_repo: Path, ref: str, path: str) -> bool:
     return git("cat-file", "-e", f"{ref}:{path}", cwd=content_repo, check=False).returncode == 0
 
 
+def comparison_sources(
+    content_repo: Path,
+    left_ref: str | None,
+    right_ref: str | None,
+    paths_file: Path | None,
+) -> list[tuple[str, str, str]]:
+    if left_ref and right_ref:
+        if paths_file:
+            requested_paths = [
+                line.strip()
+                for line in paths_file.read_text(encoding="utf-8").splitlines()
+                if line.strip().endswith(".knowl.md")
+            ]
+            paths = [
+                path
+                for path in requested_paths
+                if path_exists_at_ref(content_repo, left_ref, path)
+                and path_exists_at_ref(content_repo, right_ref, path)
+            ]
+        else:
+            paths = modified_knowl_paths(content_repo, left_ref, right_ref)
+        return [
+            (
+                path,
+                git("show", f"{left_ref}:{path}", cwd=content_repo).stdout.decode(),
+                git("show", f"{right_ref}:{path}", cwd=content_repo).stdout.decode(),
+            )
+            for path in paths
+        ]
+
+    changed = git("diff", "--name-only", "-z", "--", "content", cwd=content_repo).stdout
+    paths = [path for path in changed.decode().split("\0") if path.endswith(".knowl.md")]
+    return [
+        (
+            path,
+            git("show", f"HEAD:{path}", cwd=content_repo).stdout.decode(),
+            (content_repo / path).read_text(encoding="utf-8"),
+        )
+        for path in paths
+    ]
+
+
 def build_ref_comparison(
     content_repo: Path,
     output: Path,
@@ -505,20 +597,12 @@ def build_ref_comparison(
     right_label: str,
     heading: str,
 ) -> int:
-    if paths_file:
-        requested_paths = [
-            line.strip()
-            for line in paths_file.read_text(encoding="utf-8").splitlines()
-            if line.strip().endswith(".knowl.md")
-        ]
-        paths = [
-            path
-            for path in requested_paths
-            if path_exists_at_ref(content_repo, left_ref, path)
-            and path_exists_at_ref(content_repo, right_ref, path)
-        ]
-    else:
-        paths = modified_knowl_paths(content_repo, left_ref, right_ref)
+    comparisons = comparison_sources(
+        content_repo,
+        left_ref,
+        right_ref,
+        paths_file,
+    )
     with tempfile.TemporaryDirectory(prefix="knowl-review-ref-") as temp:
         right_tree = Path(temp)
         extract_ref(content_repo, right_ref, right_tree)
@@ -526,9 +610,7 @@ def build_ref_comparison(
         registry = {knowl.id: knowl for knowl in right_knowls}
 
         items: list[ReviewItem] = []
-        for index, path in enumerate(paths):
-            left = git("show", f"{left_ref}:{path}", cwd=content_repo).stdout.decode()
-            right = git("show", f"{right_ref}:{path}", cwd=content_repo).stdout.decode()
+        for index, (path, left, right) in enumerate(comparisons):
             left_knowl = parse_text(left, f"{left_ref}:{path}")
             right_knowl = parse_text(right, f"{right_ref}:{path}")
             safe_id = re.sub(r"[^a-z0-9-]+", "-", right_knowl.id.lower()).strip("-")
@@ -591,11 +673,49 @@ def main() -> int:
     parser.add_argument("--left-label")
     parser.add_argument("--right-label")
     parser.add_argument("--heading", default="Content comparison")
+    parser.add_argument(
+        "--diff-plan",
+        nargs="?",
+        type=Path,
+        const="-",
+        help="Write a largest-first JSONL diff plan to PATH, or stdout when PATH is omitted",
+    )
+    parser.add_argument(
+        "--chunks",
+        type=int,
+        default=1,
+        help="Greedily balance a --diff-plan across this many chunks (default: 1)",
+    )
     args = parser.parse_args()
     if bool(args.left_ref) != bool(args.right_ref):
         parser.error("--left-ref and --right-ref must be used together")
     if args.paths_from and not args.left_ref:
         parser.error("--paths-from requires --left-ref and --right-ref")
+    if args.chunks < 1:
+        parser.error("--chunks must be at least 1")
+    if args.chunks != 1 and args.diff_plan is None:
+        parser.error("--chunks requires --diff-plan")
+    if args.diff_plan is not None:
+        content_repo = args.content_repo.resolve()
+        comparisons = comparison_sources(
+            content_repo,
+            args.left_ref,
+            args.right_ref,
+            args.paths_from.resolve() if args.paths_from else None,
+        )
+        plan = build_diff_plan(comparisons, args.chunks)
+        destination = None if str(args.diff_plan) == "-" else args.diff_plan.resolve()
+        write_diff_plan(plan, destination)
+        if destination:
+            chunk_totals: dict[int, int] = {}
+            for item in plan:
+                chunk_totals[item.chunk] = chunk_totals.get(item.chunk, 0) + item.changed_characters
+            totals = ", ".join(
+                f"chunk {chunk}: {total:,} chars"
+                for chunk, total in sorted(chunk_totals.items())
+            )
+            print(f"Wrote {len(plan)} diffs to {destination} ({totals})")
+        return 0 if plan else 1
     if args.left_ref:
         count = build_ref_comparison(
             args.content_repo.resolve(),

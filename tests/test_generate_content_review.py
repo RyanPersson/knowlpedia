@@ -1,15 +1,18 @@
 import subprocess
 import tempfile
 import unittest
+import json
 from pathlib import Path
 
 from scripts.generate_content_review import (
     ReviewItem,
+    build_diff_plan,
     changed_character_count,
     modified_knowl_paths,
     parse_text,
     render_index,
     render_item_page,
+    write_diff_plan,
 )
 
 
@@ -106,8 +109,17 @@ Old definition.
             current_knowl=current_knowl,
             filename="0001-test-example.html",
         )
+        larger_item = ReviewItem(
+            index=1,
+            path="content/test/larger.knowl.md",
+            old_text=old_text,
+            current_text=old_text + ("x" * 20),
+            old_knowl=old_knowl,
+            current_knowl=current_knowl,
+            filename="0002-test-larger.html",
+        )
 
-        page = render_index([item], "abc123")
+        page = render_index([item, larger_item], "abc123")
 
         self.assertIn('<select id="review-sort">', page)
         self.assertIn(
@@ -115,6 +127,43 @@ Old definition.
             page,
         )
         self.assertIn('data-diff-length="6"', page)
+        self.assertLess(
+            page.index("items/0002-test-larger.html"),
+            page.index("items/0001-test-example.html"),
+        )
+        self.assertIn('src="items/0002-test-larger.html"', page)
+
+    def test_diff_plan_is_ranked_and_balanced_by_changed_characters(self) -> None:
+        comparisons = [
+            ("content/large.knowl.md", "", "a" * 10),
+            ("content/medium.knowl.md", "", "b" * 6),
+            ("content/small.knowl.md", "", "c" * 4),
+        ]
+
+        plan = build_diff_plan(comparisons, 2)
+
+        self.assertEqual([item.path for item in plan], [
+            "content/large.knowl.md",
+            "content/medium.knowl.md",
+            "content/small.knowl.md",
+        ])
+        self.assertEqual([item.changed_characters for item in plan], [10, 6, 4])
+        self.assertEqual([item.chunk for item in plan], [1, 2, 2])
+
+    def test_diff_plan_writes_json_lines(self) -> None:
+        plan = build_diff_plan([("content/example.knowl.md", "a", "ab")], 1)
+        with tempfile.TemporaryDirectory() as temp:
+            destination = Path(temp) / "plan.jsonl"
+
+            write_diff_plan(plan, destination)
+
+            record = json.loads(destination.read_text(encoding="utf-8"))
+            self.assertEqual(record, {
+                "changed_characters": 1,
+                "chunk": 1,
+                "path": "content/example.knowl.md",
+                "rank": 1,
+            })
 
 
 if __name__ == "__main__":
