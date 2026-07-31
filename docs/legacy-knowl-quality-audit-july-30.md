@@ -136,3 +136,18 @@ These items require a separate migration rather than opportunistic edits.
 
 Each follow-up should get its own bounded manifest, comparison page, and
 validation run rather than being folded silently into an unrelated expansion.
+
+## External-link placement follow-up
+
+A later presentation audit found 954 clickable external citations outside
+reference sections in 759 production knowls. In 942 of the initially detected
+single-line cases, the exact URL was already repeated in the same knowl's
+bibliography; the few differing URLs pointed to alternate records for sources
+that were also already listed.
+
+The corpus now keeps those in-body citations as plain source pointers such as
+`[Author, Chapter 3]` and reserves clickable external links for
+`## References`. Forty singular `## Reference` headings were normalized to
+`## References`. The policy is recorded in `knowlpedia-content/EDITORIAL.md`
+and enforced by `scripts/audit_external_links.py` through the
+`make audit-external-links` target.

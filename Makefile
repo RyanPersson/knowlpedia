@@ -21,7 +21,7 @@ PREVIEW_URL ?= http://127.0.0.1:8001
 PREVIEW_PATH ?= /algebra-groups/group/
 SCREENSHOT ?= tmp/screenshots/page.png
 
-.PHONY: deps build build-production serve clean screenshot test test-ui test-local-sources-ui audit-sections refresh-prebuilt-diagrams
+.PHONY: deps build build-production serve clean screenshot test test-ui test-local-sources-ui audit-sections audit-external-links refresh-prebuilt-diagrams
 .PHONY: compose-content compose-production-content build-content serve-content build-page preview-diagram
 .PHONY: preview-start preview-status preview-stop preview-restart preview-scan preview-adopt
 .PHONY: check-rendering check-rendering-knowls check-rendering-content review-content normalize-math
@@ -49,6 +49,10 @@ test-local-sources-ui:
 audit-sections:
 	$(PYTHON) scripts/audit_section_split.py $(CONTENT_PACKAGE)/content
 	@if [ -d "$(CONTENT_PACKAGE)/testing" ]; then $(PYTHON) scripts/audit_section_split.py $(CONTENT_PACKAGE)/testing; fi
+
+audit-external-links:
+	$(PYTHON) scripts/audit_external_links.py $(CONTENT_PACKAGE)/content
+	@if [ -d "$(CONTENT_PACKAGE)/testing" ]; then $(PYTHON) scripts/audit_external_links.py $(CONTENT_PACKAGE)/testing; fi
 
 compose-content:
 	$(PYTHON) scripts/compose_content.py --primary $(CONTENT_PACKAGE) $(CONTENT_SOURCE_ARGS) --out $(COMPOSED_CONTENT_PACKAGE)
