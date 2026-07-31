@@ -139,15 +139,22 @@ validation run rather than being folded silently into an unrelated expansion.
 
 ## External-link placement follow-up
 
-A later presentation audit found 954 clickable external citations outside
-reference sections in 759 production knowls. In 942 of the initially detected
-single-line cases, the exact URL was already repeated in the same knowl's
-bibliography; the few differing URLs pointed to alternate records for sources
-that were also already listed.
+A later presentation audit found 950 genuine clickable source citations
+outside reference sections in 759 production knowls. The audit parser was also
+corrected after an initial count of 954: unmatched mathematical interval
+notation could make a later bibliography link look like part of a multiline
+body link. In nearly every genuine case, the source was already represented in
+the same knowl's bibliography.
 
-The corpus now keeps those in-body citations as plain source pointers such as
-`[Author, Chapter 3]` and reserves clickable external links for
-`## References`. Forty singular `## Reference` headings were normalized to
-`## References`. The policy is recorded in `knowlpedia-content/EDITORIAL.md`
-and enforced by `scripts/audit_external_links.py` through the
-`make audit-external-links` target.
+Git history shows that this was a recent batch-generation convention rather
+than established corpus style. Of the 950 citations, 834 came from `3b9a0a2`
+on July 26, 101 from `d456ea2` on July 27, 9 from `316d4e7` on July 30, and 6
+from `9d63894` on July 30.
+
+The corpus now removes both hyperlinks and plain-text source pointers from
+non-reference sections while retaining bibliographic entries in final
+`## References` sections. Forty singular `## Reference` headings were
+normalized to `## References`. The policy is recorded in
+`knowlpedia-content/EDITORIAL.md` and enforced by
+`scripts/audit_external_links.py` through the `make audit-external-links`
+target.
