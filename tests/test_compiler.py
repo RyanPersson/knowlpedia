@@ -273,6 +273,18 @@ class RenderContractTests(unittest.TestCase):
         source = r"$R[[x]]$ and \(k[[t]]\) but [[formal-groups|formal groups]]"
         self.assertEqual(compiler.wikilinks_in_text(source), ["formal-groups"])
 
+    def test_wikilink_extraction_and_rendering_ignore_inline_code(self) -> None:
+        source = "`R[[x]]` and [[formal-groups|code `k[[t]]` and formal groups]]"
+        self.assertEqual(compiler.wikilinks_in_text(source), ["formal-groups"])
+        rendered = compiler.render_inline(source, {})
+        self.assertIn("<code>R[[x]]</code>", rendered)
+        self.assertIn(">code <code>k[[t]]</code> and formal groups</a>", rendered)
+        self.assertNotIn('href="/x/"', rendered)
+        self.assertNotIn('href="/t/"', rendered)
+
+        fenced = "before\n```text\n[[not-a-knowl]]\n```\nafter [[formal-groups]]"
+        self.assertEqual(compiler.wikilinks_in_text(fenced), ["formal-groups"])
+
     def test_root_relative_markdown_link_is_navigation_only(self) -> None:
         rendered = compiler.render_inline("[Index](/conjectures/generated/example/)", {})
         self.assertIn('class="page-link"', rendered)

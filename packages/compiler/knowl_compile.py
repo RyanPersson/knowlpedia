@@ -31,6 +31,8 @@ WIKILINK_RE = re.compile(
     r"\[\[([A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)*(?:#[^\]|]+)?)(?:\|((?:[^\]]|\](?=\]\])|\](?!\]))*?))?\]\](?!\])"
 )
 MARKDOWN_LINK_RE = re.compile(r"\[([^\]\n]+)\]\(([^)\n]+)\)")
+INLINE_CODE_RE = re.compile(r"(?<!`)`([^`\n]+)`(?!`)")
+FENCED_CODE_RE = re.compile(r"^```[^\n]*\n.*?^```[ \t]*$", re.MULTILINE | re.DOTALL)
 MATH_RE = re.compile(
     r"(?s)(\$\$(.+?)\$\$|\\\[(.+?)\\\]|\\\((.+?)\\\)|(?<!\\)\$(?!\$)(.+?)(?<!\\)\$)"
 )
@@ -676,6 +678,17 @@ def protect_math(text: str) -> tuple[str, dict[str, str]]:
     return MATH_RE.sub(replace, text), replacements
 
 
+def protect_inline_code(text: str) -> tuple[str, dict[str, str]]:
+    replacements: dict[str, str] = {}
+
+    def replace(match: re.Match[str]) -> str:
+        token = f"@@KNOWL_CODE_{len(replacements)}@@"
+        replacements[token] = f"<code>{html.escape(match.group(1))}</code>"
+        return token
+
+    return INLINE_CODE_RE.sub(replace, text), replacements
+
+
 def restore_math(text: str, replacements: dict[str, str]) -> str:
     for token, rendered in replacements.items():
         text = text.replace(token, rendered)
@@ -917,6 +930,7 @@ def discover_package_knowls(
 
 
 def render_inline(text: str, registry: dict[str, Knowl]) -> str:
+    text, code_replacements = protect_inline_code(text)
     text, math_replacements = protect_math(text)
     escaped = html.escape(text)
 
@@ -947,10 +961,12 @@ def render_inline(text: str, registry: dict[str, Knowl]) -> str:
 
     escaped = MARKDOWN_LINK_RE.sub(replace_markdown_link, escaped)
     escaped = WIKILINK_RE.sub(replace_wikilink, escaped)
-    escaped = re.sub(r"`([^`]+)`", r"<code>\1</code>", escaped)
     escaped = re.sub(r"\*\*([^*]+)\*\*", r"<strong>\1</strong>", escaped)
     escaped = re.sub(r"\*([^*]+)\*", r"<em>\1</em>", escaped)
-    return restore_math(escaped, math_replacements)
+    escaped = restore_math(escaped, math_replacements)
+    for token, rendered in code_replacements.items():
+        escaped = escaped.replace(token, rendered)
+    return escaped
 
 
 def render_paragraph(text: str, registry: dict[str, Knowl]) -> str:
@@ -1832,6 +1848,8 @@ def validate(registry: dict[str, Knowl]) -> list[ValidationMessage]:
 
 
 def wikilinks_in_text(text: str) -> list[str]:
+    text = FENCED_CODE_RE.sub("@@KNOWL_CODE_BLOCK@@", text)
+    text, _ = protect_inline_code(text)
     protected, _ = protect_math(text)
     return [match.group(1).strip() for match in WIKILINK_RE.finditer(protected)]
 

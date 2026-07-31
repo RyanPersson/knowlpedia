@@ -2,8 +2,9 @@
 """Audit source links and citation pointers outside References sections.
 
 External links and source citations belong only in an H2 ``References``
-section. With ``--fix``, external Markdown citations outside that section are
-removed rather than converted to plain-text citations. Bibliographic links in
+section. With ``--fix``, an external Markdown citation outside that section is
+removed only when the same destination is already present in References;
+otherwise it remains a violation for manual relocation. Bibliographic links in
 References are left unchanged.
 """
 
@@ -17,8 +18,10 @@ import sys
 
 
 H2_RE = re.compile(r"^##\s+(.+?)\s*$", re.MULTILINE)
-RAW_EXTERNAL_RE = re.compile(r"(?:https?://|mailto:)")
+RAW_EXTERNAL_RE = re.compile(r"(?:https?://|mailto:)", re.IGNORECASE)
 REFERENCE_TITLES = {"reference", "references"}
+FENCED_CODE_RE = re.compile(r"^```[^\n]*\n.*?^```[ \t]*$", re.MULTILINE | re.DOTALL)
+INLINE_CODE_RE = re.compile(r"(?<!`)`[^`\n]+`(?!`)")
 PLAIN_BRACKET_RE = re.compile(r"(?<!\[)\[([^\[\]\n]{2,200})\](?![\[(])")
 CITATION_SIGNAL_RE = re.compile(
     r"(?:"
@@ -57,8 +60,23 @@ def split_front_matter(text: str) -> tuple[str, str]:
     return text[:boundary], text[boundary:]
 
 
+def code_spans(body: str) -> list[tuple[int, int]]:
+    fenced = [(match.start(), match.end()) for match in FENCED_CODE_RE.finditer(body)]
+    inline = [
+        (match.start(), match.end())
+        for match in INLINE_CODE_RE.finditer(body)
+        if not position_in_spans(match.start(), fenced)
+    ]
+    return fenced + inline
+
+
 def reference_spans(body: str) -> list[tuple[int, int]]:
-    headings = list(H2_RE.finditer(body))
+    protected = code_spans(body)
+    headings = [
+        match
+        for match in H2_RE.finditer(body)
+        if not position_in_spans(match.start(), protected)
+    ]
     spans: list[tuple[int, int]] = []
     for index, heading in enumerate(headings):
         title = heading.group(1).strip().casefold()
@@ -138,11 +156,13 @@ def markdown_links(text: str) -> list[MarkdownLink]:
 
 def external_links_outside_references(body: str) -> list[MarkdownLink]:
     spans = reference_spans(body)
+    protected = code_spans(body)
     return [
         link
         for link in markdown_links(body)
         if RAW_EXTERNAL_RE.match(link.destination)
         and not position_in_spans(link.start, spans)
+        and not position_in_spans(link.start, protected)
     ]
 
 
@@ -151,12 +171,15 @@ def raw_external_positions(
     all_external_links: list[MarkdownLink],
 ) -> list[int]:
     spans = reference_spans(body)
+    protected = code_spans(body)
     link_spans = [(link.start, link.end) for link in all_external_links]
     positions: list[int] = []
     for match in RAW_EXTERNAL_RE.finditer(body):
         if position_in_spans(match.start(), spans):
             continue
         if position_in_spans(match.start(), link_spans):
+            continue
+        if position_in_spans(match.start(), protected):
             continue
         positions.append(match.start())
     return positions
@@ -166,9 +189,12 @@ def plain_citation_positions(body: str) -> list[int]:
     """Return conservative matches for bracketed bibliographic pointers."""
 
     spans = reference_spans(body)
+    protected = code_spans(body)
     positions: list[int] = []
     for match in PLAIN_BRACKET_RE.finditer(body):
         if position_in_spans(match.start(), spans):
+            continue
+        if position_in_spans(match.start(), protected):
             continue
         label = match.group(1).strip()
         if CITATION_SIGNAL_RE.search(label):
@@ -283,7 +309,18 @@ def remove_inline_citations(body: str, links: list[MarkdownLink]) -> str:
 def fix_path(path: Path) -> int:
     text = path.read_text(encoding="utf-8")
     prefix, body = split_front_matter(text)
-    links = external_links_outside_references(body)
+    reference_ranges = reference_spans(body)
+    referenced_destinations = {
+        link.destination
+        for link in markdown_links(body)
+        if RAW_EXTERNAL_RE.match(link.destination)
+        and position_in_spans(link.start, reference_ranges)
+    }
+    links = [
+        link
+        for link in external_links_outside_references(body)
+        if link.destination in referenced_destinations
+    ]
     if not links and not re.search(r"^## Reference\s*$", body, re.MULTILINE):
         return 0
 
@@ -309,7 +346,10 @@ def main() -> int:
     parser.add_argument(
         "--fix",
         action="store_true",
-        help="Remove external citations outside References and normalize singular headings.",
+        help=(
+            "Remove externally linked citations already duplicated in References "
+            "and normalize singular headings."
+        ),
     )
     args = parser.parse_args()
 

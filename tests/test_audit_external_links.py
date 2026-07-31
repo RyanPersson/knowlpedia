@@ -90,6 +90,31 @@ class ExternalLinkAuditTests(unittest.TestCase):
         violations = audit.audit_path(path)
         self.assertEqual(len(violations), 1)
 
+    def test_ignores_urls_and_headings_inside_code(self) -> None:
+        path = self.write_knowl(
+            "`curl https://example.com/resource`\n\n"
+            "```text\n"
+            "## References\n"
+            "https://example.com/not-a-citation\n"
+            "```\n"
+        )
+        self.assertEqual(audit.audit_path(path), [])
+
+    def test_external_schemes_are_case_insensitive(self) -> None:
+        path = self.write_knowl("See HTTPS://example.com/resource.\n")
+        self.assertEqual(len(audit.audit_path(path)), 1)
+
+    def test_fix_does_not_discard_a_source_missing_from_references(self) -> None:
+        path = self.write_knowl(
+            "See [Unique source](https://example.com/unique).\n\n"
+            "## References\n\n"
+            "1. [Other source](https://example.com/other).\n"
+        )
+        self.assertEqual(audit.fix_path(path), 0)
+        fixed = path.read_text(encoding="utf-8")
+        self.assertIn("[Unique source](https://example.com/unique)", fixed)
+        self.assertEqual(len(audit.audit_path(path)), 1)
+
     def test_unmatched_mathematical_interval_does_not_absorb_reference_link(self) -> None:
         path = self.write_knowl(
             r"A map to \([0,\infty)\) is proper." "\n\n"

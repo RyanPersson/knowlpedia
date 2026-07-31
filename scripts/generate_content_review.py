@@ -67,6 +67,19 @@ def canonicalize_delimiters(text: str) -> str:
     )
 
 
+def changed_character_count(old_text: str, current_text: str) -> int:
+    """Count inserted and removed characters after delimiter normalization."""
+
+    old_text = canonicalize_delimiters(old_text)
+    current_text = canonicalize_delimiters(current_text)
+    return sum(
+        (old_end - old_start) + (current_end - current_start)
+        for operation, old_start, old_end, current_start, current_end
+        in difflib.SequenceMatcher(None, old_text, current_text).get_opcodes()
+        if operation != "equal"
+    )
+
+
 def parse_text(text: str, label: str) -> compiler.Knowl:
     with tempfile.NamedTemporaryFile(
         mode="w",
@@ -228,6 +241,15 @@ def index_styles() -> str:
       padding: .7rem .8rem; border: 1px solid var(--line-strong);
       border-radius: .45rem; background: var(--surface); color: var(--ink);
     }
+    .review-sort-row {
+      display: flex; align-items: center; gap: .55rem; margin: 0 1rem .65rem;
+      color: var(--muted); font-size: .85rem;
+    }
+    .review-sort-row select {
+      min-width: 0; flex: 1; padding: .35rem .45rem;
+      border: 1px solid var(--line-strong); border-radius: .35rem;
+      background: var(--surface); color: var(--ink);
+    }
     .review-count { margin: 0 1rem .65rem; font-size: .85rem; color: var(--muted); }
     .review-list { min-height: 0; margin: 0; padding: 0; overflow: auto; list-style: none; }
     .review-link {
@@ -238,6 +260,7 @@ def index_styles() -> str:
     .review-link.active { box-shadow: inset 3px 0 var(--accent); }
     .review-title { display: block; font-weight: 700; }
     .review-file { display: block; margin-top: .2rem; color: var(--muted); font-size: .75rem; overflow-wrap: anywhere; }
+    .review-diff-size { display: block; margin-top: .2rem; color: var(--muted); font-size: .75rem; }
     .review-main { min-width: 0; min-height: 0; }
     .review-frame { width: 100%; height: 100%; border: 0; background: var(--surface); }
     @media (max-width: 760px) {
@@ -267,6 +290,10 @@ def render_item_page(
     <p class="review-path"><strong>{item.index + 1} of {total}</strong> · {html.escape(item.path)}</p>
     <a href="{html.escape(knowl_href)}" target="_top">Open current knowl ↗</a>
   </header>
+  <details class="source-diff" open>
+    <summary>Delimiter-normalized source diff</summary>
+    <div class="diff-wrap">{source_diff(item.old_text, item.current_text, left_label, right_label)}</div>
+  </details>
   <main class="comparison">
     <section class="version version-head" aria-label="HEAD version">
       <h2 class="version-label">{html.escape(left_label)}</h2>
@@ -277,10 +304,6 @@ def render_item_page(
       {render_complete_knowl(item.current_knowl, registry)}
     </section>
   </main>
-  <details class="source-diff">
-    <summary>Delimiter-normalized source diff</summary>
-    <div class="diff-wrap">{source_diff(item.old_text, item.current_text, left_label, right_label)}</div>
-  </details>
 </body>
 </html>
 """
@@ -294,18 +317,24 @@ def render_index(
     description: str | None = None,
 ) -> str:
     entries = []
-    for item in items:
+    ranked_items = [
+        (changed_character_count(item.old_text, item.current_text), original_index, item)
+        for original_index, item in enumerate(items)
+    ]
+    ranked_items.sort(key=lambda entry: (-entry[0], entry[1]))
+    for diff_length, original_index, item in ranked_items:
         entries.append(
-            f"""<li>
+            f"""<li data-original-index="{original_index}" data-diff-length="{diff_length}">
   <a class="review-link" href="items/{html.escape(item.filename)}"
      data-target="items/{html.escape(item.filename)}"
      data-search="{html.escape((item.current_knowl.title + ' ' + item.path).lower())}">
     <span class="review-title">{html.escape(item.current_knowl.title)}</span>
     <span class="review-file">{html.escape(item.path.removeprefix('content/'))}</span>
+    <span class="review-diff-size">{diff_length:,} changed characters</span>
   </a>
 </li>"""
         )
-    first = f"items/{items[0].filename}" if items else ""
+    first = f"items/{ranked_items[0][2].filename}" if ranked_items else ""
     return (
         common_head("Knowlpedia substantive edit review")
         + index_styles()
@@ -319,6 +348,14 @@ def render_index(
       </header>
       <input class="review-search" id="review-search" type="search"
              placeholder="Filter by title or path…" autocomplete="off">
+      <label class="review-sort-row" for="review-sort">
+        <span>Sort</span>
+        <select id="review-sort">
+          <option value="original">Original order</option>
+          <option value="largest" selected>Largest diff first</option>
+          <option value="smallest">Smallest diff first</option>
+        </select>
+      </label>
       <p class="review-count" id="review-count">{len(items)} visible</p>
       <ol class="review-list" id="review-list">
         {''.join(entries)}
@@ -331,7 +368,9 @@ def render_index(
   </main>
   <script>
     const search = document.getElementById("review-search");
+    const sort = document.getElementById("review-sort");
     const count = document.getElementById("review-count");
+    const list = document.getElementById("review-list");
     const frame = document.getElementById("review-frame");
     const links = Array.from(document.querySelectorAll(".review-link"));
     function select(link, updateHash = true) {{
@@ -352,6 +391,19 @@ def render_index(
         if (show) visible += 1;
       }});
       count.textContent = visible + " visible";
+    }});
+    sort.addEventListener("change", () => {{
+      const direction = sort.value === "largest" ? -1 : 1;
+      const entries = links.map(link => link.closest("li"));
+      entries.sort((left, right) => {{
+        if (sort.value === "original") {{
+          return Number(left.dataset.originalIndex) - Number(right.dataset.originalIndex);
+        }}
+        const difference = Number(left.dataset.diffLength) - Number(right.dataset.diffLength);
+        return difference * direction
+          || Number(left.dataset.originalIndex) - Number(right.dataset.originalIndex);
+      }});
+      entries.forEach(entry => list.appendChild(entry));
     }});
     const requested = decodeURIComponent(location.hash.slice(1));
     const initial = links.find(link => link.dataset.target === requested) || links[0];
