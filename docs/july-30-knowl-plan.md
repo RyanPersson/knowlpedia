@@ -536,6 +536,197 @@ as an alias and a categorical comparison section.
 | `langlands/ramification-of-g-local-system` | Ramification of a \(G\)-local system |
 | `langlands` | Geometric Langlands subject index |
 
+## Atomicity follow-up after rendered review
+
+A rendered-page review found two distinct problems after the first integration
+pass: top-level knowl IDs were not recognized by the wikilink parser, and a
+small number of authored pages bundled several independently named
+definitions, constructions, or theorems into one overview-style record. The
+follow-up re-audited every July 30 addition against established atomic knowls.
+Its house rule is that a knowl has one axiomatic, clickable mathematical
+nucleus; independently named results or structures receive their own IDs,
+while subject navigation belongs in an index.
+
+At the close of this follow-up, the `knowlpedia-content` working tree differs
+from `develop` by **373 added knowls** and **64 modified pre-existing knowls**.
+The 373 additions include **109 atomic dependencies and results extracted
+during this follow-up**. Six proposed July 30 overview records were folded into
+atomic children or subject indexes and therefore do not appear in the final
+added count.
+
+### Folded proposed records
+
+These IDs were introduced by the first July 30 pass and then removed before
+final integration; no pre-July canonical ID was deleted.
+
+| Folded ID | Final disposition |
+|---|---|
+| `algebra-hyperstructures/comparison-map` | Navigation moved to `algebra-hyperstructures`; mathematical assertions moved to the separate embedding, tract, band, blueprint, and tropical-comparison knowls. |
+| `complex-analysis/cross-ratio-characterization-of-mobius-transformations` | Split into cross-ratio invariance, sharp three-transitivity, and the cross-ratio-preserving-bijection characterization. |
+| `complex-analysis/schwarzian-chain-rule-and-mobius-characterization` | Split into the Schwarzian chain rule, Möbius characterization, equal-Schwarzian theorem, and the second-order-ODE relation. |
+| `differential-geometry/morphisms-between-kahler-manifolds` | Folded into the atomic holomorphic/isometric morphism definitions and the differential-geometry index. |
+| `differential-geometry/morphisms-between-hyperkahler-manifolds` | Replaced by triholomorphic maps, strict and rotating hyperkähler isometries, and hyperkähler isometric immersions. |
+| `langlands/projective-line-in-geometric-langlands` | The precise marked/ramified example moved to `langlands/ramified-geometric-langlands`; rank-one group roles remain in their atomic projective, Möbius, and dual-group records. |
+
+### Newly extracted atomic dependencies and results
+
+The following 109 records were not in the first authored manifest. They arose
+from dependency closure and from splitting independently named concepts out of
+bundled records.
+
+#### Formal groups and indefinite spin — 5
+
+- `formal-groups/affine-formal-groups-and-complete-hopf-algebras`
+- `formal-groups/distribution-algebra-and-universal-enveloping-algebra`
+- `formal-groups/height-of-one-dimensional-formal-group-law`
+- `lie-groups/indefinite-pin-group`
+- `lie-groups/restricted-spin-group`
+
+#### Complex analysis and projective structures — 11
+
+- `complex-analysis/complex-projective-structure`
+- `complex-analysis/cross-ratio-invariance-under-mobius-transformations`
+- `complex-analysis/cross-ratio-preserving-bijections-are-mobius`
+- `complex-analysis/sharp-three-transitivity-of-mobius-group`
+- `complex-analysis/little-picard-theorem`
+- `complex-analysis/montel-theorem`
+- `complex-analysis/projective-connections-form-an-affine-space`
+- `complex-analysis/schwarzian-chain-rule`
+- `complex-analysis/mobius-characterization-by-schwarzian`
+- `complex-analysis/equal-schwarzians-differ-by-mobius`
+- `complex-analysis/schwarzian-and-second-order-linear-odes`
+
+#### Almost-complex, Kähler, and hyperkähler geometry — 5
+
+- `differential-geometry/almost-complex-map`
+- `differential-geometry/nijenhuis-tensor`
+- `differential-geometry/newlander-nirenberg-theorem`
+- `differential-geometry/hyperkahler-isometric-immersion`
+- `differential-geometry/rotating-hyperkahler-isometry`
+
+#### Valuations, hyperstructures, bands, and blueprints — 26
+
+- `algebra-fields-galois/non-archimedean-absolute-value`
+- `algebra-fields-galois/valuation-ring`
+- `algebra-fields-galois/value-group`
+- `algebra-rings/parasemifield`
+- `algebra-hyperstructures/band`
+- `algebra-hyperstructures/null-set-of-a-band`
+- `algebra-hyperstructures/fusion-rule-for-bands`
+- `algebra-hyperstructures/fusion-band`
+- `algebra-hyperstructures/phase-hyperfield`
+- `algebra-hyperstructures/doubly-distributive-hyperfield`
+- `algebra-hyperstructures/doubly-distributive-hyperfields-are-stringent`
+- `algebra-hyperstructures/classification-of-stringent-hyperfields`
+- `algebra-hyperstructures/hyperfield-as-a-tract`
+- `algebra-hyperstructures/partial-field-as-a-tract`
+- `algebra-hyperstructures/partial-hyperfield-as-a-tract`
+- `algebra-hyperstructures/tract-as-an-ordered-blueprint`
+- `algebraic-geometry-foundations/pre-addition-on-a-monoid`
+- `algebraic-geometry-foundations/semiring-completion-of-a-blueprint`
+- `algebraic-geometry-foundations/k-ideal-of-a-blueprint`
+- `algebraic-geometry-foundations/locally-blueprinted-space`
+- `algebraic-geometry-foundations/ordered-blueprinted-space`
+- `algebraic-geometry-foundations/semiring-as-a-blueprint`
+- `algebraic-geometry-foundations/commutative-monoid-with-zero-as-a-blueprint`
+- `algebraic-geometry-foundations/blueprint-as-an-ordered-blueprint`
+- `algebraic-geometry-foundations/band-as-an-ordered-blueprint`
+- `algebraic-geometry-foundations/idyll-as-ordered-blue-field`
+
+#### Algebraic geometry and geometric Langlands — 33
+
+- `algebra-topological/adic-ring`
+- `algebra-topological/ideal-of-definition`
+- `algebraic-geometry-foundations/locally-topologically-ringed-space`
+- `algebraic-geometry-foundations/algebraic-group`
+- `algebraic-geometry-foundations/algebraic-space`
+- `algebraic-geometry-foundations/coherent-sheaf`
+- `algebraic-geometry-foundations/derived-algebraic-stack`
+- `algebraic-geometry-foundations/integrable-connection`
+- `algebraic-geometry-foundations/parabolic-subgroup`
+- `algebraic-geometry-foundations/projective-morphism`
+- `algebraic-geometry-foundations/punctured-algebraic-curve`
+- `algebraic-geometry-foundations/reductive-algebraic-group`
+- `algebraic-geometry-foundations/smooth-morphism`
+- `algebraic-geometry-foundations/tangent-sheaf`
+- `langlands/affine-schubert-variety`
+- `langlands/convolution-of-sheaves`
+- `langlands/dominant-coweight`
+- `langlands/global-nilpotent-cone`
+- `langlands/ind-coherent-sheaf`
+- `langlands/ind-scheme`
+- `langlands/intersection-cohomology-complex`
+- `langlands/irregular-singular-connection`
+- `langlands/iwahori-level-structure`
+- `langlands/loop-group`
+- `langlands/parahoric-level-structure`
+- `langlands/perverse-sheaf`
+- `langlands/positive-loop-group`
+- `langlands/regular-singular-connection`
+- `langlands/riemann-hilbert-correspondence`
+- `langlands/singular-support-of-coherent-sheaf`
+- `langlands/stokes-data`
+- `langlands/tame-ramification`
+- `langlands/wild-ramification`
+
+#### Supergeometry, Clifford theory, causality, and field equations — 29
+
+- `supergeometry/koszul-sign-rule`
+- `supergeometry/representation-of-a-lie-superalgebra`
+- `supergeometry/super-internal-hom`
+- `supergeometry/super-pbw-theorem`
+- `supergeometry/supercommutator`
+- `supergeometry/supertranslation-distribution`
+- `differential-geometry/complex-clifford-module-classification`
+- `differential-geometry/dirac-spinor`
+- `differential-geometry/weyl-spinor`
+- `differential-geometry/majorana-spinor`
+- `differential-geometry/majorana-weyl-spinor`
+- `differential-geometry/chirality-operator`
+- `differential-geometry/lorentzian-dirac-operator`
+- `mathematical-physics/clifford-slash-notation`
+- `differential-geometry/causal-curve`
+- `differential-geometry/chronological-and-causal-future`
+- `differential-geometry/strong-causality`
+- `differential-geometry/causal-diamond`
+- `differential-geometry/cauchy-hypersurface`
+- `differential-geometry/global-hyperbolicity-and-cauchy-hypersurfaces`
+- `differential-geometry/smooth-splitting-of-globally-hyperbolic-spacetimes`
+- `differential-geometry/connection-laplacian`
+- `differential-geometry/scalar-curvature`
+- `mathematical-physics/conformal-coupling-of-a-scalar-field`
+- `mathematical-physics/connection-form-of-a-normally-hyperbolic-operator`
+- `mathematical-physics/cauchy-problem-for-normally-hyperbolic-operators`
+- `mathematical-physics/advanced-and-retarded-green-operators`
+- `mathematical-physics/existence-of-advanced-and-retarded-green-operators`
+- `mathematical-physics/cauchy-problem-for-the-lorentzian-dirac-operator`
+
+### Parser, rendered-link checking, and preservation audit
+
+The broken raw links in the rendered screenshots were a compiler defect rather
+than missing knowls. The wikilink parser previously required at least one `/`
+in every target, so valid top-level IDs such as `formal-groups`,
+`supergeometry`, `langlands`, and `algebra-hyperstructures` remained literal
+text. The parser now accepts top-level IDs, multiline labels, and labels
+containing brackets. Link extraction protects mathematics first so expressions
+such as \(R[[x]]\) are not mistaken for links. Regression tests cover each
+case.
+
+The rendered-output checker now flags every visible raw `[[` or `]]` marker,
+including lone markers and markup-split links, while continuing to ignore
+mathematics and code. This closes the gap through which the screenshot defects
+passed the earlier build.
+
+Finally, the pre-existing-content comparison was repeated side by side against
+`develop`. The original 41 modified canonical records were audited for lost
+definitions, hypotheses, consequences, aliases, and links; displaced material
+was restored or moved to a more precise atomic child. The final preservation
+review passed with no unintended mathematical content loss. In particular, it
+retains the symplectic Stokes consequence, the projective-space `Proj` link,
+the “proper orthochronous” terminology, the formal-power-series
+completion/deformation context, and consistent real/complex scalar fields in
+smooth-section and Serre–Swan statements.
+
 ## Batch 13 — integration, indexing, and validation
 
 | Ref | Status | Canonical ID or target | Kind | Action |

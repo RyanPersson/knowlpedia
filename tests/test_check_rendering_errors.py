@@ -43,6 +43,25 @@ class RenderedHtmlCheckerTests(unittest.TestCase):
         )
         self.assertEqual(issues, [])
 
+    def test_flags_complete_lone_and_split_wikilink_markers(self) -> None:
+        issues = self.scan(
+            "<p>[[formal-groups|Formal groups]]</p>"
+            "<p>A lone [[ marker and a lone ]] marker.</p>"
+            "<p>[[target|label <em>split across a child</em>]]</p>"
+        )
+        self.assertEqual(
+            [issue.kind for issue in issues],
+            ["raw_wikilink_marker"] * 6,
+        )
+
+    def test_ignores_wikilink_markers_in_math_and_code(self) -> None:
+        issues = self.scan(
+            '<span class="katex">R[[x]]</span>'
+            "<math><mi>k[[t]]</mi></math>"
+            "<code>[[not-a-knowl]]</code>"
+        )
+        self.assertEqual(issues, [])
+
     def test_checks_local_pages_assets_and_knowl_fragments(self) -> None:
         issues = self.scan(
             '<a href="/valid/">valid</a><a href="/missing/">missing</a>'

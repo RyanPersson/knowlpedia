@@ -28,7 +28,7 @@ from typing import Any
 
 
 WIKILINK_RE = re.compile(
-    r"\[\[([A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)+(?:#[^\]|]+)?)(?:\|([^\n]*?))?\]\]"
+    r"\[\[([A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)*(?:#[^\]|]+)?)(?:\|((?:[^\]]|\](?=\]\])|\](?!\]))*?))?\]\](?!\])"
 )
 MARKDOWN_LINK_RE = re.compile(r"\[([^\]\n]+)\]\(([^)\n]+)\)")
 MATH_RE = re.compile(
@@ -1832,7 +1832,8 @@ def validate(registry: dict[str, Knowl]) -> list[ValidationMessage]:
 
 
 def wikilinks_in_text(text: str) -> list[str]:
-    return [match.group(1).strip() for match in WIKILINK_RE.finditer(text)]
+    protected, _ = protect_math(text)
+    return [match.group(1).strip() for match in WIKILINK_RE.finditer(protected)]
 
 
 def collect_links(knowl: Knowl) -> list[dict[str, str]]:

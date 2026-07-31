@@ -235,6 +235,44 @@ class RenderContractTests(unittest.TestCase):
         self.assertNotIn('class="knowl"', rendered)
         self.assertNotIn("$", rendered)
 
+    def test_top_level_knowl_id_is_rendered_as_a_wikilink(self) -> None:
+        target = self.make_knowl()
+        target.id = "formal-groups"
+        registry = {target.id: target}
+        for source in ("[[formal-groups|Formal groups]]", "[[formal-groups]]"):
+            with self.subTest(source=source):
+                rendered = compiler.render_inline(source, registry)
+                self.assertIn('class="knowl"', rendered)
+                self.assertIn('href="/formal-groups/"', rendered)
+                self.assertIn('data-knowl="/fragments/formal-groups/core.html"', rendered)
+                self.assertNotIn("[[", rendered)
+
+        missing = compiler.render_inline("[[unknown-top-level]]", registry)
+        self.assertIn('class="missing-knowl"', missing)
+        self.assertIn("unknown-top-level", missing)
+
+    def test_wikilink_extraction_supports_top_level_and_multiline_labels(self) -> None:
+        source = (
+            "[[formal-groups|Formal groups]] and "
+            "[[algebra-hyperstructures/hyperfield|a hyperfield\n"
+            "with a multiline label]] and "
+            "[[fiber-bundles/homotopy-class-mbg|Homotopy class [M,BG]]]"
+        )
+        self.assertEqual(
+            compiler.wikilinks_in_text(source),
+            [
+                "formal-groups",
+                "algebra-hyperstructures/hyperfield",
+                "fiber-bundles/homotopy-class-mbg",
+            ],
+        )
+        rendered = compiler.render_inline(source, {})
+        self.assertIn(">Homotopy class [M,BG]</a>", rendered)
+
+    def test_wikilink_extraction_ignores_power_series_brackets_in_math(self) -> None:
+        source = r"$R[[x]]$ and \(k[[t]]\) but [[formal-groups|formal groups]]"
+        self.assertEqual(compiler.wikilinks_in_text(source), ["formal-groups"])
+
     def test_root_relative_markdown_link_is_navigation_only(self) -> None:
         rendered = compiler.render_inline("[Index](/conjectures/generated/example/)", {})
         self.assertIn('class="page-link"', rendered)

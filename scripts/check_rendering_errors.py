@@ -38,7 +38,7 @@ ALLOWED_RAW_SHORTCODE_PATHS = {
 LOCAL_TARGET_ATTRIBUTES = {"href", "src", "data-knowl", "data-section-url", "data-knowl-fragment"}
 KNOWL_TARGET_ATTRIBUTES = {"data-knowl", "data-section-url", "data-knowl-fragment"}
 HUGO_PLACEHOLDER_RE = re.compile(r"HUGOSHORTCODE\d+[A-Za-z0-9]*")
-WIKILINK_RE = re.compile(r"\[\[(?:[A-Za-z0-9_.-]+/[^\]\n]+|[^\]\n]+\|[^\]\n]+)\]\]")
+WIKILINK_MARKER_RE = re.compile(r"\[\[|\]\]")
 SHORTCODE_RE = re.compile(r"\{\{<\s*[^>]+>\}\}")
 DISPLAY_DELIMITER_RE = re.compile(r"(\\\[|\\\]|\$\$)")
 INLINE_MATH_RE = re.compile(r"(?<!\\)\$(?!\$)([^$\n]{1,500}?)(?<!\\)\$")
@@ -119,8 +119,12 @@ class RenderedHtmlChecker(HTMLParser):
             if relative_path not in ALLOWED_RAW_SHORTCODE_PATHS:
                 self._add_issue("error", "raw_shortcode", match.group(0))
 
-        for match in WIKILINK_RE.finditer(text):
-            self._add_issue("error", "raw_wikilink", match.group(0))
+        for match in WIKILINK_MARKER_RE.finditer(text):
+            self._add_issue(
+                "error",
+                "raw_wikilink_marker",
+                context(text, match.start(), match.end()),
+            )
 
         for match in DISPLAY_DELIMITER_RE.finditer(text):
             raw_math_spans.append((match.start(), match.end()))
