@@ -13,6 +13,7 @@ from scripts.generate_content_review import (
     render_index,
     render_item_page,
     write_diff_plan,
+    write_patch_chunks,
 )
 
 
@@ -155,15 +156,55 @@ Old definition.
         with tempfile.TemporaryDirectory() as temp:
             destination = Path(temp) / "plan.jsonl"
 
-            write_diff_plan(plan, destination)
+            write_diff_plan(plan, destination, baseline="develop", proposed="feature")
 
             record = json.loads(destination.read_text(encoding="utf-8"))
             self.assertEqual(record, {
+                "baseline": "develop",
                 "changed_characters": 1,
                 "chunk": 1,
                 "path": "content/example.knowl.md",
+                "proposed": "feature",
                 "rank": 1,
+                "review_direction": "baseline_to_proposed",
             })
+
+    def test_patch_chunks_use_standard_git_diff_polarity(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            repo = Path(temp) / "repo"
+            repo.mkdir()
+            self.git(repo, "init")
+            self.git(repo, "config", "user.name", "Test User")
+            self.git(repo, "config", "user.email", "test@example.com")
+            content = repo / "content"
+            content.mkdir()
+            source = content / "example.knowl.md"
+            source.write_text("baseline\n", encoding="utf-8")
+            self.git(repo, "add", "content")
+            self.git(repo, "commit", "-m", "baseline")
+            self.git(repo, "branch", "baseline")
+            source.write_text("proposed\n", encoding="utf-8")
+            self.git(repo, "add", "content")
+            self.git(repo, "commit", "-m", "proposed")
+            plan = build_diff_plan(
+                [("content/example.knowl.md", "baseline\n", "proposed\n")],
+                1,
+            )
+
+            paths = write_patch_chunks(
+                repo,
+                plan,
+                Path(temp) / "patches",
+                "baseline",
+                "HEAD",
+            )
+
+            patch = paths[0].read_text(encoding="utf-8")
+            self.assertIn("diff --git a/content/example.knowl.md b/content/example.knowl.md", patch)
+            self.assertIn("--- a/content/example.knowl.md", patch)
+            self.assertIn("+++ b/content/example.knowl.md", patch)
+            self.assertIn("-baseline", patch)
+            self.assertIn("+proposed", patch)
 
 
 if __name__ == "__main__":

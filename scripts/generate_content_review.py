@@ -123,14 +123,63 @@ def build_diff_plan(
     return plan
 
 
-def write_diff_plan(plan: list[DiffPlanItem], destination: Path | None) -> None:
-    lines = [json.dumps(item.__dict__, sort_keys=True) for item in plan]
+def write_diff_plan(
+    plan: list[DiffPlanItem],
+    destination: Path | None,
+    baseline: str = "HEAD",
+    proposed: str = "WORKTREE",
+) -> None:
+    records = [
+        {
+            **item.__dict__,
+            "baseline": baseline,
+            "proposed": proposed,
+            "review_direction": "baseline_to_proposed",
+        }
+        for item in plan
+    ]
+    lines = [json.dumps(record, sort_keys=True) for record in records]
     output = "\n".join(lines) + ("\n" if lines else "")
     if destination:
         destination.parent.mkdir(parents=True, exist_ok=True)
         destination.write_text(output, encoding="utf-8")
     else:
         sys.stdout.write(output)
+
+
+def write_patch_chunks(
+    content_repo: Path,
+    plan: list[DiffPlanItem],
+    destination: Path,
+    baseline: str | None,
+    proposed: str | None,
+) -> list[Path]:
+    """Write each balanced chunk as a standard unified Git patch."""
+
+    destination.mkdir(parents=True, exist_ok=True)
+    chunk_numbers = sorted({item.chunk for item in plan})
+    width = max(2, len(str(max(chunk_numbers, default=1))))
+    written = []
+    for chunk in chunk_numbers:
+        patch_parts = []
+        for item in plan:
+            if item.chunk != chunk:
+                continue
+            diff_args = [
+                "diff",
+                "--no-ext-diff",
+                "--no-renames",
+                "--unified=3",
+                baseline or "HEAD",
+            ]
+            if proposed:
+                diff_args.append(proposed)
+            diff_args.extend(["--", item.path])
+            patch_parts.append(git(*diff_args, cwd=content_repo).stdout)
+        patch_path = destination / f"chunk-{chunk:0{width}d}.patch"
+        patch_path.write_bytes(b"".join(patch_parts))
+        written.append(patch_path)
+    return written
 
 
 def parse_text(text: str, label: str) -> compiler.Knowl:
@@ -686,6 +735,11 @@ def main() -> int:
         default=1,
         help="Greedily balance a --diff-plan across this many chunks (default: 1)",
     )
+    parser.add_argument(
+        "--patch-dir",
+        type=Path,
+        help="With --diff-plan, also write each balanced chunk as a standard Git patch",
+    )
     args = parser.parse_args()
     if bool(args.left_ref) != bool(args.right_ref):
         parser.error("--left-ref and --right-ref must be used together")
@@ -695,6 +749,8 @@ def main() -> int:
         parser.error("--chunks must be at least 1")
     if args.chunks != 1 and args.diff_plan is None:
         parser.error("--chunks requires --diff-plan")
+    if args.patch_dir and args.diff_plan is None:
+        parser.error("--patch-dir requires --diff-plan")
     if args.diff_plan is not None:
         content_repo = args.content_repo.resolve()
         comparisons = comparison_sources(
@@ -705,7 +761,21 @@ def main() -> int:
         )
         plan = build_diff_plan(comparisons, args.chunks)
         destination = None if str(args.diff_plan) == "-" else args.diff_plan.resolve()
-        write_diff_plan(plan, destination)
+        write_diff_plan(
+            plan,
+            destination,
+            baseline=args.left_ref or "HEAD",
+            proposed=args.right_ref or "WORKTREE",
+        )
+        patch_paths = []
+        if args.patch_dir:
+            patch_paths = write_patch_chunks(
+                content_repo,
+                plan,
+                args.patch_dir.resolve(),
+                args.left_ref,
+                args.right_ref,
+            )
         if destination:
             chunk_totals: dict[int, int] = {}
             for item in plan:
@@ -715,6 +785,11 @@ def main() -> int:
                 for chunk, total in sorted(chunk_totals.items())
             )
             print(f"Wrote {len(plan)} diffs to {destination} ({totals})")
+            if patch_paths:
+                print(
+                    f"Wrote {len(patch_paths)} standard Git patches to "
+                    f"{args.patch_dir.resolve()}"
+                )
         return 0 if plan else 1
     if args.left_ref:
         count = build_ref_comparison(
