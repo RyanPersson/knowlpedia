@@ -7,6 +7,7 @@ import argparse
 import difflib
 import html
 import io
+import json
 import re
 import subprocess
 import sys
@@ -32,9 +33,18 @@ class ReviewItem:
     path: str
     old_text: str
     current_text: str
-    old_knowl: compiler.Knowl
+    old_knowl: compiler.Knowl | None
     current_knowl: compiler.Knowl
     filename: str
+    change_kind: str = "modified"
+
+
+@dataclass(frozen=True)
+class DiffPlanItem:
+    rank: int
+    path: str
+    changed_characters: int
+    chunk: int
 
 
 def git(*args: str, cwd: Path, check: bool = True) -> subprocess.CompletedProcess[bytes]:
@@ -65,6 +75,112 @@ def canonicalize_delimiters(text: str) -> str:
         .replace(r"\(", "$")
         .replace(r"\)", "$")
     )
+
+
+def changed_character_count(old_text: str, current_text: str) -> int:
+    """Count inserted and removed characters after delimiter normalization."""
+
+    old_text = canonicalize_delimiters(old_text)
+    current_text = canonicalize_delimiters(current_text)
+    return sum(
+        (old_end - old_start) + (current_end - current_start)
+        for operation, old_start, old_end, current_start, current_end
+        in difflib.SequenceMatcher(None, old_text, current_text).get_opcodes()
+        if operation != "equal"
+    )
+
+
+def build_diff_plan(
+    comparisons: list[tuple[str, str, str]],
+    chunk_count: int,
+) -> list[DiffPlanItem]:
+    """Rank comparisons by size and greedily balance them across chunks."""
+
+    if chunk_count < 1:
+        raise ValueError("chunk_count must be at least 1")
+    ranked = sorted(
+        (
+            (changed_character_count(old_text, current_text), path)
+            for path, old_text, current_text in comparisons
+        ),
+        key=lambda entry: (-entry[0], entry[1]),
+    )
+    chunk_loads = [0] * min(chunk_count, max(1, len(ranked)))
+    plan = []
+    for rank, (changed_characters, path) in enumerate(ranked, start=1):
+        chunk_index = min(
+            range(len(chunk_loads)),
+            key=lambda index: (chunk_loads[index], index),
+        )
+        plan.append(
+            DiffPlanItem(
+                rank=rank,
+                path=path,
+                changed_characters=changed_characters,
+                chunk=chunk_index + 1,
+            )
+        )
+        chunk_loads[chunk_index] += changed_characters
+    return plan
+
+
+def write_diff_plan(
+    plan: list[DiffPlanItem],
+    destination: Path | None,
+    baseline: str = "HEAD",
+    proposed: str = "WORKTREE",
+) -> None:
+    records = [
+        {
+            **item.__dict__,
+            "baseline": baseline,
+            "proposed": proposed,
+            "review_direction": "baseline_to_proposed",
+        }
+        for item in plan
+    ]
+    lines = [json.dumps(record, sort_keys=True) for record in records]
+    output = "\n".join(lines) + ("\n" if lines else "")
+    if destination:
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_text(output, encoding="utf-8")
+    else:
+        sys.stdout.write(output)
+
+
+def write_patch_chunks(
+    content_repo: Path,
+    plan: list[DiffPlanItem],
+    destination: Path,
+    baseline: str | None,
+    proposed: str | None,
+) -> list[Path]:
+    """Write each balanced chunk as a standard unified Git patch."""
+
+    destination.mkdir(parents=True, exist_ok=True)
+    chunk_numbers = sorted({item.chunk for item in plan})
+    width = max(2, len(str(max(chunk_numbers, default=1))))
+    written = []
+    for chunk in chunk_numbers:
+        patch_parts = []
+        for item in plan:
+            if item.chunk != chunk:
+                continue
+            diff_args = [
+                "diff",
+                "--no-ext-diff",
+                "--no-renames",
+                "--unified=3",
+                baseline or "HEAD",
+            ]
+            if proposed:
+                diff_args.append(proposed)
+            diff_args.extend(["--", item.path])
+            patch_parts.append(git(*diff_args, cwd=content_repo).stdout)
+        patch_path = destination / f"chunk-{chunk:0{width}d}.patch"
+        patch_path.write_bytes(b"".join(patch_parts))
+        written.append(patch_path)
+    return written
 
 
 def parse_text(text: str, label: str) -> compiler.Knowl:
@@ -172,6 +288,7 @@ def item_styles() -> str:
       display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       gap: 1px; background: var(--line);
     }
+    .comparison-added { display: block; background: var(--surface); }
     .version { min-width: 0; background: var(--surface); color: var(--ink); }
     .version-label {
       position: sticky; top: 49px; z-index: 5; margin: 0; padding: .55rem 1.25rem;
@@ -228,6 +345,19 @@ def index_styles() -> str:
       padding: .7rem .8rem; border: 1px solid var(--line-strong);
       border-radius: .45rem; background: var(--surface); color: var(--ink);
     }
+    .review-sort-row {
+      display: flex; align-items: center; gap: .55rem; margin: 0 1rem .65rem;
+      color: var(--muted); font-size: .85rem;
+    }
+    .review-sort-row select {
+      min-width: 0; flex: 1; padding: .35rem .45rem;
+      border: 1px solid var(--line-strong); border-radius: .35rem;
+      background: var(--surface); color: var(--ink);
+    }
+    .review-toggle-row {
+      display: flex; align-items: center; gap: .55rem; margin: 0 1rem .65rem;
+      color: var(--muted); font-size: .85rem;
+    }
     .review-count { margin: 0 1rem .65rem; font-size: .85rem; color: var(--muted); }
     .review-list { min-height: 0; margin: 0; padding: 0; overflow: auto; list-style: none; }
     .review-link {
@@ -238,6 +368,7 @@ def index_styles() -> str:
     .review-link.active { box-shadow: inset 3px 0 var(--accent); }
     .review-title { display: block; font-weight: 700; }
     .review-file { display: block; margin-top: .2rem; color: var(--muted); font-size: .75rem; overflow-wrap: anywhere; }
+    .review-diff-size { display: block; margin-top: .2rem; color: var(--muted); font-size: .75rem; }
     .review-main { min-width: 0; min-height: 0; }
     .review-frame { width: 100%; height: 100%; border: 0; background: var(--surface); }
     @media (max-width: 760px) {
@@ -259,6 +390,26 @@ def render_item_page(
 ) -> str:
     title = item.current_knowl.title
     knowl_href = "/" + item.current_knowl.id.strip("/") + "/"
+    diff_open = " open" if item.change_kind == "modified" else ""
+    if item.change_kind == "added":
+        rendered = f"""<main class="comparison comparison-added">
+    <section class="version version-current" aria-label="New knowl">
+      <h2 class="version-label">{html.escape(right_label)} · new knowl</h2>
+      {render_complete_knowl(item.current_knowl, registry)}
+    </section>
+  </main>"""
+    else:
+        assert item.old_knowl is not None
+        rendered = f"""<main class="comparison">
+    <section class="version version-head" aria-label="Baseline version">
+      <h2 class="version-label">{html.escape(left_label)}</h2>
+      {render_complete_knowl(item.old_knowl, registry)}
+    </section>
+    <section class="version version-current" aria-label="Proposed version">
+      <h2 class="version-label">{html.escape(right_label)}</h2>
+      {render_complete_knowl(item.current_knowl, registry)}
+    </section>
+  </main>"""
     return (
         common_head(f"{title} — content review")
         + item_styles()
@@ -267,20 +418,11 @@ def render_item_page(
     <p class="review-path"><strong>{item.index + 1} of {total}</strong> · {html.escape(item.path)}</p>
     <a href="{html.escape(knowl_href)}" target="_top">Open current knowl ↗</a>
   </header>
-  <main class="comparison">
-    <section class="version version-head" aria-label="HEAD version">
-      <h2 class="version-label">{html.escape(left_label)}</h2>
-      {render_complete_knowl(item.old_knowl, registry)}
-    </section>
-    <section class="version version-current" aria-label="Working tree version">
-      <h2 class="version-label">{html.escape(right_label)}</h2>
-      {render_complete_knowl(item.current_knowl, registry)}
-    </section>
-  </main>
-  <details class="source-diff">
+  <details class="source-diff"{diff_open}>
     <summary>Delimiter-normalized source diff</summary>
     <div class="diff-wrap">{source_diff(item.old_text, item.current_text, left_label, right_label)}</div>
   </details>
+  {rendered}
 </body>
 </html>
 """
@@ -294,18 +436,35 @@ def render_index(
     description: str | None = None,
 ) -> str:
     entries = []
-    for item in items:
+    ranked_items = [
+        (changed_character_count(item.old_text, item.current_text), original_index, item)
+        for original_index, item in enumerate(items)
+    ]
+    ranked_items.sort(key=lambda entry: (-entry[0], entry[1]))
+    for diff_length, original_index, item in ranked_items:
+        size_label = (
+            f"new knowl · {len(item.current_text):,} source characters"
+            if item.change_kind == "added"
+            else f"{diff_length:,} changed characters"
+        )
         entries.append(
-            f"""<li>
+            f"""<li data-original-index="{original_index}" data-diff-length="{diff_length}"
+    data-change-kind="{html.escape(item.change_kind)}">
   <a class="review-link" href="items/{html.escape(item.filename)}"
      data-target="items/{html.escape(item.filename)}"
      data-search="{html.escape((item.current_knowl.title + ' ' + item.path).lower())}">
     <span class="review-title">{html.escape(item.current_knowl.title)}</span>
     <span class="review-file">{html.escape(item.path.removeprefix('content/'))}</span>
+    <span class="review-diff-size">{size_label}</span>
   </a>
 </li>"""
         )
-    first = f"items/{items[0].filename}" if items else ""
+    default_items = [entry for entry in ranked_items if entry[2].change_kind != "added"]
+    if not default_items:
+        default_items = ranked_items
+    first = f"items/{default_items[0][2].filename}" if default_items else ""
+    added_count = sum(item.change_kind == "added" for item in items)
+    added_checked = " checked" if items and added_count == len(items) else ""
     return (
         common_head("Knowlpedia substantive edit review")
         + index_styles()
@@ -319,6 +478,18 @@ def render_index(
       </header>
       <input class="review-search" id="review-search" type="search"
              placeholder="Filter by title or path…" autocomplete="off">
+      <label class="review-sort-row" for="review-sort">
+        <span>Sort</span>
+        <select id="review-sort">
+          <option value="original">Original order</option>
+          <option value="largest" selected>Largest diff first</option>
+          <option value="smallest">Smallest diff first</option>
+        </select>
+      </label>
+      <label class="review-toggle-row" for="review-include-added">
+        <input id="review-include-added" type="checkbox"{added_checked}>
+        <span>Include newly created knowls ({added_count})</span>
+      </label>
       <p class="review-count" id="review-count">{len(items)} visible</p>
       <ol class="review-list" id="review-list">
         {''.join(entries)}
@@ -331,7 +502,10 @@ def render_index(
   </main>
   <script>
     const search = document.getElementById("review-search");
+    const sort = document.getElementById("review-sort");
     const count = document.getElementById("review-count");
+    const includeAdded = document.getElementById("review-include-added");
+    const list = document.getElementById("review-list");
     const frame = document.getElementById("review-frame");
     const links = Array.from(document.querySelectorAll(".review-link"));
     function select(link, updateHash = true) {{
@@ -343,19 +517,42 @@ def render_index(
       event.preventDefault();
       select(link);
     }}));
-    search.addEventListener("input", () => {{
+    function updateVisibility() {{
       const query = search.value.trim().toLowerCase();
       let visible = 0;
       links.forEach(link => {{
-        const show = !query || link.dataset.search.includes(query);
-        link.closest("li").hidden = !show;
+        const entry = link.closest("li");
+        const kindAllowed = includeAdded.checked || entry.dataset.changeKind !== "added";
+        const show = kindAllowed && (!query || link.dataset.search.includes(query));
+        entry.hidden = !show;
         if (show) visible += 1;
       }});
       count.textContent = visible + " visible";
+      const active = links.find(link => link.classList.contains("active"));
+      if (active && active.closest("li").hidden) {{
+        const replacement = links.find(link => !link.closest("li").hidden);
+        if (replacement) select(replacement);
+      }}
+    }}
+    search.addEventListener("input", updateVisibility);
+    includeAdded.addEventListener("change", updateVisibility);
+    sort.addEventListener("change", () => {{
+      const direction = sort.value === "largest" ? -1 : 1;
+      const entries = links.map(link => link.closest("li"));
+      entries.sort((left, right) => {{
+        if (sort.value === "original") {{
+          return Number(left.dataset.originalIndex) - Number(right.dataset.originalIndex);
+        }}
+        const difference = Number(left.dataset.diffLength) - Number(right.dataset.diffLength);
+        return difference * direction
+          || Number(left.dataset.originalIndex) - Number(right.dataset.originalIndex);
+      }});
+      entries.forEach(entry => list.appendChild(entry));
     }});
     const requested = decodeURIComponent(location.hash.slice(1));
     const initial = links.find(link => link.dataset.target === requested) || links[0];
     if (initial) select(initial, false);
+    updateVisibility();
   </script>
 </body>
 </html>
@@ -364,14 +561,11 @@ def render_index(
 
 
 def build(content_repo: Path, output: Path) -> int:
-    changed = git("diff", "--name-only", "-z", "--", "content", cwd=content_repo).stdout
-    paths = [path for path in changed.decode().split("\0") if path.endswith(".knowl.md")]
-    substantive: list[tuple[str, str, str]] = []
-    for path in paths:
-        old = git("show", f"HEAD:{path}", cwd=content_repo).stdout.decode()
-        current = (content_repo / path).read_text(encoding="utf-8")
-        if normalize_delimiters(old) != normalize_delimiters(current):
-            substantive.append((path, old, current))
+    substantive = [
+        (path, old, current)
+        for path, old, current in comparison_sources(content_repo, None, None, None)
+        if normalize_delimiters(old) != normalize_delimiters(current)
+    ]
 
     current_knowls = compiler.discover_knowls(content_repo / "content")
     registry = {knowl.id: knowl for knowl in current_knowls}
@@ -414,6 +608,98 @@ def extract_ref(content_repo: Path, ref: str, destination: Path) -> None:
         bundle.extractall(destination)
 
 
+def modified_knowl_paths(content_repo: Path, left_ref: str, right_ref: str) -> list[str]:
+    """Return knowl paths modified in place between two refs.
+
+    Added and deleted files cannot form a two-version comparison, so this
+    deliberately excludes them.
+    """
+
+    changed = git(
+        "diff",
+        "--diff-filter=M",
+        "--name-only",
+        "-z",
+        left_ref,
+        right_ref,
+        "--",
+        "content",
+        cwd=content_repo,
+    ).stdout
+    return [
+        path
+        for path in changed.decode().split("\0")
+        if path.endswith(".knowl.md")
+    ]
+
+
+def added_knowl_paths(content_repo: Path, left_ref: str, right_ref: str) -> list[str]:
+    """Return knowl paths added between two refs."""
+
+    changed = git(
+        "diff",
+        "--diff-filter=A",
+        "--name-only",
+        "-z",
+        left_ref,
+        right_ref,
+        "--",
+        "content",
+        cwd=content_repo,
+    ).stdout
+    return [
+        path
+        for path in changed.decode().split("\0")
+        if path.endswith(".knowl.md")
+    ]
+
+
+def path_exists_at_ref(content_repo: Path, ref: str, path: str) -> bool:
+    return git("cat-file", "-e", f"{ref}:{path}", cwd=content_repo, check=False).returncode == 0
+
+
+def comparison_sources(
+    content_repo: Path,
+    left_ref: str | None,
+    right_ref: str | None,
+    paths_file: Path | None,
+) -> list[tuple[str, str, str]]:
+    if left_ref and right_ref:
+        if paths_file:
+            requested_paths = [
+                line.strip()
+                for line in paths_file.read_text(encoding="utf-8").splitlines()
+                if line.strip().endswith(".knowl.md")
+            ]
+            paths = [
+                path
+                for path in requested_paths
+                if path_exists_at_ref(content_repo, left_ref, path)
+                and path_exists_at_ref(content_repo, right_ref, path)
+            ]
+        else:
+            paths = modified_knowl_paths(content_repo, left_ref, right_ref)
+        return [
+            (
+                path,
+                git("show", f"{left_ref}:{path}", cwd=content_repo).stdout.decode(),
+                git("show", f"{right_ref}:{path}", cwd=content_repo).stdout.decode(),
+            )
+            for path in paths
+        ]
+
+    changed = git("diff", "--name-only", "-z", "--", "content", cwd=content_repo).stdout
+    paths = [path for path in changed.decode().split("\0") if path.endswith(".knowl.md")]
+    return [
+        (
+            path,
+            git("show", f"HEAD:{path}", cwd=content_repo).stdout.decode(),
+            (content_repo / path).read_text(encoding="utf-8"),
+        )
+        for path in paths
+    ]
+
+
 def build_ref_comparison(
     content_repo: Path,
     output: Path,
@@ -423,29 +709,25 @@ def build_ref_comparison(
     left_label: str,
     right_label: str,
     heading: str,
+    include_added: bool = False,
 ) -> int:
-    if paths_file:
-        paths = [
-            line.strip()
-            for line in paths_file.read_text(encoding="utf-8").splitlines()
-            if line.strip().endswith(".knowl.md")
-        ]
-    else:
-        changed = git(
-            "diff",
-            "--name-only",
-            "-z",
-            left_ref,
-            right_ref,
-            "--",
-            "content",
-            cwd=content_repo,
-        ).stdout
-        paths = [
-            path
-            for path in changed.decode().split("\0")
-            if path.endswith(".knowl.md")
-        ]
+    comparisons = comparison_sources(
+        content_repo,
+        left_ref,
+        right_ref,
+        paths_file,
+    )
+    added_paths: set[str] = set()
+    if include_added:
+        added_paths = set(added_knowl_paths(content_repo, left_ref, right_ref))
+        comparisons.extend(
+            (
+                path,
+                "",
+                git("show", f"{right_ref}:{path}", cwd=content_repo).stdout.decode(),
+            )
+            for path in sorted(added_paths)
+        )
     with tempfile.TemporaryDirectory(prefix="knowl-review-ref-") as temp:
         right_tree = Path(temp)
         extract_ref(content_repo, right_ref, right_tree)
@@ -453,10 +735,8 @@ def build_ref_comparison(
         registry = {knowl.id: knowl for knowl in right_knowls}
 
         items: list[ReviewItem] = []
-        for index, path in enumerate(paths):
-            left = git("show", f"{left_ref}:{path}", cwd=content_repo).stdout.decode()
-            right = git("show", f"{right_ref}:{path}", cwd=content_repo).stdout.decode()
-            left_knowl = parse_text(left, f"{left_ref}:{path}")
+        for index, (path, left, right) in enumerate(comparisons):
+            left_knowl = None if path in added_paths else parse_text(left, f"{left_ref}:{path}")
             right_knowl = parse_text(right, f"{right_ref}:{path}")
             safe_id = re.sub(r"[^a-z0-9-]+", "-", right_knowl.id.lower()).strip("-")
             items.append(
@@ -468,6 +748,7 @@ def build_ref_comparison(
                     old_knowl=left_knowl,
                     current_knowl=right_knowl,
                     filename=f"{index + 1:04d}-{safe_id}.html",
+                    change_kind="added" if path in added_paths else "modified",
                 )
             )
 
@@ -518,11 +799,80 @@ def main() -> int:
     parser.add_argument("--left-label")
     parser.add_argument("--right-label")
     parser.add_argument("--heading", default="Content comparison")
+    parser.add_argument(
+        "--include-added",
+        action="store_true",
+        help="Include added knowls behind a toggle; their source diffs start collapsed",
+    )
+    parser.add_argument(
+        "--diff-plan",
+        nargs="?",
+        type=Path,
+        const="-",
+        help="Write a largest-first JSONL diff plan to PATH, or stdout when PATH is omitted",
+    )
+    parser.add_argument(
+        "--chunks",
+        type=int,
+        default=1,
+        help="Greedily balance a --diff-plan across this many chunks (default: 1)",
+    )
+    parser.add_argument(
+        "--patch-dir",
+        type=Path,
+        help="With --diff-plan, also write each balanced chunk as a standard Git patch",
+    )
     args = parser.parse_args()
     if bool(args.left_ref) != bool(args.right_ref):
         parser.error("--left-ref and --right-ref must be used together")
     if args.paths_from and not args.left_ref:
         parser.error("--paths-from requires --left-ref and --right-ref")
+    if args.chunks < 1:
+        parser.error("--chunks must be at least 1")
+    if args.chunks != 1 and args.diff_plan is None:
+        parser.error("--chunks requires --diff-plan")
+    if args.patch_dir and args.diff_plan is None:
+        parser.error("--patch-dir requires --diff-plan")
+    if args.diff_plan is not None:
+        content_repo = args.content_repo.resolve()
+        comparisons = comparison_sources(
+            content_repo,
+            args.left_ref,
+            args.right_ref,
+            args.paths_from.resolve() if args.paths_from else None,
+        )
+        plan = build_diff_plan(comparisons, args.chunks)
+        destination = None if str(args.diff_plan) == "-" else args.diff_plan.resolve()
+        write_diff_plan(
+            plan,
+            destination,
+            baseline=args.left_ref or "HEAD",
+            proposed=args.right_ref or "WORKTREE",
+        )
+        patch_paths = []
+        if args.patch_dir:
+            patch_paths = write_patch_chunks(
+                content_repo,
+                plan,
+                args.patch_dir.resolve(),
+                args.left_ref,
+                args.right_ref,
+            )
+        if destination:
+            chunk_totals: dict[int, int] = {}
+            for item in plan:
+                chunk_totals[item.chunk] = chunk_totals.get(item.chunk, 0) + item.changed_characters
+            totals = ", ".join(
+                f"chunk {chunk}: {total:,} chars"
+                for chunk, total in sorted(chunk_totals.items())
+            )
+            print(f"Wrote {len(plan)} diffs to {destination} ({totals})")
+            if patch_paths:
+                print(
+                    f"Wrote {len(patch_paths)} standard Git patches to "
+                    f"{args.patch_dir.resolve()}"
+                )
+        return 0 if plan else 1
     if args.left_ref:
         count = build_ref_comparison(
             args.content_repo.resolve(),
@@ -533,6 +883,7 @@ def main() -> int:
             args.left_label or args.left_ref,
             args.right_label or args.right_ref,
             args.heading,
+            args.include_added,
         )
     else:
         count = build(args.content_repo.resolve(), args.output.resolve())
