@@ -33,9 +33,10 @@ class ReviewItem:
     path: str
     old_text: str
     current_text: str
-    old_knowl: compiler.Knowl
+    old_knowl: compiler.Knowl | None
     current_knowl: compiler.Knowl
     filename: str
+    change_kind: str = "modified"
 
 
 @dataclass(frozen=True)
@@ -287,6 +288,7 @@ def item_styles() -> str:
       display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       gap: 1px; background: var(--line);
     }
+    .comparison-added { display: block; background: var(--surface); }
     .version { min-width: 0; background: var(--surface); color: var(--ink); }
     .version-label {
       position: sticky; top: 49px; z-index: 5; margin: 0; padding: .55rem 1.25rem;
@@ -352,6 +354,10 @@ def index_styles() -> str:
       border: 1px solid var(--line-strong); border-radius: .35rem;
       background: var(--surface); color: var(--ink);
     }
+    .review-toggle-row {
+      display: flex; align-items: center; gap: .55rem; margin: 0 1rem .65rem;
+      color: var(--muted); font-size: .85rem;
+    }
     .review-count { margin: 0 1rem .65rem; font-size: .85rem; color: var(--muted); }
     .review-list { min-height: 0; margin: 0; padding: 0; overflow: auto; list-style: none; }
     .review-link {
@@ -384,6 +390,26 @@ def render_item_page(
 ) -> str:
     title = item.current_knowl.title
     knowl_href = "/" + item.current_knowl.id.strip("/") + "/"
+    diff_open = " open" if item.change_kind == "modified" else ""
+    if item.change_kind == "added":
+        rendered = f"""<main class="comparison comparison-added">
+    <section class="version version-current" aria-label="New knowl">
+      <h2 class="version-label">{html.escape(right_label)} · new knowl</h2>
+      {render_complete_knowl(item.current_knowl, registry)}
+    </section>
+  </main>"""
+    else:
+        assert item.old_knowl is not None
+        rendered = f"""<main class="comparison">
+    <section class="version version-head" aria-label="Baseline version">
+      <h2 class="version-label">{html.escape(left_label)}</h2>
+      {render_complete_knowl(item.old_knowl, registry)}
+    </section>
+    <section class="version version-current" aria-label="Proposed version">
+      <h2 class="version-label">{html.escape(right_label)}</h2>
+      {render_complete_knowl(item.current_knowl, registry)}
+    </section>
+  </main>"""
     return (
         common_head(f"{title} — content review")
         + item_styles()
@@ -392,20 +418,11 @@ def render_item_page(
     <p class="review-path"><strong>{item.index + 1} of {total}</strong> · {html.escape(item.path)}</p>
     <a href="{html.escape(knowl_href)}" target="_top">Open current knowl ↗</a>
   </header>
-  <details class="source-diff" open>
+  <details class="source-diff"{diff_open}>
     <summary>Delimiter-normalized source diff</summary>
     <div class="diff-wrap">{source_diff(item.old_text, item.current_text, left_label, right_label)}</div>
   </details>
-  <main class="comparison">
-    <section class="version version-head" aria-label="HEAD version">
-      <h2 class="version-label">{html.escape(left_label)}</h2>
-      {render_complete_knowl(item.old_knowl, registry)}
-    </section>
-    <section class="version version-current" aria-label="Working tree version">
-      <h2 class="version-label">{html.escape(right_label)}</h2>
-      {render_complete_knowl(item.current_knowl, registry)}
-    </section>
-  </main>
+  {rendered}
 </body>
 </html>
 """
@@ -425,18 +442,29 @@ def render_index(
     ]
     ranked_items.sort(key=lambda entry: (-entry[0], entry[1]))
     for diff_length, original_index, item in ranked_items:
+        size_label = (
+            f"new knowl · {len(item.current_text):,} source characters"
+            if item.change_kind == "added"
+            else f"{diff_length:,} changed characters"
+        )
         entries.append(
-            f"""<li data-original-index="{original_index}" data-diff-length="{diff_length}">
+            f"""<li data-original-index="{original_index}" data-diff-length="{diff_length}"
+    data-change-kind="{html.escape(item.change_kind)}">
   <a class="review-link" href="items/{html.escape(item.filename)}"
      data-target="items/{html.escape(item.filename)}"
      data-search="{html.escape((item.current_knowl.title + ' ' + item.path).lower())}">
     <span class="review-title">{html.escape(item.current_knowl.title)}</span>
     <span class="review-file">{html.escape(item.path.removeprefix('content/'))}</span>
-    <span class="review-diff-size">{diff_length:,} changed characters</span>
+    <span class="review-diff-size">{size_label}</span>
   </a>
 </li>"""
         )
-    first = f"items/{ranked_items[0][2].filename}" if ranked_items else ""
+    default_items = [entry for entry in ranked_items if entry[2].change_kind != "added"]
+    if not default_items:
+        default_items = ranked_items
+    first = f"items/{default_items[0][2].filename}" if default_items else ""
+    added_count = sum(item.change_kind == "added" for item in items)
+    added_checked = " checked" if items and added_count == len(items) else ""
     return (
         common_head("Knowlpedia substantive edit review")
         + index_styles()
@@ -458,6 +486,10 @@ def render_index(
           <option value="smallest">Smallest diff first</option>
         </select>
       </label>
+      <label class="review-toggle-row" for="review-include-added">
+        <input id="review-include-added" type="checkbox"{added_checked}>
+        <span>Include newly created knowls ({added_count})</span>
+      </label>
       <p class="review-count" id="review-count">{len(items)} visible</p>
       <ol class="review-list" id="review-list">
         {''.join(entries)}
@@ -472,6 +504,7 @@ def render_index(
     const search = document.getElementById("review-search");
     const sort = document.getElementById("review-sort");
     const count = document.getElementById("review-count");
+    const includeAdded = document.getElementById("review-include-added");
     const list = document.getElementById("review-list");
     const frame = document.getElementById("review-frame");
     const links = Array.from(document.querySelectorAll(".review-link"));
@@ -484,16 +517,25 @@ def render_index(
       event.preventDefault();
       select(link);
     }}));
-    search.addEventListener("input", () => {{
+    function updateVisibility() {{
       const query = search.value.trim().toLowerCase();
       let visible = 0;
       links.forEach(link => {{
-        const show = !query || link.dataset.search.includes(query);
-        link.closest("li").hidden = !show;
+        const entry = link.closest("li");
+        const kindAllowed = includeAdded.checked || entry.dataset.changeKind !== "added";
+        const show = kindAllowed && (!query || link.dataset.search.includes(query));
+        entry.hidden = !show;
         if (show) visible += 1;
       }});
       count.textContent = visible + " visible";
-    }});
+      const active = links.find(link => link.classList.contains("active"));
+      if (active && active.closest("li").hidden) {{
+        const replacement = links.find(link => !link.closest("li").hidden);
+        if (replacement) select(replacement);
+      }}
+    }}
+    search.addEventListener("input", updateVisibility);
+    includeAdded.addEventListener("change", updateVisibility);
     sort.addEventListener("change", () => {{
       const direction = sort.value === "largest" ? -1 : 1;
       const entries = links.map(link => link.closest("li"));
@@ -510,6 +552,7 @@ def render_index(
     const requested = decodeURIComponent(location.hash.slice(1));
     const initial = links.find(link => link.dataset.target === requested) || links[0];
     if (initial) select(initial, false);
+    updateVisibility();
   </script>
 </body>
 </html>
@@ -590,6 +633,27 @@ def modified_knowl_paths(content_repo: Path, left_ref: str, right_ref: str) -> l
     ]
 
 
+def added_knowl_paths(content_repo: Path, left_ref: str, right_ref: str) -> list[str]:
+    """Return knowl paths added between two refs."""
+
+    changed = git(
+        "diff",
+        "--diff-filter=A",
+        "--name-only",
+        "-z",
+        left_ref,
+        right_ref,
+        "--",
+        "content",
+        cwd=content_repo,
+    ).stdout
+    return [
+        path
+        for path in changed.decode().split("\0")
+        if path.endswith(".knowl.md")
+    ]
+
+
 def path_exists_at_ref(content_repo: Path, ref: str, path: str) -> bool:
     return git("cat-file", "-e", f"{ref}:{path}", cwd=content_repo, check=False).returncode == 0
 
@@ -645,6 +709,7 @@ def build_ref_comparison(
     left_label: str,
     right_label: str,
     heading: str,
+    include_added: bool = False,
 ) -> int:
     comparisons = comparison_sources(
         content_repo,
@@ -652,6 +717,17 @@ def build_ref_comparison(
         right_ref,
         paths_file,
     )
+    added_paths: set[str] = set()
+    if include_added:
+        added_paths = set(added_knowl_paths(content_repo, left_ref, right_ref))
+        comparisons.extend(
+            (
+                path,
+                "",
+                git("show", f"{right_ref}:{path}", cwd=content_repo).stdout.decode(),
+            )
+            for path in sorted(added_paths)
+        )
     with tempfile.TemporaryDirectory(prefix="knowl-review-ref-") as temp:
         right_tree = Path(temp)
         extract_ref(content_repo, right_ref, right_tree)
@@ -660,7 +736,7 @@ def build_ref_comparison(
 
         items: list[ReviewItem] = []
         for index, (path, left, right) in enumerate(comparisons):
-            left_knowl = parse_text(left, f"{left_ref}:{path}")
+            left_knowl = None if path in added_paths else parse_text(left, f"{left_ref}:{path}")
             right_knowl = parse_text(right, f"{right_ref}:{path}")
             safe_id = re.sub(r"[^a-z0-9-]+", "-", right_knowl.id.lower()).strip("-")
             items.append(
@@ -672,6 +748,7 @@ def build_ref_comparison(
                     old_knowl=left_knowl,
                     current_knowl=right_knowl,
                     filename=f"{index + 1:04d}-{safe_id}.html",
+                    change_kind="added" if path in added_paths else "modified",
                 )
             )
 
@@ -722,6 +799,11 @@ def main() -> int:
     parser.add_argument("--left-label")
     parser.add_argument("--right-label")
     parser.add_argument("--heading", default="Content comparison")
+    parser.add_argument(
+        "--include-added",
+        action="store_true",
+        help="Include added knowls behind a toggle; their source diffs start collapsed",
+    )
     parser.add_argument(
         "--diff-plan",
         nargs="?",
@@ -801,6 +883,7 @@ def main() -> int:
             args.left_label or args.left_ref,
             args.right_label or args.right_ref,
             args.heading,
+            args.include_added,
         )
     else:
         count = build(args.content_repo.resolve(), args.output.resolve())

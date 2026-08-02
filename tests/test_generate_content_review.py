@@ -6,6 +6,7 @@ from pathlib import Path
 
 from scripts.generate_content_review import (
     ReviewItem,
+    added_knowl_paths,
     build_diff_plan,
     changed_character_count,
     modified_knowl_paths,
@@ -50,6 +51,10 @@ class GenerateContentReviewTests(unittest.TestCase):
                 modified_knowl_paths(repo, "baseline", "HEAD"),
                 ["content/existing.knowl.md"],
             )
+            self.assertEqual(
+                added_knowl_paths(repo, "baseline", "HEAD"),
+                ["content/added.knowl.md"],
+            )
 
     def test_source_diff_is_open_and_precedes_rendered_comparison(self) -> None:
         old_text = """+++
@@ -81,6 +86,67 @@ Old definition.
         diff_position = page.index('<details class="source-diff" open>')
         comparison_position = page.index('<main class="comparison">')
         self.assertLess(diff_position, comparison_position)
+
+    def test_added_knowl_renders_alone_with_collapsed_diff(self) -> None:
+        current_text = """+++
+id = "test/new"
+title = "New knowl"
+kind = "definition"
+summary = "New summary"
+aliases = []
+domains = ["test"]
++++
+
+New definition.
+"""
+        current_knowl = parse_text(current_text, "current")
+        item = ReviewItem(
+            index=0,
+            path="content/test/new.knowl.md",
+            old_text="",
+            current_text=current_text,
+            old_knowl=None,
+            current_knowl=current_knowl,
+            filename="0001-test-new.html",
+            change_kind="added",
+        )
+
+        page = render_item_page(item, {current_knowl.id: current_knowl}, 1)
+
+        self.assertIn('<details class="source-diff">', page)
+        self.assertNotIn('<details class="source-diff" open>', page)
+        self.assertIn('class="comparison comparison-added"', page)
+        self.assertNotIn('aria-label="Baseline version"', page)
+
+    def test_index_can_toggle_added_knowls(self) -> None:
+        text = """+++
+id = "test/new"
+title = "New knowl"
+kind = "definition"
+summary = "New summary"
+aliases = []
+domains = ["test"]
++++
+
+New definition.
+"""
+        knowl = parse_text(text, "current")
+        item = ReviewItem(
+            index=0,
+            path="content/test/new.knowl.md",
+            old_text="",
+            current_text=text,
+            old_knowl=None,
+            current_knowl=knowl,
+            filename="0001-test-new.html",
+            change_kind="added",
+        )
+
+        page = render_index([item], "abc123")
+
+        self.assertIn('id="review-include-added" type="checkbox" checked', page)
+        self.assertIn('data-change-kind="added"', page)
+        self.assertIn("new knowl ·", page)
 
     def test_changed_character_count_normalizes_math_delimiters(self) -> None:
         self.assertEqual(changed_character_count(r"Value: \(x\)", "Value: $x$"), 0)

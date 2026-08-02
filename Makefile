@@ -123,7 +123,8 @@ review-content:
 		--right-ref $(REVIEW_HEAD) \
 		--left-label "$(REVIEW_BASE) · existing" \
 		--right-label "$(REVIEW_HEAD) · proposed" \
-		--heading "Existing knowl changes"
+		--heading "Knowl changes" \
+		--include-added
 
 normalize-math:
 	$(PYTHON) scripts/normalize_math_delimiters.py $(CONTENT_PACKAGE)/content $(CONTENT_PACKAGE)/testing
