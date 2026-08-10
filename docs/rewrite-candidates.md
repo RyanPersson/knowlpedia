@@ -1,10 +1,33 @@
-# Knowl rewrite candidates
+# Knowl review and rewrite backlog
 
-This list records knowls whose wording should be reviewed and rewritten to
-state definitions, hypotheses, and conventions directly. It includes every
-knowl found by a case-insensitive search for “house convention” or “this page”
-on 2026-08-03, together with the category-of-smooth-manifolds knowl explicitly
-identified for replacement.
+This is the living registry for knowls or coherent collections that have been
+flagged for verification, standardization, editing, or complete rewriting. A
+checkbox here means that the content still needs an intentional review; it does
+not by itself assert that the current mathematics is wrong.
+
+Large, source-derived collections should have a bounded review manifest rather
+than hundreds of unstructured checkboxes. The manifest should record the
+reason for review, controlling literature, intended action, convention
+boundaries, validation evidence, and whether specialist review remains useful.
+
+## Collection review campaigns
+
+- [x] **Langlands Letter modernization** — collection-wide verification and a
+  historical-to-modern terminology crosswalk for the 33 knowls derived from
+  Langlands' 1967 letter, together with missing modern local, global,
+  endoscopic, function-field, and geometrized-local foundations. Completed
+  2026-08-10; see [the campaign plan and evidence](langlands-modernization-plan.md).
+- [ ] **Langlands specialist follow-up** — optional subject-matter review of
+  the Borel--Mostow disconnected-group hypotheses, twisted invariant theory,
+  endoscopic normalizations, and the theorem/conjecture boundaries in local
+  and geometric geometrization. The exact candidates are listed in
+  [the campaign plan](langlands-modernization-plan.md#remaining-specialist-review-candidates).
+
+## Phrase-search candidates
+
+The remaining entries were originally found by a case-insensitive search for
+“house convention” or “this page” on 2026-08-03, together with the
+category-of-smooth-manifolds knowl explicitly identified for replacement.
 
 ## Explicitly marked for complete rewrite
 
