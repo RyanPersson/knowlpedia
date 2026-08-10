@@ -16,7 +16,10 @@ boundaries, validation evidence, and whether specialist review remains useful.
   historical-to-modern terminology crosswalk for the 33 knowls derived from
   Langlands' 1967 letter, together with missing modern local, global,
   endoscopic, function-field, and geometrized-local foundations. Completed
-  2026-08-10; see [the campaign plan and evidence](langlands-modernization-plan.md).
+  2026-08-10, followed by a 164-entry semantic dependency audit and 57-page
+  prerequisite closure; see the
+  [campaign plan and evidence](langlands-modernization-plan.md) and
+  [dependency ledger](langlands-dependency-audit.md).
 - [ ] **Langlands specialist follow-up** — optional subject-matter review of
   the Borel--Mostow disconnected-group hypotheses, twisted invariant theory,
   endoscopic normalizations, and the theorem/conjecture boundaries in local

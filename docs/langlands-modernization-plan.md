@@ -244,6 +244,35 @@ The campaign was completed on 2026-08-10 in the content commit `b3e5313`.
   unrelated formal-group and hyperstructure pages, were flattened without
   changing their mathematical content.
 
+## Dependency-closure follow-up
+
+A second campaign pass audited the 97 substantive modernized pages by
+mathematical concept rather than exact wording.  The reproducible ledger is in
+[`langlands-dependency-audit.md`](langlands-dependency-audit.md).
+
+- The deduplicated ledger contains 164 semantic entries: 88 concept families
+  already covered by the corpus, 57 reusable missing prerequisites, and 19
+  notation or convention items best defined in their consuming pages.
+- All 57 reusable prerequisites were authored with concise canonical cores,
+  progressive documentation, and literature sections. A repeat pass exposed
+  Fontaine period rings and the Artin conductor; the read-only literal
+  backstop then exposed a category mismatch between Euclidean test-function
+  and distribution pages and their local-group analogues. All four became
+  explicit reusable dependencies before declaring closure.
+- Existing matches were accepted only after checking scope.  For example, the
+  Euclidean Schwartz-distribution page was not treated as interchangeable
+  with invariant distributions on a p-adic group, and smooth vector-bundle
+  pages were not substituted for algebraic locally free sheaves.
+- Ambiguous notation was resolved in place. In particular, the local
+  parameter page now introduces \(W_F\) as the Weil group of the stated local
+  field before defining \(L_F\).
+- The content index
+  `langlands/modern-langlands-dependency-index` exposes the full prerequisite
+  collection as a navigable reading path.
+- The repository's literal interlinking script is used only as a read-only
+  final backstop for exact aliases and typos; the dependency decisions and
+  page edits in this pass are model-reviewed.
+
 ## Remaining specialist-review candidates
 
 These are follow-up opportunities, not known errors or blockers:
@@ -256,6 +285,17 @@ These are follow-up opportunities, not known errors or blockers:
 - `langlands/transfer-factor` and `langlands/arthur-multiplicity-formula` —
   review normalization and scope language against a specialist's preferred
   endoscopic conventions.
+- `langlands/drinfeld-lemma` — review the precise coefficient-category and
+  finiteness hypotheses across the finite-étale, lisse ell-adic, stack, and
+  diamond variants.
+- `langlands/fontaine-period-rings`, the four p-adic Hodge representation
+  pages, `langlands/artin-conductor`, and the local factor pages — review sign,
+  Frobenius, conductor, and additive-character normalization conventions as a
+  connected cluster.
+- `langlands/local-shimura-variety`, `langlands/rapoport-zink-space`, and
+  `algebraic-geometry-foundations/v-stack` — review how far the concise pages
+  should distinguish classical representable spaces from general diamonds
+  and v-stacks.
 - `langlands/spectral-action` and
   `langlands/fargues-scholze-parameter-map` — review the interface between the
   constructed spectral action, the semisimple parameter map, and the stronger
@@ -270,14 +310,14 @@ These are follow-up opportunities, not known errors or blockers:
 - [x] Every Letter knowl has an action and completed editorial review.
 - [x] The general and geometric Langlands indexes expose the new graph.
 - [x] The 72 compiler/runtime tests pass.
-- [x] The section audit passes for 3,332 primary knowls and 8,239 extracted
-  sections; the external-link-format audit passes for all 3,332 files.
+- [x] The section audit passes for 3,390 primary knowls and 8,418 extracted
+  sections; the external-link-format audit passes for all 3,390 files.
 - [x] A strict development compilation resolves all IDs and links across
-  4,518 composed knowls. Its only diagnostics are 12 pre-existing ambiguous
-  alias warnings.
-- [x] The production build compiles all 3,332 primary knowls, and the complete
+  4,576 knowls composed from 4,616 files. Its only diagnostics are 12
+  pre-existing ambiguous alias warnings.
+- [x] The production build compiles all 3,390 primary knowls, and the complete
   rendered-HTML scan reports no errors.
-- [x] The generated before/after review contains 106 comparisons and was
+- [x] The generated before/after review contains 158 comparisons and was
   inspected in rendered form.
 - [x] Representative local, global, endoscopic, function-field, and geometric
   pages were checked in rendered form.
