@@ -93,7 +93,7 @@ valuable.
 | `frobenius-unramified` | REFINE | Arithmetic/geometric Frobenius convention. |
 | `galois-descent-forms` | VERIFY | Forms, inner forms, and pure/rigid inner twists. |
 | `galois-extension-and-group` | VERIFY | Mostly stable prerequisite. |
-| `global-local-fields-completions` | REFINE | Separate number and function fields and their places. |
+| `global-local-fields-completions` | COMPLETE | Retain the legacy ID for global field; number field, global function field, places, completions, and local-field variants now have atomic knowls. |
 | `group-algebra-of-lattice` | VERIFY | Coefficient ring and invariant-subring hypotheses. |
 | `ideles-artin-reciprocity-hecke-character` | SPLIT | Three reusable concepts and reciprocity normalization are bundled. |
 | `l-group-satake-parameter` | SPLIT | Separate the \(L\)-group, unramified parameter, and Satake class. |

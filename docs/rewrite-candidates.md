@@ -12,6 +12,12 @@ boundaries, validation evidence, and whether specialist review remains useful.
 
 ## Collection review campaigns
 
+- [ ] **Concept-ownership remediation** — split or consolidate the
+  human-reviewed pages that currently own more than one independently reusable
+  concept. The initiating global/local-field bundle and one lecture-note
+  container are corrected; the remaining bounded queue and audit procedure
+  are recorded in the
+  [concept-scope audit](knowl-concept-scope-audit.md#confirmed-follow-up-ledger).
 - [x] **Langlands Letter modernization** — collection-wide verification and a
   historical-to-modern terminology crosswalk for the 33 knowls derived from
   Langlands' 1967 letter, together with missing modern local, global,

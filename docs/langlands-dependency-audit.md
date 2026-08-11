@@ -36,11 +36,11 @@ mathematical decision to automation.
 
 | Row | Concept encountered | Existing canonical coverage |
 |---|---|---|
-| E01 | global field, number field, function field | `langlands-letter/knowls/global-local-fields-completions` |
-| E02 | place, archimedean place, nonarchimedean place, completion | `langlands-letter/knowls/global-local-fields-completions` |
-| E03 | local field | `langlands-letter/knowls/global-local-fields-completions` |
+| E01 | global field, number field, global function field | `langlands-letter/knowls/global-local-fields-completions`, `algebra-fields-galois/number-field`, and `algebra-fields-galois/global-function-field` |
+| E02 | place and completion at a place | `algebra-fields-galois/place-of-global-field` and `algebra-fields-galois/completion-at-place` |
+| E03 | local, archimedean local, and nonarchimedean local field | `algebra-fields-galois/local-field`, `algebra-fields-galois/archimedean-local-field`, and `algebra-fields-galois/nonarchimedean-local-field` |
 | E04 | p-adic field | `langlands-letter/knowls/p-adic-field` |
-| E05 | finite field and residue field | `algebra-fields-galois/finite-field` plus local-field coverage in E01 |
+| E05 | finite field and residue field | `algebra-fields-galois/finite-field` plus local-field coverage in E03 |
 | E06 | discrete valuation ring and uniformizer | `algebra-commutative/dvr` |
 | E07 | valuation ring | `algebra-fields-galois/valuation-ring` |
 | E08 | algebraic closure and separability terminology | `algebra-fields-galois/algebraic-closure` and `separable-extension` |
