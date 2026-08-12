@@ -21,7 +21,7 @@ PREVIEW_URL ?= http://127.0.0.1:8001
 PREVIEW_PATH ?= /algebra-groups/group/
 SCREENSHOT ?= tmp/screenshots/page.png
 
-.PHONY: deps build build-production serve clean screenshot test test-ui test-local-sources-ui audit-sections audit-external-links refresh-prebuilt-diagrams
+.PHONY: deps build build-production serve clean screenshot test test-ui test-local-sources-ui audit-sections audit-external-links audit-scope refresh-prebuilt-diagrams
 .PHONY: compose-content compose-production-content build-content serve-content build-page preview-diagram
 .PHONY: preview-start preview-status preview-stop preview-restart preview-scan preview-adopt
 .PHONY: check-rendering check-rendering-knowls check-rendering-content review-content normalize-math
@@ -53,6 +53,11 @@ audit-sections:
 audit-external-links:
 	$(PYTHON) scripts/audit_external_links.py $(CONTENT_PACKAGE)/content
 	@if [ -d "$(CONTENT_PACKAGE)/testing" ]; then $(PYTHON) scripts/audit_external_links.py $(CONTENT_PACKAGE)/testing; fi
+
+# Scope findings require semantic review and therefore do not fail by default.
+# Pass --fail-on-findings directly to the script when enforcing a reviewed set.
+audit-scope:
+	$(PYTHON) scripts/audit_knowl_scope.py $(CONTENT_PACKAGE)/content
 
 compose-content:
 	$(PYTHON) scripts/compose_content.py --primary $(CONTENT_PACKAGE) $(CONTENT_SOURCE_ARGS) --out $(COMPOSED_CONTENT_PACKAGE)
