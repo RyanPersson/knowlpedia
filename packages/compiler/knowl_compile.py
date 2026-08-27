@@ -58,6 +58,25 @@ OLD_HUGO_TOPIC_LINKS = [
     ("Shale's Paper", "/shale-paper/"),
 ]
 
+HOME_FEATURED_SUBJECT_IDS = (
+    "shared-foundations",
+    "linear-algebra",
+    "analysis",
+    "topology",
+    "differential-geometry",
+    "lie-groups",
+    "operator-algebras",
+    "mathematical-physics",
+)
+
+HOME_DEPENDENCY_PREVIEW = (
+    ("linear-algebra/vector-space", "origin"),
+    ("linear-algebra/inner-product-space", "branch branch-left"),
+    ("linear-algebra/normed-vector-space", "branch branch-right"),
+    ("linear-algebra/hilbert-space", "leaf leaf-left"),
+    ("linear-algebra/banach-space", "leaf leaf-right"),
+)
+
 PROFILE_NAMES = ("development", "production")
 
 
@@ -598,6 +617,7 @@ class Knowl:
     domains: list[str]
     source_path: Path
     core_markdown: str
+    prerequisites: list[str] = field(default_factory=list)
     core_data: list[dict[str, Any]] = field(default_factory=list)
     core_axioms: list[dict[str, Any]] = field(default_factory=list)
     sections: list[dict[str, Any]] = field(default_factory=list)
@@ -842,6 +862,7 @@ def knowl_from_meta(
         domains=list(meta.get("domains", [])),
         source_path=source_path,
         core_markdown=core_markdown,
+        prerequisites=list(meta.get("prerequisites", [])),
         core_data=list(core_meta.get("data", [])),
         core_axioms=list(core_meta.get("axioms", [])),
         sections=sections or [],
@@ -869,6 +890,7 @@ def knowl_from_meta(
             "title": knowl.title,
             "summary": knowl.summary,
             "core": knowl.core_markdown,
+            "prerequisites": knowl.prerequisites,
             "data": knowl.core_data,
             "axioms": knowl.core_axioms,
             "sections": serializable_sections(knowl.sections),
@@ -1691,7 +1713,10 @@ __PALETTE_SCRIPT__
 <body data-knowl-preload="{escape_attr(preload_mode)}">
 <a class="skip-link" href="#main-content">Skip to content</a>
 <header class="site-header">
-  <a class="site-brand" href="/" aria-label="Knowlpedia home"><span class="brand-mark" aria-hidden="true">K</span><span>Knowlpedia</span></a>
+  <div class="site-identity">
+    <a class="site-brand" href="/" aria-label="Knowlpedia home"><span class="brand-mark" aria-hidden="true">K</span><span>Knowlpedia</span></a>
+    <nav class="site-nav" aria-label="Primary"><a href="/library/">Library</a></nav>
+  </div>
   <div class="site-actions">
     <button type="button" id="search-open" class="header-action" aria-haspopup="dialog" aria-controls="search-dialog"><span aria-hidden="true">⌕</span><span>Search</span><kbd>⌘K</kbd></button>
 {testing_button}
@@ -1714,6 +1739,109 @@ __PALETTE_SCRIPT__
 """
 
 
+def render_homepage(
+    registry: dict[str, Knowl],
+    package: dict[str, Any],
+    profile: BuildProfile = BUILD_PROFILES["development"],
+) -> str:
+    production_knowls = [knowl for knowl in registry.values() if knowl.visibility == "production"]
+    subject_ids = {knowl.id.split("/", 1)[0] for knowl in production_knowls}
+    subject_cards = []
+    for subject_id in HOME_FEATURED_SUBJECT_IDS:
+        subject = registry.get(subject_id)
+        if not subject or subject.visibility != "production":
+            continue
+        count = sum(
+            knowl.id == subject_id or knowl.id.startswith(subject_id + "/")
+            for knowl in production_knowls
+        )
+        subject_cards.append(
+            '<a class="subject-card" href="'
+            + escape_attr(target_href(subject.id))
+            + '"><span class="subject-count">'
+            + f"{count:,} knowls"
+            + '</span><h3>'
+            + render_inline(subject.title, registry)
+            + '</h3><p>'
+            + render_inline(subject.summary, registry)
+            + '</p><span class="subject-link">Explore subject <span aria-hidden="true">&#8594;</span></span></a>'
+        )
+
+    graph_nodes = []
+    for knowl_id, position in HOME_DEPENDENCY_PREVIEW:
+        knowl = registry.get(knowl_id)
+        if not knowl:
+            continue
+        graph_nodes.append(
+            f'<a class="dependency-node {escape_attr(position)}" href="{escape_attr(target_href(knowl.id))}">'
+            f'<span>{render_inline(knowl.title, registry)}</span></a>'
+        )
+
+    body = "\n".join(
+        [
+            '<main class="home-shell" id="main-content">',
+            '<section class="home-hero" aria-labelledby="home-title">',
+            '<div class="home-hero-copy">',
+            '<p class="kind">A connected mathematical reference</p>',
+            '<h1 id="home-title">Start with one idea. Follow it anywhere.</h1>',
+            '<p class="home-lede">Search for a concept, open its definition in place, and follow the mathematics it depends on without losing your context.</p>',
+            '<button type="button" class="hero-search" data-open-search><span aria-hidden="true">⌕</span><span>Search concepts, theorems, and examples</span><kbd>⌘K</kbd></button>',
+            '<div class="home-hero-links">',
+            f'<a class="primary-link" href="/library/">Browse all {len(production_knowls):,} knowls <span aria-hidden="true">&#8594;</span></a>',
+            '<a href="#how-it-works">How Knowlpedia works</a>',
+            '</div>',
+            '</div>',
+            '<aside class="home-note" aria-label="What is a knowl?">',
+            '<span class="home-note-number" aria-hidden="true">01</span>',
+            '<p class="kind">Small pieces, deep context</p>',
+            '<h2>One concept per knowl.</h2>',
+            '<p>Each page begins with a compact definition. Examples, equivalent formulations, proofs, and references stay available when you want more depth.</p>',
+            '</aside>',
+            '</section>',
+            '<section class="home-section subject-section" aria-labelledby="subjects-title">',
+            '<div class="section-heading"><div><p class="kind">Browse the library</p><h2 id="subjects-title">Choose a subject.</h2></div>',
+            f'<p>{len(subject_ids)} areas, from foundations to current research.</p></div>',
+            '<div class="subject-grid">' + "".join(subject_cards) + '</div>',
+            '<a class="section-link" href="/library/">See the complete subject index <span aria-hidden="true">&#8594;</span></a>',
+            '</section>',
+            '<section class="home-section connection-section" aria-labelledby="connections-title">',
+            '<div class="connection-copy">',
+            '<p class="kind">Built for learning</p>',
+            '<h2 id="connections-title">Definitions become paths.</h2>',
+            '<p>Ordinary links tell you what is related. Authored prerequisite metadata tells you what to learn first. Keeping those signals separate gives future learning paths a dependable mathematical backbone.</p>',
+            '<div class="roadmap-note"><span>In development</span><p>Full graph mode and curated learning paths will build on this dependency layer.</p></div>',
+            '</div>',
+            '<div class="dependency-card">',
+            '<div class="dependency-card-heading"><div><span>Dependency preview</span><strong>Spaces and completeness</strong></div><span class="dependency-key"><i></i> unlocks</span></div>',
+            '<div class="dependency-preview">',
+            '<svg class="dependency-lines" viewBox="0 0 640 360" preserveAspectRatio="none" aria-hidden="true">',
+            '<path d="M320 72 V126 M320 126 H174 V164 M320 126 H466 V164 M174 222 V286 M466 222 V286" />',
+            '</svg>',
+            "".join(graph_nodes),
+            '</div>',
+            '<p class="dependency-caption">A small authored slice of the emerging graph. Select a node to open its full knowl.</p>',
+            '</div>',
+            '</section>',
+            '<section class="home-section how-section" id="how-it-works" aria-labelledby="how-title">',
+            '<div class="section-heading"><div><p class="kind">Low-friction reading</p><h2 id="how-title">Stay in the flow.</h2></div>',
+            '<p>Definitions first; detail when you ask for it.</p></div>',
+            '<ol class="how-grid">',
+            '<li><span>1</span><h3>Find the idea</h3><p>Search by name, notation, alias, or description.</p></li>',
+            '<li><span>2</span><h3>Open it in place</h3><p>Expand a linked definition without leaving the page you are reading.</p></li>',
+            '<li><span>3</span><h3>Choose your depth</h3><p>Unroll examples, proofs, references, and related structures only as needed.</p></li>',
+            '</ol>',
+            '</section>',
+            '</main>',
+        ]
+    )
+    return html_document(
+        f"Knowlpedia — Mathematical knowledge, connected",
+        body,
+        preload_mode="none",
+        profile=profile,
+    )
+
+
 def render_index(
     registry: dict[str, Knowl],
     package: dict[str, Any],
@@ -1729,15 +1857,16 @@ def render_index(
     parts = [
         '<main class="page-shell index-shell" id="main-content">',
         '<header class="page-header index-hero">',
-        f'<p class="kind">Mathematical knowledge, connected</p><h1>{html.escape(package["title"])}</h1>',
-        '<p class="page-summary">Open a definition without losing your place, then follow its prerequisites as deeply as you need.</p>',
+        '<nav class="breadcrumb library-breadcrumb" aria-label="Breadcrumb"><a href="/">Knowlpedia</a><span aria-hidden="true">/</span><span>Library</span></nav>',
+        '<p class="kind">Complete index</p><h1>The Knowlpedia library</h1>',
+        f'<p class="page-summary">Browse all {sum(len(items) for items in grouped.values()):,} production knowls by subject, or search the entire library.</p>',
         '<button type="button" class="hero-search" data-open-search><span aria-hidden="true">⌕</span><span>Search concepts, theorems, and examples</span><kbd>⌘K</kbd></button>',
         "</header>",
-        '<div class="index-intro"><h2>Browse by area</h2><p>Choose an area, then expand any term in place.</p></div>',
+        '<div class="index-intro"><h2>Browse by subject</h2><p>Expand any term in place.</p></div>',
     ]
     for group, knowls in sorted(grouped.items()):
         parts.append(
-            f'<details class="index-section"><summary><span>{html.escape(humanize_identifier(group))}</span>'
+            f'<details class="index-section" id="subject-{escape_attr(group)}"><summary><span>{html.escape(humanize_identifier(group))}</span>'
             f'<span class="index-count">{len(knowls)} knowls</span></summary><ul class="index-list">'
         )
         for knowl in sorted(knowls, key=lambda k: k.title.lower()):
@@ -1748,7 +1877,7 @@ def render_index(
             )
         parts.append("</ul></details>")
     parts.append("</main>")
-    return html_document(package["title"], "\n".join(parts), preload_mode="visible", profile=profile)
+    return html_document(f"Library - {package['title']}", "\n".join(parts), preload_mode="visible", profile=profile)
 
 
 def render_testing_hub(
@@ -1824,6 +1953,9 @@ def validate(registry: dict[str, Knowl]) -> list[ValidationMessage]:
                 )
             aliases[normalized] = knowl.id
 
+        for target in knowl.prerequisites:
+            validate_target(messages, registry, knowl.id, target, "prerequisite")
+
         for target in wikilinks_in_text(knowl.core_markdown):
             validate_target(messages, registry, knowl.id, target, "core wikilink")
 
@@ -1844,7 +1976,50 @@ def validate(registry: dict[str, Knowl]) -> list[ValidationMessage]:
                 for target in wikilinks_in_text(section.get("markdown", "")):
                     validate_target(messages, registry, knowl.id, target, f'section {section["id"]} wikilink')
 
+    validate_prerequisite_cycles(messages, registry)
     return messages
+
+
+def validate_prerequisite_cycles(
+    messages: list[ValidationMessage], registry: dict[str, Knowl]
+) -> None:
+    """Reject authored prerequisite loops while allowing ordinary links to cycle."""
+
+    state: dict[str, int] = {}
+    path: list[str] = []
+    reported: set[frozenset[str]] = set()
+
+    def visit(knowl_id: str) -> None:
+        state[knowl_id] = 1
+        path.append(knowl_id)
+        for target in registry[knowl_id].prerequisites:
+            base, _ = split_target(target)
+            if base not in registry:
+                continue
+            if state.get(base, 0) == 0:
+                visit(base)
+                continue
+            if state.get(base) != 1:
+                continue
+            cycle_start = path.index(base)
+            cycle = path[cycle_start:] + [base]
+            cycle_key = frozenset(cycle)
+            if cycle_key in reported:
+                continue
+            reported.add(cycle_key)
+            messages.append(
+                ValidationMessage(
+                    "error",
+                    knowl_id,
+                    "prerequisite cycle: " + " -> ".join(cycle),
+                )
+            )
+        path.pop()
+        state[knowl_id] = 2
+
+    for knowl_id in registry:
+        if state.get(knowl_id, 0) == 0:
+            visit(knowl_id)
 
 
 def wikilinks_in_text(text: str) -> list[str]:
@@ -1867,6 +2042,8 @@ def collect_links(knowl: Knowl) -> list[dict[str, str]]:
             }
         )
 
+    for target in knowl.prerequisites:
+        add(target, "metadata.prerequisites", "prerequisite")
     for target in wikilinks_in_text(knowl.core_markdown):
         add(target, "core")
     for item in knowl.core_data:
@@ -1979,6 +2156,7 @@ def registry_json(registry: dict[str, Knowl]) -> dict[str, Any]:
             "summary": knowl.summary,
             "aliases": knowl.aliases,
             "domains": knowl.domains,
+            "prerequisites": knowl.prerequisites,
             "visibility": knowl.visibility,
             "href": target_href(knowl.id),
             "fragment": fragment_href(knowl.id),
@@ -2029,6 +2207,48 @@ def links_json(registry: dict[str, Knowl]) -> list[dict[str, Any]]:
         for link in collect_links(knowl):
             links.append(link)
     return links
+
+
+def dependency_graph_json(registry: dict[str, Knowl]) -> dict[str, Any]:
+    """Return the authored learning graph, distinct from incidental wikilinks.
+
+    Edges point from a prerequisite toward the concept it unlocks, matching the
+    direction a learner would move through a topological ordering.
+    """
+
+    nodes = [
+        {
+            "id": knowl.id,
+            "title": knowl.title,
+            "kind": display_kind(knowl.kind) or "Concept",
+            "summary": knowl.summary,
+            "domains": knowl.domains,
+            "href": target_href(knowl.id),
+            "fragment": fragment_href(knowl.id),
+            "visibility": knowl.visibility,
+        }
+        for knowl in registry.values()
+    ]
+    edges = []
+    for knowl in registry.values():
+        for prerequisite in knowl.prerequisites:
+            source, _ = split_target(prerequisite)
+            if source not in registry:
+                continue
+            edges.append(
+                {
+                    "source": source,
+                    "target": knowl.id,
+                    "type": "prerequisite",
+                    "authored": True,
+                }
+            )
+    return {
+        "version": 1,
+        "edge_direction": "prerequisite-to-dependent",
+        "nodes": nodes,
+        "edges": edges,
+    }
 
 
 def proofs_json(registry: dict[str, Knowl]) -> list[dict[str, Any]]:
@@ -2209,7 +2429,12 @@ def write_site_for_ids(
         target_knowls = list(registry.values())
         fragment_cache = {knowl.id: render_knowl_core(knowl, registry) for knowl in registry.values()}
 
-        (out_dir / "index.html").write_text(render_index(registry, package, profile), encoding="utf-8")
+        (out_dir / "index.html").write_text(
+            render_homepage(registry, package, profile), encoding="utf-8"
+        )
+        library_path = out_dir / "library" / "index.html"
+        library_path.parent.mkdir(parents=True, exist_ok=True)
+        library_path.write_text(render_index(registry, package, profile), encoding="utf-8")
         topics_path = out_dir / "topics" / "index.html"
         topics_path.parent.mkdir(parents=True, exist_ok=True)
         topics_path.write_text(render_old_topics_page(package, profile), encoding="utf-8")
@@ -2237,6 +2462,7 @@ def write_site_for_ids(
         write_compact_json(out_dir / "indexes" / "search.json", search_json(registry))
         write_json(out_dir / "indexes" / "relations.json", relations_json(registry))
         write_json(out_dir / "indexes" / "links.json", links_json(registry))
+        write_compact_json(out_dir / "indexes" / "dependencies.json", dependency_graph_json(registry))
         write_json(out_dir / "indexes" / "proofs.json", proofs_json(registry))
         write_json(out_dir / "reports" / "validation.json", [msg.__dict__ for msg in messages])
         write_json(

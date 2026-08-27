@@ -135,6 +135,8 @@ class BuildProfileTests(unittest.TestCase):
             self.assertEqual(set(production_registry), {"sample/main"})
             self.assertTrue((development_out / "testing" / "index.html").is_file())
             self.assertFalse((production_out / "testing").exists())
+            self.assertTrue((development_out / "library" / "index.html").is_file())
+            self.assertTrue((development_out / "indexes" / "dependencies.json").is_file())
             self.assertTrue((development_out / "assets" / "knowl-testing.js").is_file())
             self.assertFalse((production_out / "assets" / "knowl-testing.js").exists())
             self.assertIn(
@@ -375,6 +377,62 @@ class RenderContractTests(unittest.TestCase):
         item = compiler.search_json({knowl.id: knowl})[0]
         self.assertEqual(item["aliases"], ["sample"])
         self.assertEqual(item["summary"], "A concise orientation sentence.")
+
+    def test_authored_prerequisites_are_validated_and_exported_for_learning_order(self) -> None:
+        foundation = self.make_knowl()
+        foundation.id = "sample/foundation"
+        foundation.title = "Foundation"
+        dependent = self.make_knowl()
+        dependent.id = "sample/dependent"
+        dependent.title = "Dependent"
+        dependent.prerequisites = [foundation.id]
+        registry = {foundation.id: foundation, dependent.id: dependent}
+
+        errors = [message for message in compiler.validate(registry) if message.severity == "error"]
+        self.assertEqual(errors, [])
+        self.assertEqual(compiler.registry_json(registry)[dependent.id]["prerequisites"], [foundation.id])
+        self.assertIn(
+            {
+                "source": foundation.id,
+                "target": dependent.id,
+                "type": "prerequisite",
+                "authored": True,
+            },
+            compiler.dependency_graph_json(registry)["edges"],
+        )
+        self.assertIn(
+            {
+                "source": dependent.id,
+                "source_part": "metadata.prerequisites",
+                "type": "prerequisite",
+                "target": foundation.id,
+            },
+            compiler.collect_links(dependent),
+        )
+
+    def test_prerequisite_cycles_are_rejected_without_treating_wikilinks_as_dependencies(self) -> None:
+        first = self.make_knowl()
+        first.id = "sample/first"
+        second = self.make_knowl()
+        second.id = "sample/second"
+        first.prerequisites = [second.id]
+        second.prerequisites = [first.id]
+        messages = compiler.validate({first.id: first, second.id: second})
+        self.assertTrue(any("prerequisite cycle" in message.message for message in messages))
+
+    def test_homepage_and_complete_library_have_distinct_jobs(self) -> None:
+        knowl = self.make_knowl()
+        knowl.id = "analysis"
+        knowl.title = "Analysis"
+        registry = {knowl.id: knowl}
+        package = {"title": "Knowlpedia"}
+        homepage = compiler.render_homepage(registry, package)
+        library = compiler.render_index(registry, package)
+        self.assertIn("Start with one idea. Follow it anywhere.", homepage)
+        self.assertIn('href="/library/"', homepage)
+        self.assertNotIn('class="index-section"', homepage)
+        self.assertIn("The Knowlpedia library", library)
+        self.assertIn('class="index-section"', library)
 
     def test_large_knowl_index_uses_visible_lazy_loading_without_inline_templates(self) -> None:
         targets = {
