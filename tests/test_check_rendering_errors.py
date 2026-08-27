@@ -43,6 +43,17 @@ class RenderedHtmlCheckerTests(unittest.TestCase):
         )
         self.assertEqual(issues, [])
 
+    def test_flags_katex_parse_error_from_stray_math_backslash(self) -> None:
+        issues = self.scan(
+            r'<html><body><p>affine line <span class="math-inline math-katex">'
+            r'<span class="katex-error" title="ParseError">L\</span></span></p></body></html>'
+        )
+        self.assertEqual([issue.kind for issue in issues], ["katex-error"])
+
+    def test_classifies_known_raw_latex_without_duplicate_backslash_issue(self) -> None:
+        issues = self.scan(r"<html><body><p>A \subseteq B</p></body></html>")
+        self.assertEqual([issue.kind for issue in issues], ["raw_latex_command"])
+
     def test_flags_complete_lone_and_split_wikilink_markers(self) -> None:
         issues = self.scan(
             "<p>[[formal-groups|Formal groups]]</p>"

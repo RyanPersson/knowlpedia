@@ -30,7 +30,7 @@ IGNORED_CLASSES = {
     "math-mathml",
     "diagram-source",
 }
-ERROR_CLASSES = {"math-render-error", "diagram-error", "knowl-error", "missing-knowl"}
+ERROR_CLASSES = {"math-render-error", "katex-error", "diagram-error", "knowl-error", "missing-knowl"}
 ALLOWED_RAW_SHORTCODE_PATHS = {
     "fragments/posts/semigroup-quasigroup-structure/core.html",
     "posts/semigroup-quasigroup-structure/index.html",
@@ -43,6 +43,7 @@ SHORTCODE_RE = re.compile(r"\{\{<\s*[^>]+>\}\}")
 DISPLAY_DELIMITER_RE = re.compile(r"(\\\[|\\\]|\$\$)")
 INLINE_MATH_RE = re.compile(r"(?<!\\)\$(?!\$)([^$\n]{1,500}?)(?<!\\)\$")
 RAW_LATEX_COMMAND_RE = re.compile(r"\\(?:lhd|cdots|triangleleft|cong|subseteq|mathbb|mathcal|frac|to|in)\b")
+VISIBLE_BACKSLASH_RE = re.compile(r"\\+")
 
 
 @dataclass
@@ -107,6 +108,7 @@ class RenderedHtmlChecker(HTMLParser):
 
     def _check_text(self, text: str) -> None:
         raw_math_spans: list[tuple[int, int]] = []
+        raw_latex_spans: list[tuple[int, int]] = []
 
         for match in HUGO_PLACEHOLDER_RE.finditer(text):
             self._add_issue("error", "hugo_shortcode_placeholder", match.group(0))
@@ -144,7 +146,15 @@ class RenderedHtmlChecker(HTMLParser):
         for match in RAW_LATEX_COMMAND_RE.finditer(text):
             if any(start <= match.start() < end for start, end in raw_math_spans):
                 continue
+            raw_latex_spans.append((match.start(), match.end()))
             self._add_issue("error", "raw_latex_command", context(text, match.start(), match.end()))
+
+        for match in VISIBLE_BACKSLASH_RE.finditer(text):
+            if any(start <= match.start() < end for start, end in raw_math_spans):
+                continue
+            if any(start <= match.start() < end for start, end in raw_latex_spans):
+                continue
+            self._add_issue("error", "raw_backslash", context(text, match.start(), match.end()))
 
     def _check_local_target(self, attribute: str, value: str) -> None:
         parsed = urlsplit(value)
