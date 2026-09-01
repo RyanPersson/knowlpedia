@@ -43,6 +43,36 @@ class RenderedHtmlCheckerTests(unittest.TestCase):
         )
         self.assertEqual(issues, [])
 
+    def test_flags_katex_parse_error_from_stray_math_backslash(self) -> None:
+        issues = self.scan(
+            r'<html><body><p>affine line <span class="math-inline math-katex">'
+            r'<span class="katex-error" title="ParseError">L\</span></span></p></body></html>'
+        )
+        self.assertEqual([issue.kind for issue in issues], ["katex-error"])
+
+    def test_classifies_known_raw_latex_without_duplicate_backslash_issue(self) -> None:
+        issues = self.scan(r"<html><body><p>A \subseteq B</p></body></html>")
+        self.assertEqual([issue.kind for issue in issues], ["raw_latex_command"])
+
+    def test_flags_complete_lone_and_split_wikilink_markers(self) -> None:
+        issues = self.scan(
+            "<p>[[formal-groups|Formal groups]]</p>"
+            "<p>A lone [[ marker and a lone ]] marker.</p>"
+            "<p>[[target|label <em>split across a child</em>]]</p>"
+        )
+        self.assertEqual(
+            [issue.kind for issue in issues],
+            ["raw_wikilink_marker"] * 6,
+        )
+
+    def test_ignores_wikilink_markers_in_math_and_code(self) -> None:
+        issues = self.scan(
+            '<span class="katex">R[[x]]</span>'
+            "<math><mi>k[[t]]</mi></math>"
+            "<code>[[not-a-knowl]]</code>"
+        )
+        self.assertEqual(issues, [])
+
     def test_checks_local_pages_assets_and_knowl_fragments(self) -> None:
         issues = self.scan(
             '<a href="/valid/">valid</a><a href="/missing/">missing</a>'
@@ -91,6 +121,26 @@ class RenderedHtmlCheckerTests(unittest.TestCase):
             issues = checker.scan_tree(root, fragments_only=True)
         self.assertEqual(len(issues), 1)
         self.assertEqual(issues[0].file, "fragments/sample/core.html")
+
+    def test_production_profile_rejects_review_artifacts(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            report = root / "reports" / "build.json"
+            report.parent.mkdir(parents=True)
+            report.write_text(
+                '{"profile":"production","content_roots":[],"development_knowl_ids":[]}',
+                encoding="utf-8",
+            )
+            review = root / "review" / "content-changes" / "index.html"
+            review.parent.mkdir(parents=True)
+            review.write_text("review", encoding="utf-8")
+
+            issues = checker.check_build_profile(root, "production")
+
+        self.assertIn(
+            ("testing_artifact_in_production", "review"),
+            [(issue.kind, issue.file) for issue in issues],
+        )
 
 
 if __name__ == "__main__":

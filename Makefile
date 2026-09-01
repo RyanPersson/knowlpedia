@@ -8,6 +8,9 @@ COMPOSED_CONTENT_PACKAGE ?= .knowl-cache/content-package
 PRODUCTION_CONTENT_PACKAGE ?= .knowl-cache/production-content-package
 CONTENT_SOURCE_ARGS = $(foreach source,$(EXTRA_CONTENT_SOURCES),--source $(source))
 KNOWLPEDIA_PROFILE ?= development
+REVIEW_BASE ?= develop
+REVIEW_HEAD ?= HEAD
+REVIEW_OUTPUT ?= public-imported/review/content-changes
 DIAGRAM_CACHE_DIR ?= .knowl-cache/diagrams
 PREBUILT_DIAGRAM_DIR ?= prebuilt/diagrams
 DIAGRAM_SOURCE ?= ../knowlpedia-content/testing/algebra-category-theory/tikz-lab-whiskering-coherence.knowl.md
@@ -18,10 +21,10 @@ PREVIEW_URL ?= http://127.0.0.1:8001
 PREVIEW_PATH ?= /algebra-groups/group/
 SCREENSHOT ?= tmp/screenshots/page.png
 
-.PHONY: deps build build-production serve clean screenshot test test-ui test-local-sources-ui audit-sections refresh-prebuilt-diagrams
+.PHONY: deps build build-production serve clean screenshot test test-ui test-home-ui test-graph-ui test-local-sources-ui audit-sections audit-external-links audit-scope refresh-prebuilt-diagrams
 .PHONY: compose-content compose-production-content build-content serve-content build-page preview-diagram
 .PHONY: preview-start preview-status preview-stop preview-restart preview-scan preview-adopt
-.PHONY: check-rendering check-rendering-knowls check-rendering-content
+.PHONY: check-rendering check-rendering-knowls check-rendering-content review-content normalize-math
 
 $(VENV_STAMP): requirements.txt
 	python3 -m venv .venv
@@ -40,12 +43,27 @@ test:
 test-ui:
 	PREVIEW_URL=$(PREVIEW_URL) node tests/runtime_smoke.mjs
 
+test-home-ui:
+	PREVIEW_URL=$(PREVIEW_URL) node tests/homepage_smoke.mjs
+
+test-graph-ui:
+	PREVIEW_URL=$(PREVIEW_URL) node tests/graph_smoke.mjs
+
 test-local-sources-ui:
 	PREVIEW_URL=$(PREVIEW_URL) node tests/local_sources_smoke.mjs
 
 audit-sections:
 	$(PYTHON) scripts/audit_section_split.py $(CONTENT_PACKAGE)/content
 	@if [ -d "$(CONTENT_PACKAGE)/testing" ]; then $(PYTHON) scripts/audit_section_split.py $(CONTENT_PACKAGE)/testing; fi
+
+audit-external-links:
+	$(PYTHON) scripts/audit_external_links.py $(CONTENT_PACKAGE)/content
+	@if [ -d "$(CONTENT_PACKAGE)/testing" ]; then $(PYTHON) scripts/audit_external_links.py $(CONTENT_PACKAGE)/testing; fi
+
+# Scope findings require semantic review and therefore do not fail by default.
+# Pass --fail-on-findings directly to the script when enforcing a reviewed set.
+audit-scope:
+	$(PYTHON) scripts/audit_knowl_scope.py $(CONTENT_PACKAGE)/content
 
 compose-content:
 	$(PYTHON) scripts/compose_content.py --primary $(CONTENT_PACKAGE) $(CONTENT_SOURCE_ARGS) --out $(COMPOSED_CONTENT_PACKAGE)
@@ -103,6 +121,24 @@ check-rendering-knowls:
 	$(PYTHON) scripts/check_rendering_errors.py public-imported --fragments-only
 
 check-rendering-content: build-content check-rendering
+
+# Render existing knowls before and after a feature branch for human review.
+# Production builds never invoke this target and reject review artifacts.
+review-content:
+	@test "$(KNOWLPEDIA_PROFILE)" = "development" || (echo "review-content is development-only" >&2; exit 1)
+	$(MAKE) build-content
+	$(PYTHON) scripts/generate_content_review.py \
+		--content-repo $(CONTENT_PACKAGE) \
+		--output $(REVIEW_OUTPUT) \
+		--left-ref $(REVIEW_BASE) \
+		--right-ref $(REVIEW_HEAD) \
+		--left-label "$(REVIEW_BASE) · existing" \
+		--right-label "$(REVIEW_HEAD) · proposed" \
+		--heading "Knowl changes" \
+		--include-added
+
+normalize-math:
+	$(PYTHON) scripts/normalize_math_delimiters.py $(CONTENT_PACKAGE)/content $(CONTENT_PACKAGE)/testing
 
 screenshot:
 	mkdir -p tmp/screenshots

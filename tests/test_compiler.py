@@ -135,6 +135,9 @@ class BuildProfileTests(unittest.TestCase):
             self.assertEqual(set(production_registry), {"sample/main"})
             self.assertTrue((development_out / "testing" / "index.html").is_file())
             self.assertFalse((production_out / "testing").exists())
+            self.assertTrue((development_out / "index" / "index.html").is_file())
+            self.assertFalse((development_out / "library").exists())
+            self.assertTrue((development_out / "indexes" / "dependencies.json").is_file())
             self.assertTrue((development_out / "assets" / "knowl-testing.js").is_file())
             self.assertFalse((production_out / "assets" / "knowl-testing.js").exists())
             self.assertIn(
@@ -203,18 +206,87 @@ class RenderContractTests(unittest.TestCase):
             "/fragments/shale-paper/segal-unitary-representation-ufrak/core.html",
         )
 
-    def test_inline_dollar_math_is_deterministic(self) -> None:
-        for tex in ("1", "(0)", "k[x]", r"\mathbb{F}_q[[t]]"):
-            with self.subTest(tex=tex):
-                protected, replacements = compiler.protect_math(f"${tex}$")
+    def test_all_four_math_delimiters_are_supported(self) -> None:
+        forms = (
+            (r"\(x + y\)", False),
+            ("$x + y$", False),
+            (r"\[x + y\]", True),
+            ("$$x + y$$", True),
+        )
+        for source, display in forms:
+            with self.subTest(source=source):
+                protected, replacements = compiler.protect_math(source)
                 self.assertEqual(protected, "@@KNOWL_MATH_0@@")
                 self.assertEqual(len(replacements), 1)
+                rendered = next(iter(replacements.values()))
+                expected_class = "math-display" if display else "math-inline"
+                self.assertIn(expected_class, rendered)
+
+    def test_equivalent_delimiters_render_identically(self) -> None:
+        self.assertEqual(
+            compiler.render_inline(r"\(\mathbb{F}_q[[t]]\)", {}),
+            compiler.render_inline(r"$\mathbb{F}_q[[t]]$", {}),
+        )
+        self.assertEqual(
+            compiler.render_markdown("\\[x^2\\]", {}),
+            compiler.render_markdown("$$x^2$$", {}),
+        )
 
     def test_power_series_brackets_inside_math_are_not_wikilinks(self) -> None:
         rendered = compiler.render_inline(r"$\mathbb{F}_q[[t]]$", {})
         self.assertIn('class="katex"', rendered)
         self.assertNotIn('class="knowl"', rendered)
         self.assertNotIn("$", rendered)
+
+    def test_top_level_knowl_id_is_rendered_as_a_wikilink(self) -> None:
+        target = self.make_knowl()
+        target.id = "formal-groups"
+        registry = {target.id: target}
+        for source in ("[[formal-groups|Formal groups]]", "[[formal-groups]]"):
+            with self.subTest(source=source):
+                rendered = compiler.render_inline(source, registry)
+                self.assertIn('class="knowl"', rendered)
+                self.assertIn('href="/formal-groups/"', rendered)
+                self.assertIn('data-knowl="/fragments/formal-groups/core.html"', rendered)
+                self.assertNotIn("[[", rendered)
+
+        missing = compiler.render_inline("[[unknown-top-level]]", registry)
+        self.assertIn('class="missing-knowl"', missing)
+        self.assertIn("unknown-top-level", missing)
+
+    def test_wikilink_extraction_supports_top_level_and_multiline_labels(self) -> None:
+        source = (
+            "[[formal-groups|Formal groups]] and "
+            "[[algebra-hyperstructures/hyperfield|a hyperfield\n"
+            "with a multiline label]] and "
+            "[[fiber-bundles/homotopy-class-mbg|Homotopy class [M,BG]]]"
+        )
+        self.assertEqual(
+            compiler.wikilinks_in_text(source),
+            [
+                "formal-groups",
+                "algebra-hyperstructures/hyperfield",
+                "fiber-bundles/homotopy-class-mbg",
+            ],
+        )
+        rendered = compiler.render_inline(source, {})
+        self.assertIn(">Homotopy class [M,BG]</a>", rendered)
+
+    def test_wikilink_extraction_ignores_power_series_brackets_in_math(self) -> None:
+        source = r"$R[[x]]$ and \(k[[t]]\) but [[formal-groups|formal groups]]"
+        self.assertEqual(compiler.wikilinks_in_text(source), ["formal-groups"])
+
+    def test_wikilink_extraction_and_rendering_ignore_inline_code(self) -> None:
+        source = "`R[[x]]` and [[formal-groups|code `k[[t]]` and formal groups]]"
+        self.assertEqual(compiler.wikilinks_in_text(source), ["formal-groups"])
+        rendered = compiler.render_inline(source, {})
+        self.assertIn("<code>R[[x]]</code>", rendered)
+        self.assertIn(">code <code>k[[t]]</code> and formal groups</a>", rendered)
+        self.assertNotIn('href="/x/"', rendered)
+        self.assertNotIn('href="/t/"', rendered)
+
+        fenced = "before\n```text\n[[not-a-knowl]]\n```\nafter [[formal-groups]]"
+        self.assertEqual(compiler.wikilinks_in_text(fenced), ["formal-groups"])
 
     def test_root_relative_markdown_link_is_navigation_only(self) -> None:
         rendered = compiler.render_inline("[Index](/conjectures/generated/example/)", {})
@@ -230,6 +302,22 @@ class RenderContractTests(unittest.TestCase):
     def test_unsafe_markdown_link_is_not_activated(self) -> None:
         rendered = compiler.render_inline("[bad](javascript:alert(1))", {})
         self.assertNotIn("<a ", rendered)
+
+    def test_pipe_table_renders_with_knowl_links_and_math(self) -> None:
+        target = self.make_knowl()
+        rendered = compiler.render_markdown(
+            "| Structure | Relation |\n"
+            "| --- | --- |\n"
+            "| [[sample/concept|Sample]] | A map $M\\to N$. |",
+            {target.id: target},
+        )
+        self.assertIn("<div class=\"table-scroll\"><table>", rendered)
+        self.assertEqual(rendered.count("<th>"), 2)
+        self.assertEqual(rendered.count("<td>"), 2)
+        self.assertIn("class=\"knowl\"", rendered)
+        self.assertIn(">Sample</a>", rendered)
+        self.assertIn("class=\"math-inline math-katex\"", rendered)
+        self.assertNotIn("<p>|", rendered)
 
     def test_redundant_source_h1_is_removed_from_rendered_core(self) -> None:
         source = "# Document title\n\nFirst paragraph.\n\n## Section"
@@ -290,6 +378,95 @@ class RenderContractTests(unittest.TestCase):
         item = compiler.search_json({knowl.id: knowl})[0]
         self.assertEqual(item["aliases"], ["sample"])
         self.assertEqual(item["summary"], "A concise orientation sentence.")
+
+    def test_authored_prerequisites_are_validated_and_exported_for_learning_order(self) -> None:
+        foundation = self.make_knowl()
+        foundation.id = "sample/foundation"
+        foundation.title = "Foundation"
+        dependent = self.make_knowl()
+        dependent.id = "sample/dependent"
+        dependent.title = "Dependent"
+        dependent.prerequisites = [foundation.id]
+        registry = {foundation.id: foundation, dependent.id: dependent}
+
+        errors = [message for message in compiler.validate(registry) if message.severity == "error"]
+        self.assertEqual(errors, [])
+        self.assertEqual(compiler.registry_json(registry)[dependent.id]["prerequisites"], [foundation.id])
+        self.assertIn(
+            {
+                "source": foundation.id,
+                "target": dependent.id,
+                "type": "prerequisite",
+                "authored": True,
+                "dependency_review_count": 0,
+                "reviewed": False,
+                "provenance": "authored",
+            },
+            compiler.dependency_graph_json(registry)["edges"],
+        )
+        self.assertIn(
+            {
+                "source": dependent.id,
+                "source_part": "metadata.prerequisites",
+                "type": "prerequisite",
+                "target": foundation.id,
+            },
+            compiler.collect_links(dependent),
+        )
+
+    def test_prerequisite_cycles_are_rejected_without_treating_wikilinks_as_dependencies(self) -> None:
+        first = self.make_knowl()
+        first.id = "sample/first"
+        second = self.make_knowl()
+        second.id = "sample/second"
+        first.prerequisites = [second.id]
+        second.prerequisites = [first.id]
+        messages = compiler.validate({first.id: first, second.id: second})
+        self.assertTrue(any("prerequisite cycle" in message.message for message in messages))
+
+    def test_homepage_and_complete_index_have_distinct_jobs(self) -> None:
+        knowl = self.make_knowl()
+        knowl.id = "analysis"
+        knowl.title = "Analysis"
+        registry = {knowl.id: knowl}
+        package = {"title": "Knowlpedia"}
+        homepage = compiler.render_homepage(registry, package)
+        index = compiler.render_index(registry, package)
+        graph = compiler.render_graph_page(registry, package)
+        self.assertIn('<h1 id="home-title">Knowlpedia</h1>', homepage)
+        self.assertIn('href="/index/"', homepage)
+        self.assertIn('href="/graph/"', homepage)
+        self.assertNotIn('class="index-section"', homepage)
+        self.assertIn("Mathematical knowledge, connected", index)
+        self.assertIn("Browse all 1 knowls by subject", index)
+        self.assertNotIn("production knowls", index)
+        self.assertIn("Open a definition without losing your place", index)
+        self.assertIn('id="subject-filter"', index)
+        self.assertNotIn("The Knowlpedia library", index)
+        self.assertNotIn('class="library-breadcrumb"', index)
+        self.assertNotIn('class="hero-search"', index)
+        self.assertNotIn('class="index-intro"', index)
+        self.assertIn('class="index-section"', index)
+        self.assertIn('data-dependency-graph', graph)
+        self.assertIn('id="graph-orientation"', graph)
+        self.assertRegex(graph, r'/assets/graph\.js\?v=[0-9a-f]{12}')
+        self.assertRegex(homepage, r'/assets/knowl\.css\?v=[0-9a-f]{12}')
+
+    def test_meta_subjects_are_excluded_from_reader_directories(self) -> None:
+        registry = {}
+        for knowl_id in ("analysis/concept", "knowlification/batch", "posts/note", "search"):
+            knowl = self.make_knowl()
+            knowl.id = knowl_id
+            knowl.title = knowl_id
+            registry[knowl_id] = knowl
+        package = {"title": "Knowlpedia"}
+        homepage = compiler.render_homepage(registry, package)
+        index = compiler.render_index(registry, package)
+        self.assertIn('subject-analysis', homepage)
+        self.assertIn('subject-analysis', index)
+        for subject in ("knowlification", "posts", "search"):
+            self.assertNotIn(f'subject-{subject}', homepage)
+            self.assertNotIn(f'subject-{subject}', index)
 
     def test_large_knowl_index_uses_visible_lazy_loading_without_inline_templates(self) -> None:
         targets = {
