@@ -135,7 +135,8 @@ class BuildProfileTests(unittest.TestCase):
             self.assertEqual(set(production_registry), {"sample/main"})
             self.assertTrue((development_out / "testing" / "index.html").is_file())
             self.assertFalse((production_out / "testing").exists())
-            self.assertTrue((development_out / "library" / "index.html").is_file())
+            self.assertTrue((development_out / "index" / "index.html").is_file())
+            self.assertFalse((development_out / "library").exists())
             self.assertTrue((development_out / "indexes" / "dependencies.json").is_file())
             self.assertTrue((development_out / "assets" / "knowl-testing.js").is_file())
             self.assertFalse((production_out / "assets" / "knowl-testing.js").exists())
@@ -397,6 +398,9 @@ class RenderContractTests(unittest.TestCase):
                 "target": dependent.id,
                 "type": "prerequisite",
                 "authored": True,
+                "dependency_review_count": 0,
+                "reviewed": False,
+                "provenance": "authored",
             },
             compiler.dependency_graph_json(registry)["edges"],
         )
@@ -420,19 +424,49 @@ class RenderContractTests(unittest.TestCase):
         messages = compiler.validate({first.id: first, second.id: second})
         self.assertTrue(any("prerequisite cycle" in message.message for message in messages))
 
-    def test_homepage_and_complete_library_have_distinct_jobs(self) -> None:
+    def test_homepage_and_complete_index_have_distinct_jobs(self) -> None:
         knowl = self.make_knowl()
         knowl.id = "analysis"
         knowl.title = "Analysis"
         registry = {knowl.id: knowl}
         package = {"title": "Knowlpedia"}
         homepage = compiler.render_homepage(registry, package)
-        library = compiler.render_index(registry, package)
-        self.assertIn("Start with one idea. Follow it anywhere.", homepage)
-        self.assertIn('href="/library/"', homepage)
+        index = compiler.render_index(registry, package)
+        graph = compiler.render_graph_page(registry, package)
+        self.assertIn('<h1 id="home-title">Knowlpedia</h1>', homepage)
+        self.assertIn('href="/index/"', homepage)
+        self.assertIn('href="/graph/"', homepage)
         self.assertNotIn('class="index-section"', homepage)
-        self.assertIn("The Knowlpedia library", library)
-        self.assertIn('class="index-section"', library)
+        self.assertIn("Mathematical knowledge, connected", index)
+        self.assertIn("Browse all 1 knowls by subject", index)
+        self.assertNotIn("production knowls", index)
+        self.assertIn("Open a definition without losing your place", index)
+        self.assertIn('id="subject-filter"', index)
+        self.assertNotIn("The Knowlpedia library", index)
+        self.assertNotIn('class="library-breadcrumb"', index)
+        self.assertNotIn('class="hero-search"', index)
+        self.assertNotIn('class="index-intro"', index)
+        self.assertIn('class="index-section"', index)
+        self.assertIn('data-dependency-graph', graph)
+        self.assertIn('id="graph-orientation"', graph)
+        self.assertRegex(graph, r'/assets/graph\.js\?v=[0-9a-f]{12}')
+        self.assertRegex(homepage, r'/assets/knowl\.css\?v=[0-9a-f]{12}')
+
+    def test_meta_subjects_are_excluded_from_reader_directories(self) -> None:
+        registry = {}
+        for knowl_id in ("analysis/concept", "knowlification/batch", "posts/note", "search"):
+            knowl = self.make_knowl()
+            knowl.id = knowl_id
+            knowl.title = knowl_id
+            registry[knowl_id] = knowl
+        package = {"title": "Knowlpedia"}
+        homepage = compiler.render_homepage(registry, package)
+        index = compiler.render_index(registry, package)
+        self.assertIn('subject-analysis', homepage)
+        self.assertIn('subject-analysis', index)
+        for subject in ("knowlification", "posts", "search"):
+            self.assertNotIn(f'subject-{subject}', homepage)
+            self.assertNotIn(f'subject-{subject}', index)
 
     def test_large_knowl_index_uses_visible_lazy_loading_without_inline_templates(self) -> None:
         targets = {

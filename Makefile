@@ -21,7 +21,7 @@ PREVIEW_URL ?= http://127.0.0.1:8001
 PREVIEW_PATH ?= /algebra-groups/group/
 SCREENSHOT ?= tmp/screenshots/page.png
 
-.PHONY: deps build build-production serve clean screenshot test test-ui test-home-ui test-local-sources-ui audit-sections audit-external-links audit-scope refresh-prebuilt-diagrams
+.PHONY: deps build build-production serve clean screenshot test test-ui test-home-ui test-graph-ui test-local-sources-ui audit-sections audit-external-links audit-scope refresh-prebuilt-diagrams
 .PHONY: compose-content compose-production-content build-content serve-content build-page preview-diagram
 .PHONY: preview-start preview-status preview-stop preview-restart preview-scan preview-adopt
 .PHONY: check-rendering check-rendering-knowls check-rendering-content review-content normalize-math
@@ -45,6 +45,9 @@ test-ui:
 
 test-home-ui:
 	PREVIEW_URL=$(PREVIEW_URL) node tests/homepage_smoke.mjs
+
+test-graph-ui:
+	PREVIEW_URL=$(PREVIEW_URL) node tests/graph_smoke.mjs
 
 test-local-sources-ui:
 	PREVIEW_URL=$(PREVIEW_URL) node tests/local_sources_smoke.mjs

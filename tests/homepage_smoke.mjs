@@ -14,22 +14,21 @@ try {
   const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
   await page.goto(`${baseUrl}/`);
 
-  const heading = page.getByRole("heading", { level: 1 });
-  if ((await heading.textContent()) !== "Start with one idea. Follow it anywhere.") {
-    throw new Error("Homepage orientation heading is missing");
+  if ((await page.getByRole("heading", { level: 1 }).textContent()) !== "Knowlpedia") {
+    throw new Error("Homepage entry heading is missing");
   }
   if ((await page.locator("body").textContent()).includes("Imported Knowlpedia Content")) {
     throw new Error("Legacy imported-content copy returned to the homepage");
   }
-  if ((await page.locator(".subject-card").count()) !== 8) {
-    throw new Error("Homepage does not show the eight featured subject gateways");
+  if ((await page.locator(".start-actions > a").count()) !== 2) {
+    throw new Error("Homepage does not expose graph and library entry points");
   }
-  if ((await page.locator(".dependency-node").count()) !== 5) {
-    throw new Error("Homepage dependency preview is incomplete");
+  if ((await page.locator(".start-subjects li").count()) < 20) {
+    throw new Error("Homepage subject directory is unexpectedly incomplete");
   }
   if (await hasHorizontalOverflow(page)) throw new Error("Desktop homepage overflows horizontally");
 
-  await page.getByRole("button", { name: /Search concepts/ }).click();
+  await page.getByRole("button", { name: /Search the mathematical library/ }).click();
   const search = page.getByRole("searchbox", { name: "Search by name, alias, or description" });
   await search.fill("Hilbert space");
   if ((await page.locator(".search-result").first().locator("strong").textContent()) !== "Hilbert space") {
@@ -37,34 +36,84 @@ try {
   }
   await search.press("Escape");
 
-  const libraryHref = await page.getByRole("link", { name: "Library", exact: true }).getAttribute("href");
-  if (libraryHref !== "/library/") throw new Error("Global navigation does not point to the complete library");
+  const graphHref = await page.getByRole("link", { name: /Dependency graph/ }).getAttribute("href");
+  const indexHref = await page.getByRole("link", { name: /Complete index/ }).getAttribute("href");
+  if (graphHref !== "/graph/" || indexHref !== "/index/") {
+    throw new Error("Homepage entry points target the wrong routes");
+  }
+  const desktopActionHeights = await page.locator(".start-actions > a").evaluateAll((items) =>
+    items.map((item) => item.getBoundingClientRect().height)
+  );
+  if (desktopActionHeights.some((height) => height > 52)) {
+    throw new Error("Homepage entry actions have expanded into oversized cards");
+  }
+  const desktopHeadingSize = await page.getByRole("heading", { level: 1 }).evaluate((heading) =>
+    Number.parseFloat(getComputedStyle(heading).fontSize)
+  );
+  if (desktopHeadingSize > 32) throw new Error("Desktop homepage heading is oversized");
+  if ((await page.locator(".start-subjects").evaluate((section) => section.getBoundingClientRect().top)) > 650) {
+    throw new Error("Homepage subjects do not begin in the first desktop viewport");
+  }
 
   await page.setViewportSize({ width: 390, height: 844 });
   if (await hasHorizontalOverflow(page)) throw new Error("Mobile homepage overflows horizontally");
-  const cardBoxes = await page.locator(".subject-card").evaluateAll((cards) =>
-    cards.slice(0, 2).map((card) => {
-      const box = card.getBoundingClientRect();
+  const actionBoxes = await page.locator(".start-actions > a").evaluateAll((items) =>
+    items.map((item) => {
+      const box = item.getBoundingClientRect();
       return { left: box.left, top: box.top };
     })
   );
-  if (Math.abs(cardBoxes[0].left - cardBoxes[1].left) > 1 || cardBoxes[1].top <= cardBoxes[0].top) {
-    throw new Error("Narrow mobile subject cards are not arranged in one readable column");
+  if (Math.abs(actionBoxes[0].top - actionBoxes[1].top) > 1 || actionBoxes[1].left <= actionBoxes[0].left) {
+    throw new Error("Mobile entry actions are not compact and side by side");
   }
-  const searchHeight = await page.locator(".home-hero .hero-search").evaluate(
-    (button) => button.getBoundingClientRect().height
-  );
-  if (searchHeight < 44) throw new Error("Mobile homepage search target is too small");
+  if ((await page.locator(".start-search").evaluate((button) => button.getBoundingClientRect().height)) < 44) {
+    throw new Error("Mobile homepage search target is too small");
+  }
 
-  await page.goto(`${baseUrl}/library/`);
-  if (!(await page.getByRole("heading", { name: "The Knowlpedia library" }).isVisible())) {
-    throw new Error("Complete library route is unavailable");
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto(`${baseUrl}/index/`);
+  if (!(await page.getByRole("heading", { name: /Browse all .* knowls by subject/ }).isVisible())) {
+    throw new Error("Complete index route is unavailable");
+  }
+  if ((await page.locator(".index-hero .hero-search").count()) !== 0) {
+    throw new Error("Index page repeats the global concept search control");
+  }
+  if (!(await page.locator("#search-open").isVisible())) {
+    throw new Error("Index page removed the requested header search control");
+  }
+  if ((await page.locator(".library-breadcrumb, .index-intro, .index-hero .kind").count()) !== 0) {
+    throw new Error("Index page restored redundant identity or browse copy");
   }
   if (!(await page.locator(".index-section").first().isVisible())) {
-    throw new Error("Complete library does not contain its subject index");
+    throw new Error("Complete index does not contain its subject directory");
   }
 
-  console.log("Homepage smoke test passed: orientation copy, search, library navigation, graph preview, and responsive layout.");
+  const indexText = await page.locator("main").textContent();
+  if (!indexText.includes("Mathematical knowledge, connected") || !indexText.includes("Open a definition without losing your place")) {
+    throw new Error("Index orientation copy is missing");
+  }
+  if (indexText.includes("production knowls")) throw new Error("Reader-facing index exposes build-profile terminology");
+  for (const subject of ["knowlification", "posts", "search"]) {
+    if ((await page.locator(`#subject-${subject}`).count()) !== 0) throw new Error(`Meta subject ${subject} leaked into the index`);
+  }
+
+  await page.locator("#subject-filter").fill("differential");
+  const visibleSubjectNames = await page.locator(".index-section:visible > summary > span:first-child").allTextContents();
+  if (!visibleSubjectNames.length || visibleSubjectNames.some((name) => !name.toLowerCase().includes("differential"))) {
+    throw new Error("Subject filter does not restrict the index by subject name");
+  }
+
+  const desktopSearchWidth = await page.locator("#search-open").evaluate((button) => button.getBoundingClientRect().width);
+  const desktopIconSize = await page.locator("#search-open .header-action-icon").evaluate((icon) => Number.parseFloat(getComputedStyle(icon).fontSize));
+  if (desktopSearchWidth < 160 || desktopIconSize < 18) throw new Error("Desktop header search control is too cramped");
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  if (await hasHorizontalOverflow(page)) throw new Error("Mobile index header overflows horizontally");
+  const mobileSearchWidth = await page.locator("#search-open").evaluate((button) => button.getBoundingClientRect().width);
+  const mobileIconSize = await page.locator("#theme-toggle .header-action-icon").evaluate((icon) => Number.parseFloat(getComputedStyle(icon).fontSize));
+  if (mobileSearchWidth < 58 || mobileIconSize < 19) throw new Error("Mobile header controls are too small");
+
+  console.log("Homepage smoke test passed: search, graph/index entry points, subject filter, and responsive layout.");
 } finally {
   await browser.close();
 }
