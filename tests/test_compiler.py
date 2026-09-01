@@ -135,6 +135,9 @@ class BuildProfileTests(unittest.TestCase):
             self.assertEqual(set(production_registry), {"sample/main"})
             self.assertTrue((development_out / "testing" / "index.html").is_file())
             self.assertFalse((production_out / "testing").exists())
+            self.assertTrue((development_out / "index" / "index.html").is_file())
+            self.assertFalse((development_out / "library").exists())
+            self.assertTrue((development_out / "indexes" / "dependencies.json").is_file())
             self.assertTrue((development_out / "assets" / "knowl-testing.js").is_file())
             self.assertFalse((production_out / "assets" / "knowl-testing.js").exists())
             self.assertIn(
@@ -375,6 +378,95 @@ class RenderContractTests(unittest.TestCase):
         item = compiler.search_json({knowl.id: knowl})[0]
         self.assertEqual(item["aliases"], ["sample"])
         self.assertEqual(item["summary"], "A concise orientation sentence.")
+
+    def test_authored_prerequisites_are_validated_and_exported_for_learning_order(self) -> None:
+        foundation = self.make_knowl()
+        foundation.id = "sample/foundation"
+        foundation.title = "Foundation"
+        dependent = self.make_knowl()
+        dependent.id = "sample/dependent"
+        dependent.title = "Dependent"
+        dependent.prerequisites = [foundation.id]
+        registry = {foundation.id: foundation, dependent.id: dependent}
+
+        errors = [message for message in compiler.validate(registry) if message.severity == "error"]
+        self.assertEqual(errors, [])
+        self.assertEqual(compiler.registry_json(registry)[dependent.id]["prerequisites"], [foundation.id])
+        self.assertIn(
+            {
+                "source": foundation.id,
+                "target": dependent.id,
+                "type": "prerequisite",
+                "authored": True,
+                "dependency_review_count": 0,
+                "reviewed": False,
+                "provenance": "authored",
+            },
+            compiler.dependency_graph_json(registry)["edges"],
+        )
+        self.assertIn(
+            {
+                "source": dependent.id,
+                "source_part": "metadata.prerequisites",
+                "type": "prerequisite",
+                "target": foundation.id,
+            },
+            compiler.collect_links(dependent),
+        )
+
+    def test_prerequisite_cycles_are_rejected_without_treating_wikilinks_as_dependencies(self) -> None:
+        first = self.make_knowl()
+        first.id = "sample/first"
+        second = self.make_knowl()
+        second.id = "sample/second"
+        first.prerequisites = [second.id]
+        second.prerequisites = [first.id]
+        messages = compiler.validate({first.id: first, second.id: second})
+        self.assertTrue(any("prerequisite cycle" in message.message for message in messages))
+
+    def test_homepage_and_complete_index_have_distinct_jobs(self) -> None:
+        knowl = self.make_knowl()
+        knowl.id = "analysis"
+        knowl.title = "Analysis"
+        registry = {knowl.id: knowl}
+        package = {"title": "Knowlpedia"}
+        homepage = compiler.render_homepage(registry, package)
+        index = compiler.render_index(registry, package)
+        graph = compiler.render_graph_page(registry, package)
+        self.assertIn('<h1 id="home-title">Knowlpedia</h1>', homepage)
+        self.assertIn('href="/index/"', homepage)
+        self.assertIn('href="/graph/"', homepage)
+        self.assertNotIn('class="index-section"', homepage)
+        self.assertIn("Mathematical knowledge, connected", index)
+        self.assertIn("Browse all 1 knowls by subject", index)
+        self.assertNotIn("production knowls", index)
+        self.assertIn("Open a definition without losing your place", index)
+        self.assertIn('id="subject-filter"', index)
+        self.assertNotIn("The Knowlpedia library", index)
+        self.assertNotIn('class="library-breadcrumb"', index)
+        self.assertNotIn('class="hero-search"', index)
+        self.assertNotIn('class="index-intro"', index)
+        self.assertIn('class="index-section"', index)
+        self.assertIn('data-dependency-graph', graph)
+        self.assertIn('id="graph-orientation"', graph)
+        self.assertRegex(graph, r'/assets/graph\.js\?v=[0-9a-f]{12}')
+        self.assertRegex(homepage, r'/assets/knowl\.css\?v=[0-9a-f]{12}')
+
+    def test_meta_subjects_are_excluded_from_reader_directories(self) -> None:
+        registry = {}
+        for knowl_id in ("analysis/concept", "knowlification/batch", "posts/note", "search"):
+            knowl = self.make_knowl()
+            knowl.id = knowl_id
+            knowl.title = knowl_id
+            registry[knowl_id] = knowl
+        package = {"title": "Knowlpedia"}
+        homepage = compiler.render_homepage(registry, package)
+        index = compiler.render_index(registry, package)
+        self.assertIn('subject-analysis', homepage)
+        self.assertIn('subject-analysis', index)
+        for subject in ("knowlification", "posts", "search"):
+            self.assertNotIn(f'subject-{subject}', homepage)
+            self.assertNotIn(f'subject-{subject}', index)
 
     def test_large_knowl_index_uses_visible_lazy_loading_without_inline_templates(self) -> None:
         targets = {

@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import atexit
 import base64
+import functools
 import hashlib
 import html
 import json
@@ -58,6 +59,9 @@ OLD_HUGO_TOPIC_LINKS = [
     ("Shale's Paper", "/shale-paper/"),
 ]
 
+GRAPH_DEFAULT_FOCUS = "linear-algebra/vector-space"
+DIRECTORY_EXCLUDED_SUBJECTS = frozenset({"knowlification", "posts", "search"})
+
 PROFILE_NAMES = ("development", "production")
 
 
@@ -97,6 +101,20 @@ INLINE_PRELOAD_TEMPLATE_LIMIT = 64
 
 def repo_root() -> Path:
     return Path(__file__).resolve().parents[2]
+
+
+@functools.lru_cache(maxsize=1)
+def runtime_asset_version() -> str:
+    """Return a stable cache key for the browser runtime shipped by this build."""
+    runtime_dir = Path(__file__).resolve().parents[1] / "static-runtime"
+    digest = hashlib.sha256()
+    for filename in ("knowl.css", "knowl.js", "graph.js", "knowl-testing.js"):
+        path = runtime_dir / filename
+        if not path.is_file():
+            continue
+        digest.update(filename.encode("utf-8"))
+        digest.update(path.read_bytes())
+    return digest.hexdigest()[:12]
 
 
 def find_node() -> Path | None:
@@ -598,6 +616,9 @@ class Knowl:
     domains: list[str]
     source_path: Path
     core_markdown: str
+    prerequisites: list[str] = field(default_factory=list)
+    dependency_heuristic: str | None = None
+    dependency_review_count: int = 0
     core_data: list[dict[str, Any]] = field(default_factory=list)
     core_axioms: list[dict[str, Any]] = field(default_factory=list)
     sections: list[dict[str, Any]] = field(default_factory=list)
@@ -842,6 +863,9 @@ def knowl_from_meta(
         domains=list(meta.get("domains", [])),
         source_path=source_path,
         core_markdown=core_markdown,
+        prerequisites=list(meta.get("prerequisites", [])),
+        dependency_heuristic=meta.get("dependency_heuristic"),
+        dependency_review_count=meta.get("dependency_review_count", 0),
         core_data=list(core_meta.get("data", [])),
         core_axioms=list(core_meta.get("axioms", [])),
         sections=sections or [],
@@ -869,6 +893,9 @@ def knowl_from_meta(
             "title": knowl.title,
             "summary": knowl.summary,
             "core": knowl.core_markdown,
+            "prerequisites": knowl.prerequisites,
+            "dependency_heuristic": knowl.dependency_heuristic,
+            "dependency_review_count": knowl.dependency_review_count,
             "data": knowl.core_data,
             "axioms": knowl.core_axioms,
             "sections": serializable_sections(knowl.sections),
@@ -1607,7 +1634,9 @@ def html_document(
     body: str,
     preload_mode: str = "eager",
     profile: BuildProfile = BUILD_PROFILES["development"],
+    page_script: str | None = None,
 ) -> str:
+    asset_version = runtime_asset_version()
     math_script = ""
     if MATH_RENDERER.backend == "tex":
         math_script = """  <script>
@@ -1673,7 +1702,12 @@ __PALETTE_SCRIPT__
     </div>
   </fieldset>
 </aside>""" if profile.show_testing_ui else ""
-    testing_script = '  <script defer src="/assets/knowl-testing.js"></script>' if profile.show_testing_ui else ""
+    testing_script = f'  <script defer src="/assets/knowl-testing.js?v={asset_version}"></script>' if profile.show_testing_ui else ""
+    page_script_html = (
+        f'  <script defer src="/assets/{escape_attr(page_script)}?v={asset_version}"></script>'
+        if page_script
+        else ""
+    )
     return f"""<!doctype html>
 <html lang="en" data-knowlpedia-profile="{escape_attr(profile.name)}" data-knowlpedia-development-content="{str(profile.include_development_content).lower()}" data-knowlpedia-testing-ui="{str(profile.show_testing_ui).lower()}">
 <head>
@@ -1682,20 +1716,24 @@ __PALETTE_SCRIPT__
   <title>{html.escape(title)}</title>
 {config_script}
 {theme_script}
-  <link rel="stylesheet" href="/assets/katex.min.css">
-  <link rel="stylesheet" href="/assets/knowl.css">
-  <script defer src="/assets/knowl.js"></script>
+  <link rel="stylesheet" href="/assets/katex.min.css?v={asset_version}">
+  <link rel="stylesheet" href="/assets/knowl.css?v={asset_version}">
+  <script defer src="/assets/knowl.js?v={asset_version}"></script>
 {testing_script}
+{page_script_html}
 {math_script.rstrip()}
 </head>
 <body data-knowl-preload="{escape_attr(preload_mode)}">
 <a class="skip-link" href="#main-content">Skip to content</a>
 <header class="site-header">
-  <a class="site-brand" href="/" aria-label="Knowlpedia home"><span class="brand-mark" aria-hidden="true">K</span><span>Knowlpedia</span></a>
+  <div class="site-identity">
+    <a class="site-brand" href="/" aria-label="Knowlpedia home"><span class="brand-mark" aria-hidden="true">K</span><span>Knowlpedia</span></a>
+    <nav class="site-nav" aria-label="Primary"><a href="/graph/">Graph</a><a href="/index/">Index</a></nav>
+  </div>
   <div class="site-actions">
-    <button type="button" id="search-open" class="header-action" aria-haspopup="dialog" aria-controls="search-dialog"><span aria-hidden="true">⌕</span><span>Search</span><kbd>⌘K</kbd></button>
+    <button type="button" id="search-open" class="header-action" aria-haspopup="dialog" aria-controls="search-dialog"><span class="header-action-icon" aria-hidden="true">⌕</span><span>Search</span><kbd>⌘K</kbd></button>
 {testing_button}
-    <button type="button" id="theme-toggle" class="header-action theme-toggle" aria-label="Use dark theme" aria-pressed="false"><span class="theme-icon" aria-hidden="true">◐</span><span class="theme-label">Dark</span></button>
+    <button type="button" id="theme-toggle" class="header-action theme-toggle" aria-label="Use dark theme" aria-pressed="false"><span class="theme-icon header-action-icon" aria-hidden="true">◐</span><span class="theme-label">Dark</span></button>
   </div>
 </header>
 {testing_panel}
@@ -1714,6 +1752,104 @@ __PALETTE_SCRIPT__
 """
 
 
+def render_homepage(
+    registry: dict[str, Knowl],
+    package: dict[str, Any],
+    profile: BuildProfile = BUILD_PROFILES["development"],
+) -> str:
+    production_knowls = [knowl for knowl in registry.values() if knowl.visibility == "production"]
+    grouped: dict[str, list[Knowl]] = {}
+    for knowl in production_knowls:
+        grouped.setdefault(knowl.id.split("/", 1)[0], []).append(knowl)
+    subject_links = []
+    for subject_id, knowls in sorted(grouped.items()):
+        if subject_id in DIRECTORY_EXCLUDED_SUBJECTS:
+            continue
+        subject = registry.get(subject_id)
+        title = subject.title if subject else humanize_identifier(subject_id)
+        subject_links.append(
+            f'<li><a href="/index/#subject-{escape_attr(subject_id)}">'
+            f'<span>{render_inline(title, registry)}</span><small>{len(knowls):,}</small></a></li>'
+        )
+
+    body = "\n".join(
+        [
+            '<main class="start-shell" id="main-content">',
+            '<section class="start-intro" aria-labelledby="home-title">',
+            '<h1 id="home-title">Knowlpedia</h1>',
+            f'<p>A linked library of {len(production_knowls):,} compact mathematical definitions.</p>',
+            '<button type="button" class="start-search" data-open-search><span aria-hidden="true">⌕</span><span>Search the mathematical library</span><kbd>⌘K</kbd></button>',
+            '</section>',
+            '<nav class="start-actions" aria-label="Ways to explore">',
+            '<a href="/graph/"><strong>Dependency graph</strong><small>Explore prerequisites and dependents</small><span aria-hidden="true">&#8594;</span></a>',
+            f'<a href="/index/"><strong>Complete index</strong><small>Browse all {len(production_knowls):,} knowls</small><span aria-hidden="true">&#8594;</span></a>',
+            '</nav>',
+            '<section class="start-subjects" aria-labelledby="subjects-title">',
+            '<div class="start-section-heading"><h2 id="subjects-title">Subjects</h2><p>Compact definitions first; examples, proofs, and references when needed.</p></div>',
+            '<ul>' + "".join(subject_links) + '</ul>',
+            '</section>',
+            '</main>',
+        ]
+    )
+    return html_document(
+        "Knowlpedia — Mathematical knowledge, connected",
+        body,
+        preload_mode="none",
+        profile=profile,
+    )
+
+
+def render_graph_page(
+    registry: dict[str, Knowl],
+    package: dict[str, Any],
+    profile: BuildProfile = BUILD_PROFILES["development"],
+) -> str:
+    default = registry.get(GRAPH_DEFAULT_FOCUS)
+    default_title = default.title if default else "a concept"
+    body = "\n".join(
+        [
+            '<main class="graph-shell" id="main-content" data-dependency-graph '
+            f'data-default-focus="{escape_attr(GRAPH_DEFAULT_FOCUS)}">',
+            '<section class="graph-workspace" aria-label="Dependency map">',
+            '<div class="graph-toolbar">',
+            '<div class="graph-find">',
+            '<label for="graph-search">Find a concept</label>',
+            f'<input id="graph-search" type="search" autocomplete="off" spellcheck="false" placeholder="Try {escape_attr(default_title)}" aria-controls="graph-search-results">',
+            '<div id="graph-search-results" class="graph-search-results" hidden></div>',
+            '</div>',
+            '<label class="graph-depth-label" for="graph-depth">Depth<select id="graph-depth"><option value="1">1 step</option><option value="2" selected>2 steps</option><option value="3">3 steps</option></select></label>',
+            '<button type="button" id="graph-orientation" class="graph-tool-button" aria-label="Switch to vertical layout">Vertical</button>',
+            '<button type="button" id="graph-fit" class="graph-tool-button">Fit</button>',
+            '</div>',
+            '<div class="graph-stage" id="graph-stage">',
+            '<div class="graph-status" id="graph-status" role="status">Loading dependency data…</div>',
+            '<svg id="dependency-map" class="dependency-map" role="img" aria-labelledby="graph-map-title graph-map-description">',
+            '<title id="graph-map-title">Knowlpedia dependency graph</title>',
+            '<desc id="graph-map-description">Prerequisites flow toward concepts they unlock.</desc>',
+            '<defs><marker id="graph-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs>',
+            '<g class="graph-edge-layer"></g><g class="graph-node-layer"></g>',
+            '</svg>',
+            '<div class="graph-legend" aria-label="Graph legend"><span><i class="legend-edge"></i> prerequisite flow</span><span><i class="legend-edge unreviewed"></i> unreviewed heuristic</span><span><i class="legend-node"></i> current knowl</span></div>',
+            '</div>',
+            '</section>',
+            '<aside class="graph-viewer" id="graph-viewer" aria-live="polite">',
+            '<header class="graph-viewer-header"><div><p class="kind">Selected knowl</p><h1 id="graph-viewer-title">Choose a node</h1></div><button type="button" id="graph-viewer-close" class="icon-button" aria-label="Close knowl viewer">&times;</button></header>',
+            '<p id="graph-viewer-summary" class="graph-viewer-summary">Select a node to inspect its definition and redraw the map around it.</p>',
+            '<div id="graph-review-state" class="graph-review-state"></div>',
+            '<div id="graph-viewer-content" class="graph-viewer-content"></div>',
+            '</aside>',
+            '</main>',
+        ]
+    )
+    return html_document(
+        f"Dependency graph - {package['title']}",
+        body,
+        preload_mode="visible",
+        profile=profile,
+        page_script="graph.js",
+    )
+
+
 def render_index(
     registry: dict[str, Knowl],
     package: dict[str, Any],
@@ -1724,20 +1860,27 @@ def render_index(
         if knowl.visibility != "production":
             continue
         top = knowl.id.split("/", 1)[0]
+        if top in DIRECTORY_EXCLUDED_SUBJECTS:
+            continue
         grouped.setdefault(top, []).append(knowl)
 
+    knowl_count = sum(len(items) for items in grouped.values())
     parts = [
         '<main class="page-shell index-shell" id="main-content">',
         '<header class="page-header index-hero">',
-        f'<p class="kind">Mathematical knowledge, connected</p><h1>{html.escape(package["title"])}</h1>',
-        '<p class="page-summary">Open a definition without losing your place, then follow its prerequisites as deeply as you need.</p>',
-        '<button type="button" class="hero-search" data-open-search><span aria-hidden="true">⌕</span><span>Search concepts, theorems, and examples</span><kbd>⌘K</kbd></button>',
+        '<p class="index-kicker">Mathematical knowledge, connected</p>',
+        f'<h1>Browse all {knowl_count:,} knowls by subject</h1>',
+        '<p class="index-summary">Open a definition without losing your place, then follow its prerequisites as deeply as you need.</p>',
         "</header>",
-        '<div class="index-intro"><h2>Browse by area</h2><p>Choose an area, then expand any term in place.</p></div>',
+        '<div class="index-tools">',
+        '<label class="index-subject-filter" for="subject-filter"><span class="header-action-icon" aria-hidden="true">⌕</span><input id="subject-filter" type="search" autocomplete="off" spellcheck="false" placeholder="Filter subjects" aria-describedby="subject-filter-status"></label>',
+        f'<p id="subject-filter-status" class="index-filter-status" role="status">{len(grouped)} subjects</p>',
+        '</div>',
+        '<p class="index-instruction">Expand any term in place.</p>',
     ]
     for group, knowls in sorted(grouped.items()):
         parts.append(
-            f'<details class="index-section"><summary><span>{html.escape(humanize_identifier(group))}</span>'
+            f'<details class="index-section" id="subject-{escape_attr(group)}" data-subject-name="{escape_attr(humanize_identifier(group))}"><summary><span>{html.escape(humanize_identifier(group))}</span>'
             f'<span class="index-count">{len(knowls)} knowls</span></summary><ul class="index-list">'
         )
         for knowl in sorted(knowls, key=lambda k: k.title.lower()):
@@ -1748,7 +1891,7 @@ def render_index(
             )
         parts.append("</ul></details>")
     parts.append("</main>")
-    return html_document(package["title"], "\n".join(parts), preload_mode="visible", profile=profile)
+    return html_document(f"Index - {package['title']}", "\n".join(parts), preload_mode="visible", profile=profile)
 
 
 def render_testing_hub(
@@ -1812,6 +1955,18 @@ def validate(registry: dict[str, Knowl]) -> list[ValidationMessage]:
     messages: list[ValidationMessage] = []
     aliases: dict[str, str] = {}
     for knowl in registry.values():
+        if (
+            isinstance(knowl.dependency_review_count, bool)
+            or not isinstance(knowl.dependency_review_count, int)
+            or knowl.dependency_review_count < 0
+        ):
+            messages.append(
+                ValidationMessage(
+                    "error",
+                    knowl.id,
+                    "dependency_review_count must be a nonnegative integer",
+                )
+            )
         for alias in knowl.aliases:
             normalized = alias.lower()
             if normalized in aliases:
@@ -1823,6 +1978,9 @@ def validate(registry: dict[str, Knowl]) -> list[ValidationMessage]:
                     )
                 )
             aliases[normalized] = knowl.id
+
+        for target in knowl.prerequisites:
+            validate_target(messages, registry, knowl.id, target, "prerequisite")
 
         for target in wikilinks_in_text(knowl.core_markdown):
             validate_target(messages, registry, knowl.id, target, "core wikilink")
@@ -1844,7 +2002,57 @@ def validate(registry: dict[str, Knowl]) -> list[ValidationMessage]:
                 for target in wikilinks_in_text(section.get("markdown", "")):
                     validate_target(messages, registry, knowl.id, target, f'section {section["id"]} wikilink')
 
+    validate_prerequisite_cycles(messages, registry)
     return messages
+
+
+def validate_prerequisite_cycles(
+    messages: list[ValidationMessage], registry: dict[str, Knowl]
+) -> None:
+    """Reject authored prerequisite loops while allowing ordinary links to cycle."""
+
+    state: dict[str, int] = {}
+    path: list[str] = []
+    reported: set[frozenset[str]] = set()
+
+    def visit(knowl_id: str) -> None:
+        state[knowl_id] = 1
+        path.append(knowl_id)
+        for target in registry[knowl_id].prerequisites:
+            base, _ = split_target(target)
+            if base not in registry:
+                continue
+            if state.get(base, 0) == 0:
+                visit(base)
+                continue
+            if state.get(base) != 1:
+                continue
+            cycle_start = path.index(base)
+            cycle = path[cycle_start:] + [base]
+            cycle_key = frozenset(cycle)
+            if cycle_key in reported:
+                continue
+            reported.add(cycle_key)
+            severity = (
+                "error"
+                if all(registry[item].dependency_review_count > 0 for item in cycle_key)
+                else "warning"
+            )
+            messages.append(
+                ValidationMessage(
+                    severity,
+                    knowl_id,
+                    "prerequisite cycle"
+                    + (" survived review: " if severity == "error" else " in unreviewed metadata: ")
+                    + " -> ".join(cycle),
+                )
+            )
+        path.pop()
+        state[knowl_id] = 2
+
+    for knowl_id in registry:
+        if state.get(knowl_id, 0) == 0:
+            visit(knowl_id)
 
 
 def wikilinks_in_text(text: str) -> list[str]:
@@ -1867,6 +2075,8 @@ def collect_links(knowl: Knowl) -> list[dict[str, str]]:
             }
         )
 
+    for target in knowl.prerequisites:
+        add(target, "metadata.prerequisites", "prerequisite")
     for target in wikilinks_in_text(knowl.core_markdown):
         add(target, "core")
     for item in knowl.core_data:
@@ -1979,6 +2189,9 @@ def registry_json(registry: dict[str, Knowl]) -> dict[str, Any]:
             "summary": knowl.summary,
             "aliases": knowl.aliases,
             "domains": knowl.domains,
+            "prerequisites": knowl.prerequisites,
+            "dependency_heuristic": knowl.dependency_heuristic,
+            "dependency_review_count": knowl.dependency_review_count,
             "visibility": knowl.visibility,
             "href": target_href(knowl.id),
             "fragment": fragment_href(knowl.id),
@@ -2007,6 +2220,7 @@ def search_json(registry: dict[str, Knowl]) -> list[dict[str, Any]]:
             "summary": knowl.summary,
             "aliases": knowl.aliases,
             "domains": knowl.domains,
+            "dependency_review_count": knowl.dependency_review_count,
             "href": target_href(knowl.id),
             "visibility": knowl.visibility,
         }
@@ -2029,6 +2243,53 @@ def links_json(registry: dict[str, Knowl]) -> list[dict[str, Any]]:
         for link in collect_links(knowl):
             links.append(link)
     return links
+
+
+def dependency_graph_json(registry: dict[str, Knowl]) -> dict[str, Any]:
+    """Return the authored learning graph, distinct from incidental wikilinks.
+
+    Edges point from a prerequisite toward the concept it unlocks, matching the
+    direction a learner would move through a topological ordering.
+    """
+
+    nodes = [
+        {
+            "id": knowl.id,
+            "title": knowl.title,
+            "kind": display_kind(knowl.kind) or "Concept",
+            "summary": knowl.summary,
+            "domains": knowl.domains,
+            "dependency_heuristic": knowl.dependency_heuristic,
+            "dependency_review_count": knowl.dependency_review_count,
+            "href": target_href(knowl.id),
+            "fragment": fragment_href(knowl.id),
+            "visibility": knowl.visibility,
+        }
+        for knowl in registry.values()
+    ]
+    edges = []
+    for knowl in registry.values():
+        for prerequisite in knowl.prerequisites:
+            source, _ = split_target(prerequisite)
+            if source not in registry:
+                continue
+            edges.append(
+                {
+                    "source": source,
+                    "target": knowl.id,
+                    "type": "prerequisite",
+                    "authored": True,
+                    "dependency_review_count": knowl.dependency_review_count,
+                    "reviewed": knowl.dependency_review_count > 0,
+                    "provenance": knowl.dependency_heuristic or "authored",
+                }
+            )
+    return {
+        "version": 1,
+        "edge_direction": "prerequisite-to-dependent",
+        "nodes": nodes,
+        "edges": edges,
+    }
 
 
 def proofs_json(registry: dict[str, Knowl]) -> list[dict[str, Any]]:
@@ -2133,7 +2394,7 @@ def copy_runtime_assets(out_dir: Path, profile: BuildProfile) -> None:
     runtime_dir = Path(__file__).resolve().parents[1] / "static-runtime"
     assets_dir = out_dir / "assets"
     assets_dir.mkdir(parents=True, exist_ok=True)
-    for filename in ("knowl.css", "knowl.js"):
+    for filename in ("knowl.css", "knowl.js", "graph.js"):
         shutil.copyfile(runtime_dir / filename, assets_dir / filename)
     if profile.show_testing_ui:
         shutil.copyfile(runtime_dir / "knowl-testing.js", assets_dir / "knowl-testing.js")
@@ -2209,7 +2470,15 @@ def write_site_for_ids(
         target_knowls = list(registry.values())
         fragment_cache = {knowl.id: render_knowl_core(knowl, registry) for knowl in registry.values()}
 
-        (out_dir / "index.html").write_text(render_index(registry, package, profile), encoding="utf-8")
+        (out_dir / "index.html").write_text(
+            render_homepage(registry, package, profile), encoding="utf-8"
+        )
+        index_path = out_dir / "index" / "index.html"
+        index_path.parent.mkdir(parents=True, exist_ok=True)
+        index_path.write_text(render_index(registry, package, profile), encoding="utf-8")
+        graph_path = out_dir / "graph" / "index.html"
+        graph_path.parent.mkdir(parents=True, exist_ok=True)
+        graph_path.write_text(render_graph_page(registry, package, profile), encoding="utf-8")
         topics_path = out_dir / "topics" / "index.html"
         topics_path.parent.mkdir(parents=True, exist_ok=True)
         topics_path.write_text(render_old_topics_page(package, profile), encoding="utf-8")
@@ -2237,6 +2506,7 @@ def write_site_for_ids(
         write_compact_json(out_dir / "indexes" / "search.json", search_json(registry))
         write_json(out_dir / "indexes" / "relations.json", relations_json(registry))
         write_json(out_dir / "indexes" / "links.json", links_json(registry))
+        write_compact_json(out_dir / "indexes" / "dependencies.json", dependency_graph_json(registry))
         write_json(out_dir / "indexes" / "proofs.json", proofs_json(registry))
         write_json(out_dir / "reports" / "validation.json", [msg.__dict__ for msg in messages])
         write_json(

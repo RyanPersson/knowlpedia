@@ -114,7 +114,40 @@ matches, including the same words used in a different subject, a broad umbrella
 page when an atomic owner exists, or a complex analogue where the prose means a
 quaternionic or octonionic object. Apply accepted links and rerun the report.
 
-## 7. Validate source and structure
+## 7. Seed and review dependency metadata
+
+Treat links in the compact definition core as candidate prerequisites. Generate
+a deterministic sample report before editing metadata:
+
+~~~bash
+.venv/bin/python scripts/generate_dependency_metadata.py \
+  --content-root ../knowlpedia-content/content \
+  --paths-file /tmp/knowl-batch-paths.txt \
+  --sample-size 20 \
+  --seed 20260827 \
+  --report /tmp/knowl-batch-dependencies.jsonl
+~~~
+
+Inspect the sample semantically. Definition-core links can still name a
+consequence, comparison, convention, or example. If example material is present
+in the core, repair the knowl by moving it under a descriptive `##` section;
+do not complicate the dependency heuristic to accommodate malformed structure.
+
+Apply the reviewed scope only after the sample behaves conservatively:
+
+~~~bash
+.venv/bin/python scripts/generate_dependency_metadata.py \
+  --content-root ../knowlpedia-content/content \
+  --paths-file /tmp/knowl-batch-paths.txt \
+  --report /tmp/knowl-batch-dependencies.jsonl \
+  --apply
+~~~
+
+Generated metadata starts with `dependency_review_count = 0`. A later human or
+AI dependency review must inspect the complete list, correct it, and increment
+the counter. The generator preserves metadata with a positive review count.
+
+## 8. Validate source and structure
 
 Run the cheap checks first:
 
@@ -130,7 +163,7 @@ The scope audit is a review report. Inspect every new-page finding; do not
 silence it mechanically. A finding may reveal a bundled definition or a
 semantic duplicate that title matching missed.
 
-## 8. Build and inspect rendered output
+## 9. Build and inspect rendered output
 
 For a live-site-only development build, explicitly exclude unrelated optional
 content sources:
@@ -167,7 +200,7 @@ into math, malformed subscripts, oversized formulas, awkward line wrapping,
 broken links, and cores that are too long to work well inline. A browser
 spot-check is a required completion step for a knowl batch.
 
-## 9. Generate a review and commit
+## 10. Generate a review and commit
 
 After committing the content branch, generate a review directly from the
 content repository so optional content sources are not composed:

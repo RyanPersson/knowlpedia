@@ -476,10 +476,35 @@
     if (dialog) dialog.addEventListener("keydown", handleSearchKeydown);
   }
 
+  function initSubjectFilter() {
+    const input = document.getElementById("subject-filter");
+    const status = document.getElementById("subject-filter-status");
+    const sections = Array.from(document.querySelectorAll(".index-section[data-subject-name]"));
+    if (!input || !status || !sections.length) return;
+
+    const update = () => {
+      const query = normalizeSearchText(input.value.trim());
+      let visible = 0;
+      sections.forEach((section) => {
+        const matches = !query || normalizeSearchText(section.dataset.subjectName || "").includes(query);
+        section.hidden = !matches;
+        if (matches) visible += 1;
+      });
+      status.textContent = query
+        ? `${visible} of ${sections.length} subjects`
+        : `${sections.length} subjects`;
+    };
+
+    input.addEventListener("input", update);
+    input.addEventListener("search", update);
+    update();
+  }
+
   function init() {
     loadInlineFragments();
     initTheme();
     initSearch();
+    initSubjectFilter();
     preloadForDocument();
     window.setTimeout(autoExpandKnowls, 0);
   }
