@@ -319,3 +319,38 @@ Live cumulative review: http://100.69.17.72:8015/review/content-changes/ .
 It compares content `ea7256bd` to `c1e30e06` using the current renderer on both
 sides. The next fan-out is a plan for 60 existing pending knowls in five lanes,
 followed by independent cross-review; that larger batch has not been executed.
+
+### Large batch and complete DAG repair (2026-09-05)
+
+The larger fan-out completed 1,026 additional full reviews, bringing the
+source-hashed total to 1,049 of the fixed 3,491 starting knowls. There are 54
+recorded substantive corrections in total and 2,442 entries awaiting full
+review. The exact 64 deferrals from this batch remain in the assignment
+manifest. See [refactor-fanout.md](refactor-fanout.md) for scope and audit results.
+
+All prerequisite cycles are now resolved, including the previously unreviewed
+parts of the graph. The final canonical graph has 9,889 edges, zero cycles,
+zero missing targets, and zero self-dependencies. Independent semantic checks
+restored needed antecedents removed too aggressively; no graph algorithm
+chooses which mathematical dependency to delete. Compiler validation now
+rejects cycles regardless of review count and resolves redirected targets
+before traversing them. Standard build targets no longer bypass errors.
+
+The static architecture and reader interaction remain unchanged in this batch.
+Ten existing duplicate-alias warnings remain; they are not prerequisite loops.
+The refreshed cumulative diff compares content against `ea7256bd` using the
+current renderer, at http://100.69.17.72:8015/review/content-changes/ .
+
+Large-batch verification: 102 Python tests pass; source-section and external-link
+checks pass for all 3,493 source files. The strict production build compiles
+3,491 canonical knowls and its complete rendered HTML scan reports no errors.
+The composed development preview compiles 4,677 knowls, including the existing
+additional source collection. Homepage, runtime, graph, reading-flow and
+320/390/1440px reader checks pass. The cumulative diff has 1,482 comparisons;
+search and the rendered before/after axiom were browser-checked.
+
+The narrowest development header exposed a one-pixel overflow: its icon-only
+search button retained an unnecessary 64px width. It now uses the same 44px
+minimum touch target as the other header actions. The graph smoke test now
+checks that unreviewed edges disappear, allowing nodes that remain connected
+through reviewed paths to stay visible.

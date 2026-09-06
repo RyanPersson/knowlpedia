@@ -2148,7 +2148,7 @@ def validate_prerequisite_cycles(
         state[knowl_id] = 1
         path.append(knowl_id)
         for target in registry[knowl_id].prerequisites:
-            base, _ = split_target(target)
+            base, _ = split_target(canonical_target(registry, target))
             if base not in registry:
                 continue
             if state.get(base, 0) == 0:
@@ -2162,18 +2162,11 @@ def validate_prerequisite_cycles(
             if cycle_key in reported:
                 continue
             reported.add(cycle_key)
-            severity = (
-                "error"
-                if all(registry[item].dependency_review_count > 0 for item in cycle_key)
-                else "warning"
-            )
             messages.append(
                 ValidationMessage(
-                    severity,
+                    "error",
                     knowl_id,
-                    "prerequisite cycle"
-                    + (" survived review: " if severity == "error" else " in unreviewed metadata: ")
-                    + " -> ".join(cycle),
+                    "prerequisite cycle: " + " -> ".join(cycle),
                 )
             )
         path.pop()

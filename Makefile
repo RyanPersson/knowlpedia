@@ -78,10 +78,10 @@ build: build-content
 serve: serve-content
 
 build-content: deps compose-content
-	$(PYTHON) packages/compiler/knowl_compile.py $(COMPOSED_CONTENT_PACKAGE) --profile $(KNOWLPEDIA_PROFILE) --out public-imported --allow-validation-errors --diagram-cache-dir $(DIAGRAM_CACHE_DIR) --prebuilt-diagram-dir $(PREBUILT_DIAGRAM_DIR)
+	$(PYTHON) packages/compiler/knowl_compile.py $(COMPOSED_CONTENT_PACKAGE) --profile $(KNOWLPEDIA_PROFILE) --out public-imported --diagram-cache-dir $(DIAGRAM_CACHE_DIR) --prebuilt-diagram-dir $(PREBUILT_DIAGRAM_DIR)
 
 build-production: deps compose-production-content
-	$(PYTHON) packages/compiler/knowl_compile.py $(PRODUCTION_CONTENT_PACKAGE) --profile production --out public-imported --allow-validation-errors --no-diagram-cache --prebuilt-diagram-dir $(PREBUILT_DIAGRAM_DIR) --prebuilt-only-diagrams
+	$(PYTHON) packages/compiler/knowl_compile.py $(PRODUCTION_CONTENT_PACKAGE) --profile production --out public-imported --no-diagram-cache --prebuilt-diagram-dir $(PREBUILT_DIAGRAM_DIR) --prebuilt-only-diagrams
 	$(PYTHON) scripts/check_rendering_errors.py public-imported --require-rendered-diagrams --require-profile production
 
 refresh-prebuilt-diagrams: deps compose-content

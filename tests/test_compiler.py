@@ -438,7 +438,29 @@ class RenderContractTests(unittest.TestCase):
         first.prerequisites = [second.id]
         second.prerequisites = [first.id]
         messages = compiler.validate({first.id: first, second.id: second})
-        self.assertTrue(any("prerequisite cycle" in message.message for message in messages))
+        self.assertTrue(any(message.severity == "error" and "prerequisite cycle" in message.message for message in messages))
+        first.prerequisites = []
+        second.prerequisites = []
+        first.core_markdown = f"See [[{second.id}]]."
+        second.core_markdown = f"See [[{first.id}]]."
+        messages = compiler.validate({first.id: first, second.id: second})
+        self.assertFalse(any("prerequisite cycle" in message.message for message in messages))
+
+    def test_prerequisite_cycle_through_redirect_uses_canonical_nodes(self) -> None:
+        first = self.make_knowl()
+        first.id = "sample/first"
+        second = self.make_knowl()
+        second.id = "sample/second"
+        first.prerequisites = ["sample/old-second"]
+        second.prerequisites = [first.id]
+        registry = compiler.AliasRegistry(
+            {first.id: first, second.id: second}, {"sample/old-second": second.id}
+        )
+        messages = compiler.validate(registry)
+        cycles = [message for message in messages if "prerequisite cycle" in message.message]
+        self.assertEqual(1, len(cycles))
+        self.assertEqual("error", cycles[0].severity)
+        self.assertNotIn("old-second", cycles[0].message)
 
     def test_homepage_and_complete_index_have_distinct_jobs(self) -> None:
         knowl = self.make_knowl()

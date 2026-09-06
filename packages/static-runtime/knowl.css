@@ -1983,8 +1983,7 @@ mjx-container[display="true"] {
   }
 
   #search-open {
-    width: 64px;
-    min-width: 64px;
+    width: 44px;
     justify-content: center;
   }
 

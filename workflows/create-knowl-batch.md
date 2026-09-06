@@ -59,6 +59,12 @@ monographs for established definitions. Resolve, rather than conceal:
 Put the adopted convention in the knowl. Add a warning or comparison section
 when a nearby convention could cause a real misunderstanding.
 
+Record exact inspected source locators for nontrivial claims. Elementary
+claims can instead carry specific direct verification with no external source
+claim. Return unresolved entries as targeted reviews, and provide partial
+per-ID checkpoints before expanding a lane. Repeated general assurances and
+unrelated references do not complete a review.
+
 ## 4. Write atomic knowls with short cores
 
 Each file begins with valid front matter containing at least id, title, kind,

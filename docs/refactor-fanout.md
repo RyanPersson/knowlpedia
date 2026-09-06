@@ -1,43 +1,54 @@
-# Next review batch: 60 existing knowls
+# Large review batch
 
-Status: planned, not executed. The exact, nonoverlapping ownership manifest is
-`../knowlpedia-content/reviews/next-batch.json`: five lanes of twelve knowls.
+Completed the requested 1,000-review milestone on 2026-09-05. The exact
+ownership manifest is `../knowlpedia-content/reviews/large-batch-plan.json`.
+The fixed starting corpus remains 3,491 knowls; new pages do not reduce it.
 
-| Lane | Reading question |
-|---|---|
-| Linear geometry | How do inner products produce orthogonality, projections, and operator norms? |
-| Ring conventions | Which results require a multiplicative identity or preservation of it? |
-| Metric foundations | How do convergence, completeness, and continuity fit together? |
-| Integration foundations | Which partition definition and integrator hypotheses support each theorem? |
-| Functions and quotients | Are domains, inverse images, and equivalence classes distinguished consistently? |
+| Measure | This batch |
+|---|---:|
+| Assigned to 26 full-review lanes | 1,090 |
+| Accepted full reviews | 1,026 |
+| Assigned entries still requiring full review | 64 |
+| Substantive content corrections | 36 |
+| Additional dependency-audit assignments | 514 |
 
-Each author reads its assigned pages and the prerequisites needed to understand
-them before editing. Neighboring pages are read-only unless the coordinator
-reassigns ownership. The coordinator owns shared runtime, redirects, indexes,
-and the ledger; authors return per-ID findings and evidence. Useful unchanged
-pages stay unchanged. Do not create a new example or section merely to record a
-correction. Record inaccessible sources and unresolved claims explicitly.
+Together with the previous 23 full reviews, 1,049 starting knowls are now
+reviewed at their current source hashes. The cumulative correction count is
+54. See [refactor-progress.md](refactor-progress.md) for regenerated totals.
 
-Run the five author lanes concurrently. Then assign two independent review
-passes across the proposed changes: one for hypotheses/conventions and one for
-reading flow and duplicate scope. Reviewers report findings to the owners;
-they do not concurrently rewrite the same files. The coordinator resolves
-cross-lane conventions, checks two-prerequisite reading exercises, runs source,
-unit, browser and rendered-output checks, and refreshes the cumulative diff.
+The 64 deferrals comprise 16 entries whose source/proof evidence remains
+incomplete and 48 entries in the final real-analysis lane whose prerequisite
+reading was incomplete. That lane delivered one substantiated full review;
+its unsupported metadata-only edits were reverted. The seven useful authored
+prerequisite changes remain, with their review counters at zero. No partial
+review or dependency-only repair contributes to the full-review total.
 
-For each assigned ID report full, targeted, or dependency-only review; corrected,
-reviewed unchanged, or redirected outcome; inspected source locators; and any
-remaining assumptions. Only completed full reviews receive a current-source
-SHA-256 in the ledger. A blocked or targeted review remains in the backlog.
-New pages and redirects are separate statistics, not extra corrections.
+Three independent auditors checked body changes, prerequisite removals, and
+sampled unchanged claims. Generic chapter references and repeated assertions
+were returned for rework. Elementary entries can be checked by explicit direct
+reasoning; an unrelated bibliography is not evidence. More advanced claims
+need an inspected relevant source or a substantive mathematical verification.
+The accepted per-ID evidence and hashes live in the existing review ledger.
 
-After the batch, regenerate `docs/refactor-progress.md` and publish the exact
-number assigned, fully reviewed, corrected, unchanged, deferred, and returned
-for rework. Measure actual review time before estimating throughput; this first
-small, selected batch does not justify a completion date for the entire corpus.
-At sixty completed full reviews per batch, the current backlog needs roughly
-58 further batches; deferrals and later source changes can increase that number.
-Select subsequent batches from `scripts/review_progress.py --json`, prioritizing
-frequently used prerequisites and demonstrated inconsistencies rather than
-alphabetical coverage. Stop expanding parallelism if integration or mathematical
-review becomes the bottleneck.
+The prerequisite graph has zero cycles across 3,491 canonical knowls and
+9,889 edges, with no missing prerequisite targets or self-dependencies.
+Definitions no longer require their consequences or extracted restatements.
+Integration restored necessary antecedents removed too aggressively, including
+test-function spaces, stalks, Cartan subalgebras, and Cauchy hypersurfaces.
+Ordinary explanatory links remain free to cycle. The compiler rejects every
+prerequisite cycle, including cycles through redirects; standard builds no
+longer bypass validation errors.
+
+## Next batch
+
+Start with the 64 deferred entries listed in the ownership manifest, then
+choose unreviewed definitions used by many already-reviewed pages. Assign
+bounded subject groups with one writer each and an independent integration
+review. Require early partial evidence checkpoints; a running agent is not a
+completed review. Keep source checking and mathematical review ahead of queue
+size. Do not extrapolate a completion date from this selected batch.
+
+Retain stable IDs, existing mathematical delimiters, useful unchanged prose,
+and the static reader architecture. Generate the cumulative diff from the
+original content baseline `ea7256bd` after each integrated batch. The existing
+`knowlpedia-astra-benchmark` service serves it on port 8015.

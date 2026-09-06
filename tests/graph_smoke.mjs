@@ -35,15 +35,14 @@ try {
   if (!mixedFocus) throw new Error("Dependency graph has no concept with both reviewed and unreviewed links");
   await page.goto(`${baseUrl}/graph/?focus=${encodeURIComponent(mixedFocus)}`);
   await page.locator(".map-node.current").waitFor();
-  const allNodeIds = await page.locator(".map-node").evaluateAll((items) => items.map((item) => item.dataset.nodeId).sort());
-  const allEdges = await page.locator(".map-edge").count();
+  const unreviewedEdges = await page.locator(".map-edge.unreviewed").count();
+  if (!unreviewedEdges) throw new Error("The test neighborhood has no displayed unreviewed edges");
   await reviewFilter.check();
   if (new URL(page.url()).searchParams.get("review") !== "reviewed") throw new Error("Reviewed-only filter is not reflected in the URL");
-  const reviewedNodeIds = await page.locator(".map-node").evaluateAll((items) => items.map((item) => item.dataset.nodeId).sort());
-  const reviewedEdges = await page.locator(".map-edge").count();
-  if (reviewedEdges >= allEdges || reviewedNodeIds.join("\n") === allNodeIds.join("\n")) {
-    throw new Error("Reviewed-only mode did not change the focused neighborhood");
-  }
+  // A node may remain reachable through a reviewed path after its unreviewed
+  // edge disappears. Filtering need not reduce the number of visible nodes.
+  if (await page.locator(".map-edge.unreviewed").count()) throw new Error("Reviewed-only mode retained unreviewed edges");
+  if (!(await page.locator(".map-edge").count())) throw new Error("Reviewed-only mode lost the reviewed links");
   if (!(await page.locator(`.map-node.current[data-node-id="${mixedFocus}"]`).count())) throw new Error("Reviewed-only mode lost the focused node");
   if (!/reviewed-only mode hides/i.test(await page.locator("#graph-status").textContent())) throw new Error("Reviewed-only empty/filter state is not explained");
   await page.goBack();
