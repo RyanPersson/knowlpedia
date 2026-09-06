@@ -31,10 +31,6 @@ IGNORED_CLASSES = {
     "diagram-source",
 }
 ERROR_CLASSES = {"math-render-error", "katex-error", "diagram-error", "knowl-error", "missing-knowl"}
-ALLOWED_RAW_SHORTCODE_PATHS = {
-    "fragments/posts/semigroup-quasigroup-structure/core.html",
-    "posts/semigroup-quasigroup-structure/index.html",
-}
 LOCAL_TARGET_ATTRIBUTES = {"href", "src", "data-knowl", "data-section-url", "data-knowl-fragment"}
 KNOWL_TARGET_ATTRIBUTES = {"data-knowl", "data-section-url", "data-knowl-fragment"}
 HUGO_PLACEHOLDER_RE = re.compile(r"HUGOSHORTCODE\d+[A-Za-z0-9]*")
@@ -114,12 +110,7 @@ class RenderedHtmlChecker(HTMLParser):
             self._add_issue("error", "hugo_shortcode_placeholder", match.group(0))
 
         for match in SHORTCODE_RE.finditer(text):
-            try:
-                relative_path = str(self.path.relative_to(self.root))
-            except ValueError:
-                relative_path = str(self.path)
-            if relative_path not in ALLOWED_RAW_SHORTCODE_PATHS:
-                self._add_issue("error", "raw_shortcode", match.group(0))
+            self._add_issue("error", "raw_shortcode", match.group(0))
 
         for match in WIKILINK_MARKER_RE.finditer(text):
             self._add_issue(
