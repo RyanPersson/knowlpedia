@@ -349,8 +349,8 @@ additional source collection. Homepage, runtime, graph, reading-flow and
 320/390/1440px reader checks pass. The cumulative diff has 1,482 comparisons;
 search and the rendered before/after axiom were browser-checked.
 
-The narrowest development header exposed a one-pixel overflow: its icon-only
-search button retained an unnecessary 64px width. It now uses the same 44px
-minimum touch target as the other header actions. The graph smoke test now
+The narrowest development header exposed a one-pixel overflow. Reducing the
+gap between navigation and actions keeps the larger mobile search target
+while fitting the 320px viewport. The graph smoke test now
 checks that unreviewed edges disappear, allowing nodes that remain connected
 through reviewed paths to stay visible.

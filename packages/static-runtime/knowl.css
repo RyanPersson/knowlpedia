@@ -1961,6 +1961,7 @@ mjx-container[display="true"] {
 
   .site-header {
     min-height: 54px;
+    gap: 0.5rem;
     padding: 0.42rem 0.65rem;
   }
 
@@ -1983,7 +1984,8 @@ mjx-container[display="true"] {
   }
 
   #search-open {
-    width: 44px;
+    width: 64px;
+    min-width: 64px;
     justify-content: center;
   }
 
