@@ -354,3 +354,16 @@ gap between navigation and actions keeps the larger mobile search target
 while fitting the 320px viewport. The graph smoke test now
 checks that unreviewed edges disappear, allowing nodes that remain connected
 through reviewed paths to stay visible.
+
+### Entire remaining corpus reviewed (2026-09-05)
+
+Completed all 2,442 remaining entries: the fixed starting corpus now has
+3,491 full current-source reviews, zero pending reviews, and zero stale hashes.
+The two later additions also have full reviews. Cumulative content corrections
+rose from 54 to 120; unchanged pages were retained. The final prerequisite graph
+has 9,892 edges and remains acyclic, with no missing or self-referencing edges.
+See [remainder-review-plan.md](remainder-review-plan.md) for the completed scope,
+verification, and the corrections rejected during independent review.
+
+The cumulative before/after page remains at
+http://100.69.17.72:8015/review/content-changes/ on the existing persistent service.

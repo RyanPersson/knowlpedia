@@ -31,3 +31,38 @@ Commit validated content and app changes on their existing branches. Rebuild
 the existing port-8015 preview and refresh the cumulative diff from `ea7256bd`
 after integrated batches. Finish only when the remaining full-review count is
 zero and source, rendering and browser checks pass.
+
+## Completion
+
+All 2,442 assigned entries passed full review and independent integration checks.
+The fixed 3,491-entry corpus has zero pending or stale full reviews. The two
+entries added after the baseline also passed full current-source reviews.
+There are 120 cumulative content corrections, 66 more than at this batch's
+start. Metadata-only edits are excluded from that correction count.
+
+The final checks rejected misleading source locators and generic review
+assertions, corrected convention errors, and restored two proposed changes
+that were mathematically wrong or unnecessarily weakened a valid theorem.
+The retained edits include connection and Maurer–Cartan signs, missing
+hypotheses, convex lecture formulas, and traceable research-advice exposition.
+The unsupported Euler shortcode and its rendering-check exception were deleted.
+Browser testing also removed an escaped, redundant search button.
+
+The canonical prerequisite graph has 3,491 nodes and 9,892 edges, with no
+cycles, missing targets, or self-dependencies. Source-section and external-link
+audits pass for all 3,493 files. The 102 Python tests pass. The strict production
+build has 3,491 canonical entries; the existing development preview includes
+its optional collection and has 4,677. Ten existing duplicate-alias warnings
+remain. The fixed-baseline progress and exact source-hash evidence are in
+`docs/refactor-progress.md` and the content repository's review ledger.
+
+Final validation passed: the full production HTML scan reports no errors;
+homepage, runtime, graph and built-reader browser checks pass. The three revised
+landing/post pages were checked at 320px and 1440px, including screenshots and
+search interaction. The graph smoke test now chooses a small mixed-review
+neighborhood so the display cap cannot hide the edge being tested.
+
+Content commits: `f65a3e03` (3,440-entry checkpoint) and `e93d52ff` (all
+reviews complete). The cumulative diff compares `ea7256bd` to `e93d52ff`, using
+the current renderer on both sides, at
+http://100.69.17.72:8015/review/content-changes/ .

@@ -5,9 +5,9 @@ Fixed content baseline: `ea7256bd`. Counts come from the review ledger and Git s
 | Measure | Count |
 |---|---:|
 | Knowls in the fixed starting corpus | 3,491 |
-| Starting knowls with a recorded content correction | 118 |
-| Starting knowls fully reviewed at their current source revision | 3,440 |
-| Starting knowls still requiring full review | 51 |
+| Starting knowls with a recorded content correction | 120 |
+| Starting knowls fully reviewed at their current source revision | 3,491 |
+| Starting knowls still requiring full review | 0 |
 | Starting knowls consolidated into compatibility redirects | 2 |
 | Full reviews invalidated by subsequent source changes | 0 |
 | Current canonical knowls (including collections) | 3,491 |

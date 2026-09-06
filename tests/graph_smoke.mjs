@@ -27,10 +27,14 @@ try {
     const bySource = new Map();
     for (const edge of data.edges) {
       if (!production.has(edge.source) || !production.has(edge.target)) continue;
-      if (!bySource.has(edge.source)) bySource.set(edge.source, new Set());
-      bySource.get(edge.source).add(Boolean(edge.reviewed));
+      if (!bySource.has(edge.source)) bySource.set(edge.source, []);
+      bySource.get(edge.source).push(Boolean(edge.reviewed));
     }
-    return [...bySource.entries()].find(([, reviews]) => reviews.has(true) && reviews.has(false))?.[0] || null;
+    // Prefer a small neighborhood so the display cap cannot hide the edge
+    // whose review filter this check exercises.
+    return [...bySource.entries()]
+      .filter(([, reviews]) => reviews.includes(true) && reviews.includes(false))
+      .sort((a, b) => a[1].length - b[1].length)[0]?.[0] || null;
   });
   if (!mixedFocus) throw new Error("Dependency graph has no concept with both reviewed and unreviewed links");
   await page.goto(`${baseUrl}/graph/?focus=${encodeURIComponent(mixedFocus)}`);
