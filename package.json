@@ -10,7 +10,9 @@
     "playwright:install": "playwright install chromium",
     "test:ui": "node tests/runtime_smoke.mjs",
     "test:home-ui": "node tests/homepage_smoke.mjs",
-    "test:graph-ui": "node tests/graph_smoke.mjs"
+    "test:graph-ui": "node tests/graph_smoke.mjs",
+    "test:graph-model": "node tests/graph_model.cjs",
+    "test:graph-views": "node tests/graph_views.mjs"
   },
   "dependencies": {
     "katex": "^0.16.22"

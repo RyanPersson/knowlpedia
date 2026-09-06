@@ -27,6 +27,14 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+# The compiler is also loaded directly by the test suite, so make its sibling
+# algorithm module importable in both ``python packages/compiler/...`` and
+# importlib-based callers.
+_COMPILER_DIR = str(Path(__file__).resolve().parent)
+if _COMPILER_DIR not in sys.path:
+    sys.path.insert(0, _COMPILER_DIR)
+from graph_algorithms import cycle_witnesses
+
 
 WIKILINK_RE = re.compile(
     r"\[\[([A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)*(?:#[^\]|]+)?)(?:\|((?:[^\]]|\](?=\]\])|\](?!\]))*?))?\]\](?!\])"
@@ -1817,18 +1825,24 @@ def render_graph_page(
             f'<input id="graph-search" type="search" autocomplete="off" spellcheck="false" placeholder="Try {escape_attr(default_title)}" aria-controls="graph-search-results">',
             '<div id="graph-search-results" class="graph-search-results" hidden></div>',
             '</div>',
-            '<label class="graph-depth-label" for="graph-depth">Depth<select id="graph-depth"><option value="1">1 step</option><option value="2" selected>2 steps</option><option value="3">3 steps</option></select></label>',
+            '<label class="graph-depth-label graph-view-label" for="graph-view">View<select id="graph-view" aria-label="View"><option value="neighborhood">Neighborhood</option><option value="subjects">Subjects</option><option value="components">Components</option></select></label>',
+            '<label class="graph-depth-label" for="graph-depth">Depth<select id="graph-depth" aria-label="Depth"><option value="1" selected>1 step</option><option value="2">2 steps</option><option value="3">3 steps</option></select></label>',
             '<button type="button" id="graph-orientation" class="graph-tool-button" aria-label="Switch to vertical layout">Vertical</button>',
+            '<button type="button" id="graph-cluster-back" class="graph-tool-button" hidden>All clusters</button>',
             '<button type="button" id="graph-fit" class="graph-tool-button">Fit</button>',
             '</div>',
             '<div class="graph-stage" id="graph-stage">',
-            '<div class="graph-status" id="graph-status" role="status">Loading dependency data…</div>',
-            '<svg id="dependency-map" class="dependency-map" role="img" aria-labelledby="graph-map-title graph-map-description">',
+            '<section id="graph-clusters" class="graph-clusters" aria-label="Graph clusters" hidden></section>',
+            '<div class="graph-zoom" aria-label="Graph zoom"><button id="graph-zoom-in" class="graph-tool-button" aria-label="Zoom in">+</button><button id="graph-zoom-out" class="graph-tool-button" aria-label="Zoom out">−</button></div>',
+            '<svg id="dependency-map" class="dependency-map" role="group" tabindex="0" aria-keyshortcuts="ArrowUp ArrowDown ArrowLeft ArrowRight + - Home" aria-labelledby="graph-map-title graph-map-description">',
             '<title id="graph-map-title">Knowlpedia dependency graph</title>',
             '<desc id="graph-map-description">Prerequisites flow toward concepts they unlock.</desc>',
             '<defs><marker id="graph-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs>',
             '<g class="graph-edge-layer"></g><g class="graph-node-layer"></g>',
             '</svg>',
+            '</div>',
+            '<div class="graph-footer">',
+            '<div class="graph-status" id="graph-status" role="status">Loading dependency data…</div>',
             '<div class="graph-legend" aria-label="Graph legend"><span><i class="legend-edge"></i> prerequisite flow</span><span><i class="legend-edge unreviewed"></i> unreviewed heuristic</span><span><i class="legend-node"></i> current knowl</span></div>',
             '</div>',
             '</section>',
@@ -2009,50 +2023,25 @@ def validate(registry: dict[str, Knowl]) -> list[ValidationMessage]:
 def validate_prerequisite_cycles(
     messages: list[ValidationMessage], registry: dict[str, Knowl]
 ) -> None:
-    """Reject authored prerequisite loops while allowing ordinary links to cycle."""
+    """Report every authored prerequisite cycle as an error.
 
-    state: dict[str, int] = {}
-    path: list[str] = []
-    reported: set[frozenset[str]] = set()
-
-    def visit(knowl_id: str) -> None:
-        state[knowl_id] = 1
-        path.append(knowl_id)
-        for target in registry[knowl_id].prerequisites:
-            base, _ = split_target(target)
-            if base not in registry:
-                continue
-            if state.get(base, 0) == 0:
-                visit(base)
-                continue
-            if state.get(base) != 1:
-                continue
-            cycle_start = path.index(base)
-            cycle = path[cycle_start:] + [base]
-            cycle_key = frozenset(cycle)
-            if cycle_key in reported:
-                continue
-            reported.add(cycle_key)
-            severity = (
-                "error"
-                if all(registry[item].dependency_review_count > 0 for item in cycle_key)
-                else "warning"
+    Missing targets are handled by normal validation.  They are omitted from
+    this graph so one malformed reference cannot fabricate a cycle.  SCCs are
+    used instead of recursive DFS, making validation safe for very long chains.
+    """
+    prerequisites = {
+        knowl_id: [split_target(target)[0] for target in knowl.prerequisites
+                   if split_target(target)[0] in registry]
+        for knowl_id, knowl in registry.items()
+    }
+    for cycle in cycle_witnesses(prerequisites):
+        messages.append(
+            ValidationMessage(
+                "error",
+                cycle[0],
+                "prerequisite cycle: " + " -> ".join(cycle),
             )
-            messages.append(
-                ValidationMessage(
-                    severity,
-                    knowl_id,
-                    "prerequisite cycle"
-                    + (" survived review: " if severity == "error" else " in unreviewed metadata: ")
-                    + " -> ".join(cycle),
-                )
-            )
-        path.pop()
-        state[knowl_id] = 2
-
-    for knowl_id in registry:
-        if state.get(knowl_id, 0) == 0:
-            visit(knowl_id)
+        )
 
 
 def wikilinks_in_text(text: str) -> list[str]:
@@ -2252,6 +2241,16 @@ def dependency_graph_json(registry: dict[str, Knowl]) -> dict[str, Any]:
     direction a learner would move through a topological ordering.
     """
 
+    prerequisites = {
+        knowl_id: [split_target(target)[0] for target in knowl.prerequisites
+                   if split_target(target)[0] in registry]
+        for knowl_id, knowl in registry.items()
+    }
+    cycles = cycle_witnesses(prerequisites)
+    if cycles:
+        formatted = "; ".join(" -> ".join(cycle) for cycle in cycles)
+        raise ValueError("Refusing to export cyclic prerequisite graph: " + formatted)
+
     nodes = [
         {
             "id": knowl.id,
@@ -2265,14 +2264,19 @@ def dependency_graph_json(registry: dict[str, Knowl]) -> dict[str, Any]:
             "fragment": fragment_href(knowl.id),
             "visibility": knowl.visibility,
         }
-        for knowl in registry.values()
+        for knowl in sorted(registry.values(), key=lambda item: item.id)
     ]
     edges = []
-    for knowl in registry.values():
+    seen_edges: set[tuple[str, str]] = set()
+    for knowl in sorted(registry.values(), key=lambda item: item.id):
         for prerequisite in knowl.prerequisites:
             source, _ = split_target(prerequisite)
             if source not in registry:
                 continue
+            edge_key = (source, knowl.id)
+            if edge_key in seen_edges:
+                continue
+            seen_edges.add(edge_key)
             edges.append(
                 {
                     "source": source,
@@ -2447,6 +2451,7 @@ def write_site_for_ids(
 
     messages = validate(registry)
     errors = [msg for msg in messages if msg.severity == "error"]
+    has_cycle = any("prerequisite cycle" in msg.message for msg in messages)
     if only_ids:
         missing = sorted(only_ids - set(registry))
         if missing:
@@ -2506,7 +2511,11 @@ def write_site_for_ids(
         write_compact_json(out_dir / "indexes" / "search.json", search_json(registry))
         write_json(out_dir / "indexes" / "relations.json", relations_json(registry))
         write_json(out_dir / "indexes" / "links.json", links_json(registry))
-        write_compact_json(out_dir / "indexes" / "dependencies.json", dependency_graph_json(registry))
+        # A cyclic graph is a fatal export error even when ordinary validation
+        # errors are explicitly allowed.  This keeps consumers from receiving
+        # an artifact that cannot have a learning order.
+        if not has_cycle:
+            write_compact_json(out_dir / "indexes" / "dependencies.json", dependency_graph_json(registry))
         write_json(out_dir / "indexes" / "proofs.json", proofs_json(registry))
         write_json(out_dir / "reports" / "validation.json", [msg.__dict__ for msg in messages])
         write_json(
@@ -2535,6 +2544,8 @@ def write_site_for_ids(
     if messages:
         for msg in messages:
             print(f"{msg.severity.upper()}: {msg.source}: {msg.message}", file=sys.stderr)
+    if has_cycle:
+        return 1
     if errors and not allow_validation_errors:
         return 1
     return 0

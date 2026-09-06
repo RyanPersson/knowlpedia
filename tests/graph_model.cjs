@@ -1,0 +1,23 @@
+const assert = require('node:assert/strict');
+const {rank, clusters} = require('../packages/static-runtime/graph.js');
+// A shortcut must never place a prerequisite at the same rank as its dependent.
+const edges = [{source:'a',target:'b'},{source:'b',target:'c'},{source:'a',target:'c'}];
+const levels = rank(['a','b','c','isolated'], edges);
+assert.equal(levels.get('c'), 2);
+for (const edge of edges) assert.ok(levels.get(edge.source) < levels.get(edge.target));
+assert.equal(rank(['a','b','c'], [...edges, edges[0]]).get('c'), 2);
+assert.throws(() => rank(['a'], [{source:'a',target:'a'}]), /cycle/);
+assert.throws(() => rank(['a','b'], [{source:'a',target:'b'}, {source:'b',target:'a'}]), /cycle/);
+const longIds = Array.from({length:10000}, (_,i) => String(i));
+assert.equal(rank(longIds, longIds.slice(1).map((id,i) => ({source:String(i), target:id}))).get('9999'), 9999);
+const nodes = new Map(['s/a','s/b','t/c','u/d'].map(id => [id, {id,title:id}]));
+const links = [{source:'s/a',target:'t/c'},{source:'t/c',target:'s/b'}];
+const connected = clusters(nodes, links, 'components');
+assert.deepEqual(connected.map(group => group.members.size), [3,1]);
+assert.equal(connected[0].edges, 2);
+const subjects = clusters(nodes, links, 'subjects');
+assert.deepEqual(subjects.map(group => group.members.size), [2,1,1]);
+assert.equal(subjects.reduce((n,g) => n+g.edges,0), 0);
+assert.deepEqual(clusters(new Map([...nodes].reverse()), [...links].reverse(), 'components'), connected);
+assert.deepEqual(rank([], []), new Map());
+console.log('Graph model tests passed: ranks, cycles, long chains, subjects, connected components.');

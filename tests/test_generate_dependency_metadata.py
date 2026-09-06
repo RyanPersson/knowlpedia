@@ -151,6 +151,33 @@ class DependencyMetadataTests(unittest.TestCase):
             self.assertEqual(metadata(target)["prerequisites"], [])
             self.assertEqual(stats["changed"], 2)
 
+    def test_semantic_cycle_repair_is_preserved_and_full_apply_is_idempotent(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            content = root / "content"
+            write_knowl(content / "base.knowl.md", "sample/base", "Base.")
+            target = content / "target.knowl.md"
+            write_knowl(
+                target, "sample/target", "A [[sample/base|base]].",
+                extra_meta=(
+                    'prerequisites = ["sample/base"]\n'
+                    'dependency_heuristic = "semantic-cycle-repair-v1"\n'
+                    "dependency_review_count = 0\n"
+                ),
+            )
+            original = target.read_text(encoding="utf-8")
+            args = argparse.Namespace(content_root=content, report=root / "report.jsonl",
+                                      sample_size=None, seed=1, paths_file=None, apply=True)
+            first = dependency_metadata.run(args)
+            self.assertEqual(first["changed"], 1)  # only the unmarked base receives metadata
+            self.assertEqual(target.read_text(encoding="utf-8"), original)
+            row = next(json.loads(line) for line in args.report.read_text().splitlines()
+                       if "sample/target" in line)
+            self.assertEqual(row["status"], "semantic_repair_preserved")
+            second = dependency_metadata.run(args)
+            self.assertEqual(second["changed"], 0)
+            self.assertEqual(target.read_text(encoding="utf-8"), original)
+
     def test_sampling_is_deterministic(self) -> None:
         items = [
             dependency_metadata.SourceKnowl(str(index), str(index), "definition", Path(str(index)), {}, "", "", "")
