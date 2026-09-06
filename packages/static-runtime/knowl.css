@@ -711,6 +711,29 @@ kbd {
   text-transform: uppercase;
 }
 
+.graph-review-filter-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  max-width: 9rem;
+  min-height: 44px;
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  line-height: 1.25;
+}
+
+.graph-review-filter-label input {
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+}
+
+.index-group-heading {
+  margin: 1.5rem 0 0.75rem;
+  font-family: var(--font-ui);
+  font-size: 1.15rem;
+}
+
 .core-section p,
 .section-body p {
   margin: 0 0 1rem;
@@ -2061,10 +2084,17 @@ mjx-container[display="true"] {
     align-items: end;
     gap: 0.4rem;
     padding: 0.48rem;
+    flex-wrap: wrap;
+  }
+
+  .graph-review-filter-label {
+    order: 5;
+    flex-basis: 100%;
+    max-width: none;
   }
 
   .graph-stage {
-    top: 92px;
+    top: 148px;
   }
 
   .graph-find {

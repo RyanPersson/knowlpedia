@@ -12,6 +12,7 @@ from scripts.generate_content_review import (
     modified_knowl_paths,
     parse_text,
     render_index,
+    render_complete_knowl,
     render_item_page,
     write_diff_plan,
     write_patch_chunks,
@@ -271,6 +272,13 @@ Old definition.
             self.assertIn("+++ b/content/example.knowl.md", patch)
             self.assertIn("-baseline", patch)
             self.assertIn("+proposed", patch)
+
+    def test_redirect_comparison_displays_canonical_mathematics(self):
+        old = parse_text('+++\nid="old"\ntitle="Old"\nkind="definition"\nsummary="Moved"\nredirect_to="new"\n+++\n', "old")
+        new = parse_text('+++\nid="new"\ntitle="New"\nkind="definition"\nsummary="Canonical"\n+++\nCanonical mathematical content.', "new")
+        rendered = render_complete_knowl(old, {"old": old, "new": new})
+        self.assertIn("Consolidated into", rendered)
+        self.assertIn("Canonical mathematical content", rendered)
 
 
 if __name__ == "__main__":

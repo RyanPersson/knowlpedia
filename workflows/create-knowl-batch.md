@@ -8,20 +8,14 @@ end.
 The commands below assume that knowlpedia and knowlpedia-content are sibling
 repositories and that the shell is in knowlpedia.
 
-## 1. Synchronize and branch
+## 1. Establish the working state
 
-Update develop in both repositories before auditing the corpus:
+Inspect both repositories and record the current branch and starting commits
+before auditing the corpus. Preserve a user-provided feature branch; do not
+switch branches as a workflow prerequisite. If a new branch is needed, create
+the same feature branch name in both repositories.
 
-~~~bash
-git switch develop
-git pull --ff-only
-
-git -C ../knowlpedia-content switch develop
-git -C ../knowlpedia-content pull --ff-only
-~~~
-
-Create the same feature branch name in both repositories. Record the two
-starting commits in a batch plan under docs/.
+Record the two starting commits in a batch plan under docs/.
 
 ## 2. Build a semantic inventory before assigning IDs
 
@@ -46,7 +40,8 @@ whether each item is:
 Reserve accepted IDs in the batch plan before writing files. If one page owns
 multiple independently reusable concepts, split it. If two proposed pages
 describe the same object from different presentations, choose one canonical
-owner and link the presentations.
+owner and link the presentations. Preserve stable IDs and incoming URLs; use
+redirect_to and redirect_sections when consolidation changes ownership.
 
 ## 3. Research conventions and scope
 
@@ -70,9 +65,11 @@ Each file begins with valid front matter containing at least id, title, kind,
 summary, aliases, domains, and section_mode.
 
 The text before the first level-two heading is the collapsible core. Keep it
-short and axiomatic: state the definition or theorem with all necessary
-hypotheses, but defer motivation, examples, equivalent formulations, caveats,
-and literature discussion to progressive sections.
+compact but self-contained: state the definition or theorem with all necessary
+hypotheses and the conventions needed to interpret it. Include a brief verbal
+explanation when formulas alone obscure the structure. Put longer motivation,
+examples, equivalent formulations, and literature discussion in progressive
+sections; never defer a qualification that changes the core statement.
 
 Add knowl links while writing when the intended target is unambiguous. Link a
 technical term on its first useful occurrence; do not saturate prose with
@@ -81,10 +78,11 @@ repeated links.
 End substantive pages with references that identify a relevant section,
 theorem, chapter, or other locator whenever practical.
 
-## 5. Close indexes and dependencies
+## 5. Close dependencies and discovery
 
-Add each new page to its subject index. For a large batch, create a permanent
-dependency-ordered expansion index that:
+Update an existing subject index only when the repository's discovery model
+requires it. A permanent dependency-ordered expansion index is optional and
+must not be introduced solely to close a batch. If one is useful, it should:
 
 - lists the new and reused prerequisites;
 - explains the bridges between subject areas;
@@ -145,9 +143,32 @@ Apply the reviewed scope only after the sample behaves conservatively:
 
 Generated metadata starts with `dependency_review_count = 0`. A later human or
 AI dependency review must inspect the complete list, correct it, and increment
-the counter. The generator preserves metadata with a positive review count.
+the counter. The generator preserves metadata with a positive review count. A
+dependency review is distinct from a targeted or full content review: it
+verifies the complete prerequisite list and its provenance, but does not
+certify the prose.
 
-## 8. Validate source and structure
+## 8. Record review evidence and validate structure
+
+Maintain reviews/refactor-ledger.json. Each entry declares scope (full,
+targeted, or dependencies) and outcome (corrected, reviewed_unchanged,
+redirected, or new). Full reviews also record the current source sha256 and
+concrete source evidence; a later edit invalidates that full review. Targeted
+reviews record their bounded claim or section. Dependency reviews record the
+complete list reviewed. A metadata-only prerequisite change is not a content
+correction.
+
+Use the progress script to report the fixed baseline and pending IDs:
+
+~~~bash
+python3 scripts/review_progress.py --content-repo ../knowlpedia-content --output docs/refactor-progress.md
+python3 scripts/review_progress.py --content-repo ../knowlpedia-content --json
+~~~
+
+The cumulative refactor baseline is fixed at the content commit recorded in
+the ledger (currently ea7256bd). Do not replace it with a moving branch tip.
+
+## 9. Validate source and structure
 
 Run the cheap checks first:
 
@@ -163,7 +184,7 @@ The scope audit is a review report. Inspect every new-page finding; do not
 silence it mechanically. A finding may reveal a bundled definition or a
 semantic duplicate that title matching missed.
 
-## 9. Build and inspect rendered output
+## 10. Build and inspect rendered output
 
 For a live-site-only development build, explicitly exclude unrelated optional
 content sources:
@@ -200,7 +221,7 @@ into math, malformed subscripts, oversized formulas, awkward line wrapping,
 broken links, and cores that are too long to work well inline. A browser
 spot-check is a required completion step for a knowl batch.
 
-## 10. Generate a review and commit
+## 11. Generate a review and commit
 
 After committing the content branch, generate a review directly from the
 content repository so optional content sources are not composed:
@@ -209,17 +230,18 @@ content repository so optional content sources are not composed:
 .venv/bin/python scripts/generate_content_review.py \
   --content-repo ../knowlpedia-content \
   --output public-imported/review/content-changes \
-  --left-ref develop \
-  --right-ref HEAD \
-  --left-label "develop · existing" \
-  --right-label "HEAD · proposed" \
+  --left-label "baseline · existing" \
+  --right-label "working tree · proposed" \
   --heading "Knowl changes" \
   --include-added
 ~~~
 
 Keep mathematical authorship, broad mechanical interlinking, and application
 tooling in separate commits when that separation makes the review clearer.
-Before handoff, confirm both worktrees are clean and report:
+Before committing, run git diff --check against the working tree and inspect
+the generated review. For a cumulative final review, use the fixed baseline
+explicitly (ea7256bd..HEAD) after the content commit. Before handoff, confirm
+both worktrees are clean and report:
 
 - branch and commit IDs;
 - numbers of new and expanded knowls;

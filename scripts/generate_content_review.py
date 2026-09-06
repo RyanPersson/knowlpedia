@@ -196,7 +196,17 @@ def parse_text(text: str, label: str) -> compiler.Knowl:
 
 
 def render_complete_knowl(knowl: compiler.Knowl, registry: dict[str, compiler.Knowl]) -> str:
+    moved = ""
+    seen: set[str] = set()
+    while knowl.redirect_to and knowl.redirect_to in registry and knowl.id not in seen:
+        seen.add(knowl.id)
+        knowl = registry[knowl.redirect_to]
+    if seen:
+        moved = (f'<p class="review-consolidation">Consolidated into '
+                 f'<a href="{compiler.escape_attr(compiler.target_href(knowl.id))}">'
+                 f'{html.escape(knowl.title)}</a>. Canonical content follows.</p>')
     parts = [
+        moved,
         '<article class="review-knowl">',
         '<header class="review-knowl-header">',
         f'<p class="kind">{html.escape(compiler.display_kind(knowl.kind))}</p>',

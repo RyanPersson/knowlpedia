@@ -34,6 +34,15 @@ try {
   if ((await page.locator(".search-result").first().locator("strong").textContent()) !== "Hilbert space") {
     throw new Error("Homepage search does not rank an exact concept first");
   }
+  await search.fill("Gelfand–Naimark–Segal construction");
+  if ((await page.locator(".search-result").first().getAttribute("href")) !== "/operator-algebras/gns-construction/") {
+    throw new Error("Standard GNS alias did not retrieve its canonical concept");
+  }
+  await search.fill("field");
+  const fieldResults = page.locator(".search-result");
+  if (await fieldResults.count() < 2) throw new Error("Ambiguous field query lost distinct results");
+  const descriptions = await fieldResults.locator(".search-result-summary").allTextContents();
+  if (new Set(descriptions.filter(Boolean)).size < 2) throw new Error("Ambiguous results lack distinct scope descriptions");
   await search.press("Escape");
 
   const graphHref = await page.getByRole("link", { name: /Dependency graph/ }).getAttribute("href");
@@ -51,7 +60,7 @@ try {
     Number.parseFloat(getComputedStyle(heading).fontSize)
   );
   if (desktopHeadingSize > 32) throw new Error("Desktop homepage heading is oversized");
-  if ((await page.locator(".start-subjects").evaluate((section) => section.getBoundingClientRect().top)) > 650) {
+  if ((await page.locator(".start-subjects:not(.start-collections)").evaluate((section) => section.getBoundingClientRect().top)) > 650) {
     throw new Error("Homepage subjects do not begin in the first desktop viewport");
   }
 
@@ -92,10 +101,19 @@ try {
   if (!indexText.includes("Mathematical knowledge, connected") || !indexText.includes("Open a definition without losing your place")) {
     throw new Error("Index orientation copy is missing");
   }
-  if (indexText.includes("production knowls")) throw new Error("Reader-facing index exposes build-profile terminology");
-  for (const subject of ["knowlification", "posts", "search"]) {
-    if ((await page.locator(`#subject-${subject}`).count()) !== 0) throw new Error(`Meta subject ${subject} leaked into the index`);
+  if ((await page.locator(".index-hero").textContent()).includes("production knowls")) throw new Error("Reader-facing index exposes build-profile terminology");
+  if ((await page.locator("#subject-search").count()) !== 0) throw new Error("Internal search page leaked into the directory");
+  for (const subject of ["knowlification", "posts", "langlands-letter", "shale-paper"]) {
+    if ((await page.locator(`#subject-${subject}[data-directory-kind="collection"]`).count()) !== 1) {
+      throw new Error(`Source collection ${subject} is missing or mixed with subjects`);
+    }
   }
+  if (!(await page.locator("#subject-algebra-topological > summary").textContent()).includes("Topological algebra")) {
+    throw new Error("Topological algebra still has a mechanical directory label");
+  }
+
+  await page.locator("#subject-filter").fill("Shale");
+  if ((await page.locator(".index-section:visible").count()) !== 1) throw new Error("Collection search lost its source entry");
 
   await page.locator("#subject-filter").fill("differential");
   const visibleSubjectNames = await page.locator(".index-section:visible > summary > span:first-child").allTextContents();

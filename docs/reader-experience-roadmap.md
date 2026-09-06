@@ -72,7 +72,7 @@ This review does not standardize the corpus-wide meaning of “ring.”
 
 ## Milestone 2 — Review complete mathematical reading paths
 
-Status: planned. Depends on milestone 1's interaction baseline.
+Status: complete (2026-09-05). Bounded paths and remaining assumptions are recorded in [refactor-reading-paths.md](refactor-reading-paths.md).
 
 Start with two bounded neighborhoods: vector space → inner product space →
 Hilbert space → a GNS reading path, and the ring foundations reviewed above.
@@ -96,7 +96,7 @@ Do not add path-generation algorithms at this stage.
 
 ## Milestone 3 — Organize discovery around readers
 
-Status: planned. Use the reviewed paths to test navigation decisions.
+Status: complete (2026-09-05). Subject and source browsing remain separate presentations of stable IDs.
 
 - Separate mathematical subject browsing from source/paper collections in the
   homepage and index presentation, without moving content or changing URLs.
@@ -113,7 +113,7 @@ changes do not silently remove knowls from discovery or rename stable IDs.
 
 ## Milestone 4 — Consolidate duplicates and bundled records
 
-Status: planned. Redirect support must precede destructive consolidation.
+Status: complete (2026-09-05). Two proven duplicates have compatibility redirects; the integration bundle links four atomic results.
 
 - Build a small semantic manifest from known candidates: composition of
   functions, orthonormal frame bundles, and elementary Riemann-integral results.
@@ -130,7 +130,7 @@ Do not batch-delete files merely because titles or formulas look similar.
 
 ## Milestone 5 — Consolidate the workflow
 
-Status: planned after the earlier milestones demonstrate useful practices.
+Status: complete (2026-09-05). Updated the existing batch workflow and content editorial guidance.
 
 Update the existing authoring workflow with the successful reading exercises,
 convention checks, and source-review expectations. Remove conflicting guidance
@@ -231,10 +231,91 @@ It does not claim the neighboring lists have received the same review.
 - Both repository diffs pass whitespace checks. Work remains uncommitted on
   `astra-refactor`; no deployment or merge was performed.
 
-Next work is milestone 2: review full reading paths and their conventions before
-expanding the reviewed graph or beginning subject regrouping and deduplication.
+The next planned batch is documented in [refactor-fanout.md](refactor-fanout.md).
+Milestones 2–5 were completed in the subsequent batch described below.
 
 Milestone 1 content review was regenerated and browser-checked: seven knowls,
 including the four metadata-only edits. Live review:
 http://100.69.17.72:8015/review/content-changes/ . Both panes use the current
 renderer; this review compares content, not historical versions of the UI.
+
+
+### Milestones 2–5 delivery (2026-09-05)
+
+The functional and ring lanes reviewed 23 complete pages. Corrections include
+scalar-field restrictions, the common additive identity in the vector-space
+axioms, conjugation in polynomial inner products, almost-everywhere classes in
+L², the zero-functional GNS case, and the hypotheses for the ideal
+characterization of fields. The reading-path note records checked conventions,
+source locators, and prerequisites outside this batch. Source review rejected
+incorrect chapter citations and replaced them with substantive accessible
+references. The ledger records AI editorial review, not independent certification.
+
+The graph's reviewed-only checkbox filters edges before traversal, preserves
+the selected concept, explains empty neighborhoods, and persists the mode in
+the URL. Its review statement applies to a node's direct prerequisite list.
+
+Homepage/index browsing now separates subjects from source collections, including
+Langlands' letter, Shale's paper, historical expansion guides, and posts. Editorial
+labels replace mechanical word order. The existing Analysis section mixes
+absolute continuity with porosity and uncertainty geometry, Real Analysis covers
+the introductory sequence, and Convex Analysis includes its own background
+prerequisites. These are overlapping scopes, not interchangeable owners; they
+were not mechanically merged. Discovery tests cover an exact title (Hilbert
+space), a standard alias (Gelfand–Naimark–Segal construction), and distinct scope
+descriptions for the ambiguous query “field.”
+
+Composition of functions and the Riemannian orthonormal-frame specialization
+now redirect to their canonical owners. Old page URLs, core fragments, and
+historical example/remark fragments remain available; canonical search entries
+retain retired titles and aliases. Chained redirects compose section mappings;
+missing targets and cycles produce validation errors. Dependency exports use
+canonical IDs. The cumulative diff shows the canonical mathematics beside the
+historical source, instead of an empty redirect stub.
+
+The former combined integration theorem is now a reading guide to Riemann and
+Riemann–Stieltjes linearity and interval additivity. The two additivity results
+are new atomic pages. The Stieltjes page distinguishes the local mesh-limit
+definition from the cited upper/lower-sum formulation instead of assuming their
+unqualified equivalence.
+
+The existing authoring workflow now preserves supplied branches, keeps essential
+hypotheses in the core, makes extra expansion indexes optional, and distinguishes
+full, targeted, and dependency-only review. Progress is recorded in the content
+repository's `reviews/refactor-ledger.json`; source hashes invalidate stale full
+reviews. [Current statistics](refactor-progress.md): 18 starting knowls corrected,
+23 fully reviewed, 3,468 still requiring full review, two compatibility redirects,
+two new knowls, and 30 prerequisite lists with recorded reviews. These measures
+overlap and must not be added together. The denominator remains the 3,491-source
+starting corpus, including collections.
+
+Verification:
+
+- 101 Python tests pass, including real chained-redirect builds, selective old-ID
+  builds, canonical dependency exports, review rendering, and stale-review counts.
+- Homepage, graph, and runtime browser suites pass against the existing preview.
+  Standalone reading-flow checks and built-page checks at 320/390/1440px pass.
+  Final mobile spot checks include vector space, inner product space, field,
+  positive functional, and Stieltjes additivity. Reviewed graph screenshots were
+  inspected at all three widths.
+- Production contains 3,491 canonical entries from 3,493 sources (two redirects).
+  The existing development preview retains its optional conjecture collection
+  and contains 4,677 canonical entries. Both builds have zero validation errors
+  and 577 existing warnings: 567 unreviewed cycle warnings and ten alias warnings.
+- The source-section audit passes for all 3,493 sources; the new external-reference
+  syntax audit passes. The full production HTML scan passes with rendered
+  diagrams and production-profile isolation required. This is separate from
+  semantic review.
+- The cumulative review contains 34 comparisons, including two additions.
+  Browser checks cover filtering, sorting, both panes, consolidation destinations,
+  both retired page URLs, and their historical example fragments.
+
+Content baseline checkpoint: `4c48c37c`; milestone completion: `c1e30e06`.
+Compiler baseline checkpoint: `4ee8847`. Work is committed to `astra-refactor`;
+no production publication, push, or merge is part of this delivery. The existing
+`knowlpedia-astra-benchmark` service continues to serve port 8015.
+
+Live cumulative review: http://100.69.17.72:8015/review/content-changes/ .
+It compares content `ea7256bd` to `c1e30e06` using the current renderer on both
+sides. The next fan-out is a plan for 60 existing pending knowls in five lanes,
+followed by independent cross-review; that larger batch has not been executed.

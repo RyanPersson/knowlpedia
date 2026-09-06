@@ -468,7 +468,7 @@ class RenderContractTests(unittest.TestCase):
         self.assertRegex(graph, r'/assets/graph\.js\?v=[0-9a-f]{12}')
         self.assertRegex(homepage, r'/assets/knowl\.css\?v=[0-9a-f]{12}')
 
-    def test_meta_subjects_are_excluded_from_reader_directories(self) -> None:
+    def test_source_collections_are_discoverable_separately_from_subjects(self) -> None:
         registry = {}
         for knowl_id in ("analysis/concept", "knowlification/batch", "posts/note", "search"):
             knowl = self.make_knowl()
@@ -480,9 +480,14 @@ class RenderContractTests(unittest.TestCase):
         index = compiler.render_index(registry, package)
         self.assertIn('subject-analysis', homepage)
         self.assertIn('subject-analysis', index)
-        for subject in ("knowlification", "posts", "search"):
-            self.assertNotIn(f'subject-{subject}', homepage)
-            self.assertNotIn(f'subject-{subject}', index)
+        for subject in ("knowlification", "posts"):
+            self.assertIn(f'subject-{subject}', homepage)
+            self.assertIn(f'subject-{subject}', index)
+        self.assertIn('class="start-subjects start-collections"', homepage)
+        self.assertIn('data-directory-kind="collection"', index)
+        self.assertIn('Sources and collections', index)
+        self.assertNotIn('subject-search', homepage)
+        self.assertNotIn('subject-search', index)
 
     def test_large_knowl_index_uses_visible_lazy_loading_without_inline_templates(self) -> None:
         targets = {

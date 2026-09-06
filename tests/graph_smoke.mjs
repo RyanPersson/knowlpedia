@@ -19,6 +19,42 @@ try {
   await page.locator(".map-node").first().waitFor();
   await page.locator("#graph-viewer-content .knowl-content").waitFor();
 
+  const reviewFilter = page.locator("#graph-review-filter");
+  await reviewFilter.waitFor();
+  const mixedFocus = await page.evaluate(async () => {
+    const data = await (await fetch("/indexes/dependencies.json")).json();
+    const production = new Set(data.nodes.filter((node) => node.visibility === "production").map((node) => node.id));
+    const bySource = new Map();
+    for (const edge of data.edges) {
+      if (!production.has(edge.source) || !production.has(edge.target)) continue;
+      if (!bySource.has(edge.source)) bySource.set(edge.source, new Set());
+      bySource.get(edge.source).add(Boolean(edge.reviewed));
+    }
+    return [...bySource.entries()].find(([, reviews]) => reviews.has(true) && reviews.has(false))?.[0] || null;
+  });
+  if (!mixedFocus) throw new Error("Dependency graph has no concept with both reviewed and unreviewed links");
+  await page.goto(`${baseUrl}/graph/?focus=${encodeURIComponent(mixedFocus)}`);
+  await page.locator(".map-node.current").waitFor();
+  const allNodeIds = await page.locator(".map-node").evaluateAll((items) => items.map((item) => item.dataset.nodeId).sort());
+  const allEdges = await page.locator(".map-edge").count();
+  await reviewFilter.check();
+  if (new URL(page.url()).searchParams.get("review") !== "reviewed") throw new Error("Reviewed-only filter is not reflected in the URL");
+  const reviewedNodeIds = await page.locator(".map-node").evaluateAll((items) => items.map((item) => item.dataset.nodeId).sort());
+  const reviewedEdges = await page.locator(".map-edge").count();
+  if (reviewedEdges >= allEdges || reviewedNodeIds.join("\n") === allNodeIds.join("\n")) {
+    throw new Error("Reviewed-only mode did not change the focused neighborhood");
+  }
+  if (!(await page.locator(`.map-node.current[data-node-id="${mixedFocus}"]`).count())) throw new Error("Reviewed-only mode lost the focused node");
+  if (!/reviewed-only mode hides/i.test(await page.locator("#graph-status").textContent())) throw new Error("Reviewed-only empty/filter state is not explained");
+  await page.goBack();
+  await page.waitForFunction(() => !new URL(location.href).searchParams.has("review"));
+  if (await reviewFilter.isChecked()) throw new Error("Back navigation did not restore all-edge mode");
+  await page.goForward();
+  await page.waitForFunction(() => new URL(location.href).searchParams.get("review") === "reviewed");
+  if (!(await reviewFilter.isChecked())) throw new Error("Forward navigation did not restore reviewed-only mode");
+  await page.goto(`${baseUrl}/graph/`);
+  await page.locator(".map-node.current").waitFor();
+
   const nodeCount = await page.locator(".map-node").count();
   if (nodeCount < 2 || nodeCount > 84) throw new Error(`Focused graph has an invalid node count: ${nodeCount}`);
   if (!(await page.locator(".map-node.current").isVisible())) throw new Error("Current concept is not highlighted");

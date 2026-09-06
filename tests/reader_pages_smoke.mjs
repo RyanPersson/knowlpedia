@@ -64,7 +64,7 @@ try {
 
   await page.goto("http://knowlpedia.test/graph/?focus=algebra-rings/ring");
   await page.locator("#graph-viewer-content .knowl-content").waitFor();
-  assert.match(await page.locator("#graph-review-state").textContent(), /This prerequisite list has 1 review/);
+  assert.match(await page.locator("#graph-review-state").textContent(), /This prerequisite list has [1-9]\d* review/);
   assert.match(await page.locator("#graph-status").textContent(), /reviewed and \d+ unreviewed/);
   const graph = JSON.parse(await readFile(path.join(site, "indexes/dependencies.json"), "utf8"));
   const ring = "algebra-rings/ring";

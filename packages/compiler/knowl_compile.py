@@ -59,7 +59,32 @@ OLD_HUGO_TOPIC_LINKS = [
 ]
 
 GRAPH_DEFAULT_FOCUS = "linear-algebra/vector-space"
-DIRECTORY_EXCLUDED_SUBJECTS = frozenset({"knowlification", "posts", "search"})
+DIRECTORY_EXCLUDED_SUBJECTS = frozenset({"search"})
+SOURCE_COLLECTIONS = {
+    "langlands-letter": "Langlands's letter",
+    "shale-paper": "Shale's paper",
+    "knowlification": "Source expansion guides",
+    "posts": "Long-form documents",
+}
+SUBJECT_TITLES = {
+    "algebra-category-theory": "Category theory",
+    "algebra-coalgebras": "Coalgebras",
+    "algebra-commutative": "Commutative algebra",
+    "algebra-fields-galois": "Fields and Galois theory",
+    "algebra-groups": "Groups",
+    "algebra-homological": "Homological algebra",
+    "algebra-hyperstructures": "Hyperstructures, semirings, and blueprints",
+    "algebra-modules": "Modules",
+    "algebra-representation-theory": "Representation theory",
+    "algebra-rings": "Rings",
+    "algebra-topological": "Topological algebra",
+    "algebraic-geometry-foundations": "Algebraic geometry",
+    "analysis": "Analysis: geometric and quantitative tools",
+    "formal-groups": "Formal groups",
+    "nonassociative-algebra": "Nonassociative and Jordan algebras",
+    "shared-foundations": "Foundations",
+    "stat-mech-quantum": "Quantum statistical mechanics",
+}
 
 PROFILE_NAMES = ("development", "production")
 
@@ -627,6 +652,47 @@ class Knowl:
     visibility: str = "production"
     anchors: set[str] = field(default_factory=set)
     content_hash: str = ""
+    redirect_to: str | None = None
+    redirect_sections: dict[str, str] = field(default_factory=dict)
+
+
+class AliasRegistry(dict[str, Knowl]):
+    """Canonical knowls with legacy IDs resolving through the mapping."""
+
+    def __init__(self, canonical: dict[str, Knowl], aliases: dict[str, str], redirects: dict[str, Knowl] | None = None):
+        super().__init__(canonical)
+        self.aliases = aliases
+        self._redirects = redirects or {}
+
+    def canonical_id(self, knowl_id: str) -> str:
+        seen: set[str] = set()
+        while knowl_id in self.aliases and knowl_id not in seen:
+            seen.add(knowl_id)
+            knowl_id = self.aliases[knowl_id]
+        return knowl_id
+
+    def __contains__(self, key: object) -> bool:
+        return dict.__contains__(self, key) or (isinstance(key, str) and key in self.aliases)
+
+    def __getitem__(self, key: str) -> Knowl:
+        return dict.__getitem__(self, self.canonical_id(key))
+
+    def get(self, key: str, default: Knowl | None = None) -> Knowl | None:
+        return dict.get(self, self.canonical_id(key), default)
+
+    def canonical_target(self, target: str) -> str:
+        base, anchor = split_target(target)
+        current = base
+        seen: set[str] = set()
+        while current in self.aliases and current not in seen:
+            seen.add(current)
+            redirect = self._redirects.get(current)
+            if redirect and anchor:
+                prefix = "section." if anchor.startswith("section.") else ""
+                section = anchor.removeprefix("section.")
+                anchor = prefix + redirect.redirect_sections.get(section, section)
+            current = self.aliases[current]
+        return current + (f"#{anchor}" if anchor else "")
 
 
 def read_toml(path: Path) -> dict[str, Any]:
@@ -674,6 +740,32 @@ def section_fragment_href(knowl_id: str, section_id: str) -> str:
 
 def escape_attr(value: str) -> str:
     return html.escape(value, quote=True)
+
+
+def canonical_target(registry: dict[str, Knowl], target: str) -> str:
+    if isinstance(registry, AliasRegistry):
+        return registry.canonical_target(target)
+    base, anchor = split_target(target)
+    return base + (f"#{anchor}" if anchor else "")
+
+
+def render_redirect_page(redirect: Knowl, destination: str, profile: BuildProfile, section_map: dict[str, str] | None = None) -> str:
+    """A static fallback for a retired page URL, with a crawlable canonical link."""
+    mapping = json.dumps(section_map or redirect.redirect_sections, separators=(",", ":")).replace("</", "<\\/")
+    body = (
+        '<main class="page-shell redirect-page" id="main-content">'
+        f'<p>This knowl moved to <a href="{escape_attr(destination)}">the canonical page</a>.</p>'
+        f'<script>(function(){{var m={mapping},h=location.hash.slice(1),k=h.indexOf("section.")==0?h.slice(8):h;location.replace({json.dumps(destination)}+(m[k]?"#section."+encodeURIComponent(m[k]):location.hash));}}());</script>'
+        '</main>'
+    )
+    return html_document(
+        f"Moved: {redirect.title}",
+        body,
+        preload_mode="none",
+        profile=profile,
+        canonical_url=destination,
+        redirect_url=destination,
+    )
 
 
 def protect_math(text: str) -> tuple[str, dict[str, str]]:
@@ -852,6 +944,15 @@ def knowl_from_meta(
     missing = [field_name for field_name in required if not meta.get(field_name)]
     if missing:
         raise ValueError(f"{source_path}: missing required fields: {', '.join(missing)}")
+    redirect_to = meta.get("redirect_to")
+    redirect_sections = meta.get("redirect_sections", {})
+    if redirect_to is not None and (not isinstance(redirect_to, str) or not redirect_to.strip()):
+        raise ValueError(f"{source_path}: redirect_to must be a nonempty string")
+    if not isinstance(redirect_sections, dict) or not all(
+        isinstance(key, str) and isinstance(value, str) and key and value
+        for key, value in redirect_sections.items()
+    ):
+        raise ValueError(f"{source_path}: redirect_sections must map nonempty strings to nonempty strings")
 
     core_meta = meta.get("core", {})
     knowl = Knowl(
@@ -872,6 +973,8 @@ def knowl_from_meta(
         sections=sections or [],
         relations=list(meta.get("relations", [])),
         knowls_open=bool(meta.get("knowls_open", False)),
+        redirect_to=redirect_to,
+        redirect_sections=dict(redirect_sections),
     )
     knowl.anchors.add("section.core")
     for item in knowl.core_data:
@@ -966,10 +1069,13 @@ def render_inline(text: str, registry: dict[str, Knowl]) -> str:
         target = html.unescape(match.group(1).strip())
         label = html.unescape(match.group(2).strip()) if match.group(2) else target_label(target)
         base, _ = split_target(target)
+        canonical_target_value = canonical_target(registry, target)
+        canonical, _ = split_target(canonical_target_value)
         class_name = "knowl"
         attrs = ""
-        if base in registry:
-            attrs = f' data-knowl="{escape_attr(fragment_href(base))}"'
+        if canonical in registry:
+            target = canonical_target_value
+            attrs = f' data-knowl="{escape_attr(fragment_href(canonical))}"'
         else:
             class_name = "missing-knowl"
         return (
@@ -1521,6 +1627,8 @@ def preload_template_targets(knowl: Knowl, registry: dict[str, Knowl]) -> list[s
 
     def add(target: str) -> None:
         base, _ = split_target(target)
+        if isinstance(registry, AliasRegistry):
+            base = registry.canonical_id(base)
         if base in registry and base not in targets:
             targets.append(base)
 
@@ -1636,6 +1744,8 @@ def html_document(
     preload_mode: str = "eager",
     profile: BuildProfile = BUILD_PROFILES["development"],
     page_script: str | None = None,
+    canonical_url: str | None = None,
+    redirect_url: str | None = None,
 ) -> str:
     asset_version = runtime_asset_version()
     math_script = ""
@@ -1709,12 +1819,15 @@ __PALETTE_SCRIPT__
         if page_script
         else ""
     )
+    canonical_tags = (f'  <link rel="canonical" href="{escape_attr(canonical_url)}">\n' if canonical_url else "")
+    redirect_script = (f'  <noscript><meta http-equiv="refresh" content="0;url={escape_attr(redirect_url)}"></noscript>\n' if redirect_url else "")
     return f"""<!doctype html>
 <html lang="en" data-knowlpedia-profile="{escape_attr(profile.name)}" data-knowlpedia-development-content="{str(profile.include_development_content).lower()}" data-knowlpedia-testing-ui="{str(profile.show_testing_ui).lower()}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{html.escape(title)}</title>
+{canonical_tags}{redirect_script}
 {config_script}
 {theme_script}
   <link rel="stylesheet" href="/assets/katex.min.css?v={asset_version}">
@@ -1753,22 +1866,32 @@ __PALETTE_SCRIPT__
 """
 
 
+def directory_title(subject_id: str) -> str:
+    return SOURCE_COLLECTIONS.get(subject_id, SUBJECT_TITLES.get(subject_id, humanize_identifier(subject_id)))
+
+
+def directory_groups(registry: dict[str, Knowl]) -> dict[str, list[Knowl]]:
+    grouped: dict[str, list[Knowl]] = {}
+    for knowl in registry.values():
+        subject_id = knowl.id.split("/", 1)[0]
+        if knowl.visibility == "production" and not knowl.redirect_to and subject_id not in DIRECTORY_EXCLUDED_SUBJECTS:
+            grouped.setdefault(subject_id, []).append(knowl)
+    return dict(sorted(grouped.items(), key=lambda item: directory_title(item[0]).casefold()))
+
+
 def render_homepage(
     registry: dict[str, Knowl],
     package: dict[str, Any],
     profile: BuildProfile = BUILD_PROFILES["development"],
 ) -> str:
-    production_knowls = [knowl for knowl in registry.values() if knowl.visibility == "production"]
-    grouped: dict[str, list[Knowl]] = {}
-    for knowl in production_knowls:
-        grouped.setdefault(knowl.id.split("/", 1)[0], []).append(knowl)
+    grouped = directory_groups(registry)
+    knowl_count = sum(len(knowls) for knowls in grouped.values())
     subject_links = []
-    for subject_id, knowls in sorted(grouped.items()):
-        if subject_id in DIRECTORY_EXCLUDED_SUBJECTS:
-            continue
-        subject = registry.get(subject_id)
-        title = subject.title if subject else humanize_identifier(subject_id)
-        subject_links.append(
+    collection_links = []
+    for subject_id, knowls in grouped.items():
+        title = directory_title(subject_id)
+        links = collection_links if subject_id in SOURCE_COLLECTIONS else subject_links
+        links.append(
             f'<li><a href="/index/#subject-{escape_attr(subject_id)}">'
             f'<span>{render_inline(title, registry)}</span><small>{len(knowls):,}</small></a></li>'
         )
@@ -1778,17 +1901,21 @@ def render_homepage(
             '<main class="start-shell" id="main-content">',
             '<section class="start-intro" aria-labelledby="home-title">',
             '<h1 id="home-title">Knowlpedia</h1>',
-            f'<p>A linked library of {len(production_knowls):,} compact mathematical definitions.</p>',
+            f'<p>A linked library of {knowl_count:,} mathematical concepts and reading guides.</p>',
             '<button type="button" class="start-search" data-open-search><span aria-hidden="true">⌕</span><span>Search the mathematical library</span><kbd>⌘K</kbd></button>',
             '</section>',
             '<nav class="start-actions" aria-label="Ways to explore">',
             '<a href="/graph/"><strong>Dependency graph</strong><small>Explore prerequisites and dependents</small><span aria-hidden="true">&#8594;</span></a>',
-            f'<a href="/index/"><strong>Complete index</strong><small>Browse all {len(production_knowls):,} knowls</small><span aria-hidden="true">&#8594;</span></a>',
+            f'<a href="/index/"><strong>Complete index</strong><small>Browse all {knowl_count:,} knowls</small><span aria-hidden="true">&#8594;</span></a>',
             '</nav>',
             '<section class="start-subjects" aria-labelledby="subjects-title">',
             '<div class="start-section-heading"><h2 id="subjects-title">Subjects</h2><p>Compact definitions first; examples, proofs, and references when needed.</p></div>',
             '<ul>' + "".join(subject_links) + '</ul>',
             '</section>',
+            '<section class="start-subjects start-collections" aria-labelledby="collections-title">'
+            '<div class="start-section-heading"><h2 id="collections-title">Sources and collections</h2>'
+            '<p>Read through a paper or explore a connected collection.</p></div><ul>'
+            + "".join(collection_links) + '</ul></section>' if collection_links else "",
             '</main>',
         ]
     )
@@ -1819,6 +1946,7 @@ def render_graph_page(
             '<div id="graph-search-results" class="graph-search-results" hidden></div>',
             '</div>',
             '<label class="graph-depth-label" for="graph-depth">Depth<select id="graph-depth"><option value="1">1 step</option><option value="2" selected>2 steps</option><option value="3">3 steps</option></select></label>',
+            '<label class="graph-review-filter-label" for="graph-review-filter"><input id="graph-review-filter" type="checkbox">Reviewed links only</label>',
             '<button type="button" id="graph-orientation" class="graph-tool-button" aria-label="Switch to vertical layout">Vertical</button>',
             '<button type="button" id="graph-fit" class="graph-tool-button">Fit</button>',
             '</div>',
@@ -1856,14 +1984,7 @@ def render_index(
     package: dict[str, Any],
     profile: BuildProfile = BUILD_PROFILES["development"],
 ) -> str:
-    grouped: dict[str, list[Knowl]] = {}
-    for knowl in registry.values():
-        if knowl.visibility != "production":
-            continue
-        top = knowl.id.split("/", 1)[0]
-        if top in DIRECTORY_EXCLUDED_SUBJECTS:
-            continue
-        grouped.setdefault(top, []).append(knowl)
+    grouped = directory_groups(registry)
 
     knowl_count = sum(len(items) for items in grouped.values())
     parts = [
@@ -1874,14 +1995,21 @@ def render_index(
         '<p class="index-summary">Open a definition without losing your place, then follow its prerequisites as deeply as you need.</p>',
         "</header>",
         '<div class="index-tools">',
-        '<label class="index-subject-filter" for="subject-filter"><span class="header-action-icon" aria-hidden="true">⌕</span><input id="subject-filter" type="search" autocomplete="off" spellcheck="false" placeholder="Filter subjects" aria-describedby="subject-filter-status"></label>',
-        f'<p id="subject-filter-status" class="index-filter-status" role="status">{len(grouped)} subjects</p>',
+        '<label class="index-subject-filter" for="subject-filter"><span class="header-action-icon" aria-hidden="true">⌕</span><input id="subject-filter" type="search" autocomplete="off" spellcheck="false" placeholder="Filter subjects and collections" aria-describedby="subject-filter-status"></label>',
+        f'<p id="subject-filter-status" class="index-filter-status" role="status">{len(grouped)} subjects and collections</p>',
         '</div>',
         '<p class="index-instruction">Expand any term in place.</p>',
     ]
-    for group, knowls in sorted(grouped.items()):
+    previous_collection = None
+    ordered_groups = sorted(grouped.items(), key=lambda item: (item[0] in SOURCE_COLLECTIONS, directory_title(item[0]).casefold()))
+    for group, knowls in ordered_groups:
+        collection = group in SOURCE_COLLECTIONS
+        if collection != previous_collection:
+            parts.append('<h2 class="index-group-heading">' + ("Sources and collections" if collection else "Subjects") + '</h2>')
+            previous_collection = collection
+        label = directory_title(group)
         parts.append(
-            f'<details class="index-section" id="subject-{escape_attr(group)}" data-subject-name="{escape_attr(humanize_identifier(group))}"><summary><span>{html.escape(humanize_identifier(group))}</span>'
+            f'<details class="index-section" id="subject-{escape_attr(group)}" data-directory-kind="{"collection" if collection else "subject"}" data-subject-name="{escape_attr(label + " " + group)}"><summary><span>{html.escape(label)}</span>'
             f'<span class="index-count">{len(knowls)} knowls</span></summary><ul class="index-list">'
         )
         for knowl in sorted(knowls, key=lambda k: k.title.lower()):
@@ -2063,10 +2191,12 @@ def wikilinks_in_text(text: str) -> list[str]:
     return [match.group(1).strip() for match in WIKILINK_RE.finditer(protected)]
 
 
-def collect_links(knowl: Knowl) -> list[dict[str, str]]:
+def collect_links(knowl: Knowl, registry: dict[str, Knowl] | None = None) -> list[dict[str, str]]:
     links: list[dict[str, str]] = []
 
     def add(target: str, source_part: str, link_type: str = "mentions") -> None:
+        if registry is not None:
+            target = canonical_target(registry, target)
         links.append(
             {
                 "source": knowl.id,
@@ -2121,11 +2251,12 @@ def validate_target(
     target: str,
     context: str,
 ) -> None:
-    base, anchor = split_target(target)
+    base, anchor = split_target(canonical_target(registry, target))
     if base not in registry:
         messages.append(ValidationMessage("error", source, f"{context}: missing target {target}"))
         return
-    if anchor and anchor not in registry[base].anchors:
+    knowl = registry[base]
+    if anchor and anchor not in knowl.anchors:
         messages.append(ValidationMessage("error", source, f"{context}: missing anchor {target}"))
 
 
@@ -2181,6 +2312,16 @@ def write_compact_json(path: Path, data: Any) -> None:
     )
 
 
+def discovery_aliases(knowl: Knowl, registry: dict[str, Knowl]) -> list[str]:
+    result = list(knowl.aliases)
+    if isinstance(registry, AliasRegistry):
+        for alias in registry.aliases:
+            if registry.canonical_id(alias) == knowl.id:
+                retired = registry._redirects.get(alias)
+                result.extend([alias, retired.title, *retired.aliases] if retired else [alias])
+    return list(dict.fromkeys(result))
+
+
 def registry_json(registry: dict[str, Knowl]) -> dict[str, Any]:
     return {
         knowl.id: {
@@ -2188,9 +2329,9 @@ def registry_json(registry: dict[str, Knowl]) -> dict[str, Any]:
             "title": knowl.title,
             "kind": knowl.kind,
             "summary": knowl.summary,
-            "aliases": knowl.aliases,
+            "aliases": discovery_aliases(knowl, registry),
             "domains": knowl.domains,
-            "prerequisites": knowl.prerequisites,
+            "prerequisites": list(dict.fromkeys(canonical_target(registry, target) for target in knowl.prerequisites)),
             "dependency_heuristic": knowl.dependency_heuristic,
             "dependency_review_count": knowl.dependency_review_count,
             "visibility": knowl.visibility,
@@ -2219,7 +2360,7 @@ def search_json(registry: dict[str, Knowl]) -> list[dict[str, Any]]:
             "title": knowl.title,
             "kind": display_kind(knowl.kind) or "Concept",
             "summary": knowl.summary,
-            "aliases": knowl.aliases,
+            "aliases": discovery_aliases(knowl, registry),
             "domains": knowl.domains,
             "dependency_review_count": knowl.dependency_review_count,
             "href": target_href(knowl.id),
@@ -2234,6 +2375,7 @@ def relations_json(registry: dict[str, Knowl]) -> list[dict[str, Any]]:
     for knowl in registry.values():
         for relation in knowl.relations:
             item = {"source": knowl.id, **relation}
+            item["target"] = canonical_target(registry, item["target"])
             relations.append(item)
     return relations
 
@@ -2241,7 +2383,7 @@ def relations_json(registry: dict[str, Knowl]) -> list[dict[str, Any]]:
 def links_json(registry: dict[str, Knowl]) -> list[dict[str, Any]]:
     links = []
     for knowl in registry.values():
-        for link in collect_links(knowl):
+        for link in collect_links(knowl, registry):
             links.append(link)
     return links
 
@@ -2271,7 +2413,7 @@ def dependency_graph_json(registry: dict[str, Knowl]) -> dict[str, Any]:
     edges = []
     for knowl in registry.values():
         for prerequisite in knowl.prerequisites:
-            source, _ = split_target(prerequisite)
+            source, _ = split_target(canonical_target(registry, prerequisite))
             if source not in registry:
                 continue
             edges.append(
@@ -2342,11 +2484,12 @@ def write_site(
     out_dir: Path,
     allow_validation_errors: bool = False,
     profile: BuildProfile = BUILD_PROFILES["development"],
+    only_ids: set[str] | None = None,
 ) -> int:
     return write_site_for_ids(
         package_dir,
         out_dir,
-        only_ids=None,
+        only_ids=only_ids,
         allow_validation_errors=allow_validation_errors,
         profile=profile,
     )
@@ -2362,15 +2505,49 @@ def write_site_for_ids(
     package_path = package_dir / "knowlpack.toml"
     package = read_toml(package_path)
     knowls, content_roots = discover_package_knowls(package_dir, package, profile)
-    registry = {knowl.id: knowl for knowl in knowls}
-    if len(registry) != len(knowls):
+    all_by_id = {knowl.id: knowl for knowl in knowls}
+    if len(all_by_id) != len(knowls):
         duplicates = sorted({knowl.id for knowl in knowls if sum(k.id == knowl.id for k in knowls) > 1})
         raise ValueError("Duplicate knowl ids: " + ", ".join(duplicates))
-
+    redirects = {knowl.id: knowl for knowl in knowls if knowl.redirect_to}
+    canonical = {knowl.id: knowl for knowl in knowls if not knowl.redirect_to}
+    aliases: dict[str, str] = {}
+    resolving: set[str] = set()
+    def resolve_redirect(old_id: str) -> str | None:
+        if old_id in canonical:
+            return old_id
+        if old_id in resolving:
+            return None
+        redirect = redirects.get(old_id)
+        if not redirect or not redirect.redirect_to:
+            return None
+        resolving.add(old_id)
+        result = resolve_redirect(redirect.redirect_to)
+        resolving.remove(old_id)
+        if result:
+            aliases[old_id] = redirect.redirect_to
+        return result
+    for old_id in redirects:
+        resolve_redirect(old_id)
+    # Lexical aliases are search terms; only explicit redirect IDs resolve as
+    # IDs, avoiding accidental hijacking of a real canonical ID.
+    registry = AliasRegistry(canonical, aliases, redirects)
     messages = validate(registry)
+    for old_id, redirect in redirects.items():
+        target = redirect.redirect_to
+        if not target or target not in all_by_id:
+            messages.append(ValidationMessage("error", old_id, f"redirect target missing: {target}"))
+        elif target == old_id or resolve_redirect(old_id) is None:
+            messages.append(ValidationMessage("error", old_id, f"redirect target is cyclic or unresolved: {target}"))
+        for old_section, new_section in redirect.redirect_sections.items():
+            resolved_target = resolve_redirect(target) if target in redirects else target
+            if resolved_target in canonical:
+                mapped = split_target(registry.canonical_target(f"{old_id}#{old_section}"))[1]
+                if not mapped or f"section.{mapped}" not in canonical[resolved_target].anchors:
+                    messages.append(ValidationMessage("error", old_id, f"redirect section target missing: {new_section}"))
     errors = [msg for msg in messages if msg.severity == "error"]
     if only_ids:
-        missing = sorted(only_ids - set(registry))
+        missing = sorted(knowl_id for knowl_id in only_ids if knowl_id not in registry)
         if missing:
             for knowl_id in missing:
                 messages.append(ValidationMessage("error", knowl_id, "only target not found"))
@@ -2422,6 +2599,33 @@ def write_site_for_ids(
             section_path = out_dir / "fragments" / slug_to_relpath(knowl.id) / "sections" / f'{section["id"]}.html'
             section_path.parent.mkdir(parents=True, exist_ok=True)
             section_path.write_text(render_section(section, registry), encoding="utf-8")
+
+    if not only_ids or redirects.keys() & only_ids:
+        for old_id, redirect in redirects.items():
+            if only_ids and old_id not in only_ids:
+                continue
+            target = redirect.redirect_to
+            if target not in registry:
+                continue
+            canonical_id = registry.canonical_id(old_id)
+            destination = target_href(canonical_id)
+            section_map = {
+                old_section: split_target(registry.canonical_target(f"{old_id}#{old_section}"))[1]
+                for old_section in redirect.redirect_sections
+            }
+            redirect_html = render_redirect_page(redirect, destination, profile, section_map)
+            page_path = out_dir / slug_to_relpath(old_id) / "index.html"
+            page_path.parent.mkdir(parents=True, exist_ok=True)
+            page_path.write_text(redirect_html, encoding="utf-8")
+            old_fragment = out_dir / "fragments" / slug_to_relpath(old_id) / "core.html"
+            old_fragment.parent.mkdir(parents=True, exist_ok=True)
+            old_fragment.write_text(fragment_cache[canonical_id], encoding="utf-8")
+            for old_section, new_section in section_map.items():
+                section = next((item for item in registry[canonical_id].sections if item["id"] == new_section), None)
+                if section is not None:
+                    section_path = old_fragment.parent / "sections" / f"{old_section}.html"
+                    section_path.parent.mkdir(parents=True, exist_ok=True)
+                    section_path.write_text(render_section(section, registry), encoding="utf-8")
 
     if not only_ids:
         write_json(out_dir / "indexes" / "registry.json", registry_json(registry))

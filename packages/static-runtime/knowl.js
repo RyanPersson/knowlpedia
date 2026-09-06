@@ -509,8 +509,17 @@
         if (matches) visible += 1;
       });
       status.textContent = query
-        ? `${visible} of ${sections.length} subjects`
-        : `${sections.length} subjects`;
+        ? `${visible} of ${sections.length} subjects and collections`
+        : `${sections.length} subjects and collections`;
+      document.querySelectorAll(".index-group-heading").forEach((heading) => {
+        let sibling = heading.nextElementSibling;
+        let hasVisible = false;
+        while (sibling && !sibling.classList.contains("index-group-heading")) {
+          if (sibling.classList.contains("index-section") && !sibling.hidden) hasVisible = true;
+          sibling = sibling.nextElementSibling;
+        }
+        heading.hidden = !hasVisible;
+      });
     };
 
     input.addEventListener("input", update);

@@ -12,6 +12,7 @@
   const search = document.getElementById("graph-search");
   const searchResults = document.getElementById("graph-search-results");
   const depthSelect = document.getElementById("graph-depth");
+  const reviewFilter = document.getElementById("graph-review-filter");
   const orientationButton = document.getElementById("graph-orientation");
   const fitButton = document.getElementById("graph-fit");
   const mapDescription = document.getElementById("graph-map-description");
@@ -35,6 +36,7 @@
   let allEdges = [];
   let focusId = null;
   let orientation = "horizontal";
+  let reviewMode = "all";
   let graphBounds = { x: -400, y: -300, width: 800, height: 600 };
   let viewBox = { ...graphBounds };
   let drag = null;
@@ -90,6 +92,15 @@
     let beforeFrontier = [centerId];
     let afterFrontier = [centerId];
     let omitted = 0;
+    const visibleGraphEdges = reviewMode === "reviewed"
+      ? allEdges.filter((edge) => edge.reviewed)
+      : allEdges;
+    const visibleIncoming = new Map();
+    const visibleOutgoing = new Map();
+    visibleGraphEdges.forEach((edge) => {
+      edgeMapAdd(visibleIncoming, edge.target, edge);
+      edgeMapAdd(visibleOutgoing, edge.source, edge);
+    });
 
     function expand(frontier, edgeMap, direction, level, cap) {
       const candidates = [];
@@ -112,11 +123,11 @@
     for (let distance = 1; distance <= depth; distance += 1) {
       const beforeCap = distance === 1 ? 10 : distance === 2 ? 10 : 8;
       const afterCap = distance === 1 ? 12 : distance === 2 ? 12 : 10;
-      beforeFrontier = expand(beforeFrontier, incoming, "source", -distance, beforeCap);
-      afterFrontier = expand(afterFrontier, outgoing, "target", distance, afterCap);
+      beforeFrontier = expand(beforeFrontier, visibleIncoming, "source", -distance, beforeCap);
+      afterFrontier = expand(afterFrontier, visibleOutgoing, "target", distance, afterCap);
     }
 
-    const visibleEdges = allEdges.filter((edge) => levels.has(edge.source) && levels.has(edge.target));
+    const visibleEdges = visibleGraphEdges.filter((edge) => levels.has(edge.source) && levels.has(edge.target));
     return { levels, visibleEdges, omitted };
   }
 
@@ -257,6 +268,20 @@
     }
   }
 
+  function setReviewMode(next, updateUrl) {
+    reviewMode = next === "reviewed" ? "reviewed" : "all";
+    if (reviewFilter) {
+      if (reviewFilter.type === "checkbox") reviewFilter.checked = reviewMode === "reviewed";
+      else reviewFilter.value = reviewMode;
+    }
+    if (updateUrl) {
+      const url = new URL(window.location.href);
+      if (reviewMode === "reviewed") url.searchParams.set("review", "reviewed");
+      else url.searchParams.delete("review");
+      history.pushState({ ...(history.state || {}), focus: focusId, review: reviewMode }, "", url);
+    }
+  }
+
   function renderGraph() {
     const depth = Number(depthSelect.value || 2);
     const { levels, visibleEdges, omitted } = collectNeighborhood(focusId, depth);
@@ -281,7 +306,14 @@
     const omittedMessage = omitted ? ` ${omitted} additional neighbors are hidden; refocus a node to continue.` : "";
     const layoutDescription = orientation === "vertical" ? " Dependents are above; prerequisites are below." : " Prerequisites flow left to right.";
     const reviewedEdges = visibleEdges.filter((edge) => edge.reviewed).length;
-    status.textContent = `Showing ${levels.size} concepts around ${nodes.get(focusId).title}: ${reviewedEdges} reviewed and ${visibleEdges.length - reviewedEdges} unreviewed prerequisite links.${layoutDescription}${omittedMessage}`;
+    const unreviewedEdges = visibleEdges.length - reviewedEdges;
+    const reviewDescription = reviewMode === "reviewed"
+      ? ` Reviewed-only mode hides ${allEdges.filter((edge) => !edge.reviewed && levels.has(edge.source) && levels.has(edge.target)).length} unreviewed links.`
+      : "";
+    const emptyDescription = reviewMode === "reviewed" && levels.size === 1
+      ? " No reviewed prerequisite links connect to this concept yet."
+      : "";
+    status.textContent = `Showing ${levels.size} concepts around ${nodes.get(focusId).title}: ${reviewedEdges} reviewed and ${unreviewedEdges} unreviewed prerequisite links.${reviewDescription}${emptyDescription}${layoutDescription}${omittedMessage}`;
     status.classList.add("ready");
     fitGraph();
   }
@@ -413,12 +445,14 @@
       const parameters = new URL(window.location.href).searchParams;
       const requested = parameters.get("focus");
       const requestedLayout = parameters.get("layout");
+      const requestedReview = parameters.get("review");
       setOrientation(
         requestedLayout === "vertical" || requestedLayout === "horizontal"
           ? requestedLayout
           : (useMobileLayout() ? "vertical" : "horizontal"),
         false,
       );
+      setReviewMode(requestedReview === "reviewed" ? "reviewed" : "all", false);
       const initial = nodes.has(requested) ? requested : root.dataset.defaultFocus;
       if (useMobileLayout()) depthSelect.value = "1";
       selectNode(initial, false, window.innerWidth > 760);
@@ -442,6 +476,15 @@
     if (!event.target.closest(".graph-find")) searchResults.hidden = true;
   });
   depthSelect.addEventListener("change", renderGraph);
+  if (reviewFilter) {
+    reviewFilter.addEventListener("change", () => {
+      const next = reviewFilter.type === "checkbox"
+        ? (reviewFilter.checked ? "reviewed" : "all")
+        : reviewFilter.value;
+      setReviewMode(next, true);
+      renderGraph();
+    });
+  }
   orientationButton.addEventListener("click", () => {
     setOrientation(orientation === "horizontal" ? "vertical" : "horizontal", true);
     renderGraph();
@@ -468,9 +511,11 @@
   window.addEventListener("popstate", (event) => {
     const parameters = new URL(window.location.href).searchParams;
     const requestedLayout = parameters.get("layout");
+    const requestedReview = parameters.get("review");
     if (requestedLayout === "vertical" || requestedLayout === "horizontal") {
       setOrientation(requestedLayout, false);
     }
+    setReviewMode(requestedReview === "reviewed" ? "reviewed" : "all", false);
     const requested = event.state?.focus || parameters.get("focus");
     if (nodes.has(requested)) selectNode(requested, false);
   });
