@@ -21,22 +21,20 @@ try {
 
   const reviewFilter = page.locator("#graph-review-filter");
   await reviewFilter.waitFor();
-  const mixedFocus = await page.evaluate(async () => {
-    const data = await (await fetch("/indexes/dependencies.json")).json();
-    const production = new Set(data.nodes.filter((node) => node.visibility === "production").map((node) => node.id));
-    const bySource = new Map();
-    for (const edge of data.edges) {
-      if (!production.has(edge.source) || !production.has(edge.target)) continue;
-      if (!bySource.has(edge.source)) bySource.set(edge.source, []);
-      bySource.get(edge.source).push(Boolean(edge.reviewed));
-    }
-    // Prefer a small neighborhood so the display cap cannot hide the edge
-    // whose review filter this check exercises.
-    return [...bySource.entries()]
-      .filter(([, reviews]) => reviews.includes(true) && reviews.includes(false))
-      .sort((a, b) => a[1].length - b[1].length)[0]?.[0] || null;
+  // A completed corpus may have no unreviewed edges. Exercise filtering on
+  // a deterministic three-node graph, then resume checks on the real index.
+  const mixedFocus = "algebra-rings/ring";
+  await page.route("**/indexes/dependencies.json", async route => {
+    const response = await route.fetch();
+    const data = await response.json();
+    const ids = new Set([mixedFocus, "algebra-rings/unital-ring", "algebra-rings/commutative-ring"]);
+    data.nodes = data.nodes.filter(node => ids.has(node.id));
+    data.edges = [
+      {source: mixedFocus, target: "algebra-rings/unital-ring", reviewed: true},
+      {source: mixedFocus, target: "algebra-rings/commutative-ring", reviewed: false},
+    ];
+    await route.fulfill({response, json: data});
   });
-  if (!mixedFocus) throw new Error("Dependency graph has no concept with both reviewed and unreviewed links");
   await page.goto(`${baseUrl}/graph/?focus=${encodeURIComponent(mixedFocus)}`);
   await page.locator(".map-node.current").waitFor();
   const unreviewedEdges = await page.locator(".map-edge.unreviewed").count();
@@ -55,6 +53,7 @@ try {
   await page.goForward();
   await page.waitForFunction(() => new URL(location.href).searchParams.get("review") === "reviewed");
   if (!(await reviewFilter.isChecked())) throw new Error("Forward navigation did not restore reviewed-only mode");
+  await page.unroute("**/indexes/dependencies.json");
   await page.goto(`${baseUrl}/graph/`);
   await page.locator(".map-node.current").waitFor();
 

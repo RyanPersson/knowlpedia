@@ -30,11 +30,23 @@ try {
   for (const width of [320, 390, 1440]) {
     await page.setViewportSize({ width, height: width === 1440 ? 1000 : 844 });
     for (const id of ["operator-algebras/gns-construction", "algebra-category-theory/group-object",
-      "complex-analysis/subharmonic-function", "complex-analysis/quaternionic-plurisubharmonic-function"]) {
+      "complex-analysis/subharmonic-function", "complex-analysis/quaternionic-plurisubharmonic-function",
+      "linear-algebra/vector-space", "fiber-bundles/yangmills-functional"]) {
       await page.goto(`http://knowlpedia.test/${id}/`);
       await page.evaluate(() => document.fonts.ready);
       assert.equal(await page.locator("h1").count(), 1, `Missing page: ${id}`);
       assert.equal(await page.locator(".core-heading").count(), 0, `Repeated definition label: ${id}`);
+      if (id.endsWith("vector-space")) {
+        assert.equal(await page.locator(".core-section > ul > li").count(), 8, "One named vector-space axiom per list item");
+        assert.equal(await page.locator(".core-section > ul > li > strong").count(), 8, "Each axiom has a name");
+        assert.equal(await page.locator("details.knowl-section[open]").count(), 0, "Details start collapsed");
+        assert.doesNotMatch(await page.locator(".core-section").textContent(), /The first two rows|basic objects studied/);
+      }
+      if (id.endsWith("yangmills-functional")) {
+        assert.match(await page.locator(".core-section").textContent(), /Yang–Mills functional/);
+        assert.ok(await page.locator(".core-section .math-display").count(), "Defining energy formula must be in the opening");
+        assert.doesNotMatch(await page.locator(".core-section").textContent(), /invariant under gauge transformations/);
+      }
       await page.locator("details.knowl-section").evaluateAll((sections) => sections.forEach((section) => { section.open = true; }));
       assert.equal(await page.locator(".math-render-error, .katex-error, .missing-knowl").count(), 0, `Rendering error: ${id}`);
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, `Page overflow: ${width}px ${id}`);
@@ -61,6 +73,10 @@ try {
       await page.screenshot({ path: path.join(artifacts, `${id.split("/").pop()}-${width}.png`), fullPage: true });
     }
   }
+
+  await page.goto("http://knowlpedia.test/posts/research-advice-analysis/");
+  assert.match(await page.locator("main").textContent(), /22 source documents/);
+  assert.equal(await page.locator("details.knowl-section").count(), 0, "Research article stays continuous");
 
   await page.goto("http://knowlpedia.test/graph/?focus=algebra-rings/ring");
   await page.locator("#graph-viewer-content .knowl-content").waitFor();

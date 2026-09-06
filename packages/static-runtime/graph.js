@@ -1,6 +1,74 @@
+/* Shared, deterministic graph operations; also exercised directly by Node tests. */
+const GraphModel = (() => {
+  function rank(ids, edges) {
+    const degree = new Map([...ids].sort().map(id => [id, 0]));
+    const next = new Map([...degree.keys()].map(id => [id, new Set()]));
+    for (const {source, target} of edges) {
+      if (!degree.has(source) || !degree.has(target) || next.get(source).has(target)) continue;
+      next.get(source).add(target);
+      degree.set(target, degree.get(target) + 1);
+    }
+    const queue = [...degree.keys()].filter(id => degree.get(id) === 0);
+    const levels = new Map(queue.map(id => [id, 0]));
+    for (let i = 0; i < queue.length; i++) {
+      const id = queue[i];
+      for (const target of next.get(id)) {
+        levels.set(target, Math.max(levels.get(target) || 0, levels.get(id) + 1));
+        degree.set(target, degree.get(target) - 1);
+        if (degree.get(target) === 0) queue.push(target);
+      }
+    }
+    if (queue.length !== degree.size) throw new Error("The dependency index contains a cycle. Rebuild it after correcting the prerequisite metadata.");
+    return levels;
+  }
+
+  function clusters(nodes, edges, mode) {
+    const groups = new Map();
+    if (mode === "subjects") {
+      for (const node of nodes.values()) {
+        const key = node.id.split("/")[0];
+        if (!groups.has(key)) groups.set(key, new Set());
+        groups.get(key).add(node.id);
+      }
+    } else {
+      const neighbors = new Map([...nodes.keys()].map(id => [id, []]));
+      for (const {source, target} of edges) {
+        neighbors.get(source).push(target);
+        neighbors.get(target).push(source);
+      }
+      const seen = new Set();
+      for (const id of [...nodes.keys()].sort()) {
+        if (seen.has(id)) continue;
+        const members = new Set([id]);
+        seen.add(id);
+        const queue = [id];
+        for (let i = 0; i < queue.length; i++) {
+          for (const neighbor of neighbors.get(queue[i])) {
+            if (seen.has(neighbor)) continue;
+            seen.add(neighbor); members.add(neighbor); queue.push(neighbor);
+          }
+        }
+        groups.set(id, members);
+      }
+    }
+    const result = [...groups].map(([id, members]) => ({
+      id, members,
+      title: mode === "subjects" ? id.replaceAll("-", " ") : members.size === 1 ? nodes.get(id).title : `Component containing ${nodes.get(id).title}`,
+      edges: 0,
+    }));
+    const owner = new Map();
+    result.forEach(group => group.members.forEach(id => owner.set(id, group)));
+    edges.forEach(edge => { if (owner.get(edge.source) === owner.get(edge.target)) owner.get(edge.source).edges++; });
+    return result.sort((a, b) => b.members.size - a.members.size || a.title.localeCompare(b.title));
+  }
+  return {rank, clusters};
+})();
+if (typeof module !== "undefined") module.exports = GraphModel;
+
 (function () {
   "use strict";
 
+  if (typeof document === "undefined") return;
   const root = document.querySelector("[data-dependency-graph]");
   if (!root) return;
 
@@ -23,11 +91,16 @@
   const reviewState = document.getElementById("graph-review-state");
   const viewerClose = document.getElementById("graph-viewer-close");
   const svgNamespace = "http://www.w3.org/2000/svg";
-  const maxNodes = 54;
-  const nodeWidth = 194;
-  const nodeHeight = 48;
-  const columnGap = 250;
-  const rowGap = 72;
+  const viewSelect = document.getElementById("graph-view");
+  const clusterPanel = document.getElementById("graph-clusters");
+  const clusterBack = document.getElementById("graph-cluster-back");
+  const controls = [...root.querySelectorAll(".graph-toolbar input, .graph-toolbar select, .graph-toolbar button, .graph-zoom button")];
+  controls.forEach(control => { control.disabled = true; });
+  const maxNodes = 42;
+  const nodeWidth = 176;
+  const nodeHeight = 56;
+  const columnGap = 216;
+  const rowGap = 80;
 
   let nodes = new Map();
   let nodesByHref = new Map();
@@ -40,6 +113,11 @@
   let graphBounds = { x: -400, y: -300, width: 800, height: 600 };
   let viewBox = { ...graphBounds };
   let drag = null;
+  let mode = "neighborhood";
+  let clusterId = null;
+  let clusterGroups = [];
+  let viewerRequest = 0;
+  let initialFocus = null;
 
   function normalize(value) {
     return String(value || "")
@@ -91,7 +169,6 @@
     const levels = new Map([[centerId, 0]]);
     let beforeFrontier = [centerId];
     let afterFrontier = [centerId];
-    let omitted = 0;
     const visibleGraphEdges = reviewMode === "reviewed"
       ? allEdges.filter((edge) => edge.reviewed)
       : allEdges;
@@ -101,6 +178,9 @@
       edgeMapAdd(visibleIncoming, edge.target, edge);
       edgeMapAdd(visibleOutgoing, edge.source, edge);
     });
+    const hidden = new Set();
+    const activeCluster = clusterGroups.find(group => group.id === clusterId);
+    const allowed = activeCluster?.members;
 
     function expand(frontier, edgeMap, direction, level, cap) {
       const candidates = [];
@@ -109,26 +189,31 @@
         for (const edge of preferredNeighbors(edgeMap.get(id) || [], direction, centerDomain)) {
           const candidateId = edge[direction];
           if (levels.has(candidateId) || seen.has(candidateId)) continue;
+          if (allowed && !allowed.has(candidateId)) { hidden.add(candidateId); continue; }
           seen.add(candidateId);
           candidates.push(candidateId);
         }
       }
       const available = Math.max(0, maxNodes - levels.size);
       const selected = candidates.slice(0, Math.min(cap, available));
-      omitted += Math.max(0, candidates.length - selected.length);
+      candidates.slice(selected.length).forEach(id => hidden.add(id));
       selected.forEach((id) => levels.set(id, level));
       return selected;
     }
 
     for (let distance = 1; distance <= depth; distance += 1) {
-      const beforeCap = distance === 1 ? 10 : distance === 2 ? 10 : 8;
-      const afterCap = distance === 1 ? 12 : distance === 2 ? 12 : 10;
+      const beforeCap = useMobileLayout() ? 3 : distance === 1 ? 6 : 5;
+      const afterCap = useMobileLayout() ? 3 : distance === 1 ? 7 : 6;
       beforeFrontier = expand(beforeFrontier, visibleIncoming, "source", -distance, beforeCap);
       afterFrontier = expand(afterFrontier, visibleOutgoing, "target", distance, afterCap);
     }
 
     const visibleEdges = visibleGraphEdges.filter((edge) => levels.has(edge.source) && levels.has(edge.target));
-    return { levels, visibleEdges, omitted };
+    const orderedLevels = GraphModel.rank(levels.keys(), visibleEdges);
+    const centerLevel = orderedLevels.get(centerId);
+    orderedLevels.forEach((level, id) => orderedLevels.set(id, level - centerLevel));
+    levels.forEach((_, id) => hidden.delete(id));
+    return { levels: orderedLevels, visibleEdges, omitted: hidden.size, cluster: activeCluster };
   }
 
   function layout(levels) {
@@ -155,7 +240,7 @@
         items.forEach((node, index) => {
           const row = Math.floor(index / columnsInLayer);
           const column = index % columnsInLayer;
-          const horizontalGap = mobile ? 216 : 226;
+          const horizontalGap = mobile ? 200 : 210;
           const x = (column - (columnsInLayer - 1) / 2) * horizontalGap;
           const y = cursorY + row * rowGap;
           positions.set(node.id, { x, y, level });
@@ -164,13 +249,13 @@
           minY = Math.min(minY, y - nodeHeight / 2);
           maxY = Math.max(maxY, y + nodeHeight / 2);
         });
-        cursorY += rows * rowGap + (mobile ? 92 : 110);
+        cursorY += rows * rowGap + (mobile ? 36 : 80);
       }
       graphBounds = {
         x: minX - (mobile ? 28 : 110),
-        y: minY - (mobile ? 72 : 110),
+        y: minY - (mobile ? 28 : 80),
         width: Math.max(mobile ? 440 : 720, maxX - minX + (mobile ? 56 : 220)),
-        height: Math.max(mobile ? 520 : 620, maxY - minY + (mobile ? 144 : 220)),
+        height: Math.max(mobile ? 520 : 620, maxY - minY + (mobile ? 56 : 160)),
       };
       return positions;
     }
@@ -192,26 +277,45 @@
       });
     });
     graphBounds = {
-      x: minX - 110,
+      x: minX - 24,
       y: minY - 100,
-      width: Math.max(500, maxX - minX + 220),
+      width: Math.max(400, maxX - minX + 48),
       height: Math.max(420, maxY - minY + 200),
     };
     return positions;
   }
 
-  function edgePath(source, target) {
-    if (useVerticalLayout()) {
-      const direction = target.y >= source.y ? 1 : -1;
-      const startY = source.y + direction * nodeHeight / 2;
-      const endY = target.y - direction * nodeHeight / 2;
-      const bend = Math.max(38, Math.abs(endY - startY) * 0.42);
-      return `M ${source.x} ${startY} C ${source.x} ${startY + direction * bend}, ${target.x} ${endY - direction * bend}, ${target.x} ${endY}`;
+  function edgePath(source, target, positions, edgeIndex) {
+    const vertical = useVerticalLayout();
+    const start = vertical ? {x: source.x, y: source.y - nodeHeight / 2}
+      : {x: source.x + nodeWidth / 2, y: source.y};
+    const end = vertical ? {x: target.x, y: target.y + nodeHeight / 2}
+      : {x: target.x - nodeWidth / 2, y: target.y};
+    const bend = Math.max(24, Math.abs(vertical ? end.y - start.y : end.x - start.x) * 0.42);
+    const c1 = vertical ? {x: start.x, y: start.y - bend} : {x: start.x + bend, y: start.y};
+    const c2 = vertical ? {x: end.x, y: end.y + bend} : {x: end.x - bend, y: end.y};
+    const obstacles = [...positions.values()].filter(p => p !== source && p !== target);
+    // A shortcut edge may skip ranks, and wrapped vertical layers may contain
+    // intervening cards. Keep these edges out of the card bodies and labels.
+    let blocked = false;
+    for (let step = 1; step < 40 && !blocked; step++) {
+      const t = step / 40, u = 1 - t;
+      const x = u**3 * start.x + 3*u*u*t*c1.x + 3*u*t*t*c2.x + t**3*end.x;
+      const y = u**3 * start.y + 3*u*u*t*c1.y + 3*u*t*t*c2.y + t**3*end.y;
+      blocked = obstacles.some(p => Math.abs(x-p.x) < nodeWidth/2+4 && Math.abs(y-p.y) < nodeHeight/2+4);
     }
-    const startX = source.x + nodeWidth / 2;
-    const endX = target.x - nodeWidth / 2;
-    const bend = Math.max(45, Math.abs(endX - startX) * 0.42);
-    return `M ${startX} ${source.y} C ${startX + bend} ${source.y}, ${endX - bend} ${target.y}, ${endX} ${target.y}`;
+    if (!blocked) return `M ${start.x} ${start.y} C ${c1.x} ${c1.y}, ${c2.x} ${c2.y}, ${end.x} ${end.y}`;
+    const laneOffset = 22 + (edgeIndex % 4) * 12;
+    if (vertical) {
+      const lane = Math.max(...[...positions.values()].map(p => p.x + nodeWidth/2)) + laneOffset;
+      graphBounds.width = Math.max(graphBounds.width, lane + 20 - graphBounds.x);
+      return `M ${start.x} ${start.y} V ${start.y-12} H ${lane} V ${end.y+12} H ${end.x} V ${end.y}`;
+    }
+    const lane = Math.min(...[...positions.values()].map(p => p.y - nodeHeight/2)) - laneOffset;
+    const bottom = graphBounds.y + graphBounds.height;
+    graphBounds.y = Math.min(graphBounds.y, lane - 20);
+    graphBounds.height = bottom - graphBounds.y;
+    return `M ${start.x} ${start.y} H ${start.x+16} V ${lane} H ${end.x-16} V ${end.y} H ${end.x}`;
   }
 
   function truncate(value, limit = 29) {
@@ -226,8 +330,22 @@
     const group = svgElement("g", { transform: `translate(${position.x - nodeWidth / 2} ${position.y - nodeHeight / 2})` });
     const body = svgElement("rect", { width: nodeWidth, height: nodeHeight, rx: 8 });
     const accent = svgElement("rect", { width: 6, height: nodeHeight, rx: 3, fill: domainColor(node) });
-    const label = svgElement("text", { x: 18, y: 29 });
-    label.textContent = truncate(node.title);
+    const title = svgElement("title");
+    title.textContent = `${node.title} — ${node.id.split("/")[0].replaceAll("-", " ")}`;
+    const label = svgElement("text", { x: 14, y: 24 });
+    const words = node.title.split(/\s+/);
+    let first = "";
+    while (words.length && (first + " " + words[0]).trim().length <= 19) first = (first + " " + words.shift()).trim();
+    if (!first) first = words.shift() || "";
+    const line1 = svgElement("tspan", {x: 14, y: words.length ? 23 : 33});
+    line1.textContent = truncate(first, 19);
+    label.appendChild(line1);
+    if (words.length) {
+      const line2 = svgElement("tspan", {x: 14, y: 41});
+      line2.textContent = truncate(words.join(" "), 19);
+      label.appendChild(line2);
+    }
+    link.appendChild(title);
     group.append(body, accent, label);
     if (node.dependency_review_count === 0) {
       const marker = svgElement("circle", { cx: nodeWidth - 13, cy: 12, r: 3 });
@@ -249,7 +367,13 @@
   }
 
   function fitGraph() {
-    setViewBox({ ...graphBounds });
+    const bounds = svg.getBoundingClientRect();
+    if (!bounds.width || !bounds.height) return;
+    const ratio = bounds.width / bounds.height;
+    const width = Math.max(graphBounds.width, graphBounds.height * ratio);
+    const height = width / ratio;
+    setViewBox({ x: graphBounds.x + (graphBounds.width - width) / 2,
+      y: graphBounds.y + (graphBounds.height - height) / 2, width, height });
   }
 
   function setOrientation(next, updateUrl) {
@@ -283,15 +407,21 @@
   }
 
   function renderGraph() {
+    if (!nodes.has(focusId)) return;
     const depth = Number(depthSelect.value || 2);
-    const { levels, visibleEdges, omitted } = collectNeighborhood(focusId, depth);
+    if (mode !== "neighborhood" && !clusterId) { renderClusters(); return; }
+    clusterPanel.hidden = true;
+    depthSelect.disabled = orientationButton.disabled = fitButton.disabled = false;
+    svg.removeAttribute("hidden");
+    clusterBack.hidden = mode === "neighborhood";
+    const { levels, visibleEdges, omitted, cluster } = collectNeighborhood(focusId, depth);
     const positions = layout(levels);
     edgeLayer.replaceChildren();
     nodeLayer.replaceChildren();
 
-    for (const edge of visibleEdges) {
+    for (const [edgeIndex, edge] of visibleEdges.entries()) {
       const path = svgElement("path", {
-        d: edgePath(positions.get(edge.source), positions.get(edge.target)),
+        d: edgePath(positions.get(edge.source), positions.get(edge.target), positions, edgeIndex),
         "marker-end": "url(#graph-arrow)",
         "data-edge-source": edge.source,
         "data-edge-target": edge.target,
@@ -313,29 +443,35 @@
     const emptyDescription = reviewMode === "reviewed" && levels.size === 1
       ? " No reviewed prerequisite links connect to this concept yet."
       : "";
-    status.textContent = `Showing ${levels.size} concepts around ${nodes.get(focusId).title}: ${reviewedEdges} reviewed and ${unreviewedEdges} unreviewed prerequisite links.${reviewDescription}${emptyDescription}${layoutDescription}${omittedMessage}`;
+    status.textContent = `${cluster ? `${cluster.title}: ${cluster.members.size} concepts in this cluster. ` : ""}Showing ${levels.size} concepts around ${nodes.get(focusId).title}: ${reviewedEdges} reviewed and ${unreviewedEdges} unreviewed prerequisite links.${reviewDescription}${emptyDescription}${layoutDescription}${omittedMessage}`;
     status.classList.add("ready");
     fitGraph();
   }
 
   async function loadViewer(node, shouldOpen) {
+    const request = ++viewerRequest;
     root.classList.toggle("viewer-hidden", !shouldOpen);
     viewer.classList.toggle("open", shouldOpen);
+    viewer.inert = !shouldOpen;
     viewerTitle.textContent = node.title;
     viewerSummary.textContent = node.summary;
     reviewState.textContent = node.dependency_review_count > 0
       ? `This prerequisite list has ${node.dependency_review_count} review${node.dependency_review_count === 1 ? "" : "s"}. Neighboring lists may be unreviewed.`
-      : "Prerequisite suggestions · not yet reviewed";
+      : node.dependency_heuristic === "semantic-cycle-repair-v1"
+        ? "Cycle repairs applied · full dependency review pending"
+        : "Prerequisite suggestions · not yet reviewed";
     reviewState.classList.toggle("reviewed", node.dependency_review_count > 0);
     viewerContent.innerHTML = '<div class="loading" role="status">Loading definition…</div>';
     try {
       const response = await fetch(node.fragment);
       if (!response.ok) throw new Error("fragment unavailable");
       const markup = await response.text();
+      if (request !== viewerRequest) return;
       const documentFragment = new DOMParser().parseFromString(markup, "text/html");
       const content = documentFragment.querySelector(".knowl-content");
       viewerContent.innerHTML = content ? content.outerHTML : markup;
     } catch (error) {
+      if (request !== viewerRequest) return;
       viewerContent.innerHTML = `<p class="error">Definition could not be loaded. <a href="${node.href}">Open its full page</a>.</p>`;
     }
   }
@@ -343,13 +479,88 @@
   function selectNode(id, pushHistory, openViewer = true) {
     if (!nodes.has(id)) return;
     focusId = id;
+    if (mode !== "neighborhood") {
+      const group = clusterGroups.find(group => group.members.has(id));
+      clusterId = group?.id || null;
+    }
     renderGraph();
     loadViewer(nodes.get(id), openViewer);
-    if (pushHistory) {
-      const url = new URL(window.location.href);
-      url.searchParams.set("focus", id);
-      history.pushState({ focus: id }, "", url);
+    if (pushHistory) writeUrl(true);
+  }
+
+  function writeUrl(push = false) {
+    const url = new URL(location.href);
+    url.searchParams.set("focus", focusId);
+    url.searchParams.set("layout", orientation);
+    url.searchParams.set("depth", depthSelect.value);
+    url.searchParams.set("view", mode);
+    if (reviewMode === "reviewed") url.searchParams.set("review", "reviewed");
+    else url.searchParams.delete("review");
+    if (clusterId) url.searchParams.set("cluster", clusterId);
+    else url.searchParams.delete("cluster");
+    history[push ? "pushState" : "replaceState"]({}, "", url);
+  }
+
+  function renderClusters() {
+    clusterPanel.replaceChildren();
+    depthSelect.disabled = orientationButton.disabled = fitButton.disabled = true;
+    clusterPanel.hidden = false;
+    svg.setAttribute("hidden", "");
+    clusterBack.hidden = true;
+    root.classList.add("viewer-hidden");
+    viewer.classList.remove("open");
+    viewer.inert = true;
+    const heading = document.createElement("h1");
+    heading.textContent = mode === "subjects" ? "Explore by subject" : "Connected components";
+    const description = document.createElement("p");
+    description.textContent = mode === "subjects"
+      ? "Browse concepts by their canonical subject. Open a cluster to explore its prerequisite graph."
+      : "Each component contains concepts connected by prerequisite links, ignoring direction for grouping. Isolated concepts form their own components.";
+    const grid = document.createElement("div");
+    grid.className = "graph-cluster-grid";
+    for (const group of clusterGroups) {
+      const button = document.createElement("button");
+      button.className = "graph-cluster-card";
+      button.type = "button";
+      const title = document.createElement("strong");
+      title.textContent = group.title;
+      const count = document.createElement("span");
+      count.textContent = `${group.members.size.toLocaleString()} concept${group.members.size === 1 ? "" : "s"} · ${group.edges.toLocaleString()} link${group.edges === 1 ? "" : "s"}`;
+      button.append(title, count);
+      button.addEventListener("click", () => {
+        clusterId = group.id;
+        const id = group.members.has(focusId) ? focusId : [...group.members].sort((a, b) =>
+          (outgoing.get(b)?.length || 0) - (outgoing.get(a)?.length || 0) || a.localeCompare(b))[0];
+        selectNode(id, true, !useMobileLayout());
+      });
+      grid.appendChild(button);
     }
+    clusterPanel.append(heading, description, grid);
+    status.textContent = `${nodes.size.toLocaleString()} concepts · ${clusterGroups.length.toLocaleString()} ${mode === "subjects" ? "subject clusters" : "connected components"} · acyclic prerequisite graph`;
+  }
+
+  function setMode(value) {
+    mode = ["subjects", "components"].includes(value) ? value : "neighborhood";
+    root.dataset.graphView = mode;
+    viewSelect.value = mode;
+    clusterGroups = mode === "neighborhood" ? [] : GraphModel.clusters(nodes, reviewMode === "reviewed" ? allEdges.filter(edge => edge.reviewed) : allEdges, mode);
+  }
+
+  function restoreUrl() {
+    const parameters = new URL(location.href).searchParams;
+    const requestedLayout = parameters.get("layout");
+    setOrientation(["vertical", "horizontal"].includes(requestedLayout) ? requestedLayout : (useMobileLayout() ? "vertical" : "horizontal"), false);
+    depthSelect.value = ["1", "2", "3"].includes(parameters.get("depth")) ? parameters.get("depth") : "1";
+    setReviewMode(parameters.get("review"), false);
+    setMode(parameters.get("view"));
+    clusterId = clusterGroups.some(group => group.id === parameters.get("cluster")) ? parameters.get("cluster") : null;
+    const requested = parameters.get("focus");
+    focusId = nodes.has(requested) ? requested : initialFocus;
+    if (clusterId && !clusterGroups.find(group => group.id === clusterId).members.has(focusId)) {
+      focusId = [...clusterGroups.find(group => group.id === clusterId).members][0];
+    }
+    if (mode !== "neighborhood" && !clusterId) renderClusters();
+    else selectNode(focusId, false, !useMobileLayout());
   }
 
   function searchMatches(query) {
@@ -376,7 +587,12 @@
     const matches = searchMatches(search.value);
     searchResults.replaceChildren();
     if (!matches.length) {
-      searchResults.hidden = true;
+      searchResults.hidden = !search.value.trim();
+      if (search.value.trim()) {
+        const message = document.createElement("p");
+        message.textContent = "No concepts found. Try another name.";
+        searchResults.appendChild(message);
+      }
       return;
     }
     for (const node of matches) {
@@ -395,32 +611,33 @@
     searchResults.hidden = false;
   }
 
+  function svgPoint(clientX, clientY) {
+    return new DOMPoint(clientX, clientY).matrixTransform(svg.getScreenCTM().inverse());
+  }
+
+  function zoom(scale, point = {x: viewBox.x + viewBox.width / 2, y: viewBox.y + viewBox.height / 2}) {
+    const width = Math.min(graphBounds.width * 5, Math.max(240, viewBox.width * scale));
+    const factor = width / viewBox.width;
+    setViewBox({x: point.x - (point.x - viewBox.x) * factor,
+      y: point.y - (point.y - viewBox.y) * factor, width, height: viewBox.height * factor});
+  }
+
   function zoomAt(event) {
     event.preventDefault();
-    const bounds = svg.getBoundingClientRect();
-    const scale = event.deltaY < 0 ? 0.86 : 1.16;
-    const pointerX = viewBox.x + ((event.clientX - bounds.left) / bounds.width) * viewBox.width;
-    const pointerY = viewBox.y + ((event.clientY - bounds.top) / bounds.height) * viewBox.height;
-    const width = Math.min(graphBounds.width * 3, Math.max(260, viewBox.width * scale));
-    const height = width * (bounds.height / bounds.width);
-    const ratioX = (pointerX - viewBox.x) / viewBox.width;
-    const ratioY = (pointerY - viewBox.y) / viewBox.height;
-    setViewBox({ x: pointerX - ratioX * width, y: pointerY - ratioY * height, width, height });
+    zoom(event.deltaY < 0 ? 0.86 : 1.16, svgPoint(event.clientX, event.clientY));
   }
 
   function beginDrag(event) {
-    if (event.target.closest(".map-node")) return;
+    if (event.button !== 0 || event.target.closest(".map-node")) return;
     svg.setPointerCapture(event.pointerId);
-    drag = { x: event.clientX, y: event.clientY, viewBox: { ...viewBox } };
+    drag = { point: svgPoint(event.clientX, event.clientY), viewBox: { ...viewBox }, inverse: svg.getScreenCTM().inverse() };
     svg.classList.add("dragging");
   }
 
   function moveDrag(event) {
     if (!drag) return;
-    const bounds = svg.getBoundingClientRect();
-    const dx = ((event.clientX - drag.x) / bounds.width) * drag.viewBox.width;
-    const dy = ((event.clientY - drag.y) / bounds.height) * drag.viewBox.height;
-    setViewBox({ ...drag.viewBox, x: drag.viewBox.x - dx, y: drag.viewBox.y - dy });
+    const point = new DOMPoint(event.clientX, event.clientY).matrixTransform(drag.inverse);
+    setViewBox({ ...drag.viewBox, x: drag.viewBox.x - (point.x - drag.point.x), y: drag.viewBox.y - (point.y - drag.point.y) });
   }
 
   function endDrag() {
@@ -442,28 +659,24 @@
         edgeMapAdd(incoming, edge.target, edge);
         edgeMapAdd(outgoing, edge.source, edge);
       });
-      const parameters = new URL(window.location.href).searchParams;
-      const requested = parameters.get("focus");
-      const requestedLayout = parameters.get("layout");
-      const requestedReview = parameters.get("review");
-      setOrientation(
-        requestedLayout === "vertical" || requestedLayout === "horizontal"
-          ? requestedLayout
-          : (useMobileLayout() ? "vertical" : "horizontal"),
-        false,
-      );
-      setReviewMode(requestedReview === "reviewed" ? "reviewed" : "all", false);
-      const initial = nodes.has(requested) ? requested : root.dataset.defaultFocus;
-      if (useMobileLayout()) depthSelect.value = "1";
-      selectNode(initial, false, window.innerWidth > 760);
+      GraphModel.rank(nodes.keys(), allEdges);
+      if (!nodes.size) throw new Error("No published concepts are available.");
+      controls.forEach(control => { control.disabled = false; });
+      initialFocus = nodes.has(root.dataset.defaultFocus) ? root.dataset.defaultFocus : nodes.keys().next().value;
+      restoreUrl();
     } catch (error) {
-      status.textContent = "The dependency graph could not be loaded.";
+      status.textContent = `The dependency graph could not be loaded. ${error.message}`;
       status.classList.add("error");
+      controls.forEach(control => { control.disabled = true; });
     }
   }
 
   search.addEventListener("input", renderSearchResults);
   search.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") { searchResults.hidden = true; return; }
+    if (event.key === "ArrowDown" && !searchResults.hidden) {
+      event.preventDefault(); searchResults.querySelector("button")?.focus(); return;
+    }
     if (event.key !== "Enter") return;
     const match = searchMatches(search.value)[0];
     if (match) {
@@ -472,17 +685,37 @@
       selectNode(match.id, true);
     }
   });
+  searchResults.addEventListener("keydown", event => {
+    const buttons = [...searchResults.querySelectorAll("button")];
+    const index = buttons.indexOf(document.activeElement);
+    if (event.key === "Escape") { searchResults.hidden = true; search.focus(); }
+    if (["ArrowDown", "ArrowUp"].includes(event.key)) {
+      event.preventDefault(); buttons[(index + (event.key === "ArrowDown" ? 1 : buttons.length - 1)) % buttons.length]?.focus();
+    }
+  });
   document.addEventListener("click", (event) => {
     if (!event.target.closest(".graph-find")) searchResults.hidden = true;
   });
-  depthSelect.addEventListener("change", renderGraph);
+  depthSelect.addEventListener("change", () => { renderGraph(); writeUrl(true); });
+  viewSelect.addEventListener("change", () => {
+    setMode(viewSelect.value); clusterId = null;
+    if (mode === "neighborhood") selectNode(focusId, false, !useMobileLayout());
+    else renderClusters();
+    writeUrl(true);
+  });
+  clusterBack.addEventListener("click", () => { clusterId = null; renderClusters(); writeUrl(true); });
+  document.getElementById("graph-zoom-in").addEventListener("click", () => zoom(0.8));
+  document.getElementById("graph-zoom-out").addEventListener("click", () => zoom(1.25));
   if (reviewFilter) {
     reviewFilter.addEventListener("change", () => {
       const next = reviewFilter.type === "checkbox"
         ? (reviewFilter.checked ? "reviewed" : "all")
         : reviewFilter.value;
-      setReviewMode(next, true);
+      setReviewMode(next, false);
+      setMode(mode);
+      if (clusterId) clusterId = clusterGroups.find(group => group.members.has(focusId))?.id || null;
       renderGraph();
+      writeUrl(true);
     });
   }
   orientationButton.addEventListener("click", () => {
@@ -493,6 +726,7 @@
   viewerClose.addEventListener("click", () => {
     root.classList.add("viewer-hidden");
     viewer.classList.remove("open");
+    viewer.inert = true;
   });
   viewer.addEventListener("click", (event) => {
     const link = event.target.closest("a.knowl[href]");
@@ -503,26 +737,29 @@
     event.stopPropagation();
     selectNode(node.id, true);
   }, true);
+  svg.addEventListener("keydown", event => {
+    if (event.target !== svg) return;
+    const moves = {ArrowLeft: [-1,0], ArrowRight: [1,0], ArrowUp: [0,-1], ArrowDown: [0,1]};
+    if (moves[event.key]) {
+      event.preventDefault(); const [x,y] = moves[event.key];
+      setViewBox({...viewBox, x:viewBox.x+x*viewBox.width*0.12, y:viewBox.y+y*viewBox.height*0.12});
+    } else if (["+", "=", "-", "Home"].includes(event.key)) {
+      event.preventDefault();
+      if (event.key === "Home") fitGraph(); else zoom(event.key === "-" ? 1.25 : 0.8);
+    }
+  });
   svg.addEventListener("wheel", zoomAt, { passive: false });
   svg.addEventListener("pointerdown", beginDrag);
   svg.addEventListener("pointermove", moveDrag);
   svg.addEventListener("pointerup", endDrag);
   svg.addEventListener("pointercancel", endDrag);
-  window.addEventListener("popstate", (event) => {
-    const parameters = new URL(window.location.href).searchParams;
-    const requestedLayout = parameters.get("layout");
-    const requestedReview = parameters.get("review");
-    if (requestedLayout === "vertical" || requestedLayout === "horizontal") {
-      setOrientation(requestedLayout, false);
-    }
-    setReviewMode(requestedReview === "reviewed" ? "reviewed" : "all", false);
-    const requested = event.state?.focus || parameters.get("focus");
-    if (nodes.has(requested)) selectNode(requested, false);
-  });
+  window.addEventListener("popstate", restoreUrl);
+  new ResizeObserver(() => { if (!svg.hasAttribute("hidden")) fitGraph(); }).observe(stage);
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && viewer.classList.contains("open") && window.innerWidth <= 760) {
+    if (event.key === "Escape" && viewer.classList.contains("open") && useMobileLayout()) {
       root.classList.add("viewer-hidden");
       viewer.classList.remove("open");
+    viewer.inert = true;
     }
   });
 

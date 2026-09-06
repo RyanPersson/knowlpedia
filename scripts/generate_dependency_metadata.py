@@ -19,6 +19,7 @@ from pathlib import Path
 
 
 HEURISTIC_VERSION = "definition-links-v1"
+SEMANTIC_REPAIR_VERSION = "semantic-cycle-repair-v1"
 NON_CONCEPT_KINDS = {"document", "index", "page", "section"}
 WIKILINK_RE = re.compile(
     r"\[\[([A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)*(?:#[^\]|]+)?)(?:\|((?:[^\]]|\](?=\]\])|\](?!\]))*?))?\]\](?!\])"
@@ -169,8 +170,11 @@ def propose(knowl: SourceKnowl, known_ids: set[str]) -> DependencyProposal:
         raise ValueError(f"{knowl.path}: prerequisites must be a list of knowl IDs")
     existing = tuple(dict.fromkeys(raw_existing))
     inferred = infer_dependencies(knowl, known_ids)
+    provenance = knowl.meta.get("dependency_heuristic")
     if review_count > 0:
         return DependencyProposal(knowl, inferred, existing, existing, review_count, "reviewed_preserved")
+    if provenance == SEMANTIC_REPAIR_VERSION:
+        return DependencyProposal(knowl, inferred, existing, existing, review_count, "semantic_repair_preserved")
     # Only refresh lists owned entirely by this heuristic. Authored lists
     # (including legacy mixed provenance) must remain under editorial control.
     if "prerequisites" in knowl.meta and knowl.meta.get("dependency_heuristic") != HEURISTIC_VERSION:
@@ -263,6 +267,7 @@ def run(args: argparse.Namespace) -> dict[str, int]:
         "inferred_edges": sum(len(item.inferred) for item in proposals),
         "reviewed_preserved": sum(item.status == "reviewed_preserved" for item in proposals),
         "authored_preserved": sum(item.status == "authored_preserved" for item in proposals),
+        "semantic_repair_preserved": sum(item.status == "semantic_repair_preserved" for item in proposals),
         "changed": changed,
     }
 

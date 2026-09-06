@@ -367,3 +367,8 @@ verification, and the corrections rejected during independent review.
 
 The cumulative before/after page remains at
 http://100.69.17.72:8015/review/content-changes/ on the existing persistent service.
+
+
+## Editorial constraint: minimal opening
+
+A mathematical knowl opens with its minimal complete definition (or theorem statement), including the data, hypotheses, quantifiers and defining axioms. Name axioms and give each its own list item when this improves legibility. Keep necessary assumptions; do not substitute a short but incomplete introduction. Put proofs, examples, consequences, equivalent constructions and optional convention commentary after H2 headings so they unfold progressively. Do not add a heading between a definition's setup and its defining formula. Articles such as Research Advice Analysis remain continuous pages. See [the graph integration review](graph-experiments-integration.md).
