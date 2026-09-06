@@ -65,6 +65,26 @@ try {
   if (dataset.knowlpediaProfile !== "development" || dataset.knowlpediaDevelopmentContent !== "true" || dataset.knowlpediaTestingUi !== "true") {
     throw new Error("HTML dataset does not mirror the development profile configuration");
   }
+  const feedbackButton = page.getByRole("button", { name: /Ask Codex about G-torsor on a site/i }).first();
+  await feedbackButton.click();
+  const feedbackDialog = page.getByRole("dialog", { name: "Message Codex" });
+  if (!(await feedbackDialog.isVisible())) throw new Error("Development knowls do not expose Codex feedback");
+  if (!(await feedbackDialog.getByText("algebraic-geometry-foundations/g-torsor-on-a-site", { exact: false }).isVisible())) {
+    throw new Error("Codex feedback does not identify the current knowl");
+  }
+  await feedbackDialog.getByLabel("Your message").fill("UI payload smoke test");
+  await feedbackDialog.getByLabel("Access key").fill("browser-smoke-key");
+  const feedbackRequest = page.waitForRequest((request) => request.url().endsWith("/__knowlpedia/codex") && request.method() === "POST");
+  await page.route("**/__knowlpedia/codex", async (route) => {
+    await route.fulfill({ status: 202, contentType: "application/json", body: JSON.stringify({ jobId: "browser-smoke", status: "queued" }) });
+  });
+  await feedbackDialog.getByRole("button", { name: "Send to Codex" }).click();
+  const feedbackPayload = (await feedbackRequest).postDataJSON();
+  if (feedbackPayload.knowlId !== "algebraic-geometry-foundations/g-torsor-on-a-site") {
+    throw new Error(`Codex feedback sent the wrong knowl ID: ${JSON.stringify(feedbackPayload)}`);
+  }
+  await page.unroute("**/__knowlpedia/codex");
+  await feedbackDialog.getByRole("button", { name: "Close Codex feedback" }).click();
 
   await page.getByRole("button", { name: /Search/ }).click();
   const search = page.getByRole("searchbox", { name: "Search by name, alias, or description" });

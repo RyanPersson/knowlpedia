@@ -14,7 +14,8 @@
     "test:reading-ui": "node tests/reading_flow_smoke.mjs",
     "test:reader-pages": "node tests/reader_pages_smoke.mjs",
     "test:graph-model": "node tests/graph_model.cjs",
-    "test:graph-views": "node tests/graph_views.mjs"
+    "test:graph-views": "node tests/graph_views.mjs",
+    "test:feedback-ui": "node tests/feedback_ui_smoke.mjs"
   },
   "dependencies": {
     "katex": "^0.16.22"

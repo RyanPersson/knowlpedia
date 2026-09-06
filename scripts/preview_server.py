@@ -146,13 +146,15 @@ def command_start(args: argparse.Namespace) -> int:
     log = LOG_FILE.open("ab")
     command = [
         default_python(),
-        "-m",
-        "http.server",
+        str(ROOT / "scripts" / "knowl_feedback_server.py"),
+        "--port",
         str(args.port),
-        "--bind",
+        "--host",
         args.host,
         "--directory",
         str(directory),
+        "--token-file",
+        str(STATE_DIR / "codex-access-token"),
     ]
     process = subprocess.Popen(
         command,
