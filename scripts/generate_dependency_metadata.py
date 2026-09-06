@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Generate conservative prerequisite metadata from a knowl's definition core.
 
-The default mode is report-only. Existing reviewed dependency metadata is never
-changed. Use a deterministic sample report before applying the heuristic across
-the corpus.
+The default mode is report-only. Authored and reviewed dependency metadata is
+never changed. Use a deterministic sample report before applying the heuristic
+across the corpus.
 """
 
 from __future__ import annotations
@@ -28,7 +28,6 @@ INLINE_CODE_RE = re.compile(r"(?<!`)`[^`\n]+`(?!`)")
 MATH_RE = re.compile(
     r"(?s)(\$\$.+?\$\$|\\\[.+?\\\]|\\\(.+?\\\)|(?<!\\)\$(?!\$).+?(?<!\\)\$)"
 )
-HEADING_RE = re.compile(r"^##\s+.+?\s*$", re.MULTILINE)
 EXAMPLES_RE = re.compile(r"^\*\*(?:Example|Examples):\*\*\s*$", re.MULTILINE | re.IGNORECASE)
 
 
@@ -172,13 +171,11 @@ def propose(knowl: SourceKnowl, known_ids: set[str]) -> DependencyProposal:
     inferred = infer_dependencies(knowl, known_ids)
     if review_count > 0:
         return DependencyProposal(knowl, inferred, existing, existing, review_count, "reviewed_preserved")
-    # Metadata owned by this heuristic is a cache of the current definition
-    # core, so a rerun must remove candidates that disappeared when the core
-    # was edited. Authored or legacy prerequisites are retained and augmented.
-    if knowl.meta.get("dependency_heuristic") == HEURISTIC_VERSION:
-        final = inferred
-    else:
-        final = tuple(dict.fromkeys((*existing, *inferred)))
+    # Only refresh lists owned entirely by this heuristic. Authored lists
+    # (including legacy mixed provenance) must remain under editorial control.
+    if "prerequisites" in knowl.meta and knowl.meta.get("dependency_heuristic") != HEURISTIC_VERSION:
+        return DependencyProposal(knowl, inferred, existing, existing, review_count, "authored_preserved")
+    final = inferred
     status = "unchanged" if (
         final == existing
         and knowl.meta.get("dependency_heuristic") == HEURISTIC_VERSION
@@ -205,17 +202,11 @@ def upsert_frontmatter_line(lines: list[str], key: str, rendered: str, after_key
 
 
 def apply_proposal(proposal: DependencyProposal) -> bool:
-    if proposal.status == "reviewed_preserved":
+    if proposal.status != "proposed":
         return False
     lines = proposal.knowl.frontmatter.splitlines()
     upsert_frontmatter_line(lines, "prerequisites", toml_string_list(proposal.final), ("domains",))
-    prior_provenance = proposal.knowl.meta.get("dependency_heuristic")
-    provenance = (
-        f"authored+{HEURISTIC_VERSION}"
-        if isinstance(prior_provenance, str) and prior_provenance.startswith("authored")
-        else HEURISTIC_VERSION
-    )
-    upsert_frontmatter_line(lines, "dependency_heuristic", json.dumps(provenance), ("prerequisites",))
+    upsert_frontmatter_line(lines, "dependency_heuristic", json.dumps(HEURISTIC_VERSION), ("prerequisites",))
     upsert_frontmatter_line(lines, "dependency_review_count", "0", ("dependency_heuristic",))
     updated = "+++\n" + "\n".join(lines) + "\n+++\n" + proposal.knowl.body
     if updated == proposal.knowl.text:
@@ -271,6 +262,7 @@ def run(args: argparse.Namespace) -> dict[str, int]:
         "with_inferred_dependencies": sum(bool(item.inferred) for item in proposals),
         "inferred_edges": sum(len(item.inferred) for item in proposals),
         "reviewed_preserved": sum(item.status == "reviewed_preserved" for item in proposals),
+        "authored_preserved": sum(item.status == "authored_preserved" for item in proposals),
         "changed": changed,
     }
 

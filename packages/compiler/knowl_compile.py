@@ -17,7 +17,6 @@ import json
 import os
 import re
 import shutil
-import sqlite3
 import subprocess
 import sys
 import tempfile
@@ -616,6 +615,7 @@ class Knowl:
     domains: list[str]
     source_path: Path
     core_markdown: str
+    progressive_sections: bool = True
     prerequisites: list[str] = field(default_factory=list)
     dependency_heuristic: str | None = None
     dependency_review_count: int = 0
@@ -863,6 +863,7 @@ def knowl_from_meta(
         domains=list(meta.get("domains", [])),
         source_path=source_path,
         core_markdown=core_markdown,
+        progressive_sections=uses_progressive_sections(meta),
         prerequisites=list(meta.get("prerequisites", [])),
         dependency_heuristic=meta.get("dependency_heuristic"),
         dependency_review_count=meta.get("dependency_review_count", 0),
@@ -1466,13 +1467,11 @@ def display_kind(kind: str) -> str:
 
 def core_heading_for_kind(kind: str) -> str | None:
     normalized = kind.lower()
-    if normalized == "knowl":
+    if normalized in {"knowl", "definition", "example"}:
         return None
     if normalized in {"theorem", "lemma", "proposition", "corollary"}:
         return "Statement"
-    if normalized == "example":
-        return "Example"
-    return "Definition" if normalized == "definition" else "Core idea"
+    return "Core idea"
 
 
 def render_section_links(knowl: Knowl, registry: dict[str, Knowl]) -> str:
@@ -1495,11 +1494,12 @@ def render_section_links(knowl: Knowl, registry: dict[str, Knowl]) -> str:
 
 def render_knowl_core(knowl: Knowl, registry: dict[str, Knowl]) -> str:
     title_text = knowl.title
+    compact_core_attr = ' data-compact-core="true"' if knowl.progressive_sections else ""
     body = [
         f'<div class="knowl-content" data-knowl-id="{escape_attr(knowl.id)}" '
         f'data-knowl-title="{escape_attr(title_text)}" data-knowl-kind="{escape_attr(display_kind(knowl.kind))}" '
         f'data-knowl-visibility="{escape_attr(knowl.visibility)}">',
-        '<div class="knowl-body">',
+        f'<div class="knowl-body"{compact_core_attr}>',
         render_markdown(without_redundant_leading_h1(knowl.core_markdown), registry),
         render_structured_core(knowl, registry),
         "</div>",
@@ -1591,6 +1591,7 @@ def render_page(
         )
 
     kind = display_kind(knowl.kind)
+    compact_core_attr = ' data-compact-core="true"' if knowl.progressive_sections else ""
     kind_html = f'<p class="kind">{html.escape(kind)}</p>' if kind else ""
     core_heading = core_heading_for_kind(knowl.kind)
     core_heading_html = (
@@ -1612,7 +1613,7 @@ def render_page(
                 development_banner,
                 f'<article class="knowl-page" data-knowl-id="{escape_attr(knowl.id)}" data-knowl-visibility="{escape_attr(knowl.visibility)}"{knowls_open_attr}>',
                 f'<header class="page-header">{kind_html}<h1>{render_inline(knowl.title, registry)}</h1><p class="page-summary">{render_inline(knowl.summary, registry)}</p></header>',
-                '<section class="core-section" id="section.core">',
+                f'<section class="core-section" id="section.core"{compact_core_attr}>',
                 core_heading_html,
                 render_markdown(without_redundant_leading_h1(knowl.core_markdown), registry),
                 render_structured_core(knowl, registry),
@@ -2311,85 +2312,6 @@ def proofs_json(registry: dict[str, Knowl]) -> list[dict[str, Any]]:
     return proofs
 
 
-def write_sqlite(path: Path, registry: dict[str, Knowl]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    if path.exists():
-        path.unlink()
-    conn = sqlite3.connect(path)
-    try:
-        conn.executescript(
-            """
-            create table knowls (
-              id text primary key,
-              title text not null,
-              kind text not null,
-              summary text not null,
-              href text not null,
-              fragment text not null,
-              content_hash text not null
-            );
-            create table aliases (
-              alias text not null,
-              knowl_id text not null references knowls(id)
-            );
-            create table relations (
-              source text not null references knowls(id),
-              type text not null,
-              target text not null,
-              note text
-            );
-            create table links (
-              source text not null references knowls(id),
-              source_part text not null,
-              type text not null,
-              target text not null
-            );
-            create table proof_steps (
-              knowl_id text not null references knowls(id),
-              proof_id text not null,
-              step_id text not null,
-              assertion text not null
-            );
-            """
-        )
-        for knowl in registry.values():
-            conn.execute(
-                "insert into knowls values (?, ?, ?, ?, ?, ?, ?)",
-                (
-                    knowl.id,
-                    knowl.title,
-                    knowl.kind,
-                    knowl.summary,
-                    target_href(knowl.id),
-                    fragment_href(knowl.id),
-                    knowl.content_hash,
-                ),
-            )
-            for alias in knowl.aliases:
-                conn.execute("insert into aliases values (?, ?)", (alias, knowl.id))
-            for relation in knowl.relations:
-                conn.execute(
-                    "insert into relations values (?, ?, ?, ?)",
-                    (knowl.id, relation["type"], relation["target"], relation.get("note")),
-                )
-            for link in collect_links(knowl):
-                conn.execute(
-                    "insert into links values (?, ?, ?, ?)",
-                    (link["source"], link["source_part"], link["type"], link["target"]),
-                )
-            for section in knowl.sections:
-                if section.get("kind") == "proof":
-                    payload = section["payload"]
-                    for step in payload.get("steps", []):
-                        conn.execute(
-                            "insert into proof_steps values (?, ?, ?, ?)",
-                            (knowl.id, payload["id"], step["id"], step["assertion"]),
-                        )
-        conn.commit()
-    finally:
-        conn.close()
-
-
 def copy_runtime_assets(out_dir: Path, profile: BuildProfile) -> None:
     runtime_dir = Path(__file__).resolve().parents[1] / "static-runtime"
     assets_dir = out_dir / "assets"
@@ -2527,7 +2449,6 @@ def write_site_for_ids(
                 ),
             },
         )
-        write_sqlite(out_dir / "indexes" / "knowls.sqlite", registry)
         print(f"Compiled {len(registry)} knowls into {out_dir}")
     else:
         print(f"Compiled {len(target_knowls)} selected knowls into {out_dir}")

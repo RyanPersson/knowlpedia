@@ -53,6 +53,22 @@ def write_package(root: Path) -> None:
 
 
 class SingleFileSectionTests(unittest.TestCase):
+    def test_expansion_boundary_respects_continuous_and_progressive_overrides(self) -> None:
+        for kind, mode, compact in (
+            ("definition", "auto", True), ("document", "auto", False),
+            ("definition", "continuous", False), ("document", "progressive", True),
+        ):
+            with self.subTest(kind=kind, mode=mode):
+                knowl = compiler.knowl_from_meta(
+                    {"id": "sample/reading", "title": "Reading", "kind": kind,
+                     "summary": "Reading boundary.", "section_mode": mode},
+                    Path("reading.knowl.md"), "A first paragraph.\n\nA second paragraph.",
+                )
+                registry = {knowl.id: knowl}
+                for output in (compiler.render_knowl_core(knowl, registry),
+                               compiler.render_page(knowl, registry, {"title": "Sample"})):
+                    self.assertEqual('data-compact-core="true"' in output, compact)
+
     def test_documents_and_indexes_remain_continuous_by_default(self) -> None:
         self.assertFalse(compiler.uses_progressive_sections({"kind": "document"}))
         self.assertFalse(compiler.uses_progressive_sections({"kind": "index"}))

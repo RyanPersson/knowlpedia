@@ -151,6 +151,28 @@ class DependencyMetadataTests(unittest.TestCase):
             self.assertEqual(metadata(target)["prerequisites"], [])
             self.assertEqual(stats["changed"], 2)
 
+    def test_authored_lists_survive_repeated_runs_and_core_edits(self) -> None:
+        for prerequisites in ('[]', '["sample/authored"]'):
+            for provenance in ('', 'dependency_heuristic = "authored+definition-links-v1"\n'):
+                with self.subTest(prerequisites=prerequisites, provenance=provenance), tempfile.TemporaryDirectory() as directory:
+                    target = Path(directory) / "target.knowl.md"
+                    write_knowl(
+                        target,
+                        "sample/target",
+                        "A [[sample/inferred|candidate]].",
+                        extra_meta=f"prerequisites = {prerequisites}\n{provenance}",
+                    )
+                    known_ids = {"sample/target", "sample/authored", "sample/inferred"}
+                    for body_changed in (False, False, True):
+                        if body_changed:
+                            target.write_text(target.read_text().replace("[[sample/inferred|candidate]]", "concept"))
+                        original = target.read_text()
+                        proposal = dependency_metadata.propose(dependency_metadata.split_source(target), known_ids)
+                        self.assertEqual(proposal.status, "authored_preserved")
+                        self.assertEqual(proposal.inferred, () if body_changed else ("sample/inferred",))
+                        self.assertFalse(dependency_metadata.apply_proposal(proposal))
+                        self.assertEqual(target.read_text(), original)
+
     def test_sampling_is_deterministic(self) -> None:
         items = [
             dependency_metadata.SourceKnowl(str(index), str(index), "definition", Path(str(index)), {}, "", "", "")

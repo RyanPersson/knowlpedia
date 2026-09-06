@@ -32,17 +32,34 @@
   function findInsertionPoint(trigger) {
     const boundary = trigger.closest(".knowl-panel");
     let current = trigger;
+    let paragraph = null;
     while (current && current.parentElement) {
       const parent = current.parentElement;
       if (boundary && !boundary.contains(parent)) break;
-      if (parent.classList.contains("knowl-body")) return current;
+      // A compact core can put a display equation between two paragraphs.
+      // Keep that whole unit together; optional sections still fall back to
+      // the paragraph boundary below.
+      if (parent.classList.contains("core-section") && parent.dataset.compactCore === "true") {
+        return { element: parent, append: true };
+      }
+      if (parent.classList.contains("knowl-body") && parent.dataset.compactCore === "true") {
+        return { element: parent, append: true };
+      }
+      if (parent.tagName === "P") {
+        paragraph = parent;
+        current = parent;
+        continue;
+      }
+      if (["LI", "TD", "TH"].includes(parent.tagName)) {
+        return { element: paragraph || parent, append: !paragraph };
+      }
       const display = window.getComputedStyle(parent).display;
-      if (parent.tagName === "P" || parent.tagName === "LI" || display === "block" || display === "flex") {
-        return current;
+      if (display === "block" || display === "flex") {
+        return { element: paragraph || parent, append: false };
       }
       current = parent;
     }
-    return current || trigger;
+    return { element: current || trigger, append: true };
   }
 
   function insertPanel(trigger, panel) {
@@ -53,8 +70,9 @@
         return;
       }
     }
-    const insertAfter = findInsertionPoint(trigger);
-    insertAfter.parentNode.insertBefore(panel, insertAfter.nextSibling);
+    const insertion = findInsertionPoint(trigger);
+    if (insertion.append) insertion.element.appendChild(panel);
+    else insertion.element.parentNode.insertBefore(panel, insertion.element.nextSibling);
   }
 
   function closePanel(panel, restoreFocus) {

@@ -280,7 +280,8 @@
 
     const omittedMessage = omitted ? ` ${omitted} additional neighbors are hidden; refocus a node to continue.` : "";
     const layoutDescription = orientation === "vertical" ? " Dependents are above; prerequisites are below." : " Prerequisites flow left to right.";
-    status.textContent = `Showing ${levels.size} concepts and ${visibleEdges.length} prerequisite links around ${nodes.get(focusId).title}.${layoutDescription}${omittedMessage}`;
+    const reviewedEdges = visibleEdges.filter((edge) => edge.reviewed).length;
+    status.textContent = `Showing ${levels.size} concepts around ${nodes.get(focusId).title}: ${reviewedEdges} reviewed and ${visibleEdges.length - reviewedEdges} unreviewed prerequisite links.${layoutDescription}${omittedMessage}`;
     status.classList.add("ready");
     fitGraph();
   }
@@ -291,8 +292,8 @@
     viewerTitle.textContent = node.title;
     viewerSummary.textContent = node.summary;
     reviewState.textContent = node.dependency_review_count > 0
-      ? `Dependencies reviewed ${node.dependency_review_count} time${node.dependency_review_count === 1 ? "" : "s"}.`
-      : "Heuristic dependencies · not yet reviewed";
+      ? `This prerequisite list has ${node.dependency_review_count} review${node.dependency_review_count === 1 ? "" : "s"}. Neighboring lists may be unreviewed.`
+      : "Prerequisite suggestions · not yet reviewed";
     reviewState.classList.toggle("reviewed", node.dependency_review_count > 0);
     viewerContent.innerHTML = '<div class="loading" role="status">Loading definition…</div>';
     try {

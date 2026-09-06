@@ -1,0 +1,240 @@
+# Knowlpedia reader-experience roadmap
+
+Started 2026-09-05 on `astra-refactor` in both repositories.
+Starting commits: compiler `9c1e005`, content `ea7256bd`.
+The preceding uncommitted SQLite/export cleanup and dependency-generator
+preservation fix are part of this branch and must be retained.
+
+## Outcome
+
+A reader should be able to open a mathematical concept, understand its precise
+statement, follow two unfamiliar prerequisites, and return to the original
+argument without losing their place. A useful example should make the statement
+concrete. The graph should distinguish editorially reviewed prerequisites from
+unreviewed suggestions. Content correctness takes precedence over polish.
+
+Keep the static architecture, stable IDs, compact cores, optional sections, and
+ordinary link navigation. Improve existing content before adding more material.
+Do not equate fewer words with easier reading, link coverage with prerequisite
+coverage, or successful rendering with mathematical correctness.
+
+## Milestone 1 — Establish a trustworthy reading baseline
+
+Status: complete (2026-09-05). This is the first implementation batch, not a claim that
+the whole corpus has been reviewed.
+
+### Mathematical exposition
+
+Exact content scope:
+
+- `complex-analysis/subharmonic-function`: qualify the distributional
+  characterization by the almost-everywhere representative and give the
+  point-spike counterexample; check the zero-function convention in examples.
+- `operator-algebras/gns-construction`: add one worked example that identifies
+  the quotient, representation, and cyclic vector using the stated convention.
+- `algebra-category-theory/group-object`: state the defining equations instead
+  of requiring the reader to reconstruct unspecified diagrams.
+
+Acceptance: source-supported statements, explicit notation, unchanged IDs and
+math delimiters, intact links, and visual inspection of the changed sections.
+Examples must perform a calculation or explain a mechanism, not merely name
+another advanced object. No wholesale rewrites or compulsory section template.
+
+### Reading interface
+
+- Place expanded definitions after the complete compact core, keeping prose,
+  displayed equations, and their continuation together. In continuous documents
+  and optional sections use the paragraph boundary. Preserve nested-panel
+  boundaries, list structure, and the special subject-index layout.
+- Reduce mobile title and header space and remove a repeated core label when
+  the page kind already supplies the same label.
+- Preserve normal navigation, focus restoration, deepest-first Escape closing,
+  full-page fallbacks, and access to optional sections.
+
+Acceptance: desktop and 390px mobile reading checks; an opening GNS paragraph
+remains intact when a linked term expands; nested expansion stays in its owner;
+no new horizontal page overflow; closing returns to the relevant trigger.
+Check a narrow 320px viewport and a long mathematical title as well. Browser
+tests must exercise actual runtime behavior, not only compare generated markup.
+
+### First dependency review
+
+Review the complete direct prerequisite lists for `algebra-rings/ring`,
+`ring-axioms`, `unital-ring`, and `commutative-ring`. Remove the false requirements
+that the ring definition first needs its specializations or a second statement
+of its own axioms. Retain useful textual links. Record the review rationale here
+and increment only the four lists actually reviewed.
+
+Acceptance: ring is a prerequisite of its unital and commutative specializations,
+not the reverse; no reviewed-only cycle; a report/apply rerun preserves reviewed
+lists. Remaining heuristic cycles are reported, not removed mechanically.
+This review does not standardize the corpus-wide meaning of “ring.”
+
+## Milestone 2 — Review complete mathematical reading paths
+
+Status: planned. Depends on milestone 1's interaction baseline.
+
+Start with two bounded neighborhoods: vector space → inner product space →
+Hilbert space → a GNS reading path, and the ring foundations reviewed above.
+For each, record the exact file manifest before edits and read the prerequisite
+definitions as part of reviewing their dependent concepts.
+
+- Check scalar fields, inner-product linearity, completeness, quotient objects,
+  and unital/nonunital conventions across linked pages.
+- Restore verbal explanations where compressed formulas hide the role of axioms.
+- Add a worked example or a distinguishing non-example where it resolves a
+  specific difficulty; do not require one in every short entry.
+- Review actual prerequisite lists, including indispensable unlinked concepts,
+  and record editorial provenance and the scope of each review.
+- Pilot clearer graph copy and a reviewed-edge view. A node's reviewed list
+  must not imply that every neighboring node or incoming use has been reviewed.
+
+Acceptance: two documented end-to-end reading exercises, checked mathematical
+conventions, reviewed direct dependencies, and explicit remaining boundary
+assumptions. The graph must not present an unreviewed neighborhood as a syllabus.
+Do not add path-generation algorithms at this stage.
+
+## Milestone 3 — Organize discovery around readers
+
+Status: planned. Use the reviewed paths to test navigation decisions.
+
+- Separate mathematical subject browsing from source/paper collections in the
+  homepage and index presentation, without moving content or changing URLs.
+- Replace mechanically derived labels such as “Algebra topological” with
+  editorial subject names. Inspect overlaps among Analysis, Real Analysis,
+  Convex Analysis, and neighboring collections before regrouping.
+- Test search using concept names, standard aliases, and ambiguous terms.
+  Check both successful retrieval and explanations when several results differ
+  by convention or scope.
+
+Acceptance: a reader can find a named concept and browse toward an unfamiliar
+one on mobile and desktop. Source collections remain accessible. Classification
+changes do not silently remove knowls from discovery or rename stable IDs.
+
+## Milestone 4 — Consolidate duplicates and bundled records
+
+Status: planned. Redirect support must precede destructive consolidation.
+
+- Build a small semantic manifest from known candidates: composition of
+  functions, orthonormal frame bundles, and elementary Riemann-integral results.
+- Choose canonical owners by mathematical scope and existing incoming uses.
+- Implement the smallest alias/redirect model that preserves old page URLs,
+  inline fragment requests, section links, and search discovery. Specify how
+  dependency exports canonicalize IDs; test redirect loops and missing targets.
+- Then merge proven duplicates and split the independently reusable additivity
+  and linearity results. Preserve useful explanations and source references.
+
+Acceptance: each old entry point still resolves to the intended mathematics;
+no broken incoming links; search and graph do not double-count the same concept.
+Do not batch-delete files merely because titles or formulas look similar.
+
+## Milestone 5 — Consolidate the workflow
+
+Status: planned after the earlier milestones demonstrate useful practices.
+
+Update the existing authoring workflow with the successful reading exercises,
+convention checks, and source-review expectations. Remove conflicting guidance
+and redundant tooling rather than introducing another checklist system.
+Keep mechanical rendering checks distinct from editorial and mathematical review.
+
+Acceptance: one coherent workflow; no automation claiming to certify mathematical
+truth; a future batch can reuse concrete examples and checks from this refactor.
+
+## Verification and delivery
+
+Each milestone ends with an updated progress record, relevant unit/browser
+checks, source validation, and production rendering checks. Retain existing
+preview services; use temporary browser interception for isolated checks rather
+than launch duplicate servers. Publish or merge only under the user's deployment
+instructions. Keep unrelated corpus transformations separate and explain known
+warnings rather than presenting a green build as semantic certification.
+
+Regenerate the side-by-side content review after each content batch. Before
+committing, run `scripts/generate_content_review.py` with
+`--content-repo ../knowlpedia-content --output public-imported/review/content-changes`
+and omit ref arguments to compare HEAD with the working tree. The existing
+`knowlpedia-astra-benchmark` preview serves this checkout on port 8015; the older
+`.preview-server/state.json` port 8012 refers to a different checkout.
+
+## Progress record
+
+- Baseline: 92 Python tests pass; 3,491 production knowls compile; rendered-output
+  checker reports no errors. Validation reports 583 unreviewed cycle warnings
+  and 12 duplicate-alias warnings. These are warning counts, not a count of
+  independent cycles or a complete semantic-duplicate inventory.
+- Added mathematical examples and qualifications to the three specified knowls.
+  The group-object operations and axioms use short displayed rows suitable for
+  mobile reading. No IDs or delimiter conventions were changed.
+- Reduced mobile page-heading space and omitted repeated Definition/Example
+  core headings when the page kind already supplies that label.
+- The first paragraph-only expansion attempt still separated GNS prose from a
+  display equation. The final approach uses the compiler's existing reading-mode
+  decision to mark compact cores explicitly. Continuous documents retain nearby
+  paragraph expansion; no paragraph-length or punctuation heuristic is used.
+- Added `npm run test:reading-ui` (standalone runtime fixtures) and
+  `KNOWLPEDIA_SITE_DIR=tmp/refactor-production npm run test:reader-pages`
+  (built pages at 320px, 390px, and 1440px). The latter saves inspection images
+  in `tmp/reader-pages-smoke/` and checks reviewed ring edges.
+
+### Mathematical review evidence
+
+The subharmonic representative issue was checked against the distributional
+discussion in [Harvey–Lawson](https://www.math.stonybrook.edu/~blaine/The-G-Paper-ArXiv.pdf).
+The point-spike counterexample can also be checked directly: it is zero almost
+everywhere, while its value at the spike exceeds every surrounding spherical
+average. The GNS example was checked by computing the null ideal and evaluation
+representation, alongside the GNS construction in
+[C*-algebra notes hosted at Dartmouth](https://math.dartmouth.edu/~dana/bookspapers/cstar.pdf).
+The group-object formulation uses the generalized-element interpretation in
+[Vistoli's notes](https://www.sas.rochester.edu/mth/sites/doug-ravenel/otherpapers/vistoli.pdf).
+These checks support the bounded edits, not a certification of the full corpus.
+
+### Ring dependency review (2026-09-05)
+
+Reviewed the complete direct lists of four knowls, retaining their current
+nonunital-ring convention. `ring` and `ring-axioms` each require binary operations
+and abelian groups. The latter is an alternative statement of the same axioms,
+not a prerequisite of the former. `unital-ring` and `commutative-ring` each
+require `ring`; they specialize it and are not prerequisites of its definition.
+The existing textual links to these variants remain useful and are unchanged.
+Set the four review counters to 1 and removed the obsolete heuristic-ownership
+marker. This is an AI editorial review of these lists, not a review of their
+full transitive closure or a certification of every mathematical assertion.
+
+The graph now counts reviewed and unreviewed displayed edges separately and
+identifies the selected node's review as a review of its prerequisite list.
+It does not claim the neighboring lists have received the same review.
+
+### Milestone 1 verification (2026-09-05)
+
+- 93 Python tests pass, including reading-mode overrides in both full pages
+  and inline fragments.
+- The standalone reading-flow browser test passes for compact prose/display/
+  continuation sequences, nested definitions, continuous documents with later
+  paragraphs, lists, index entries, table cells, Escape, and focus restoration.
+- Built-page checks pass at 320px, 390px, and 1440px. The 390px GNS core starts
+  at 285px; its complete statement precedes the expanded prerequisite. Group
+  object core formulas need no horizontal scrolling even at 320px. Inspected
+  generated screenshots, including the changed mathematical sections.
+- Existing homepage, graph, and runtime browser suites pass against a freshly
+  generated development site. The temporary test server was shut down.
+- Production builds 3,491 knowls; development builds 3,501. Both have zero
+  validation errors and 593 warnings: 581 heuristic-cycle warnings and 12
+  duplicate-alias warnings. Two cycle warnings were removed by the bounded ring
+  review; this is not a claim of corpus-wide graph correctness.
+- The final production HTML scan passes, requiring rendered diagrams and the
+  production profile. The source-section audit passes for all 3,491 production
+  files; the external-reference audit passes for the three prose-edited knowls.
+- Dependency generation reports four reviewed lists preserved, four existing
+  authored lists preserved, and no changes. Direct apply checks leave the four
+  reviewed ring files byte-identical.
+- Both repository diffs pass whitespace checks. Work remains uncommitted on
+  `astra-refactor`; no deployment or merge was performed.
+
+Next work is milestone 2: review full reading paths and their conventions before
+expanding the reviewed graph or beginning subject regrouping and deduplication.
+
+Milestone 1 content review was regenerated and browser-checked: seven knowls,
+including the four metadata-only edits. Live review:
+http://100.69.17.72:8015/review/content-changes/ . Both panes use the current
+renderer; this review compares content, not historical versions of the UI.

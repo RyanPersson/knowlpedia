@@ -2140,6 +2140,26 @@ mjx-container[display="true"] {
     font-size: clamp(2.15rem, 12vw, 3.2rem);
   }
 
+  .breadcrumb {
+    margin-bottom: 1rem;
+  }
+
+  .knowl-page > .page-header {
+    margin-bottom: 1rem;
+    padding: 0 0 1rem;
+  }
+
+  .knowl-page > .page-header h1 {
+    margin-bottom: 0.5rem;
+    font-size: clamp(1.8rem, 8vw, 2.2rem);
+    line-height: 1.12;
+  }
+
+  .knowl-page > .page-header .page-summary {
+    font-size: 0.95rem;
+    line-height: 1.45;
+  }
+
   .core-section,
   .section-body,
   .knowl-body,

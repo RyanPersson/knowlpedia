@@ -69,8 +69,9 @@ candidate prerequisites. It deliberately ignores later expandable sections,
 code, mathematics, self-links, and missing targets. The generator is
 report-only by default, supports deterministic random samples and path
 manifests, and never overwrites metadata whose review count is positive.
-Heuristic-owned metadata is refreshed when the core changes; separately
-authored prerequisites are retained.
+Heuristic-owned metadata is refreshed when the core changes. Authored lists,
+including empty lists and legacy mixed authored/heuristic lists, are reported
+but never changed or relabeled by the generator.
 
 Run a sample before a corpus-wide application:
 
