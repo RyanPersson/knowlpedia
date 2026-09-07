@@ -43,9 +43,8 @@ $('refresh').onclick = () => refresh().catch(e => {$('status').textContent=e.mes
 $('latest').onclick = () => {$('history').scrollTop=$('history').scrollHeight;};
 $('compose').onsubmit = async event => {
   event.preventDefault(); if (sending) return;
-  const message=$('message').value.trim(), knowlId=$('knowl').value.trim(), intent=$('intent').value;
+  const message=$('message').value.trim(), knowlId=$('knowl').value.trim(), intent='auto';
   if (!message) return;
-  if (intent==='flag' && !knowlId) { $('status').textContent='Enter the knowl ID to attach this flag to.'; return; }
 
   sending=true; $('send').disabled=true; $('dictate').disabled=true; $('status').textContent='Sending…';
   try {

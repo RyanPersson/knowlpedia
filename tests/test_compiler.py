@@ -129,6 +129,24 @@ class SingleFileSectionTests(unittest.TestCase):
 
 
 class BuildProfileTests(unittest.TestCase):
+    def test_dependency_nodes_preserve_composed_source_ownership(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_package(root)
+            write_knowl(root / "content" / "main.knowl.md", "sample/main", "Main")
+            # Ownership must work without a catalog ID prefix or conjecture kind.
+            write_knowl(root / "content" / "other.knowl.md", "sample/other", "Other")
+            (root / ".knowl-source-manifest.json").write_text(json.dumps({
+                "primary": "/private/path/knowlpedia-content",
+                "file_sources": {"other.knowl.md": "conjectures-catalog"},
+            }))
+            knowls, _ = compiler.discover_package_knowls(root, {}, compiler.BUILD_PROFILES["production"])
+            graph = compiler.dependency_graph_json({knowl.id: knowl for knowl in knowls})
+            self.assertEqual({node["id"]: node["content_source"] for node in graph["nodes"]}, {
+                "sample/main": "knowlpedia-content", "sample/other": "conjectures-catalog",
+            })
+            self.assertNotIn("/private/path", json.dumps(graph))
+
     def test_profile_precedence_is_explicit_then_environment_then_development(self) -> None:
         self.assertEqual(compiler.resolve_profile(environment={}).name, "development")
         self.assertEqual(

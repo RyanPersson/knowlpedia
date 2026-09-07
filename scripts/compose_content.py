@@ -120,6 +120,7 @@ def compose(primary: Path, sources: list[Path], output: Path) -> dict:
             "content_dir": content_dir_name,
             "sources": entries,
             "total_content_files": sum(entry["file_count"] for entry in entries),
+            "file_sources": {path.as_posix(): Path(owner).name for path, owner in sorted(claimed.items())},
         }
         (temporary / MANIFEST_NAME).write_text(
             json.dumps(manifest, indent=2, ensure_ascii=False) + "\n",

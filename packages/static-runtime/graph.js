@@ -80,6 +80,7 @@ if (typeof module !== "undefined") module.exports = GraphModel;
   const search = document.getElementById("graph-search");
   const searchResults = document.getElementById("graph-search-results");
   const depthSelect = document.getElementById("graph-depth");
+  const showDependents = document.getElementById("graph-show-dependents");
   const reviewFilter = document.getElementById("graph-review-filter");
   const orientationButton = document.getElementById("graph-orientation");
   const fitButton = document.getElementById("graph-fit");
@@ -93,10 +94,16 @@ if (typeof module !== "undefined") module.exports = GraphModel;
   const svgNamespace = "http://www.w3.org/2000/svg";
   const viewSelect = document.getElementById("graph-view");
   const clusterPanel = document.getElementById("graph-clusters");
+  const catalogControl = document.getElementById("graph-catalog-control");
+  const showCatalog = document.getElementById("graph-show-catalog");
+  const organizationalControl = document.getElementById("graph-organizational-control");
+  const showOrganizational = document.getElementById("graph-show-organizational");
+  const organizationalKinds = new Set(["page", "document", "section", "index"]);
+  let graphData = null;
   const clusterBack = document.getElementById("graph-cluster-back");
   const controls = [...root.querySelectorAll(".graph-toolbar input, .graph-toolbar select, .graph-toolbar button, .graph-zoom button")];
   controls.forEach(control => { control.disabled = true; });
-  const maxNodes = 42;
+  const maxNodes = 600;
   const nodeWidth = 176;
   const nodeHeight = 56;
   const columnGap = 216;
@@ -164,6 +171,7 @@ if (typeof module !== "undefined") module.exports = GraphModel;
   }
 
   function collectNeighborhood(centerId, depth) {
+    const nodeBudget = Math.min(maxNodes, 42 + 12 * Math.max(0, depth - 3));
     const center = nodes.get(centerId);
     const centerDomain = center.id.split("/", 1)[0];
     const levels = new Map([[centerId, 0]]);
@@ -194,7 +202,7 @@ if (typeof module !== "undefined") module.exports = GraphModel;
           candidates.push(candidateId);
         }
       }
-      const available = Math.max(0, maxNodes - levels.size);
+      const available = Math.max(0, nodeBudget - levels.size);
       const selected = candidates.slice(0, Math.min(cap, available));
       candidates.slice(selected.length).forEach(id => hidden.add(id));
       selected.forEach((id) => levels.set(id, level));
@@ -205,7 +213,7 @@ if (typeof module !== "undefined") module.exports = GraphModel;
       const beforeCap = useMobileLayout() ? 3 : distance === 1 ? 6 : 5;
       const afterCap = useMobileLayout() ? 3 : distance === 1 ? 7 : 6;
       beforeFrontier = expand(beforeFrontier, visibleIncoming, "source", -distance, beforeCap);
-      afterFrontier = expand(afterFrontier, visibleOutgoing, "target", distance, afterCap);
+      if (showDependents.checked) afterFrontier = expand(afterFrontier, visibleOutgoing, "target", distance, afterCap);
     }
 
     const visibleEdges = visibleGraphEdges.filter((edge) => levels.has(edge.source) && levels.has(edge.target));
@@ -411,7 +419,7 @@ if (typeof module !== "undefined") module.exports = GraphModel;
     const depth = Number(depthSelect.value || 2);
     if (mode !== "neighborhood" && !clusterId) { renderClusters(); return; }
     clusterPanel.hidden = true;
-    depthSelect.disabled = orientationButton.disabled = fitButton.disabled = false;
+    showDependents.disabled = depthSelect.disabled = orientationButton.disabled = fitButton.disabled = false;
     svg.removeAttribute("hidden");
     clusterBack.hidden = mode === "neighborhood";
     const { levels, visibleEdges, omitted, cluster } = collectNeighborhood(focusId, depth);
@@ -494,8 +502,14 @@ if (typeof module !== "undefined") module.exports = GraphModel;
     url.searchParams.set("layout", orientation);
     url.searchParams.set("depth", depthSelect.value);
     url.searchParams.set("view", mode);
+    if (showDependents.checked) url.searchParams.set("dependents", "show");
+    else url.searchParams.delete("dependents");
     if (reviewMode === "reviewed") url.searchParams.set("review", "reviewed");
     else url.searchParams.delete("review");
+    if (showOrganizational.checked) url.searchParams.set("organizational", "show");
+    else url.searchParams.delete("organizational");
+    if (showCatalog.checked) url.searchParams.set("catalog", "show");
+    else url.searchParams.delete("catalog");
     if (clusterId) url.searchParams.set("cluster", clusterId);
     else url.searchParams.delete("cluster");
     history[push ? "pushState" : "replaceState"]({}, "", url);
@@ -503,7 +517,7 @@ if (typeof module !== "undefined") module.exports = GraphModel;
 
   function renderClusters() {
     clusterPanel.replaceChildren();
-    depthSelect.disabled = orientationButton.disabled = fitButton.disabled = true;
+    showDependents.disabled = depthSelect.disabled = orientationButton.disabled = fitButton.disabled = true;
     clusterPanel.hidden = false;
     svg.setAttribute("hidden", "");
     clusterBack.hidden = true;
@@ -543,6 +557,20 @@ if (typeof module !== "undefined") module.exports = GraphModel;
     mode = ["subjects", "components"].includes(value) ? value : "neighborhood";
     root.dataset.graphView = mode;
     viewSelect.value = mode;
+    catalogControl.hidden = mode !== "components" || !graphData.nodes.some(node => node.content_source === "conjectures-catalog");
+    organizationalControl.hidden = mode !== "components";
+    const hideOrganizational = mode === "components" && !showOrganizational.checked;
+    const hideCatalog = mode === "components" && !showCatalog.checked;
+    nodes = new Map(graphData.nodes.filter(node => node.visibility === "production" &&
+      !(hideCatalog && node.content_source === "conjectures-catalog") &&
+      !(hideOrganizational && organizationalKinds.has((node.kind || "").toLowerCase()))).map(node => [node.id, node]));
+    nodesByHref = new Map([...nodes.values()].map(node => [node.href, node]));
+    allEdges = graphData.edges.filter(edge => nodes.has(edge.source) && nodes.has(edge.target));
+    incoming = new Map(); outgoing = new Map();
+    allEdges.forEach(edge => { edgeMapAdd(incoming, edge.target, edge); edgeMapAdd(outgoing, edge.source, edge); });
+    initialFocus = nodes.has(root.dataset.defaultFocus) ? root.dataset.defaultFocus : nodes.keys().next().value;
+    if (!nodes.has(focusId)) focusId = initialFocus;
+    searchResults.hidden = true;
     clusterGroups = mode === "neighborhood" ? [] : GraphModel.clusters(nodes, reviewMode === "reviewed" ? allEdges.filter(edge => edge.reviewed) : allEdges, mode);
   }
 
@@ -550,8 +578,11 @@ if (typeof module !== "undefined") module.exports = GraphModel;
     const parameters = new URL(location.href).searchParams;
     const requestedLayout = parameters.get("layout");
     setOrientation(["vertical", "horizontal"].includes(requestedLayout) ? requestedLayout : (useMobileLayout() ? "vertical" : "horizontal"), false);
-    depthSelect.value = ["1", "2", "3"].includes(parameters.get("depth")) ? parameters.get("depth") : "1";
+    depthSelect.value = [...depthSelect.options].some(option => option.value === parameters.get("depth")) ? parameters.get("depth") : "1";
     setReviewMode(parameters.get("review"), false);
+    showDependents.checked = parameters.get("dependents") === "show";
+    showCatalog.checked = parameters.get("catalog") === "show";
+    showOrganizational.checked = parameters.get("organizational") === "show";
     setMode(parameters.get("view"));
     clusterId = clusterGroups.some(group => group.id === parameters.get("cluster")) ? parameters.get("cluster") : null;
     const requested = parameters.get("focus");
@@ -650,16 +681,14 @@ if (typeof module !== "undefined") module.exports = GraphModel;
       const response = await fetch("/indexes/dependencies.json");
       if (!response.ok) throw new Error("dependency index unavailable");
       const data = await response.json();
-      nodes = new Map(data.nodes.filter((node) => node.visibility === "production").map((node) => [node.id, node]));
-      nodesByHref = new Map([...nodes.values()].map((node) => [node.href, node]));
-      allEdges = data.edges.filter((edge) => nodes.has(edge.source) && nodes.has(edge.target));
-      incoming = new Map();
-      outgoing = new Map();
-      allEdges.forEach((edge) => {
-        edgeMapAdd(incoming, edge.target, edge);
-        edgeMapAdd(outgoing, edge.source, edge);
-      });
-      GraphModel.rank(nodes.keys(), allEdges);
+      graphData = data;
+      setMode("neighborhood");
+      const ranks = GraphModel.rank(nodes.keys(), allEdges);
+      const height = Math.max(1, ...ranks.values());
+      depthSelect.replaceChildren(...Array.from({length: height}, (_, index) => {
+        const depth = index + 1;
+        return new Option(`${depth} ${depth === 1 ? "step" : "steps"}`, String(depth));
+      }));
       if (!nodes.size) throw new Error("No published concepts are available.");
       controls.forEach(control => { control.disabled = false; });
       initialFocus = nodes.has(root.dataset.defaultFocus) ? root.dataset.defaultFocus : nodes.keys().next().value;
@@ -696,11 +725,18 @@ if (typeof module !== "undefined") module.exports = GraphModel;
   document.addEventListener("click", (event) => {
     if (!event.target.closest(".graph-find")) searchResults.hidden = true;
   });
+  showDependents.addEventListener("change", () => { renderGraph(); writeUrl(true); });
   depthSelect.addEventListener("change", () => { renderGraph(); writeUrl(true); });
   viewSelect.addEventListener("change", () => {
     setMode(viewSelect.value); clusterId = null;
     if (mode === "neighborhood") selectNode(focusId, false, !useMobileLayout());
     else renderClusters();
+    writeUrl(true);
+  });
+  for (const filter of [showCatalog, showOrganizational]) filter.addEventListener("change", () => {
+    setMode(mode);
+    clusterId = null;
+    renderClusters();
     writeUrl(true);
   });
   clusterBack.addEventListener("click", () => { clusterId = null; renderClusters(); writeUrl(true); });

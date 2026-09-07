@@ -48,6 +48,10 @@ class ComposeContentTests(unittest.TestCase):
             )
             recorded = json.loads((output / composer.MANIFEST_NAME).read_text())
             self.assertEqual(len(recorded["sources"]), 2)
+            self.assertEqual(recorded["file_sources"], {
+                "definition.knowl.md": "primary",
+                "problems/open.knowl.md": "contributor",
+            })
 
     def test_rejects_relative_path_collisions(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

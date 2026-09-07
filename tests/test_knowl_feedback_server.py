@@ -35,6 +35,16 @@ class KnowlFeedbackServerTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate_feedback({"intent": "delete", "knowlId": "sample/example", "message": "Hi"})
 
+    def test_automatic_intent_uses_message_and_shared_context(self) -> None:
+        for message in ("Is this correct?", "Go ahead and fix it.", "Record this concern."):
+            feedback = validate_feedback({"conversation": True, "message": message})
+            self.assertEqual(feedback["intent"], "auto")
+            prompt = feedback_prompt(feedback)
+            self.assertIn("shared conversation context", prompt)
+            self.assertIn("Answer questions without editing files", prompt)
+            self.assertIn("Persist an open issue before investigating", prompt)
+            self.assertIn("Refresh the affected development preview", prompt)
+
     def test_prompt_marks_selected_text_as_reference_material(self) -> None:
         feedback = validate_feedback(
             {

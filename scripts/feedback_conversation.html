@@ -8,8 +8,8 @@
 <label>Access key <input id="key" type="password" autocomplete="off"></label>
 <div class="toolbar"><button id="refresh">Load / refresh conversation</button><button id="latest">Jump to latest</button></div>
 <p id="status" role="status"></p><section id="history" aria-label="Conversation history"></section>
-<form id="compose"><label>Action <select id="intent"><option value="ask">Ask · read only</option><option value="change">Request change · may edit files</option><option value="flag">Flag issue · requires knowl ID</option></select></label>
-<label>Knowl ID (optional for Ask and Request change)<input id="knowl" placeholder="mathematical-physics/hyperbolic-plane-wave" style="width:100%"></label>
+<form id="compose">
+<label>Knowl ID (optional)<input id="knowl" placeholder="mathematical-physics/hyperbolic-plane-wave" style="width:100%"></label>
 <label>Your message<textarea id="message" rows="5" maxlength="8000" required></textarea></label>
 <div class="toolbar"><button type="button" id="dictate">Dictate</button><button type="submit" id="send">Send to Codex</button></div>
 <small id="voice-note">Dictation is transcribed locally by Parakeet on the OptiPlex. Audio is processed in memory and is not saved in Oreo logs. Review the text before sending.</small>

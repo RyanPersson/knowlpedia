@@ -64,15 +64,15 @@ def validate_feedback(payload: object) -> dict[str, str]:
     if not isinstance(payload, dict):
         raise ValueError("The request body must be a JSON object.")
     feedback = {
-        "intent": clean_text(payload.get("intent"), 30),
+        "intent": clean_text(payload.get("intent") or "auto", 30),
         "knowlId": clean_text(payload.get("knowlId"), 300),
         "title": clean_text(payload.get("title"), 500),
         "url": clean_text(payload.get("url"), 1000),
         "selectedText": clean_text(payload.get("selectedText"), 4000),
         "message": clean_text(payload.get("message"), 8000),
     }
-    if feedback["intent"] not in {"ask", "flag", "change"}:
-        raise ValueError("Choose Ask, Flag, or Request change.")
+    if feedback["intent"] not in {"auto", "ask", "flag", "change"}:
+        raise ValueError("Unsupported feedback intent.")
     feedback["conversation"] = payload.get("conversation") is True
     if not feedback["knowlId"] and (not feedback["conversation"] or feedback["intent"] == "flag"):
         raise ValueError("A knowl ID is required.")
@@ -108,6 +108,18 @@ def feedback_prompt(feedback: dict[str, str]) -> str:
             "describing the fix and checks; do not close unrelated issues."
         ),
     }
+    intent_instructions["auto"] = (
+        "Infer the requested action from the reviewer's message and shared conversation context. "
+        "Answer questions without editing files. Implement clear requests to fix or change things, "
+        "including follow-ups authorizing a previously discussed change. Do not require a mode selection. "
+        "When the reviewer points out an issue and the fix is clear and safely scoped, correct it directly, "
+        "even if phrased as a question or suggestion. Do not stop at recommending the fix. "
+        "Treat purely informational questions and explicit requests not to edit as read-only. "
+        "For concerns reported for tracking rather than correction, follow the flag instructions below. "
+        "If the intended action or target is ambiguous, ask one concise question in the final response. "
+        "Apply only the instructions for the inferred action:\n"
+        + "\n".join(f"{mode.capitalize()}: {intent_instructions[mode]}" for mode in ("ask", "flag", "change"))
+    )
     selected = feedback["selectedText"] or "(none)"
     return f"""A reviewer is messaging you from the development-only Knowlpedia preview.
 

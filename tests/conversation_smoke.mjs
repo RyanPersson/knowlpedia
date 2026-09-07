@@ -27,11 +27,8 @@ try {
  await page.getByLabel('Your message').fill('General conversation test');
  await page.getByRole('button',{name:'Send to Codex',exact:true}).click();
  await page.waitForFunction(()=>document.getElementById('status').textContent==='Codex replied.');
- assert.equal(payload.knowlId,''); assert.equal(payload.intent,'ask'); assert.equal(payload.conversation,true);
- await page.getByLabel('Action').selectOption('flag');
- await page.getByLabel('Your message').fill('Needs knowl');
- await page.getByRole('button',{name:'Send to Codex',exact:true}).click();
- assert.match(await page.locator('#status').textContent(),/Enter the knowl ID/);
+ assert.equal(payload.knowlId,''); assert.equal(payload.intent,'auto'); assert.equal(payload.conversation,true);
+ assert.equal(await page.locator('#intent').count(),0);
  // Theme follows the shared preference and supports toggling.
  await page.evaluate(()=>localStorage.setItem('knowl-theme','dark'));
  await page.reload();
@@ -39,5 +36,5 @@ try {
  await page.getByRole('button',{name:'Use light theme'}).click();
  assert.equal(await page.evaluate(()=>localStorage.getItem('knowl-theme')),'light');
  assert.deepEqual(errors,[]);
- console.log('Conversation history, authentication, mobile layouts, direct send payload, flag validation, and shared dark-mode preference passed.');
+ console.log('Conversation history, authentication, mobile layouts, direct send payload, automatic intent, and shared dark-mode preference passed.');
 } finally {await browser.close();}

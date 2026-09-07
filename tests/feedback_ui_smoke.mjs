@@ -14,6 +14,7 @@ try {
   await page.getByRole('button',{name:'Ask Codex about Vector space',exact:true}).click();
   const dialog=page.getByRole('dialog',{name:'Message Codex'});
   assert.ok(await dialog.isVisible());
+  assert.equal(await dialog.locator('[name="feedback-intent"]').count(),0);
   assert.equal(await dialog.evaluate(d=>d.scrollWidth>d.clientWidth),false,'Dialog should fit mobile width');
   await dialog.getByText('Refactor ledger',{exact:true}).click();
   await dialog.getByLabel('Access key').fill(token);
@@ -40,6 +41,7 @@ try {
  await dialog.getByLabel('Your message').fill('Delayed test');
  await dialog.getByLabel('Access key').fill('test-key');
  await dialog.getByRole('button',{name:'Send to Codex'}).click();await received;
+ assert.equal(heldRoute.request().postDataJSON().intent,"auto");
  await dialog.getByRole('button',{name:'Close Codex feedback'}).click();
  await page.locator('.core-section a.knowl').filter({hasText:'field'}).first().click();
  await page.getByRole('button',{name:'Ask Codex about Field',exact:true}).click();

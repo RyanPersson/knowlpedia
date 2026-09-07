@@ -661,6 +661,7 @@ class Knowl:
     relations: list[dict[str, Any]] = field(default_factory=list)
     knowls_open: bool = False
     visibility: str = "production"
+    content_source: str = ""
     anchors: set[str] = field(default_factory=set)
     content_hash: str = ""
     redirect_to: str | None = None
@@ -1068,6 +1069,13 @@ def discover_package_knowls(
         for content_dir, visibility in roots
         for knowl in discover_knowls(content_dir, visibility=visibility)
     ]
+    manifest_path = package_dir / ".knowl-source-manifest.json"
+    manifest = json.loads(manifest_path.read_text()) if manifest_path.exists() else {}
+    file_sources = manifest.get("file_sources", {})
+    primary_source = Path(manifest.get("primary", str(package_dir))).name
+    for knowl in knowls:
+        relative = knowl.source_path.relative_to(roots[0][0]) if knowl.source_path.is_relative_to(roots[0][0]) else None
+        knowl.content_source = file_sources.get(relative.as_posix(), primary_source) if relative else primary_source
     return sorted(knowls, key=lambda knowl: knowl.id), roots
 
 
@@ -1957,7 +1965,10 @@ def render_graph_page(
             '<div id="graph-search-results" class="graph-search-results" hidden></div>',
             '</div>',
             '<label class="graph-depth-label graph-view-label" for="graph-view">View<select id="graph-view" aria-label="View"><option value="neighborhood">Neighborhood</option><option value="subjects">Subjects</option><option value="components">Components</option></select></label>',
+            '<label id="graph-catalog-control" class="graph-review-filter-label" hidden><input id="graph-show-catalog" type="checkbox">Show conjectures catalog</label>',
+            '<label id="graph-organizational-control" class="graph-review-filter-label" hidden><input id="graph-show-organizational" type="checkbox">Show organizational pages</label>',
             '<label class="graph-depth-label" for="graph-depth">Depth<select id="graph-depth" aria-label="Depth"><option value="1" selected>1 step</option><option value="2">2 steps</option><option value="3">3 steps</option></select></label>',
+            '<label class="graph-review-filter-label"><input id="graph-show-dependents" type="checkbox">Show dependents</label>',
             '<label class="graph-review-filter-label" for="graph-review-filter"><input id="graph-review-filter" type="checkbox">Reviewed links only</label>',
             '<button type="button" id="graph-orientation" class="graph-tool-button" aria-label="Switch to vertical layout">Vertical</button>',
             '<button type="button" id="graph-cluster-back" class="graph-tool-button" hidden>All clusters</button>',
@@ -2450,6 +2461,7 @@ def dependency_graph_json(registry: dict[str, Knowl]) -> dict[str, Any]:
             "href": target_href(knowl.id),
             "fragment": fragment_href(knowl.id),
             "visibility": knowl.visibility,
+            "content_source": knowl.content_source,
         }
         for knowl in sorted(registry.values(), key=lambda item: item.id)
     ]

@@ -117,11 +117,6 @@
           <button type="button" data-review-load>Load review history</button>
           <div data-review-results aria-live="polite"></div>
         </details>
-        <div class="codex-feedback-intents" role="radiogroup" aria-label="What should Codex do?">
-          <label><input type="radio" name="feedback-intent" value="ask" checked><span>Ask</span></label>
-          <label><input type="radio" name="feedback-intent" value="flag"><span>Flag issue</span></label>
-          <label><input type="radio" name="feedback-intent" value="change"><span>Request change</span></label>
-        </div>
         <label class="codex-feedback-message"><span>Your message</span><textarea rows="5" maxlength="8000" required placeholder="What looks wrong, or what should change?"></textarea></label>
         <label class="codex-feedback-access"><span>Access key</span><input type="password" autocomplete="off" spellcheck="false" placeholder="Test server access key"><small>Saved only in this browser.</small></label>
         <p class="codex-feedback-selection" data-feedback-selection hidden></p>
@@ -253,7 +248,7 @@
       button.className = "codex-feedback-open";
       button.title = "Ask Codex about this knowl";
       button.setAttribute("aria-label", `Ask Codex about ${title}`);
-      button.innerHTML = '<span aria-hidden="true">✦</span><span>Ask Codex</span>';
+      button.textContent = "Ask Codex";
       button.addEventListener("click", () => openFeedback(button));
       if (knowl.matches(".knowl-page")) controls.append(button);
       else controls.prepend(button);
@@ -319,7 +314,7 @@
         headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
         body: JSON.stringify({
           ...feedbackKnowl,
-          intent: dialog.querySelector('input[name="feedback-intent"]:checked').value,
+          intent: "auto",
           message,
           url: window.location.href,
         }),

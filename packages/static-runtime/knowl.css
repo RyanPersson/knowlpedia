@@ -537,43 +537,6 @@ button {
   background: var(--surface-subtle);
 }
 
-.codex-feedback-intents {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.45rem;
-}
-
-.codex-feedback-intents label {
-  cursor: pointer;
-}
-
-.codex-feedback-intents input {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.codex-feedback-intents span {
-  display: block;
-  padding: 0.42rem 0.7rem;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  color: var(--muted);
-  font-size: 0.78rem;
-  font-weight: 750;
-}
-
-.codex-feedback-intents input:checked + span {
-  border-color: var(--accent);
-  background: var(--accent-soft);
-  color: var(--accent-strong);
-}
-
-.codex-feedback-intents input:focus-visible + span {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
 .codex-feedback-message,
 .codex-feedback-access {
   display: grid;
@@ -917,9 +880,17 @@ kbd {
 }
 
 .index-group-heading {
-  margin: 1.5rem 0 0.75rem;
+  margin: 2.5rem 0 0;
+  padding: 0.75rem 1rem;
+  border-left: 3px solid var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-strong);
   font-family: var(--font-ui);
-  font-size: 1.15rem;
+  font-size: 0.8rem;
+  font-weight: 750;
+  letter-spacing: 0.1em;
+  line-height: 1.5;
+  text-transform: uppercase;
 }
 
 .core-section p,
