@@ -324,6 +324,21 @@ class RenderContractTests(unittest.TestCase):
         fenced = "before\n```text\n[[not-a-knowl]]\n```\nafter [[formal-groups]]"
         self.assertEqual(compiler.wikilinks_in_text(fenced), ["formal-groups"])
 
+    def test_nested_wikilinks_are_validation_errors_outside_math_and_code(self) -> None:
+        knowl = self.make_knowl()
+        knowl.core_markdown = (
+            "[[sample/concept|[[sample/concept|Sample concept]]]]\n"
+            "[[sample/concept|label $R[[x]]$]]\n"
+            "`[[sample/concept|code [[sample/concept|label]]]]`\n"
+            "~~~~text\n[[sample/concept|code [[sample/concept|label]]]]\n~~~~~\n"
+            "[[sample/concept|type I [[sample/concept|algebra]]]]"
+        )
+        nested = compiler.nested_wikilinks_in_text(knowl.core_markdown)
+        self.assertEqual(nested, ["sample/concept", "sample/concept"])
+        errors = [m for m in compiler.validate({knowl.id: knowl}) if m.severity == "error"]
+        self.assertEqual(len(errors), 2)
+        self.assertTrue(all("nested knowl link in label" in m.message for m in errors))
+
     def test_root_relative_markdown_link_is_navigation_only(self) -> None:
         rendered = compiler.render_inline("[Index](/conjectures/generated/example/)", {})
         self.assertIn('class="page-link"', rendered)

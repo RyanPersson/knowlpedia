@@ -39,6 +39,11 @@ class MissingLinkTests(unittest.TestCase):
                    '## References\nvector space')
         self.assertFalse(audit(self.root)['findings'])
 
+    def test_longer_closing_fence_is_protected(self):
+        self.knowl('target', 'Vector space', 'Definition.')
+        self.knowl('source', 'Example', '````text\nvector space\n`````\n')
+        self.assertFalse(audit(self.root)['findings'])
+
     def test_ambiguity_redirects_and_self_mentions(self):
         self.knowl('one', 'Vector space', '**Vector space**.', 'aliases=["shared term"]\n')
         self.knowl('two', 'Linear space', 'Definition.', 'aliases=["shared term"]\n')

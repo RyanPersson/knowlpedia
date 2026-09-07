@@ -50,13 +50,17 @@ From the application repository:
 .venv/bin/python scripts/link_review_progress.py \
   --audit tmp/missing-links/audit.json \
   --ledger ../knowlpedia-content/reviews/missing-links/reviews.json \
+  --include-containers \
   --report tmp/missing-links/progress.json
 .venv/bin/python scripts/audit_dependency_graph.py \
   --content-package ../knowlpedia-content --profile production \
   --report tmp/missing-links/dependencies.json
 ```
 
-Repeat discovery with `--profile development` for development-only content.
+Use `--include-containers` with the completed ledger, whose scope includes all
+57 production containers. Repeat discovery with `--profile development` for
+development-only content; those additional entries are not in the production
+review scope.
 The report uses relative source paths, exact line/column positions, context,
 source hashes, canonical targets, ambiguity, and core/supporting priority.
 `findings` contains known-term matches and explicit missing link/prerequisite
@@ -95,7 +99,7 @@ candidate quality is measured.
 
 ## Progress convention
 
-Store append-only entries in the content repository's
+After the first consolidated snapshot, append review entries to the content repository's
 `reviews/missing-links/reviews.json`, in chronological order:
 
 ```json
@@ -129,3 +133,12 @@ link IDs or prerequisite IDs. Ten existing alias-collision warnings remain
 visible in the report. These counts include false positives and do not imply
 that 768 definitions need to be written. The separate linking ledger starts
 at zero completed reviews.
+
+## Completed production pass
+
+All six stages are complete. The scope expanded to include the 57 production
+containers and 16 new definitions: 3,515 current reviews, 514 existing entries
+changed, 16 added, and zero remaining or stale reviews. See
+[results and validation](missing-links-results.md) and the content repository's
+`reviews/missing-links/progress.json`. Keep future source changes accountable by
+appending a reviewed hash and regenerating progress from a fresh audit.

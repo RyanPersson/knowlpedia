@@ -6,8 +6,8 @@ import json
 from pathlib import Path
 
 
-def summarize(audit, ledger):
-    inventory = {i['id']: i for i in audit['inventory'] if i['kind'] not in {'document', 'index', 'page', 'section'}}
+def summarize(audit, ledger, *, include_containers=False):
+    inventory = {i['id']: i for i in audit['inventory'] if include_containers or i['kind'] not in {'document', 'index', 'page', 'section'}}
     latest = {}
     for entry in ledger['reviews']:
         if entry.get('outcome') not in {'corrected', 'reviewed_unchanged', 'blocked'}:
@@ -31,8 +31,9 @@ def main():
     parser.add_argument('--audit', type=Path, required=True, help='Fresh audit of the current working tree.')
     parser.add_argument('--ledger', type=Path, required=True)
     parser.add_argument('--report', type=Path)
+    parser.add_argument('--include-containers', action='store_true', help='Include production documents, indexes, pages and sections in the review scope.')
     args = parser.parse_args()
-    result = summarize(json.loads(args.audit.read_text()), json.loads(args.ledger.read_text()))
+    result = summarize(json.loads(args.audit.read_text()), json.loads(args.ledger.read_text()), include_containers=args.include_containers)
     text = json.dumps(result, indent=2)+'\n'
     if args.report:
         args.report.parent.mkdir(parents=True, exist_ok=True)

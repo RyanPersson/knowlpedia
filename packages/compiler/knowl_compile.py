@@ -40,7 +40,10 @@ WIKILINK_RE = re.compile(
 )
 MARKDOWN_LINK_RE = re.compile(r"\[([^\]\n]+)\]\(([^)\n]+)\)")
 INLINE_CODE_RE = re.compile(r"(?<!`)`([^`\n]+)`(?!`)")
-FENCED_CODE_RE = re.compile(r"^```[^\n]*\n.*?^```[ \t]*$", re.MULTILINE | re.DOTALL)
+FENCED_CODE_RE = re.compile(
+    r"(?ms)^[ \t]*(`{3,})[^\n]*\n.*?^[ \t]*\1`*[ \t]*(?:\n|$)|"
+    r"^[ \t]*(~{3,})[^\n]*\n.*?^[ \t]*\2~*[ \t]*(?:\n|$)"
+)
 MATH_RE = re.compile(
     r"(?s)(\$\$(.+?)\$\$|\\\[(.+?)\\\]|\\\((.+?)\\\)|(?<!\\)\$(?!\$)(.+?)(?<!\\)\$)"
 )
@@ -2125,6 +2128,22 @@ def validate(registry: dict[str, Knowl]) -> list[ValidationMessage]:
         for target in knowl.prerequisites:
             validate_target(messages, registry, knowl.id, target, "prerequisite")
 
+        for field, value in (("title", knowl.title), ("summary", knowl.summary)):
+            for target in nested_wikilinks_in_text(value):
+                messages.append(
+                    ValidationMessage(
+                        "error", knowl.id,
+                        f"{field}: nested knowl link in label for {target}",
+                    )
+                )
+
+        for target in nested_wikilinks_in_text(knowl.core_markdown):
+            messages.append(
+                ValidationMessage(
+                    "error", knowl.id,
+                    f"core wikilink: nested knowl link in label for {target}",
+                )
+            )
         for target in wikilinks_in_text(knowl.core_markdown):
             validate_target(messages, registry, knowl.id, target, "core wikilink")
 
@@ -2142,6 +2161,13 @@ def validate(registry: dict[str, Knowl]) -> list[ValidationMessage]:
             elif kind == "proof":
                 validate_proof(messages, registry, knowl, section["payload"])
             else:
+                for target in nested_wikilinks_in_text(section.get("markdown", "")):
+                    messages.append(
+                        ValidationMessage(
+                            "error", knowl.id,
+                            f'section {section["id"]} wikilink: nested knowl link in label for {target}',
+                        )
+                    )
                 for target in wikilinks_in_text(section.get("markdown", "")):
                     validate_target(messages, registry, knowl.id, target, f'section {section["id"]} wikilink')
 
@@ -2178,6 +2204,24 @@ def wikilinks_in_text(text: str) -> list[str]:
     text, _ = protect_inline_code(text)
     protected, _ = protect_math(text)
     return [match.group(1).strip() for match in WIKILINK_RE.finditer(protected)]
+
+
+def nested_wikilinks_in_text(text: str) -> list[str]:
+    """Return outer link targets whose labels contain another knowl link.
+
+    Code and math are protected first because ``[[...]]`` is ordinary syntax
+    in both (notably in formal power series).  The renderer cannot recursively
+    render a knowl link label, so these are validation errors rather than link
+    targets to follow.
+    """
+    text = FENCED_CODE_RE.sub("@@KNOWL_CODE_BLOCK@@", text)
+    text, _ = protect_inline_code(text)
+    protected, _ = protect_math(text)
+    return [
+        match.group(1).strip()
+        for match in WIKILINK_RE.finditer(protected)
+        if match.group(2) and "[[" in match.group(2)
+    ]
 
 
 def collect_links(knowl: Knowl, registry: dict[str, Knowl] | None = None) -> list[dict[str, str]]:

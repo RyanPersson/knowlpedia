@@ -15,7 +15,14 @@ from interlink_content import is_plain_term, normalize_surface, plural_variant, 
 
 CONTAINERS = {"document", "index", "page", "section"}
 # Preserve offsets and line boundaries; masked syntax must not join nearby words.
-BLOCK = re.compile(r"(?ms)^\s*(`{3,}|~{3,})[^\n]*\n.*?^\s*\1[^\n]*(?:\n|$)")
+# Markdown permits a closing fence longer than its opener.  Capturing the
+# complete opener and requiring an exact backreference therefore leaks the
+# text after (for example) ```` when it is closed by `````; keep the two
+# fence characters separate so each alternative can accept extra copies.
+BLOCK = re.compile(
+    r"(?ms)^\s*(`{3,})[^\n]*\n.*?^\s*\1`*[^\n]*(?:\n|$)|"
+    r"^\s*(~{3,})[^\n]*\n.*?^\s*\2~*[^\n]*(?:\n|$)"
+)
 PROTECTED = re.compile(
     r"<!--.*?-->|`+[^`]*`+|\\\[.*?\\\]|\\\(.*?\\\)|(?<!\\)\$\$.*?(?<!\\)\$\$|"
     r"(?<!\\)\$(?!\$).*?(?<!\\)\$|!?\[[^\]]*\]\([^)]*\)|"
