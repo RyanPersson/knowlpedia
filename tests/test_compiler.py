@@ -53,6 +53,26 @@ def write_package(root: Path) -> None:
 
 
 class SingleFileSectionTests(unittest.TestCase):
+    def test_editorial_issues_do_not_enter_reader_content_or_registry(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "sample.knowl.md"
+            write_knowl(path, "sample/a", "Sample")
+            text = path.read_text()
+            metadata = '\n'.join([
+                '[[issues]]',
+                'id = "ac4428a1-e166-4e86-a687-e57ec34cdad3"',
+                'status = "open"',
+                'summary = "EDITORIAL_ONLY_SENTINEL"',
+                'reported_at = "2026-09-06T00:00:00Z"',
+                'updated_at = "2026-09-06T00:00:00Z"',
+                'report = "Check the hypothesis."',
+                'assessment = ""',
+            ])
+            path.write_text(text.replace("\n+++\n", "\n" + metadata + "\n+++\n"))
+            knowl = compiler.parse_single_file(path)
+            self.assertEqual(knowl.core_markdown, "Sample body.")
+            self.assertNotIn("EDITORIAL_ONLY_SENTINEL", json.dumps(compiler.registry_json({knowl.id: knowl})))
+
     def test_expansion_boundary_respects_continuous_and_progressive_overrides(self) -> None:
         for kind, mode, compact in (
             ("definition", "auto", True), ("document", "auto", False),

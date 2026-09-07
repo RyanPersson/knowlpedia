@@ -2589,3 +2589,22 @@ mjx-container[display="true"] {
   .graph-viewer { transition: none; }
 }
 .graph-toolbar :disabled { opacity: 0.45; cursor: default; }
+
+.knowl-review-history {
+  margin-block: 1rem;
+  overflow-wrap: anywhere;
+}
+.knowl-review-history summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.knowl-review-history details {
+  padding-block: .75rem;
+  border-bottom: 1px solid var(--border-color, #8885);
+}
+.knowl-review-history dt {
+  font-weight: 600;
+  text-transform: capitalize;
+}
+.knowl-review-history dd { margin: 0 0 .75rem; }
+.knowl-review-history dd p { margin-block: .25rem; white-space: pre-wrap; }

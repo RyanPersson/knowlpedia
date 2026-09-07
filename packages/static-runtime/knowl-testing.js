@@ -110,6 +110,13 @@
           <button type="submit" class="icon-button" value="cancel" aria-label="Close Codex feedback">&times;</button>
         </div>
         <p class="codex-feedback-context" data-feedback-context></p>
+        <a href="/conversation/" target="_blank" rel="noopener" data-conversation-link>Open shared conversation ↗</a>
+        <details class="knowl-review-history">
+          <summary>Refactor ledger</summary>
+          <p>Recorded editorial reviews, latest batch first. These are historical records, not a certification of the current text. Dependency-only reviews concern prerequisite lists.</p>
+          <button type="button" data-review-load>Load review history</button>
+          <div data-review-results aria-live="polite"></div>
+        </details>
         <div class="codex-feedback-intents" role="radiogroup" aria-label="What should Codex do?">
           <label><input type="radio" name="feedback-intent" value="ask" checked><span>Ask</span></label>
           <label><input type="radio" name="feedback-intent" value="flag"><span>Flag issue</span></label>
@@ -139,6 +146,7 @@
       feedbackPoll = null;
       if (returnFocus && returnFocus.focus) returnFocus.focus({ preventScroll: true });
     });
+    dialog.querySelector("[data-review-load]").addEventListener("click", loadReviewHistory);
     dialog.querySelector(".codex-feedback-send").addEventListener("click", sendFeedback);
     return dialog;
   }
@@ -162,6 +170,7 @@
       selectedText: selectedTextInside(knowl),
     };
     const dialog = feedbackDialog();
+    dialog.querySelector("[data-conversation-link]").href = `/conversation/?knowlId=${encodeURIComponent(feedbackKnowl.knowlId)}`;
     dialog.querySelector("[data-feedback-context]").textContent = `${feedbackKnowl.title} · ${feedbackKnowl.knowlId}`;
     const selectionNote = dialog.querySelector("[data-feedback-selection]");
     selectionNote.hidden = !feedbackKnowl.selectedText;
@@ -170,8 +179,63 @@
     const response = dialog.querySelector("[data-feedback-response]");
     response.hidden = true;
     response.textContent = "";
+    dialog.querySelector(".knowl-review-history").open = false;
+    dialog.querySelector("[data-review-results]").replaceChildren();
+    dialog.querySelector("[data-review-load]").disabled = false;
     dialog.showModal();
     dialog.querySelector("textarea").focus();
+  }
+
+  async function loadReviewHistory() {
+    const dialog = feedbackDialog();
+    const knowl = feedbackKnowl;
+    const results = dialog.querySelector("[data-review-results]");
+    const button = dialog.querySelector("[data-review-load]");
+    const token = dialog.querySelector(".codex-feedback-access input").value.trim();
+    button.disabled = true;
+    results.textContent = "Loading review history…";
+    try {
+      const response = await fetch(`/__knowlpedia/reviews?knowlId=${encodeURIComponent(knowl.knowlId)}`, {
+        cache: "no-store", headers: {Authorization: `Bearer ${token}`},
+      });
+      const history = await response.json();
+      if (feedbackKnowl !== knowl || !dialog.open) return;
+      if (!response.ok) throw new Error(history.error || "Could not load review history.");
+      results.replaceChildren();
+      if (!history.entries.length) results.textContent = "No entries for this knowl in the refactor ledger. Separate dependency-review reports may contain additional history.";
+      for (const {batch, record} of history.entries) {
+        const entry = document.createElement("details");
+        const heading = document.createElement("summary");
+        heading.textContent = `${(record.outcome || "recorded").replaceAll("_", " ")} · ${record.scope || "unspecified scope"} · ${batch}`;
+        entry.append(heading);
+        const fields = document.createElement("dl");
+        for (const [key, value] of Object.entries(record)) {
+          if (["id", "scope", "outcome"].includes(key)) continue;
+          const label = document.createElement("dt");
+          label.textContent = key.replaceAll("_", " ");
+          const body = document.createElement("dd");
+          for (const item of Array.isArray(value) ? value : [value]) {
+            const line = document.createElement("p");
+            if (key === "sources" && typeof item === "string" && /^https?:\/\//i.test(item)) {
+              const link = document.createElement("a");
+              link.href = item;
+              link.textContent = item;
+              link.target = "_blank";
+              link.rel = "noopener noreferrer";
+              line.append(link);
+            } else line.textContent = typeof item === "object" ? JSON.stringify(item) : String(item);
+            body.append(line);
+          }
+          fields.append(label, body);
+        }
+        entry.append(fields);
+        results.append(entry);
+      }
+    } catch (error) {
+      if (feedbackKnowl === knowl && dialog.open) results.textContent = error.message;
+    } finally {
+      if (feedbackKnowl === knowl) button.disabled = false;
+    }
   }
 
   function addFeedbackButtons(root = document) {

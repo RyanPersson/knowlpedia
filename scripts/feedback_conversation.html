@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Codex conversation · Knowlpedia</title>
+<style>
+:root{font-family:system-ui,sans-serif;color:var(--ink);background:var(--paper);--ink:#18332e;--paper:#f5f7f5;--card:#fff;--muted:#52655e;--line:#9caeaa;--accent:#087566;color-scheme:light}body{max-width:850px;margin:auto;padding:24px}a{color:var(--accent)}h1{margin-bottom:8px}p{line-height:1.6}button,input,textarea,select{font:inherit;box-sizing:border-box;padding:10px;border:1px solid var(--line);border-radius:8px}button{cursor:pointer;background:var(--card);color:var(--ink)}button:disabled{opacity:.6;cursor:default}label{display:block;margin:12px 0}textarea{width:100%;resize:vertical}input{max-width:100%}input,textarea,select{background:var(--card);color:var(--ink)}.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}article{background:var(--card);border:1px solid #dce4df;border-radius:12px;padding:18px;margin:16px 0;overflow-wrap:anywhere}article[data-role=user]{border-left:4px solid #087566}.message{white-space:pre-wrap;line-height:1.65}.context{font-size:.85rem;color:var(--muted)}#history{max-height:60vh;overflow:auto;padding:0 8px}#status{min-height:1.6em}form{border-top:1px solid #ccd9d2;margin-top:20px;padding-top:10px}small{display:block;line-height:1.5;color:var(--muted)}button[type=submit]{background:#087566;color:white} @media(max-width:450px){body{padding:14px}article{padding:12px}}
+ :root[data-theme="dark"]{--ink:#e4eee8;--paper:#111714;--card:#202b26;--muted:#b4c6bc;--line:#53695d;--accent:#8cdbc2;color-scheme:dark}
+</style></head><body>
+<div class="toolbar"><a href="/index/">← Knowlpedia</a><button id="theme-toggle" type="button">Theme</button></div><h1>Codex conversation</h1><p>The shared feedback conversation for this preview. Messages from individual knowls and this page appear together.</p>
+<label>Access key <input id="key" type="password" autocomplete="off"></label>
+<div class="toolbar"><button id="refresh">Load / refresh conversation</button><button id="latest">Jump to latest</button></div>
+<p id="status" role="status"></p><section id="history" aria-label="Conversation history"></section>
+<form id="compose"><label>Action <select id="intent"><option value="ask">Ask · read only</option><option value="change">Request change · may edit files</option><option value="flag">Flag issue · requires knowl ID</option></select></label>
+<label>Knowl ID (optional for Ask and Request change)<input id="knowl" placeholder="mathematical-physics/hyperbolic-plane-wave" style="width:100%"></label>
+<label>Your message<textarea id="message" rows="5" maxlength="8000" required></textarea></label>
+<div class="toolbar"><button type="button" id="dictate">Dictate</button><button type="submit" id="send">Send to Codex</button></div>
+<small id="voice-note">Dictation is transcribed locally by Parakeet on the OptiPlex. Audio is processed in memory and is not saved in Oreo logs. Review the text before sending.</small>
+<p id="voice-status" role="status"></p></form>
+<script src="/__knowlpedia/conversation.js"></script></body></html>

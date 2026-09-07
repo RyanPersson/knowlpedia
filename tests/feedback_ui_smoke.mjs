@@ -1,10 +1,11 @@
 import assert from 'node:assert/strict';
-import {mkdir} from 'node:fs/promises';
+import {mkdir, readFile} from 'node:fs/promises';
 import {chromium} from 'playwright';
 const base=process.env.PREVIEW_URL || 'http://127.0.0.1:8012';
 const browser=await chromium.launch({headless:true});
 try {
  const page=await browser.newPage();
+ const token=(await readFile('.preview-server/codex-access-token','utf8')).trim();
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await mkdir('tmp/feedback-ui',{recursive:true});
  for(const width of [320,390,1440]) {
@@ -14,6 +15,15 @@ try {
   const dialog=page.getByRole('dialog',{name:'Message Codex'});
   assert.ok(await dialog.isVisible());
   assert.equal(await dialog.evaluate(d=>d.scrollWidth>d.clientWidth),false,'Dialog should fit mobile width');
+  await dialog.getByText('Refactor ledger',{exact:true}).click();
+  await dialog.getByLabel('Access key').fill(token);
+  await dialog.getByRole('button',{name:'Load review history'}).click();
+  await dialog.locator('[data-review-results] summary').first().waitFor();
+  const results=dialog.locator('[data-review-results]');
+  assert.match(await results.textContent(),/graph-merge-minimal-openings/);
+  await results.locator('summary').first().click();
+  assert.match(await results.textContent(),/Vector-space axioms named separately/);
+  assert.equal(await dialog.evaluate(d=>d.scrollWidth>d.clientWidth),false,'Ledger should fit mobile width');
   await page.screenshot({path:`tmp/feedback-ui/dialog-${width}.png`});
   await dialog.getByRole('button',{name:'Close Codex feedback'}).click();
  }
@@ -37,6 +47,14 @@ try {
  await page.waitForTimeout(200);
  assert.match(await dialog.locator('[data-feedback-context]').textContent(),/algebra-rings\/field/);
  assert.equal(await dialog.locator('[data-feedback-response]').isVisible(),false);
+ await dialog.getByText('Refactor ledger',{exact:true}).click();
+ await dialog.getByRole('button',{name:'Load review history'}).click();
+ await page.waitForFunction(()=>document.querySelector('[data-review-results]').textContent.includes('access key'));
+ await dialog.getByLabel('Access key').fill(token);
+ await dialog.getByRole('button',{name:'Load review history'}).click();
+ await dialog.locator('[data-review-results] summary').first().waitFor();
+ assert.match(await dialog.locator('[data-review-results]').textContent(),/ring-path/);
+ assert.doesNotMatch(await dialog.locator('[data-review-results]').textContent(),/functional-path/);
  assert.equal(polls,0,'A response for a closed dialog must not be polled into another knowl');
  assert.deepEqual(errors,[]);
  console.log('Feedback dialog passed at 320/390/1440px; late replies cannot leak into another knowl.');
