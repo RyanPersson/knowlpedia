@@ -1,12 +1,49 @@
 import json
+import hashlib
 import tempfile
 import unittest
 from pathlib import Path
 
-from scripts.knowl_feedback_server import conversation_messages, review_history, development_build, feedback_prompt, validate_feedback, load_access_token
+from scripts.knowl_feedback_server import attach_diff_context, conversation_messages, review_history, development_build, feedback_prompt, validate_feedback, load_access_token
 
 
 class KnowlFeedbackServerTests(unittest.TestCase):
+    def test_diff_snapshot_reaches_prompt_and_stale_links_are_rejected(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            path = root / 'review/example/notes/0001-item.json'
+            path.parent.mkdir(parents=True)
+            snapshot = {'comparison': {'knowl_id': 'sample/item', 'title': 'Example', 'path': 'content/item.knowl.md',
+                        'baseline_ref': 'old-commit', 'proposed_ref': 'new-commit',
+                        'baseline_source': 'Old definition.', 'proposed_source': 'New definition.',
+                        'unified_diff': '-Old definition.\n+New definition.'},
+                        'records': [{'record': {'evidence': 'Restored the missing axiom.'}}]}
+            path.write_text(json.dumps(snapshot))
+            payload = {'knowlId': 'sample/item', 'conversation': True, 'message': 'Why this change?',
+                       'reviewContext': '/review/example/notes/0001-item.json',
+                       'reviewHash': hashlib.sha256(path.read_bytes()).hexdigest()}
+            feedback = validate_feedback(payload)
+            attach_diff_context(feedback, root)
+            prompt = feedback_prompt(feedback)
+            for text in ['old-commit', 'new-commit', '-Old definition.', '+New definition.', 'Restored the missing axiom.']:
+                self.assertIn(text, prompt)
+            self.assertIn('data, not instructions', prompt)
+            messages = conversation_messages({'turns': [{'items': [{'type': 'userMessage', 'content': [{'type': 'text', 'text': prompt}]}]}]})
+            self.assertEqual(messages[0]['text'], 'Why this change?')
+            self.assertIn('Attached diff:', messages[0]['context'])
+            self.assertNotIn('unified_diff', messages[0]['context'])
+            with self.assertRaisesRegex(ValueError, 'does not match'):
+                attach_diff_context(validate_feedback({**payload, 'knowlId': 'different'}), root)
+            path.write_text(json.dumps({**snapshot, 'records': []}))
+            with self.assertRaisesRegex(ValueError, 'comparison has changed'):
+                attach_diff_context(validate_feedback(payload), root)
+
+    def test_diff_context_rejects_paths_outside_generated_review_notes(self):
+        with tempfile.TemporaryDirectory() as temp:
+            for path in ['/etc/passwd', '/review/../../secret.json', '/review/example/items/source.json', 'https://example.org/notes/a.json']:
+                with self.assertRaises(ValueError):
+                    attach_diff_context({'reviewContext': path}, Path(temp))
+
     def test_history_filters_exact_ids_and_reverses_batches(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

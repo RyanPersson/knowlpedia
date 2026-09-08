@@ -40,6 +40,9 @@ class ReviewItem:
     change_kind: str = "modified"
     review_notes: list[dict] = field(default_factory=list)
     notes_ref: str = "Working tree"
+    baseline_ref: str = "HEAD"
+    proposed_ref: str = "Working tree"
+    context_hash: str = ""
 
 
 def load_review_notes(tree: Path) -> dict[str, list[dict]]:
@@ -84,9 +87,26 @@ def write_review_notes(items: list[ReviewItem], output: Path) -> None:
             "matching_source": "baseline" if item.current_knowl is None else "proposed",
             "records": [{**note, "matches_displayed_source": note_matches_item(note, item)}
                         for note in item.review_notes],
+            "comparison": {
+                "knowl_id": (item.current_knowl or item.old_knowl).id,
+                "title": (item.current_knowl or item.old_knowl).title,
+                "path": item.path,
+                "baseline_ref": item.baseline_ref,
+                "proposed_ref": item.proposed_ref,
+                "change_kind": item.change_kind,
+                "baseline_source": item.old_text,
+                "proposed_source": item.current_text,
+                "unified_diff": "".join(difflib.unified_diff(
+                    item.old_text.splitlines(keepends=True), item.current_text.splitlines(keepends=True),
+                    fromfile=f"{item.baseline_ref}:{item.path}",
+                    tofile=f"{item.proposed_ref}:{item.path}",
+                )),
+            },
         }
+        serialized = json.dumps(payload, ensure_ascii=False, indent=2) + "\n"
+        item.context_hash = hashlib.sha256(serialized.encode("utf-8")).hexdigest()
         (directory / Path(item.filename).with_suffix(".json")).write_text(
-            json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8",
+            serialized, encoding="utf-8",
         )
 
 
@@ -425,6 +445,8 @@ def item_styles() -> str:
     .review-toolbar p { margin: 0; min-width: 0; }
     .review-path { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .review-toolbar a { white-space: nowrap; }
+    .review-toolbar-actions { display: flex; gap: .8rem; flex-wrap: wrap; }
+    .review-message { padding: .4rem .65rem; border: 1px solid var(--accent); border-radius: .4rem; color: var(--accent-strong); }
     .comparison {
       display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       gap: 1px; background: var(--line);
@@ -583,7 +605,10 @@ def render_item_page(
         + f"""<body>
   <header class="review-toolbar">
     <p class="review-path"><strong>{item.index + 1} of {total}</strong> · {html.escape(item.path)}</p>
-    {current_link}
+    <nav class="review-toolbar-actions" aria-label="Review actions">
+      <a class="review-message" id="message-diff" href="/conversation/" target="_blank" rel="noopener">Message about this diff</a>
+      {current_link}
+    </nav>
   </header>
   {render_review_notes(item, registry)}
   <details class="source-diff"{diff_open}>
@@ -591,6 +616,13 @@ def render_item_page(
     <div class="diff-wrap">{source_diff(item.old_text, item.current_text, left_label, right_label)}</div>
   </details>
   {rendered}
+  <script>
+    const conversation = new URL('/conversation/', location.origin);
+    conversation.searchParams.set('knowlId', {json.dumps(display_knowl.id).replace('<', chr(92) + 'u003c')});
+    conversation.searchParams.set('reviewContext', new URL('../notes/' + {json.dumps(Path(item.filename).with_suffix('.json').name)}, location.href).pathname);
+    conversation.searchParams.set('reviewHash', {json.dumps(item.context_hash)});
+    document.getElementById('message-diff').href = conversation.href;
+  </script>
 </body>
 </html>
 """
@@ -735,6 +767,7 @@ def render_index(
 
 
 def build(content_repo: Path, output: Path) -> int:
+    baseline_ref = git("rev-parse", "HEAD", cwd=content_repo).stdout.decode().strip()
     substantive = [
         (path, old, current)
         for path, old, current in comparison_sources(content_repo, None, None, None)
@@ -757,6 +790,7 @@ def build(content_repo: Path, output: Path) -> int:
                 old_knowl=old_knowl,
                 current_knowl=current_knowl,
                 filename=f"{index + 1:04d}-{safe_id}.html",
+                baseline_ref=baseline_ref,
             )
         )
 
@@ -912,6 +946,9 @@ def build_ref_comparison(
     include_added: bool = False,
     include_deleted: bool = False,
 ) -> int:
+    # Resolve refs once so source, explanation, and messaging context stay aligned.
+    left_ref = git("rev-parse", left_ref, cwd=content_repo).stdout.decode().strip()
+    right_ref = git("rev-parse", right_ref, cwd=content_repo).stdout.decode().strip()
     comparisons = comparison_sources(
         content_repo,
         left_ref,
@@ -962,6 +999,8 @@ def build_ref_comparison(
                     old_knowl=left_knowl,
                     current_knowl=right_knowl,
                     filename=f"{index + 1:04d}-{safe_id}.html",
+                    baseline_ref=left_ref,
+                    proposed_ref=right_ref,
                     change_kind=(
                         "added" if path in added_paths
                         else "deleted" if path in deleted_paths

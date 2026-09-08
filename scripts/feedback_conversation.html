@@ -9,6 +9,11 @@
 <div class="toolbar"><button id="refresh">Load / refresh conversation</button><button id="latest">Jump to latest</button></div>
 <p id="status" role="status"></p><section id="history" aria-label="Conversation history"></section>
 <form id="compose">
+<aside id="diff-context" hidden aria-label="Attached diff" style="padding:12px;border:1px solid var(--line);border-radius:8px;overflow-wrap:anywhere">
+<strong>Discussing this diff</strong><p id="diff-description"></p>
+<div class="toolbar"><a id="diff-link">Open diff</a><button id="clear-diff" type="button">Remove diff context</button></div>
+<small>The before/after sources, exact revisions, and saved review notes are included when you send.</small>
+</aside>
 <label>Knowl ID (optional)<input id="knowl" placeholder="mathematical-physics/hyperbolic-plane-wave" style="width:100%"></label>
 <label>Your message<textarea id="message" rows="5" maxlength="8000" required></textarea></label>
 <div class="toolbar"><button type="button" id="dictate">Dictate</button><button type="submit" id="send">Send to Codex</button></div>

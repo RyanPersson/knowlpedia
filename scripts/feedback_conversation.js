@@ -3,6 +3,41 @@ const $ = id => document.getElementById(id);
 const tokenKey = 'knowl-codex-access-key';
 try { $('key').value = localStorage.getItem(tokenKey) || ''; } catch {}
 $('knowl').value = new URLSearchParams(location.search).get('knowlId') || '';
+const reviewParams = new URLSearchParams(location.search);
+let reviewContext = reviewParams.get('reviewContext') || '';
+let reviewHash = reviewParams.get('reviewHash') || '';
+let diffReady = !reviewContext;
+if (reviewContext) {
+  $('diff-context').hidden = false;
+  $('diff-description').textContent = 'Loading the selected diff…';
+  $('send').disabled = true;
+  $('knowl').readOnly = true;
+  (async () => {
+    try {
+      if (!/^\/review\/.+\/notes\/[^/]+\.json$/.test(reviewContext) || reviewContext.includes('..')) throw Error('Invalid diff link.');
+      const response = await fetch(reviewContext, {cache:'no-store'});
+      if (!response.ok) throw Error('This comparison is unavailable. Reopen the review page.');
+      const snapshot = await response.json();
+      if (!reviewContext) return;
+      const diff = snapshot.comparison;
+      if (!diff || diff.knowl_id !== $('knowl').value) throw Error('This diff link no longer matches the knowl. Reopen the review page.');
+      $('diff-description').textContent = `${diff.title} · ${diff.baseline_ref.slice(0,12)} → ${diff.proposed_ref.slice(0,12)}`;
+      $('diff-link').href = reviewContext.replace('/notes/', '/items/').replace(/\.json$/, '.html');
+      diffReady = true;
+      $('send').disabled = false;
+      $('message').focus();
+    } catch(error) {
+      if (reviewContext) $('diff-description').textContent = error.message;
+    }
+  })();
+}
+$('clear-diff').onclick = () => {
+  reviewContext = ''; reviewHash = ''; diffReady = true;
+  $('diff-context').hidden = true; $('knowl').readOnly = false; $('send').disabled = sending;
+  const url = new URL(location.href);
+  url.searchParams.delete('reviewContext'); url.searchParams.delete('reviewHash');
+  history.replaceState(null, '', url);
+};
 let sending = false;
 async function api(path, body) {
   const token = $('key').value.trim();
@@ -42,13 +77,14 @@ async function refresh() {
 $('refresh').onclick = () => refresh().catch(e => {$('status').textContent=e.message;});
 $('latest').onclick = () => {$('history').scrollTop=$('history').scrollHeight;};
 $('compose').onsubmit = async event => {
-  event.preventDefault(); if (sending) return;
+  event.preventDefault(); if (sending || !diffReady) return;
   const message=$('message').value.trim(), knowlId=$('knowl').value.trim(), intent='auto';
   if (!message) return;
 
   sending=true; $('send').disabled=true; $('dictate').disabled=true; $('status').textContent='Sending…';
   try {
-    const job=await api('/__knowlpedia/codex',{intent,knowlId,message,conversation:true,url:location.href});
+    const job=await api('/__knowlpedia/codex',{intent,knowlId,message,conversation:true,url:location.href,
+      ...(reviewContext ? {reviewContext,reviewHash} : {})});
     $('message').value='';
     let result;
     do {

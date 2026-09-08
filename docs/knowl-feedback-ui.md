@@ -56,6 +56,35 @@ in the refactor-ledger viewer, which continues to show review history.
 
 ## Shared conversation page
 
+### Messages about a diff
+
+Each generated comparison has a **Message about this diff** action. It opens
+the shared conversation in a new tab with the knowl and comparison attached.
+Opening it does not submit a message. The composer shows the selected diff,
+links back to it, and offers **Remove diff context** for unrelated questions.
+
+On submission, the bridge reads the generated snapshot from the comparison's
+`notes/` directory. It includes both complete sources, the unified diff,
+pinned Git revisions, source path, and saved review records in the model's
+reference context. A hash identifies the exact snapshot opened by the reviewer;
+if regeneration changed it, the bridge asks the reviewer to reopen the diff
+instead of silently attaching another version. Conversation history displays
+the diff identity without repeating the full source payload.
+
+Messaging requires the development preview profile. After a production-only
+validation build, restore the interactive preview with
+`make build-content KNOWLPEDIA_PROFILE=development EXTRA_CONTENT_SOURCES=`
+and regenerate the comparison (the build replaces the output directory).
+The 3,539 production knowls are unchanged; the development preview also
+includes its testing fixtures. The same persistent service, access key, and
+feedback thread are reused.
+
+Validation: `node tests/review_conversation_smoke.mjs` checks the review button,
+attached context, submission payload, removal, and desktop/mobile layouts.
+Model submissions are intercepted in this test; it creates no feedback turn.
+
+### General messages
+
 Open `/conversation/` on the feedback preview, or follow **Open shared
 conversation** in a knowl's dialog. It reads the same persistent Codex thread
 through App Server `thread/read`, including the existing reviewer messages,

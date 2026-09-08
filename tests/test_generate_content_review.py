@@ -67,6 +67,11 @@ class GenerateContentReviewTests(unittest.TestCase):
             self.assertEqual(exported["ledger_revision"], "pinned-commit")
             self.assertEqual([r["matches_displayed_source"] for r in exported["records"]], [False, True])
             self.assertEqual(exported["records"][1]["record"], current)
+            self.assertEqual(exported['comparison']['baseline_source'], item.old_text)
+            self.assertEqual(exported['comparison']['proposed_source'], item.current_text)
+            self.assertIn('Message about this diff', page)
+            self.assertIn(item.context_hash, page)
+            self.assertEqual(item.context_hash, hashlib.sha256((root / 'output/notes/0001-item.json').read_bytes()).hexdigest())
 
     def test_missing_or_historical_notes_do_not_claim_current_verification(self):
         item = self.note_item()

@@ -22,6 +22,10 @@ Each comparison also lists prerequisite additions and removals from the two
 displayed sources. **Download original review records** exports the original
 records, ledger paths, zero-based record indices, ledger revision, and source
 matching status as JSON under the generated comparison's `notes/` directory.
+The export also contains both complete sources, a unified diff, and the exact
+compared Git revisions. **Message about this diff** opens the shared feedback
+conversation with that snapshot attached; it sends only after the reviewer
+submits their message. See [the feedback UI workflow](../docs/knowl-feedback-ui.md#messages-about-a-diff).
 
 Generate the complete dependency comparison with:
 
