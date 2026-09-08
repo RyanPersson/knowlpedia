@@ -30,6 +30,23 @@ class ReviewProgressTests(unittest.TestCase):
             self.assertEqual(result['counts'], dict(canonical_entries=3, corrected=1, reviewed_unchanged=0, blocked=0, stale=1, retired=1, reviewed_current=1, remaining_review=2))
             self.assertEqual(result['stale_ids'], ['b'])
 
+    def test_targeted_repairs_do_not_close_full_review(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / 'current.md'
+            source.write_text('current definition')
+            digest = hashlib.sha256(source.read_bytes()).hexdigest()
+            records = [dict(id=kid, outcome=outcome, scope='targeted',
+                            source_sha256=digest, evidence='One claim checked')
+                       for kid, outcome in [('partial', 'corrected'), ('issue', 'blocked')]]
+            (root / 'reviews.json').write_text(json.dumps({'reviews': records}))
+            registry = {kid: SimpleNamespace(source_path=source) for kid in ['partial', 'issue']}
+            with patch.object(progress.compiler, 'read_toml', return_value={}), patch.object(progress.compiler, 'discover_package_knowls', return_value=([], [])), patch.object(progress.compiler, 'build_registry', return_value=(registry, [])):
+                result = progress.summarize(root, root)
+            self.assertEqual(result['counts']['reviewed_current'], 0)
+            self.assertEqual(result['counts']['remaining_review'], 2)
+            self.assertEqual(result['counts']['blocked'], 1)
+
 
 if __name__ == '__main__':
     unittest.main()

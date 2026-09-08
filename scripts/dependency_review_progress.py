@@ -22,6 +22,10 @@ def summarize(package, review_dir):
             kid = entry['id']
             if entry['outcome'] not in {'corrected', 'reviewed_unchanged', 'blocked'} or not entry.get('evidence'):
                 raise ValueError(f'{path}: invalid review for {kid}')
+            # A correction to one claim is not a completed semantic review.
+            # Keep explicit unresolved findings visible regardless of scope.
+            if entry.get('scope') == 'targeted' and entry['outcome'] != 'blocked':
+                continue
             entries.setdefault(kid, []).append(entry)
     counts = dict(canonical_entries=len(registry), corrected=0, reviewed_unchanged=0, blocked=0, stale=0, retired=0)
     stale_ids = []
