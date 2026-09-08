@@ -2,10 +2,15 @@ import subprocess
 import tempfile
 import unittest
 import json
+import hashlib
 from pathlib import Path
 
 from scripts.generate_content_review import (
     ReviewItem,
+    attach_review_notes,
+    extract_ref,
+    render_review_notes,
+    write_review_notes,
     added_knowl_paths,
     build_diff_plan,
     changed_character_count,
@@ -28,6 +33,84 @@ class GenerateContentReviewTests(unittest.TestCase):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
+
+    def note_item(self, change_kind="modified"):
+        text = '+++\nid="test/item"\ntitle="Item"\nkind="definition"\nsummary="Example"\n+++\nBody.\n'
+        knowl = parse_text(text, "test")
+        return ReviewItem(0, "content/test/item.knowl.md", text, text,
+                          knowl, None if change_kind == "deleted" else knowl,
+                          "0001-item.html", change_kind=change_kind)
+
+    def test_review_notes_distinguish_exact_source_from_other_versions(self):
+        item = self.note_item()
+        current = {"id": "test/item", "outcome": "corrected",
+                   "source_sha256": hashlib.sha256(item.current_text.encode()).hexdigest(),
+                   "evidence": "Add the missing hypothesis. <script>bad()</script>"}
+        old = {**current, "source_sha256": "older-version", "evidence": "Earlier decision"}
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            ledger = root / "reviews/dependency-structure/notes.json"
+            ledger.parent.mkdir(parents=True)
+            ledger.write_text(json.dumps({"reviews": [old, current],
+                                          "triage_records": [{**current, "evidence": "Unreviewed triage"}]}))
+            attach_review_notes([item], root, "pinned-commit")
+            write_review_notes([item], root / "output")
+            page = render_item_page(item, {item.current_knowl.id: item.current_knowl}, 1)
+            self.assertLess(page.index('id="review-reasons-heading"'), page.index('<details class="source-diff"'))
+            self.assertIn("Notes matching the displayed proposed source", page)
+            self.assertIn('class="review-note-history"><summary>', page)
+            self.assertIn("Earlier decision", page)
+            self.assertNotIn("Unreviewed triage", page)
+            self.assertNotIn("<script>bad()</script>", page)
+            self.assertIn("&lt;script&gt;bad()&lt;/script&gt;", page)
+            exported = json.loads((root / "output/notes/0001-item.json").read_text())
+            self.assertEqual(exported["ledger_revision"], "pinned-commit")
+            self.assertEqual([r["matches_displayed_source"] for r in exported["records"]], [False, True])
+            self.assertEqual(exported["records"][1]["record"], current)
+
+    def test_missing_or_historical_notes_do_not_claim_current_verification(self):
+        item = self.note_item()
+        self.assertIn("No justification was recorded", render_review_notes(item, {}))
+        item.review_notes = [{"ledger": "reviews/old.json", "record_index": 0,
+                              "record": {"source_sha256": "old", "evidence": "Earlier reason"}}]
+        rendered = render_review_notes(item, {})
+        self.assertIn("No saved note matches this exact source revision", rendered)
+        self.assertIn('class="review-note-history" open>', rendered)
+        self.assertNotIn("Notes matching the displayed", rendered)
+
+    def test_deleted_knowl_notes_match_baseline(self):
+        item = self.note_item("deleted")
+        item.current_text = ""
+        item.review_notes = [{"ledger": "reviews/old.json", "record_index": 0,
+                              "record": {"source_sha256": hashlib.sha256(item.old_text.encode()).hexdigest(),
+                                         "evidence": "Removal context"}}]
+        self.assertIn("Notes matching the displayed baseline source", render_review_notes(item, {}))
+
+    def test_ref_notes_come_from_compared_commit_not_worktree(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            repo = root / "repo"
+            repo.mkdir()
+            self.git(repo, "init")
+            self.git(repo, "config", "user.name", "Test User")
+            self.git(repo, "config", "user.email", "test@example.com")
+            item = self.note_item()
+            source = repo / item.path
+            source.parent.mkdir(parents=True)
+            source.write_text(item.current_text)
+            ledger = repo / "reviews/dependency-structure/notes.json"
+            ledger.parent.mkdir(parents=True)
+            record = {"id": "test/item", "source_sha256": hashlib.sha256(item.current_text.encode()).hexdigest(),
+                      "evidence": "Committed explanation"}
+            ledger.write_text(json.dumps({"reviews": [record]}))
+            self.git(repo, "add", ".")
+            self.git(repo, "commit", "-m", "Reviewed version")
+            ledger.write_text(json.dumps({"reviews": [{**record, "evidence": "Uncommitted replacement"}]}))
+            tree = root / "extracted"
+            tree.mkdir()
+            extract_ref(repo, "HEAD", tree)
+            attach_review_notes([item], tree, "HEAD")
+            self.assertEqual(item.review_notes[0]["record"]["evidence"], "Committed explanation")
 
     def test_ref_comparison_selects_only_modified_existing_knowls(self) -> None:
         with tempfile.TemporaryDirectory() as temp:

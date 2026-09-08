@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import difflib
+import hashlib
 import html
 import io
 import json
@@ -13,7 +14,7 @@ import subprocess
 import sys
 import tarfile
 import tempfile
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 
@@ -37,6 +38,136 @@ class ReviewItem:
     current_knowl: compiler.Knowl | None
     filename: str
     change_kind: str = "modified"
+    review_notes: list[dict] = field(default_factory=list)
+    notes_ref: str = "Working tree"
+
+
+def load_review_notes(tree: Path) -> dict[str, list[dict]]:
+    """Load recorded reviews, never triage records or inferred explanations."""
+    by_id: dict[str, list[dict]] = {}
+    for path in sorted((tree / "reviews" / "dependency-structure").glob("*.json")):
+        data = json.loads(path.read_text(encoding="utf-8"))
+        for index, record in enumerate(data.get("reviews", [])):
+            if not record.get("id") or not any(record.get(key) for key in ("evidence", "changes", "reason")):
+                continue
+            by_id.setdefault(record["id"], []).append({
+                "ledger": path.relative_to(tree).as_posix(),
+                "record_index": index,
+                "record": record,
+            })
+    return by_id
+
+
+def attach_review_notes(items: list[ReviewItem], tree: Path, source_ref: str) -> None:
+    notes = load_review_notes(tree)
+    for item in items:
+        ids = {knowl.id for knowl in (item.current_knowl, item.old_knowl) if knowl}
+        item.review_notes = [note for kid in sorted(ids) for note in notes.get(kid, [])]
+        item.notes_ref = source_ref
+
+
+def note_matches_item(note: dict, item: ReviewItem) -> bool:
+    text = item.current_text if item.current_knowl else item.old_text
+    return note["record"].get("source_sha256") == hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def write_review_notes(items: list[ReviewItem], output: Path) -> None:
+    """Export the original records and their provenance alongside the comparison."""
+    directory = output / "notes"
+    directory.mkdir(parents=True, exist_ok=True)
+    for stale in directory.glob("*.json"):
+        stale.unlink()
+    for item in items:
+        payload = {
+            "path": item.path,
+            "ledger_revision": item.notes_ref,
+            "matching_source": "baseline" if item.current_knowl is None else "proposed",
+            "records": [{**note, "matches_displayed_source": note_matches_item(note, item)}
+                        for note in item.review_notes],
+        }
+        (directory / Path(item.filename).with_suffix(".json")).write_text(
+            json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8",
+        )
+
+
+def render_review_notes(item: ReviewItem, registry: dict[str, compiler.Knowl]) -> str:
+    def record_html(note: dict) -> str:
+        record = note["record"]
+        labels = {"corrected": "Correction recorded", "reviewed_unchanged": "Reviewed unchanged",
+                  "blocked": "Unresolved finding"}
+        label = labels.get(record.get("outcome"), "Review note")
+        if record.get("scope") == "targeted":
+            label += " · targeted check"
+        paragraphs = []
+        seen = set()
+        for key in ("changes", "reason", "evidence"):
+            values = record.get(key, [])
+            for value in values if isinstance(values, list) else [values]:
+                if isinstance(value, str) and value.strip() and value not in seen:
+                    paragraphs.append(f'<p class="review-reason-text">{html.escape(value)}</p>')
+                    seen.add(value)
+        sources = record.get("sources", [])
+        if sources:
+            paragraphs.append('<p><strong>Recorded sources:</strong></p><ul>')
+            for source in sources:
+                text = source if isinstance(source, str) else json.dumps(source, ensure_ascii=False)
+                escaped = html.escape(text)
+                link = (f'<a href="{escaped}" target="_blank" rel="noopener noreferrer">{escaped}</a>'
+                        if text.startswith(("https://", "http://")) else escaped)
+                paragraphs.append(f"<li>{link}</li>")
+            paragraphs.append("</ul>")
+        return (f'<article class="review-note"><p class="review-note-label">{label}</p>'
+                + "".join(paragraphs)
+                + f'<p class="review-note-source">{html.escape(note["ledger"])} · record {note["record_index"] + 1}</p></article>')
+
+    matching = [note for note in item.review_notes if note_matches_item(note, item)]
+    other = [note for note in item.review_notes if not note_matches_item(note, item)]
+    priority = {"blocked": 0, "corrected": 1, "reviewed_unchanged": 2}
+    matching.sort(key=lambda note: priority.get(note["record"].get("outcome"), 3))
+    parts = ['<section class="review-reasons" aria-labelledby="review-reasons-heading">',
+             '<h2 id="review-reasons-heading">Why this changed</h2>',
+             '<p class="review-note-context">Saved review notes explain the change and the checks made. '
+             'They describe the knowl as a whole, rather than each individual diff line.</p>']
+    if matching:
+        version = "baseline" if item.current_knowl is None else "proposed"
+        parts.append(f'<p class="review-note-status">Notes matching the displayed {version} source</p>')
+        parts.extend(record_html(note) for note in matching)
+    else:
+        parts.append('<p class="review-note-status">No saved note matches this exact source revision.</p>')
+    if other:
+        # When these are the only explanations available, expose them immediately.
+        opened = "" if matching else " open"
+        parts.append(f'<details class="review-note-history"{opened}><summary>Notes for other source versions ({len(other)})</summary>'
+                     '<p>These notes may explain earlier edits, including decisions that were subsequently revised. '
+                     'They are not verification of the displayed source.</p>')
+        parts.extend(record_html(note) for note in other)
+        parts.append('</details>')
+    if not item.review_notes:
+        parts.append('<p>No justification was recorded in the dependency review ledgers for this knowl.</p>')
+
+    old = set(item.old_knowl.prerequisites if item.old_knowl else [])
+    new = set(item.current_knowl.prerequisites if item.current_knowl else [])
+    if old != new:
+        parts.append('<details class="review-prerequisite-changes"><summary>Prerequisite changes</summary>'
+                     '<p>Prerequisites are concepts needed to understand the opening definition or theorem. '
+                     'Removing one from this list does not remove its ordinary links from the text.</p>')
+        for label, targets in (("Added", new - old), ("Removed", old - new)):
+            if not targets:
+                continue
+            parts.append(f'<p><strong>{label}</strong></p><ul>')
+            for target in sorted(targets):
+                knowl = registry.get(target)
+                title = knowl.title if knowl else target
+                parts.append(f'<li><a href="{html.escape(compiler.target_href(target))}" target="_blank" '
+                             f'rel="noopener noreferrer">{html.escape(title)}</a></li>')
+            parts.append('</ul>')
+        parts.append('</details>')
+    if item.review_notes:
+        notes_file = Path(item.filename).with_suffix(".json").name
+        parts.append(f'<p class="review-note-source">Saved with content revision {html.escape(item.notes_ref)} · '
+                     f'<a href="../notes/{html.escape(notes_file)}" download>Download original review records</a></p>')
+    parts.append('</section>')
+    return "\n".join(parts)
 
 
 @dataclass(frozen=True)
@@ -313,6 +444,16 @@ def item_styles() -> str:
     .review-knowl-header h1 { margin: .15rem 0 .5rem; overflow-wrap: anywhere; }
     .review-section { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--line); }
     .review-section h2 { font-size: 1.25rem; }
+    .review-reasons { padding: 1.25rem clamp(1rem, 3vw, 3rem); background: var(--surface); border-bottom: 1px solid var(--line); }
+    .review-reasons h2 { margin: 0 0 .5rem; font-size: 1.2rem; }
+    .review-reasons p { max-width: 85ch; margin: .6rem 0; }
+    .review-note-context, .review-note-source { color: var(--muted); font-size: .85rem; overflow-wrap: anywhere; }
+    .review-note-status, .review-note-label { font-weight: 700; font-size: .9rem; }
+    .review-note { padding: .35rem 0 .35rem 1rem; margin: .9rem 0; border-left: 3px solid var(--accent); }
+    .review-reason-text { white-space: pre-line; overflow-wrap: anywhere; }
+    .review-note-history, .review-prerequisite-changes { margin: 1rem 0; }
+    .review-reasons summary { cursor: pointer; font-weight: 600; }
+    .review-reasons li { overflow-wrap: anywhere; }
     .source-diff {
       margin: 0; padding: 1.25rem; border-top: 1px solid var(--line);
       background: var(--canvas); color: var(--ink);
@@ -444,6 +585,7 @@ def render_item_page(
     <p class="review-path"><strong>{item.index + 1} of {total}</strong> · {html.escape(item.path)}</p>
     {current_link}
   </header>
+  {render_review_notes(item, registry)}
   <details class="source-diff"{diff_open}>
     <summary>Delimiter-normalized source diff</summary>
     <div class="diff-wrap">{source_diff(item.old_text, item.current_text, left_label, right_label)}</div>
@@ -618,6 +760,8 @@ def build(content_repo: Path, output: Path) -> int:
             )
         )
 
+    attach_review_notes(items, content_repo, "Working tree")
+    write_review_notes(items, output)
     item_dir = output / "items"
     item_dir.mkdir(parents=True, exist_ok=True)
     for stale in item_dir.glob("*.html"):
@@ -635,7 +779,10 @@ def build(content_repo: Path, output: Path) -> int:
 
 
 def extract_ref(content_repo: Path, ref: str, destination: Path) -> None:
-    archive = git("archive", ref, "content", cwd=content_repo).stdout
+    paths = ["content"]
+    if path_exists_at_ref(content_repo, ref, "reviews/dependency-structure"):
+        paths.append("reviews/dependency-structure")
+    archive = git("archive", ref, *paths, cwd=content_repo).stdout
     with tarfile.open(fileobj=io.BytesIO(archive), mode="r:") as bundle:
         bundle.extractall(destination)
 
@@ -823,6 +970,10 @@ def build_ref_comparison(
                 )
             )
 
+        resolved_ref = git("rev-parse", right_ref, cwd=content_repo).stdout.decode().strip()
+        attach_review_notes(items, right_tree, resolved_ref)
+
+    write_review_notes(items, output)
     item_dir = output / "items"
     item_dir.mkdir(parents=True, exist_ok=True)
     for stale in item_dir.glob("*.html"):

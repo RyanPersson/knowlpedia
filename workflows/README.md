@@ -7,3 +7,4 @@ frameworks, or external skill packages.
 ## Available workflows
 
 - [Create and integrate a knowl batch](create-knowl-batch.md)
+- [Reasons in the content comparison](review-change-reasons.md)
