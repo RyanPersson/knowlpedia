@@ -2,12 +2,31 @@ import json
 import hashlib
 import tempfile
 import unittest
+from unittest.mock import Mock
 from pathlib import Path
 
-from scripts.knowl_feedback_server import attach_diff_context, conversation_messages, review_history, development_build, feedback_prompt, validate_feedback, load_access_token
+from scripts.knowl_feedback_server import FeedbackHandler, attach_diff_context, conversation_messages, review_history, development_build, feedback_prompt, validate_feedback, load_access_token
 
 
 class KnowlFeedbackServerTests(unittest.TestCase):
+    def test_production_rejects_all_feedback_routes_before_accessing_model(self):
+        handler = object.__new__(FeedbackHandler)
+        handler.feedback_enabled = False
+        handler._json = Mock()
+        for method, paths in [
+            (handler.do_GET, ['/conversation/', '/__knowlpedia/conversation.js',
+                              '/__knowlpedia/conversation', '/__knowlpedia/reviews?knowlId=sample/a',
+                              '/__knowlpedia/codex/example-job']),
+            (handler.do_POST, ['/__knowlpedia/codex', '/__knowlpedia/transcribe']),
+        ]:
+            for path in paths:
+                with self.subTest(path=path):
+                    handler.path = path
+                    handler._json.reset_mock()
+                    method()
+                    self.assertEqual(handler._json.call_count, 1)
+                    self.assertEqual(handler._json.call_args.args[0], 403)
+
     def test_diff_snapshot_reaches_prompt_and_stale_links_are_rejected(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
