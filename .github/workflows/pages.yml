@@ -47,6 +47,11 @@ jobs:
         working-directory: knowlpedia
         run: make deps
 
+      - name: Install audio decoder for dictation tests
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends ffmpeg
+
       - name: Run tests
         working-directory: knowlpedia
         run: make test
