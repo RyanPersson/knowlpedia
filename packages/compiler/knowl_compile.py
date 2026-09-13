@@ -34,6 +34,7 @@ if _COMPILER_DIR not in sys.path:
     sys.path.insert(0, _COMPILER_DIR)
 from graph_algorithms import cycle_witnesses
 import private_facsimile
+import private_markdown
 
 
 WIKILINK_RE = re.compile(
@@ -144,7 +145,7 @@ def runtime_asset_version() -> str:
     """Return a stable cache key for the browser runtime shipped by this build."""
     runtime_dir = Path(__file__).resolve().parents[1] / "static-runtime"
     digest = hashlib.sha256()
-    for filename in ("knowl.css", "knowl.js", "graph.js", "knowl-testing.js", "facsimile.js"):
+    for filename in ("knowl.css", "knowl.js", "graph.js", "knowl-testing.js", "facsimile.js", "document-math.js"):
         path = runtime_dir / filename
         if not path.is_file():
             continue
@@ -572,6 +573,8 @@ class MathRenderer:
 
     def render(self, tex: str, display: bool) -> str:
         tex = tex.strip()
+        if private_markdown.ACTIVE.get() is not None:
+            return private_markdown.render_math(tex, display)
         if display and contains_diagram_environment(tex):
             kind = "cd" if "\\begin{CD}" in tex else "tikz-cd" if "\\begin{tikzcd}" in tex else "tikz"
             return DIAGRAM_RENDERER.render(tex, kind)
@@ -669,6 +672,8 @@ class Knowl:
     redirect_sections: dict[str, str] = field(default_factory=dict)
     facsimile_manifest: str | None = None
     facsimile: dict[str, Any] | None = None
+    reading_manifest: str | None = None
+    reading: dict[str, Any] | None = None
 
 
 class AliasRegistry(dict[str, Knowl]):
@@ -991,6 +996,7 @@ def knowl_from_meta(
         redirect_to=redirect_to,
         redirect_sections=dict(redirect_sections),
         facsimile_manifest=meta.get("facsimile_manifest"),
+        reading_manifest=meta.get("reading_manifest"),
     )
     knowl.anchors.add("section.core")
     for item in knowl.core_data:
@@ -1082,6 +1088,8 @@ def discover_package_knowls(
     for knowl in knowls:
         if knowl.facsimile_manifest is not None:
             raise ValueError("Facsimile manifests are restricted to private document input")
+        if knowl.reading_manifest is not None:
+            raise ValueError("Reading manifests are restricted to private document input")
         if knowl.id.split("/", 1)[0].lower() in {"documents", "library", "docs"}:
             raise ValueError(f"Reserved development route in public content: {knowl.id}")
         relative = knowl.source_path.relative_to(roots[0][0]) if knowl.source_path.is_relative_to(roots[0][0]) else None
@@ -1111,6 +1119,13 @@ def discover_private_documents(package_dir: Path, profile: BuildProfile) -> tupl
         if not valid_id or document.kind != "document" or document.redirect_to:
             raise ValueError("Private entries must be documents with an id under documents/ and no redirect")
         document.content_source = "knowlification-cache"
+        if document.reading_manifest is not None:
+            if document.facsimile_manifest is not None or document.progressive_sections:
+                raise ValueError("Private Markdown documents require continuous sections and one manifest")
+            document.reading = private_markdown.load_manifest(package_dir, document.reading_manifest, document.core_markdown)
+            document.anchors.update(document.reading['anchors'])
+            document.anchors.update(f"note-{key}" for key in document.reading.get('notes', {}))
+            document.content_hash = hashlib.sha256((document.content_hash + document.reading['manifest_sha256']).encode()).hexdigest()[:16]
         if document.facsimile_manifest is not None:
             if document.progressive_sections:
                 raise ValueError("Facsimile transcripts must use continuous sections")
@@ -1131,12 +1146,13 @@ def render_inline(text: str, registry: dict[str, Knowl]) -> str:
         label = html.unescape(match.group(2).strip()) if match.group(2) else target_label(target)
         base, _ = split_target(target)
         canonical_target_value = canonical_target(registry, target)
-        canonical, _ = split_target(canonical_target_value)
+        canonical, anchor = split_target(canonical_target_value)
         class_name = "knowl"
         attrs = ""
         if canonical in registry:
             target = canonical_target_value
-            attrs = f' data-knowl="{escape_attr(fragment_href(canonical))}"'
+            fragment = private_markdown.note_fragment_url(registry[canonical], anchor) or fragment_href(canonical)
+            attrs = f' data-knowl="{escape_attr(fragment)}"'
         else:
             class_name = "missing-knowl"
         return (
@@ -1147,7 +1163,8 @@ def render_inline(text: str, registry: dict[str, Knowl]) -> str:
     def replace_markdown_link(match: re.Match[str]) -> str:
         label = html.unescape(match.group(1))
         href = html.unescape(match.group(2)).strip()
-        if not (href.startswith("https://") or href.startswith("http://") or href.startswith("/")):
+        private_anchor = private_markdown.ACTIVE.get() is not None and re.fullmatch(r"#[a-zA-Z0-9_.-]+", href)
+        if not (href.startswith("https://") or href.startswith("http://") or href.startswith("/") or private_anchor):
             return match.group(0)
         return (
             f'<a class="page-link" href="{escape_attr(href)}">'
@@ -1273,6 +1290,13 @@ def render_markdown(markdown: str, registry: dict[str, Knowl]) -> str:
 
         if not stripped:
             close_list()
+            i += 1
+            continue
+
+        marker = private_markdown.render_marker(stripped)
+        if marker is not None:
+            close_list()
+            out.append(marker)
             i += 1
             continue
 
@@ -1456,12 +1480,13 @@ def without_redundant_leading_h1(markdown: str) -> str:
 
 
 def render_ref(target: str, registry: dict[str, Knowl], label: str | None = None) -> str:
-    base, _ = split_target(target)
+    base, anchor = split_target(target)
     text = label or (registry[base].title if base in registry else target_label(target))
     attrs = ""
     class_name = "knowl"
     if base in registry:
-        attrs = f' data-knowl="{escape_attr(fragment_href(base))}"'
+        fragment = private_markdown.note_fragment_url(registry[base], anchor) or fragment_href(base)
+        attrs = f' data-knowl="{escape_attr(fragment)}"'
     else:
         class_name = "missing-knowl"
     return (
@@ -1660,7 +1685,7 @@ def render_section_links(knowl: Knowl, registry: dict[str, Knowl]) -> str:
 
 
 def render_knowl_core(knowl: Knowl, registry: dict[str, Knowl]) -> str:
-    if knowl.facsimile:
+    if knowl.facsimile or knowl.reading:
         return (
             f'<div class="knowl-content" data-knowl-id="{escape_attr(knowl.id)}" data-knowl-title="{escape_attr(knowl.title)}" data-knowl-kind="Document" data-knowl-visibility="private">'
             f'<div class="knowl-body"><p>{html.escape(knowl.summary)}</p><p><a href="{target_href(knowl.id)}">Read the complete paper with expandable concepts</a></p></div>'
@@ -1752,6 +1777,11 @@ def render_page(
     fragment_cache: dict[str, str] | None = None,
     profile: BuildProfile = BUILD_PROFILES["development"],
 ) -> str:
+    if knowl.reading:
+        if not profile.include_development_content or knowl.visibility != 'private':
+            raise ValueError('Private Markdown pages require a private development document')
+        return html_document(knowl.title, private_markdown.reader_body(knowl, registry, render_markdown),
+                             preload_mode='visible', profile=profile, page_script='document-math.js')
     if knowl.facsimile:
         if not profile.include_development_content or knowl.visibility != "private":
             raise ValueError("Facsimile pages are restricted to private development documents")
@@ -1841,6 +1871,10 @@ def html_document(
   </script>
   <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 """
+    if page_script == 'document-math.js':
+        math_script = '''<script>
+window.MathJax = {startup: {typeset: false}, tex: {inlineMath: [['\\\\(', '\\\\)']], displayMath: [['\\\\[', '\\\\]']], processEscapes: true}, options: {enableMenu: false}};
+</script><script defer src="/assets/mathjax/tex-chtml.js"></script>'''
     profile_config = json.dumps(
         {"profile": profile.name, "features": profile.features},
         separators=(",", ":"),
@@ -2240,6 +2274,9 @@ def validate(registry: dict[str, Knowl]) -> list[ValidationMessage]:
         if knowl.facsimile:
             for target in private_facsimile.targets(knowl.facsimile):
                 validate_target(messages, registry, knowl.id, target, "facsimile concept")
+        if knowl.reading:
+            for target in private_markdown.targets(knowl.reading):
+                validate_target(messages, registry, knowl.id, target, "private notation")
 
         for field, value in (("title", knowl.title), ("summary", knowl.summary)):
             for target in nested_wikilinks_in_text(value):
@@ -2359,6 +2396,9 @@ def collect_links(knowl: Knowl, registry: dict[str, Knowl] | None = None) -> lis
     if knowl.facsimile:
         for target in private_facsimile.targets(knowl.facsimile):
             add(target, "facsimile concepts")
+    if knowl.reading:
+        for target in private_markdown.targets(knowl.reading):
+            add(target, "private notation")
     for item in knowl.core_data:
         for target in item.get("refs", []):
             add(target, f'data.{item["id"]}', "uses")
@@ -2619,7 +2659,7 @@ def proofs_json(registry: dict[str, Knowl]) -> list[dict[str, Any]]:
     return proofs
 
 
-def copy_runtime_assets(out_dir: Path, profile: BuildProfile) -> None:
+def copy_runtime_assets(out_dir: Path, profile: BuildProfile, include_document_math: bool = False) -> None:
     runtime_dir = Path(__file__).resolve().parents[1] / "static-runtime"
     assets_dir = out_dir / "assets"
     assets_dir.mkdir(parents=True, exist_ok=True)
@@ -2628,6 +2668,12 @@ def copy_runtime_assets(out_dir: Path, profile: BuildProfile) -> None:
     if profile.show_testing_ui:
         shutil.copyfile(runtime_dir / "knowl-testing.js", assets_dir / "knowl-testing.js")
         shutil.copyfile(runtime_dir / "facsimile.js", assets_dir / "facsimile.js")
+    if include_document_math and profile.include_development_content:
+        shutil.copyfile(runtime_dir / "document-math.js", assets_dir / "document-math.js")
+        mathjax = repo_root() / 'node_modules/mathjax/es5'
+        if not (mathjax / 'tex-chtml.js').is_file():
+            raise ValueError('Install the pinned MathJax dependency before building')
+        shutil.copytree(mathjax, assets_dir / 'mathjax', dirs_exist_ok=True)
 
     katex_assets = find_katex_assets_dir()
     if not katex_assets:
@@ -2738,7 +2784,7 @@ def write_site_for_ids(
     if not only_ids and out_dir.exists():
         shutil.rmtree(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
-    copy_runtime_assets(out_dir, profile)
+    copy_runtime_assets(out_dir, profile, any(knowl.reading for knowl in private_documents))
 
     if only_ids:
         target_knowls = [registry[knowl_id] for knowl_id in sorted(only_ids) if knowl_id in registry]
@@ -2775,6 +2821,8 @@ def write_site_for_ids(
         page_path.write_text(render_page(knowl, registry, package, fragment_cache, profile), encoding="utf-8")
         if knowl.facsimile:
             private_facsimile.write_assets_and_pages(knowl, out_dir, registry, render_ref, render_markdown, html_document, profile)
+        if knowl.reading:
+            private_markdown.write_assets(knowl, out_dir, registry, render_markdown, html_document, profile)
 
         fragment_path = out_dir / "fragments" / slug_to_relpath(knowl.id) / "core.html"
         fragment_path.parent.mkdir(parents=True, exist_ok=True)

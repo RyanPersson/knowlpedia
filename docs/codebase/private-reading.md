@@ -43,6 +43,16 @@ The faithfully extracted document body goes here.
 
 The compiler discovers the sibling cache when its manifest exists. To choose another private cache, set `PRIVATE_CONTENT_PACKAGE` when building. A full build refreshes the library index; a single-page build updates only that document and its fragments.
 
+## Flowing Markdown and inline knowls
+
+Use `reading_manifest = "metadata/my-document/reading.json"` for a continuous Markdown edition with locally served MathJax. Paragraphs, headings, tables, and equations reflow in the reading column. Public definitions and private notation notes expand inline, including nested definitions. This format does not use a page-image reader or a concept drawer.
+
+The version-one manifest has an integer `pages`, optional HTTPS `source_url`, and optional `notes` and `figures` maps. A note supplies `title`, Markdown `body`, and its source `page`; link to it with `[[documents/my-reading-copy#note-symbol|visible wording]]`. An optional `guide_note` names a note linked from the document header. A figure maps a name such as `figures/figure-1.svg` to a package-relative `path` and `sha256`. Insert it with ordinary Markdown image syntax. Only registered, hash-checked figures are copied, and the private-path and SVG restrictions also apply here.
+
+Source-position markers use `<!-- anchor: page-2 -->` on their own lines. Same-document Markdown links can navigate to these anchors. Previously shared `/pages/002/` URLs redirect to the corresponding source position. An optional `markdown_body_sha256` verifies the stripped document body after removing semantic-link wrappers. Keep the unlinked Markdown in `sources/` and separately record how its prose, equations, and original diagrams were recovered from the input.
+
+MathJax is pinned in the application's npm dependencies and copied only into development builds that contain this document format. Equations are typeset as they approach the viewport. Production builds remove the private reader, figures, notes, and MathJax assets. A public corpus entry cannot supply a reading manifest, and a document cannot combine reading and facsimile manifests.
+
 ## Preserve PDF page layouts
 
 A prepared PDF document can use a facsimile manifest. Its reader displays the original page images with expandable term overlays, a selectable linked transcript, source cross-references, and optional local notation notes. Page controls, contents, zoom, direct page URLs, and browser history retain the reading position. Concepts open in a drawer; their prerequisite links continue to unfold recursively.

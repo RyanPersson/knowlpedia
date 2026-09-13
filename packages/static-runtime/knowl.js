@@ -63,6 +63,31 @@
   }
 
   function insertPanel(trigger, panel) {
+    const documentTable = trigger.closest(".document-markdown .table-scroll");
+    const sourceRow = documentTable && trigger.closest("tr");
+    const containingPanel = trigger.closest(".knowl-panel");
+    if (sourceRow && (!containingPanel || containingPanel.contains(documentTable))) {
+      const row = document.createElement("tr");
+      const cell = document.createElement("td");
+      cell.colSpan = Array.from(sourceRow.cells).reduce((sum, item) => sum + item.colSpan, 0);
+      cell.className = "document-knowl-table-cell";
+      cell.appendChild(panel);
+      row.appendChild(cell);
+      sourceRow.after(row);
+      panel._knowlTableRow = row;
+      documentTable.scrollLeft = 0;
+      const fit = () => {
+        const style = window.getComputedStyle(cell);
+        const padding = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight) + 2;
+        panel.style.width = Math.max(0, documentTable.clientWidth - padding) + "px";
+      };
+      fit();
+      if ("ResizeObserver" in window) {
+        panel._knowlTableObserver = new ResizeObserver(fit);
+        panel._knowlTableObserver.observe(documentTable);
+      }
+      return;
+    }
     if (trigger.classList.contains("document-term")) {
       const reader = trigger.closest(".document-facsimile");
       const slot = reader && reader.querySelector(".document-knowl-slot");
@@ -92,7 +117,12 @@
       trigger.setAttribute("aria-expanded", "false");
       trigger.removeAttribute("aria-controls");
     }
-    panel.remove();
+    if (panel._knowlTableObserver) panel._knowlTableObserver.disconnect();
+    panel.querySelectorAll(".knowl-panel").forEach((child) => {
+      if (child._knowlTableObserver) child._knowlTableObserver.disconnect();
+    });
+    if (panel._knowlTableRow) panel._knowlTableRow.remove();
+    else panel.remove();
     if (restoreFocus && trigger) trigger.focus({ preventScroll: true });
   }
 
