@@ -376,6 +376,25 @@ button {
   padding: 0.45rem 0.72rem;
   font-size: 0.88rem;
   font-weight: 650;
+  text-decoration: none;
+}
+
+.docs-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem 1.2rem;
+  padding: 0 0 1.3rem;
+  margin-bottom: 1.8rem;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.88rem;
+}
+
+.codebase-docs article {
+  max-width: 76ch;
+}
+
+.codebase-docs pre {
+  overflow-x: auto;
 }
 
 #search-open {
@@ -2120,12 +2139,19 @@ mjx-container[display="true"] {
 
   .site-header {
     min-height: 54px;
+    flex-wrap: wrap;
     gap: 0.5rem;
     padding: 0.42rem 0.65rem;
   }
 
   .site-identity {
     gap: 0.72rem;
+  }
+
+  .site-actions:has(.development-link) {
+    flex: 1 0 100%;
+    justify-content: flex-end;
+    gap: 0.3rem;
   }
 
   .site-nav a {
@@ -2164,6 +2190,11 @@ mjx-container[display="true"] {
     right: 0.5rem;
     width: calc(100vw - 1rem);
     max-height: calc(100vh - 4.3rem);
+  }
+
+  .site-header:has(.development-link) + .testing-panel {
+    top: 6.4rem;
+    max-height: calc(100vh - 6.9rem);
   }
 
   .start-shell {

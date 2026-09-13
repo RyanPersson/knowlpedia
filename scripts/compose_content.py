@@ -75,6 +75,9 @@ def compose(primary: Path, sources: list[Path], output: Path) -> dict:
         raise ValueError("primary content_dir must be a string")
 
     all_sources = [primary, *sources]
+    for source in all_sources:
+        if (source / "knowlpack.toml").is_file() and read_package(source).get("private"):
+            raise ValueError("Private packages cannot be composed into public content; use the development compiler's --private-package input")
     if len(set(all_sources)) != len(all_sources):
         raise ValueError("the same content source was supplied more than once")
     for source in all_sources:

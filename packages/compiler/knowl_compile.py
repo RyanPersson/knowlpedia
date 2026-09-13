@@ -1063,6 +1063,8 @@ def discover_package_knowls(
     package: dict[str, Any],
     profile: BuildProfile,
 ) -> tuple[list[Knowl], list[tuple[Path, str]]]:
+    if package.get("private"):
+        raise ValueError("Private packages must use --private-package in development, never the public content input")
     roots = package_content_roots(package_dir, package, profile)
     knowls = [
         knowl
@@ -1074,9 +1076,36 @@ def discover_package_knowls(
     file_sources = manifest.get("file_sources", {})
     primary_source = Path(manifest.get("primary", str(package_dir))).name
     for knowl in knowls:
+        if knowl.id.split("/", 1)[0].lower() in {"documents", "library", "docs"}:
+            raise ValueError(f"Reserved development route in public content: {knowl.id}")
         relative = knowl.source_path.relative_to(roots[0][0]) if knowl.source_path.is_relative_to(roots[0][0]) else None
         knowl.content_source = file_sources.get(relative.as_posix(), primary_source) if relative else primary_source
     return sorted(knowls, key=lambda knowl: knowl.id), roots
+
+
+def discover_private_documents(package_dir: Path, profile: BuildProfile) -> tuple[list[Knowl], Path]:
+    """Load the private reader input separately from composable public content."""
+    if profile.name != "development":
+        raise ValueError("Private documents are only available in development builds")
+    package_dir = package_dir.resolve()
+    metadata = read_toml(package_dir / "knowlpack.toml")
+    if metadata.get("private") is not True:
+        raise ValueError("Private document package must declare private = true")
+    content_root = (package_dir / metadata.get("content_dir", "documents")).resolve()
+    if content_root == package_dir or not content_root.is_relative_to(package_dir):
+        raise ValueError("Private documents must be in a dedicated directory inside their package")
+    if not content_root.is_dir():
+        raise ValueError(f"Private document directory does not exist: {content_root}")
+    for path in content_root.rglob("*.knowl.md"):
+        if not path.resolve().is_relative_to(content_root):
+            raise ValueError(f"Private document symlink escapes its content directory: {path}")
+    documents = discover_knowls(content_root, visibility="private")
+    for document in documents:
+        valid_id = re.fullmatch(r"documents/[a-z0-9_-]+(?:/[a-z0-9_-]+)*", document.id)
+        if not valid_id or document.kind != "document" or document.redirect_to:
+            raise ValueError("Private entries must be documents with an id under documents/ and no redirect")
+        document.content_source = "knowlification-cache"
+    return documents, content_root
 
 
 def render_inline(text: str, registry: dict[str, Knowl]) -> str:
@@ -1725,6 +1754,9 @@ def render_page(
         f'<h2 class="core-heading">{html.escape(core_heading)}</h2>' if core_heading else ""
     )
     development_banner = (
+        '<aside class="development-banner" role="note"><strong>Private reading copy</strong>'
+        '<span>Available only in this development build. <a href="/library/">Back to library</a></span></aside>'
+        if knowl.visibility == "private" else
         '<aside class="development-banner" role="note"><strong>Testing content</strong>'
         '<span>This page is included in development previews and excluded from production.</span></aside>'
         if knowl.visibility == "development"
@@ -1813,6 +1845,11 @@ __PALETTE_SCRIPT__
   </script>""".replace("__PALETTE_SCRIPT__", palette_script)
     testing_button = """
     <button type="button" id="testing-open" class="header-action testing-trigger" aria-haspopup="dialog" aria-controls="testing-panel" aria-expanded="false"><span aria-hidden="true">◫</span><span class="testing-label">Testing</span></button>""" if profile.show_testing_ui else ""
+    development_links = (
+        '<a id="docs-open" class="header-action development-link" href="/docs/">Docs</a>'
+        '<a id="library-open" class="header-action development-link" href="/library/">Library</a>'
+        if profile.name == "development" else ""
+    )
     testing_panel = """
 <aside id="testing-panel" class="testing-panel" role="dialog" aria-modal="false" aria-labelledby="testing-title" hidden>
   <div class="testing-heading">
@@ -1866,6 +1903,7 @@ __PALETTE_SCRIPT__
   <div class="site-actions">
     <button type="button" id="search-open" class="header-action" aria-haspopup="dialog" aria-controls="search-dialog"><span class="header-action-icon" aria-hidden="true">⌕</span><span>Search</span><kbd>⌘K</kbd></button>
 {testing_button}
+{development_links}
     <button type="button" id="theme-toggle" class="header-action theme-toggle" aria-label="Use dark theme" aria-pressed="false"><span class="theme-icon header-action-icon" aria-hidden="true">◐</span><span class="theme-label">Dark</span></button>
   </div>
 </header>
@@ -1887,6 +1925,41 @@ __PALETTE_SCRIPT__
 
 def directory_title(subject_id: str) -> str:
     return SOURCE_COLLECTIONS.get(subject_id, SUBJECT_TITLES.get(subject_id, humanize_identifier(subject_id)))
+
+
+def write_development_pages(out_dir: Path, registry: dict[str, Knowl], profile: BuildProfile) -> None:
+    """Publish curated codebase docs and the private library only in development."""
+    if profile.name != "development":
+        return
+    order = {name: index for index, name in enumerate(("index", "source-format", "architecture", "private-reading", "development"))}
+    sources = sorted((repo_root() / "docs" / "codebase").glob("*.md"), key=lambda path: (order.get(path.stem, len(order)), path.stem))
+    navigation = '<nav class="docs-nav" aria-label="Documentation">' + "".join(
+        f'<a href="/docs/{"" if path.stem == "index" else path.stem + "/"}">{html.escape(path.read_text().splitlines()[0].removeprefix("# "))}</a>'
+        for path in sources
+    ) + '</nav>'
+    for source in sources:
+        markdown = source.read_text(encoding="utf-8")
+        title = markdown.splitlines()[0].removeprefix("# ")
+        page = out_dir / "docs" / ("" if source.stem == "index" else source.stem) / "index.html"
+        page.parent.mkdir(parents=True, exist_ok=True)
+        body = '<main class="page-shell codebase-docs" id="main-content">' + navigation + '<article>' + render_markdown(markdown, registry) + '</article></main>'
+        page.write_text(html_document(f"{title} · Knowlpedia docs", body, preload_mode="none", profile=profile), encoding="utf-8")
+
+    documents = sorted((knowl for knowl in registry.values() if knowl.visibility == "private"), key=lambda knowl: knowl.title.casefold())
+    entries = "".join(
+        f'<li class="testing-index-item"><a href="{escape_attr(target_href(document.id))}">{html.escape(document.title)}</a><p>{html.escape(document.summary)}</p></li>'
+        for document in documents
+    )
+    body = (
+        '<main class="page-shell" id="main-content"><header class="page-header"><p class="kind">Private reading</p><h1>Your library</h1>'
+        '<p class="page-summary">Read a document in its original words. Unfold linked mathematical concepts here, without losing your place.</p></header>'
+        '<p>These reading copies are available only in development. Their shared definitions come from Knowlpedia.</p>'
+        + (f'<ul class="testing-index-list">{entries}</ul>' if entries else '<p class="library-empty">No reading copies yet. Add a knowlified document to your private cache and rebuild the preview.</p>')
+        + '<p><a href="/docs/private-reading/">How to add a document</a></p></main>'
+    )
+    page = out_dir / "library" / "index.html"
+    page.parent.mkdir(parents=True, exist_ok=True)
+    page.write_text(html_document("Your library · Knowlpedia", body, preload_mode="none", profile=profile), encoding="utf-8")
 
 
 def directory_groups(registry: dict[str, Knowl]) -> dict[str, list[Knowl]]:
@@ -2545,6 +2618,7 @@ def write_site(
     allow_validation_errors: bool = False,
     profile: BuildProfile = BUILD_PROFILES["development"],
     only_ids: set[str] | None = None,
+    private_package: Path | None = None,
 ) -> int:
     return write_site_for_ids(
         package_dir,
@@ -2552,6 +2626,7 @@ def write_site(
         only_ids=only_ids,
         allow_validation_errors=allow_validation_errors,
         profile=profile,
+        private_package=private_package,
     )
 
 
@@ -2606,10 +2681,16 @@ def write_site_for_ids(
     only_ids: set[str] | None = None,
     allow_validation_errors: bool = False,
     profile: BuildProfile = BUILD_PROFILES["development"],
+    private_package: Path | None = None,
 ) -> int:
     package_path = package_dir / "knowlpack.toml"
     package = read_toml(package_path)
     knowls, content_roots = discover_package_knowls(package_dir, package, profile)
+    private_documents: list[Knowl] = []
+    if private_package is not None:
+        private_documents, private_root = discover_private_documents(private_package, profile)
+        knowls.extend(private_documents)
+        content_roots.append((private_root, "private"))
     registry, messages = build_registry(knowls)
     redirects = {knowl.id: knowl for knowl in knowls if knowl.redirect_to}
     errors = [msg for msg in messages if msg.severity == "error"]
@@ -2653,6 +2734,7 @@ def write_site_for_ids(
             testing_path = out_dir / "testing" / "index.html"
             testing_path.parent.mkdir(parents=True, exist_ok=True)
             testing_path.write_text(render_testing_hub(registry, package, profile), encoding="utf-8")
+            write_development_pages(out_dir, registry, profile)
 
     for knowl in target_knowls:
         page_path = out_dir / slug_to_relpath(knowl.id) / "index.html"
@@ -2714,12 +2796,13 @@ def write_site_for_ids(
                 "features": profile.features,
                 "content_roots": [
                     {
-                        "path": str(path.relative_to(package_dir)),
+                        "path": "private documents" if visibility == "private" else str(path.relative_to(package_dir)),
                         "visibility": visibility,
                     }
                     for path, visibility in content_roots
                 ],
                 "knowl_count": len(registry),
+                "private_document_ids": sorted(document.id for document in private_documents),
                 "development_knowl_ids": sorted(
                     knowl.id for knowl in registry.values() if knowl.visibility == "development"
                 ),
@@ -2743,6 +2826,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Compile a knowl package")
     parser.add_argument("package_dir", type=Path, help="Directory containing knowlpack.toml")
     parser.add_argument("--out", type=Path, default=Path("public"), help="Output directory")
+    parser.add_argument("--private-package", type=Path, help="Private document package, accepted only in development")
     parser.add_argument(
         "--profile",
         choices=PROFILE_NAMES,
@@ -2806,6 +2890,7 @@ def main() -> int:
         only_ids=set(args.only) or None,
         allow_validation_errors=args.allow_validation_errors,
         profile=profile,
+        private_package=args.private_package,
     )
 
 

@@ -38,3 +38,18 @@ make build-content \
 ```
 
 Adding a source to local builds does not authorize adding it to production.
+
+## Private reading copies
+
+The sibling `knowlification-cache` is not a composable reference source. Its
+manifest declares `private = true`; composition rejects such packages. The
+development compiler loads it separately using `--private-package`, normally
+supplied by `PRIVATE_CONTENT_PACKAGE` in the Makefile. It discovers only the
+prepared `.knowl.md` documents, not raw inputs in the ignored `docs/` directory.
+
+Private entries use `documents/` IDs and appear in the development library at
+`/library/`. They can unfold public knowls without copying the documents into
+the public corpus. Production never receives this input and rejects private
+documents, library routes and index artifacts. See
+[the private-reading guide](codebase/private-reading.md) for storage and fidelity
+requirements.

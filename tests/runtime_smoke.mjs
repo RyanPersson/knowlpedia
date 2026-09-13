@@ -136,6 +136,7 @@ try {
 
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto(`${baseUrl}/shared-foundations/real-numbers/`);
+  await page.locator('[id="section.remarks"] > summary').click();
   await page.getByRole("link", { name: "rational numbers", exact: true }).first().click();
   const rationalPanel = page.locator(".knowl-panel").first();
   await rationalPanel.getByRole("button", { name: "Remarks", exact: true }).click();

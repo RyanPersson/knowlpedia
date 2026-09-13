@@ -3,11 +3,14 @@ VENV_STAMP := .venv/.deps-installed
 NODE_MODULES_STAMP := node_modules/.deps-installed
 PYTHON ?= $(VENV_PYTHON)
 CONTENT_PACKAGE ?= ../knowlpedia-content
+PRIVATE_CONTENT_PACKAGE ?= ../knowlification-cache
+PRIVATE_CONTENT_ARGS = $(if $(wildcard $(PRIVATE_CONTENT_PACKAGE)/knowlpack.toml),--private-package $(PRIVATE_CONTENT_PACKAGE))
 EXTRA_CONTENT_SOURCES ?= ../conjectures-catalog
 COMPOSED_CONTENT_PACKAGE ?= .knowl-cache/content-package
 PRODUCTION_CONTENT_PACKAGE ?= .knowl-cache/production-content-package
 CONTENT_SOURCE_ARGS = $(foreach source,$(EXTRA_CONTENT_SOURCES),--source $(source))
 KNOWLPEDIA_PROFILE ?= development
+OUTPUT_DIR ?= public-imported
 REVIEW_BASE ?= develop
 REVIEW_HEAD ?= HEAD
 REVIEW_OUTPUT ?= public-imported/review/content-changes
@@ -78,17 +81,17 @@ build: build-content
 serve: serve-content
 
 build-content: deps compose-content
-	$(PYTHON) packages/compiler/knowl_compile.py $(COMPOSED_CONTENT_PACKAGE) --profile $(KNOWLPEDIA_PROFILE) --out public-imported --diagram-cache-dir $(DIAGRAM_CACHE_DIR) --prebuilt-diagram-dir $(PREBUILT_DIAGRAM_DIR)
+	$(PYTHON) packages/compiler/knowl_compile.py $(COMPOSED_CONTENT_PACKAGE) --profile $(KNOWLPEDIA_PROFILE) $(if $(filter development,$(KNOWLPEDIA_PROFILE)),$(PRIVATE_CONTENT_ARGS)) --out $(OUTPUT_DIR) --diagram-cache-dir $(DIAGRAM_CACHE_DIR) --prebuilt-diagram-dir $(PREBUILT_DIAGRAM_DIR)
 
 build-production: deps compose-production-content
-	$(PYTHON) packages/compiler/knowl_compile.py $(PRODUCTION_CONTENT_PACKAGE) --profile production --out public-imported --no-diagram-cache --prebuilt-diagram-dir $(PREBUILT_DIAGRAM_DIR) --prebuilt-only-diagrams
-	$(PYTHON) scripts/check_rendering_errors.py public-imported --require-rendered-diagrams --require-profile production
+	$(PYTHON) packages/compiler/knowl_compile.py $(PRODUCTION_CONTENT_PACKAGE) --profile production --out $(OUTPUT_DIR) --no-diagram-cache --prebuilt-diagram-dir $(PREBUILT_DIAGRAM_DIR) --prebuilt-only-diagrams
+	$(PYTHON) scripts/check_rendering_errors.py $(OUTPUT_DIR) --require-rendered-diagrams --require-profile production
 
 refresh-prebuilt-diagrams: deps compose-content
 	$(PYTHON) packages/compiler/knowl_compile.py $(COMPOSED_CONTENT_PACKAGE) --profile development --out public-imported --allow-validation-errors --no-diagram-cache --prebuilt-diagram-dir $(PREBUILT_DIAGRAM_DIR) --refresh-prebuilt-diagrams
 
 build-page: deps compose-content
-	$(PYTHON) packages/compiler/knowl_compile.py $(COMPOSED_CONTENT_PACKAGE) --profile $(KNOWLPEDIA_PROFILE) --out public-imported --allow-validation-errors --only $(PAGE) --diagram-cache-dir $(DIAGRAM_CACHE_DIR) --prebuilt-diagram-dir $(PREBUILT_DIAGRAM_DIR)
+	$(PYTHON) packages/compiler/knowl_compile.py $(COMPOSED_CONTENT_PACKAGE) --profile $(KNOWLPEDIA_PROFILE) $(if $(filter development,$(KNOWLPEDIA_PROFILE)),$(PRIVATE_CONTENT_ARGS)) --out $(OUTPUT_DIR) --allow-validation-errors --only $(PAGE) --diagram-cache-dir $(DIAGRAM_CACHE_DIR) --prebuilt-diagram-dir $(PREBUILT_DIAGRAM_DIR)
 
 preview-diagram: deps
 	$(PYTHON) packages/compiler/preview_diagram.py $(DIAGRAM_SOURCE) --index $(DIAGRAM_INDEX) --out $(DIAGRAM_PREVIEW_OUT) --diagram-cache-dir $(DIAGRAM_CACHE_DIR)
@@ -115,7 +118,7 @@ preview-scan:
 	$(PYTHON) scripts/preview_server.py scan
 
 check-rendering:
-	$(PYTHON) scripts/check_rendering_errors.py public-imported
+	$(PYTHON) scripts/check_rendering_errors.py $(OUTPUT_DIR)
 
 check-rendering-knowls:
 	$(PYTHON) scripts/check_rendering_errors.py public-imported --fragments-only

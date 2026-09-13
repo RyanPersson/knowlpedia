@@ -261,20 +261,20 @@ def check_build_profile(root: Path, required_profile: str) -> list[Issue]:
     if required_profile != "production":
         return issues
 
-    if report.get("development_knowl_ids"):
+    if report.get("development_knowl_ids") or report.get("private_document_ids"):
         issues.append(
             Issue(
                 "error",
                 "development_content_in_production",
                 "reports/build.json",
                 1,
-                ", ".join(report["development_knowl_ids"][:10]),
+                ", ".join((report.get("development_knowl_ids", []) + report.get("private_document_ids", []))[:10]),
             )
         )
     development_roots = [
         item.get("path", "")
         for item in report.get("content_roots", [])
-        if item.get("visibility") == "development"
+        if item.get("visibility") in {"development", "private"}
     ]
     if development_roots:
         issues.append(
@@ -288,6 +288,10 @@ def check_build_profile(root: Path, required_profile: str) -> list[Issue]:
         )
 
     forbidden_paths = [
+        root / "docs",
+        root / "library",
+        root / "documents",
+        root / "fragments" / "documents",
         root / "testing",
         root / "review",
         root / "assets" / "knowl-testing.js",
@@ -304,7 +308,12 @@ def check_build_profile(root: Path, required_profile: str) -> list[Issue]:
                 )
             )
 
-    forbidden_markup = ("id=\"testing-open\"", "id=\"testing-panel\"", "knowl-testing.js")
+    for json_file in sorted(root.rglob("*.json")):
+        source = json_file.read_text(encoding="utf-8")
+        if re.search(r'"documents/[^"\s]+"|"visibility"\s*:\s*"private"', source):
+            issues.append(Issue("error", "private_index_in_production", str(json_file.relative_to(root)), 1, "Private document data exists in production JSON"))
+
+    forbidden_markup = ("id=\"testing-open\"", "id=\"testing-panel\"", "knowl-testing.js", 'id="docs-open"', 'id="library-open"', 'data-knowl-visibility="private"')
     for html_file in sorted(root.rglob("*.html")):
         source = html_file.read_text(encoding="utf-8", errors="ignore")
         for marker in forbidden_markup:
