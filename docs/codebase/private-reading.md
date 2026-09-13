@@ -43,6 +43,18 @@ The faithfully extracted document body goes here.
 
 The compiler discovers the sibling cache when its manifest exists. To choose another private cache, set `PRIVATE_CONTENT_PACKAGE` when building. A full build refreshes the library index; a single-page build updates only that document and its fragments.
 
+## Preserve PDF page layouts
+
+A prepared PDF document can use a facsimile manifest. Its reader displays the original page images with expandable term overlays, a selectable linked transcript, source cross-references, and optional local notation notes. Page controls, contents, zoom, direct page URLs, and browser history retain the reading position. Concepts open in a drawer; their prerequisite links continue to unfold recursively.
+
+Add `facsimile_manifest = "metadata/my-document/pages.json"` to a private document's frontmatter and keep `section_mode = "continuous"`. The body contains the linked extraction with form-feed characters separating pages. After removing link wrappers, each page must match its manifest's text hash. Independently compare the complete unwrapped body with the untouched extraction to verify whitespace and page boundaries as well.
+
+The version-one manifest contains consecutive `pages` with dimensions, relative image paths, image and text SHA-256 hashes, term `links` with source-coordinate rectangles, and optional page `concepts`. It may also contain `bookmarks`, `notes`, and an HTTPS `source_url`. Original PDF references retain their rectangles and either a destination `page` with vertical position `y` or an HTTPS `url`. The compiler validates the manifest and all concept targets before writing output.
+
+Page images belong in the private package, usually an ignored reproducible `build/` directory. Only the explicitly listed, hash-checked image files are copied under that document's development route. Paths must stay inside the private package, and SVGs cannot contain scripts or external references. The original PDF is never copied. Production builds reject private facsimile input and remove prior private document assets when rebuilding an output directory.
+
+This is a prepared-document format. Extracting page geometry, selecting mathematically suitable phrases, distinguishing local notation, and recording link decisions remain explicit authoring steps.
+
 ## What is and is not automated
 
 Prepared documents are discovered and compiled automatically during development builds. Suitable existing wikilinks resolve against the combined development registry, including the public corpus. The private library index is generated from the discovered documents.

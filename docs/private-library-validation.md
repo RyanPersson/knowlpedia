@@ -54,3 +54,15 @@ Separate validation outputs were built under `tmp/docs-library-development`
 and `tmp/docs-library-production`. The development artifact was copied into
 the existing served directory while preserving its prior comparison pages.
 The public site was not deployed.
+
+## Facsimile reader extension on navier
+
+The private reader now supports hash-checked page images, literal linked transcripts, positioned source references, local notation fragments, page navigation, zoom, and a concept drawer with recursive expansion. The implementation and synthetic tests contain no source-paper prose or figures.
+
+- 185 Python tests pass, including eight facsimile-specific cases for source fidelity, asset integrity, reference destinations, private input boundaries, and production cleanup.
+- The complete production build passes strict rendered-HTML, diagram and profile checks, and contains no private document or facsimile assets.
+- The private full-document check navigated 166 pages and loaded all 166 source images. It also exercised overlays, nested prerequisites, source navigation and history, the notation guide, transcript links, keyboard opening and closing, zoom, and 390px mobile layout without console errors or page overflow.
+- Existing runtime, homepage and private-library browser regressions pass. Their coverage includes search, themes, recursive sections, focus, Escape and responsive navigation.
+- The application's existing persistent preview remains `knowlpedia-astra-benchmark` on port 8015; no duplicate service or public deployment was created.
+
+Source-specific manifests, occurrence decisions, screenshots and detailed validation remain in the private package or ignored local build directories. The historical import findings above concern the earlier baseline, outside the facsimile change.

@@ -63,6 +63,17 @@
   }
 
   function insertPanel(trigger, panel) {
+    if (trigger.classList.contains("document-term")) {
+      const reader = trigger.closest(".document-facsimile");
+      const slot = reader && reader.querySelector(".document-knowl-slot");
+      if (slot) {
+        Array.from(slot.children).forEach((previous) => {
+          if (previous.classList.contains("knowl-panel")) closePanel(previous, false);
+        });
+        slot.appendChild(panel);
+        return;
+      }
+    }
     if (trigger.classList.contains("index-knowl")) {
       const indexItem = trigger.closest(".index-item");
       if (indexItem) {
@@ -209,10 +220,13 @@
     const title = content?.dataset.knowlTitle || "Expanded concept";
     const kind = content?.dataset.knowlKind;
     panel.setAttribute("aria-label", kind ? kind + ": " + title : title);
+    const documentDrawer = panel.parentElement?.classList.contains("document-knowl-slot")
+      ? panel.closest(".document-concept-drawer") : null;
+    if (documentDrawer) documentDrawer.querySelector(".document-drawer-header strong").textContent = title;
     typeset(panel);
     scheduleObserveKnowls(panel);
     if (keyboardOpen) {
-      const close = panel.querySelector(".knowl-close");
+      const close = documentDrawer?.querySelector(".document-clear-concepts") || panel.querySelector(".knowl-close");
       if (close) close.focus({ preventScroll: true });
     }
     panel._knowlTrigger = trigger;
@@ -553,6 +567,7 @@
   document.addEventListener("click", handleClose);
   document.addEventListener("click", handleSectionChip);
   document.addEventListener("click", handleSwitcher);
+  document.addEventListener("knowl:content-updated", (event) => scheduleObserveKnowls(event.target));
   document.addEventListener("keydown", (event) => {
     if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
       event.preventDefault();

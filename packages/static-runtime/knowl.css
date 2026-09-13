@@ -748,6 +748,95 @@ kbd {
   padding: 2.2rem 0 5rem;
 }
 
+/* Private documents keep the original page geometry independently of text
+   extraction. These selectors contain no document-specific content. */
+.document-facsimile { width: min(100%, 980px); }
+.document-facsimile .page-header { margin-bottom: 0.8rem; }
+.document-facsimile .page-header h1 { font-size: clamp(1.4rem, 3vw, 2.2rem); }
+.document-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 0;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--font-ui);
+  font-size: 0.86rem;
+}
+.document-toolbar button, .document-toolbar select, .document-toolbar input,
+.document-toolbar .document-page-link, .document-drawer-header button {
+  min-height: 2.5rem;
+  border: 1px solid var(--line);
+  border-radius: 0.45rem;
+  padding: 0.4rem 0.6rem;
+  color: var(--ink);
+  background: var(--surface);
+  font: inherit;
+}
+.document-toolbar .document-page-link { min-width: 2.5rem; text-align: center; text-decoration: none; }
+.document-toolbar [aria-disabled="true"] { opacity: 0.45; }
+.document-page-label { white-space: nowrap; }
+.document-page-number { width: 4.2rem; }
+.document-bookmarks { max-width: 100%; flex: 1 1 15rem; min-width: 0; }
+.document-view-controls, .document-zoom-controls { display: flex; gap: 0.25rem; }
+.document-toolbar [aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 -2px var(--accent); }
+.document-load-status { min-height: 1.2em; color: var(--muted); font-size: 0.8rem; margin: 0.4rem 0; }
+.document-viewport { overflow: auto; max-height: 78vh; border: 1px solid var(--line); background: #e4e7e5; overscroll-behavior: contain; }
+.document-sheet { position: relative; width: 100%; background: #fff; }
+.document-sheet > img { display: block; width: 100%; height: auto; max-width: none; }
+.document-page-overlay { position: absolute; inset: 0; pointer-events: none; }
+.document-term-overlay {
+  position: absolute;
+  display: block;
+  overflow: hidden;
+  color: transparent !important;
+  font-size: 0;
+  pointer-events: auto;
+  border-bottom: 1px dotted #187459;
+  background: rgb(24 116 89 / 7%);
+  border-radius: 1px;
+}
+.document-term-overlay:hover, .document-term-overlay:focus-visible, .document-term-overlay[aria-expanded="true"] {
+  background: rgb(24 116 89 / 22%);
+  outline: 2px solid #187459;
+  outline-offset: 1px;
+}
+.document-reference { border-bottom-color: #404692; background: rgb(64 70 146 / 4%); }
+.document-reference:hover, .document-reference:focus-visible { outline-color: #404692; background: rgb(64 70 146 / 15%); }
+.document-transcript { white-space: pre-wrap; overflow-wrap: anywhere; font: 0.94rem/1.6 var(--font-ui); }
+.document-transcript-note { font-size: 0.83rem; color: var(--muted); }
+.document-concepts, .document-references { padding: 1rem 0; border-bottom: 1px solid var(--line); }
+.document-concepts summary, .document-references summary { cursor: pointer; font-weight: 600; }
+.document-concepts ul { columns: 2; column-gap: 2rem; }
+.document-concepts li { break-inside: avoid; margin-bottom: 0.35rem; }
+.document-concept-drawer {
+  display: none;
+  position: fixed;
+  z-index: 45;
+  right: 1rem;
+  bottom: 1rem;
+  width: min(440px, calc(100vw - 2rem));
+  max-height: min(78vh, 900px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--accent);
+  border-radius: 0.65rem;
+  background: var(--surface);
+  box-shadow: 0 12px 48px rgb(0 0 0 / 22%);
+}
+.document-concept-drawer:has(.knowl-panel) { display: block; }
+.document-drawer-header { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.6rem 0.8rem; background: var(--surface); border-bottom: 1px solid var(--line); }
+.document-drawer-header button { cursor: pointer; }
+.document-knowl-slot > .knowl-panel { margin: 0; border: 0; border-radius: 0; }
+.document-image-view[hidden], .document-transcript-view[hidden], .document-zoom-controls[hidden] { display: none; }
+@media (max-width: 600px) {
+  .document-shell { width: calc(100% - 1rem); padding-top: 1rem; }
+  .document-concepts ul { columns: 1; }
+  .document-toolbar { gap: 0.35rem; }
+  .document-toolbar button, .document-toolbar select { font-size: 0.8rem; }
+  .document-concept-drawer { right: 0.5rem; bottom: 0.5rem; width: calc(100vw - 1rem); max-height: 65dvh; }
+}
+
 .knowl-page {
   width: min(100%, 780px);
   margin: 0 auto;
