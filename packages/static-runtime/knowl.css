@@ -751,8 +751,15 @@ kbd {
 .document-markdown-shell { max-width: 880px; }
 .document-markdown { width: 100%; }
 .document-markdown .core-section { line-height: 1.65; }
-.document-markdown .math-display { max-width: 100%; overflow-x: auto; padding: 0.4rem 0; }
-.document-markdown .math-inline { display: inline-block; max-width: 100%; overflow-x: auto; vertical-align: middle; white-space: nowrap; }
+.document-markdown .math-display { max-width: 100%; overflow: visible; padding: 0.4rem 0; }
+.document-markdown .math-inline { display: inline-block; max-width: 100%; overflow: visible; vertical-align: middle; white-space: nowrap; }
+.document-markdown .math-mathjax mjx-container { overflow: visible; }
+/* Keep the hidden screen-reader copy from enlarging the page's scroll area. */
+.document-markdown mjx-assistive-mml { width: 1px !important; height: 1px; }
+.document-markdown .math-overflow-x { overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; }
+.document-markdown .math-inline.math-overflow-x { padding-block: 0.15em; }
+.document-markdown .math-overflow-x mjx-container[display="true"],
+.document-markdown .math-overflow-x .katex-display > .katex { text-align: left; }
 .document-markdown .math-mathjax:not([data-math-ready]) { white-space: normal; overflow-wrap: anywhere; }
 .document-markdown .document-anchor { display: block; height: 0; scroll-margin-top: 7rem; }
 .document-markdown .document-figure { margin: 1.5rem 0; }

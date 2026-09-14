@@ -7,6 +7,73 @@
   const pending = new Set();
   let running = null;
   let observer;
+  const mathSelector = ".math-inline, .math-display";
+  const measuredMath = new Map();
+  const owners = new WeakMap();
+
+  function updateOverflow(node) {
+    const content = measuredMath.get(node);
+    if (!content || !node.isConnected) return;
+    // Measure the equation itself, not scrollWidth: glyph bearings and
+    // pixel rounding can extend the scroll area of a fully visible term.
+    let width = content.getBoundingClientRect().width;
+    if (content.classList.contains("katex-html")) {
+      const range = document.createRange();
+      range.selectNodeContents(content);
+      width = range.getBoundingClientRect().width;
+    }
+    const clipped = width > node.getBoundingClientRect().width + 1;
+    node.classList.toggle("math-overflow-x", clipped);
+    if (!clipped) node.scrollLeft = 0;
+  }
+
+  const sizeObserver = "ResizeObserver" in window ? new ResizeObserver((entries) => {
+    new Set(entries.map(({ target }) => owners.get(target))).forEach((node) => {
+      if (node) updateOverflow(node);
+    });
+  }) : null;
+
+  function mathNodes(scope) {
+    if (scope.nodeType !== Node.ELEMENT_NODE) return [];
+    return scope.matches(mathSelector) ? [scope] : Array.from(scope.querySelectorAll(mathSelector));
+  }
+
+  function observeMath(scope) {
+    mathNodes(scope).forEach((node) => {
+      const content = node.querySelector("mjx-math, .katex-html");
+      if (!content || measuredMath.has(node)) return;
+      measuredMath.set(node, content);
+      for (const target of [node, content]) {
+        owners.set(target, node);
+        sizeObserver?.observe(target);
+      }
+      updateOverflow(node);
+    });
+  }
+
+  function forgetMath(scope) {
+    mathNodes(scope).forEach((node) => {
+      const content = measuredMath.get(node);
+      if (!content || node.isConnected) return;
+      sizeObserver?.unobserve(node);
+      sizeObserver?.unobserve(content);
+      measuredMath.delete(node);
+    });
+  }
+
+  new MutationObserver((records) => {
+    records.forEach(({ addedNodes, removedNodes }) => {
+      addedNodes.forEach(observeMath);
+      removedNodes.forEach(forgetMath);
+    });
+  }).observe(root, { childList: true, subtree: true });
+  observeMath(root);
+  const remeasure = () => measuredMath.forEach((_, node) => updateOverflow(node));
+  window.addEventListener("resize", remeasure);
+  if (document.fonts) {
+    document.fonts.ready.then(remeasure);
+    document.fonts.addEventListener("loadingdone", remeasure);
+  }
   const ready = new Promise((resolve) => {
     function waitForStartup() {
       const startup = window.MathJax?.startup?.promise;
@@ -25,7 +92,10 @@
         const connected = batch.filter((node) => node.isConnected && !node.dataset.mathReady);
         if (!connected.length) continue;
         await window.MathJax.typesetPromise(connected);
-        connected.forEach((node) => { node.dataset.mathReady = "true"; });
+        connected.forEach((node) => {
+          node.dataset.mathReady = "true";
+          observeMath(node);
+        });
         await new Promise((resolve) => requestAnimationFrame(resolve));
       }
     }).finally(() => { running = null; });
