@@ -1,0 +1,1854 @@
+{
+  "schema_version": 1,
+  "branch": "ergodic",
+  "authored_date": "2026-09-15",
+  "source_conversations": [
+    {
+      "id": "6aa8b0f9-2bec-83e8-bc01-223fdd770bf1",
+      "title": "Explain Noncommutative Ergodic Theory",
+      "access": "Four exchanges available. Initial assistant reply truncated at 20000 characters; original image unavailable. Other three replies read completely."
+    },
+    {
+      "id": "6aa8d414-1adc-83e8-a6d4-33e9fe7f4a0a",
+      "title": "Koopman representations",
+      "access": "One exchange available. Assistant reply truncated at 20000 characters during multiple recurrence."
+    }
+  ],
+  "coverage_limit": "Coverage is of accessible text and its mathematical prerequisites. Unseen message tails and the missing image have not been audited. The matrix example and multiple-recurrence statement are completed independently from their visible beginnings.",
+  "coverage_sections": [
+    {
+      "source": "noncommutative",
+      "topic": "Starting probability system, events, invariant sets, ergodicity",
+      "entry_ids": [
+        "measure-theory/standard-borel-space",
+        "measure-theory/measure-space-isomorphism",
+        "measure-theory/standard-probability-space",
+        "measure-theory/atom-of-measure",
+        "measure-theory/atomless-probability-space",
+        "measure-theory/atomless-standard-isomorphism-theorem",
+        "ergodic-theory/measure-preserving-transformation",
+        "ergodic-theory/measure-preserving-system",
+        "ergodic-theory/measure-preserving-action",
+        "ergodic-theory/automorphism-group-probability-space",
+        "ergodic-theory/invariant-sigma-algebra",
+        "ergodic-theory/ergodic-transformation",
+        "ergodic-theory/ergodic-action",
+        "ergodic-theory/observable",
+        "ergodic-theory/time-average",
+        "ergodic-theory/product-system",
+        "ergodic-theory/measurable-conjugacy",
+        "ergodic-theory/factor-map",
+        "ergodic-theory/measure-preserving-flow",
+        "ergodic-theory/space-average"
+      ]
+    },
+    {
+      "source": "noncommutative",
+      "topic": "Function algebras, integration as a state, automorphisms, Koopman action",
+      "entry_ids": [
+        "measure-theory/l2-hilbert-space",
+        "ergodic-theory/koopman-operator",
+        "ergodic-theory/koopman-representation",
+        "ergodic-theory/reduced-koopman-representation",
+        "ergodic-theory/fixed-function-ergodicity-criterion",
+        "operator-algebras/noncommutative-probability-space",
+        "operator-algebras/state-preserving-dynamical-system",
+        "operator-algebras/fixed-point-algebra",
+        "ergodic-theory/classical-operator-algebra-dictionary",
+        "operator-algebras/gns-implementation-dynamics",
+        "operator-algebras/tracial-mean-ergodic-theorem",
+        "operator-algebras/ergodic-operator-algebra-action"
+      ]
+    },
+    {
+      "source": "noncommutative",
+      "topic": "Irrational orbit quotient, crossed product, regular representation, center, trace and freeness",
+      "entry_ids": [
+        "operator-algebras/algebraic-crossed-product-z",
+        "operator-algebras/group-measure-space-construction",
+        "ergodic-theory/essentially-free-action",
+        "operator-algebras/maximal-abelian-subalgebra",
+        "operator-algebras/ergodicity-factor-criterion",
+        "ergodic-theory/irrational-rotation-orbit-space",
+        "noncommutative-geometry/rotation-algebra"
+      ]
+    },
+    {
+      "source": "noncommutative",
+      "topic": "Derivations, smooth torus, flow, leaves and transverse return map",
+      "entry_ids": [
+        "algebra-rings/associative-algebra-derivation",
+        "noncommutative-geometry/rotation-algebra-derivations",
+        "differential-geometry/foliation",
+        "ergodic-theory/first-return-map",
+        "differential-geometry/kronecker-foliation",
+        "noncommutative-geometry/smooth-noncommutative-torus"
+      ]
+    },
+    {
+      "source": "noncommutative",
+      "topic": "State-preserving noncommutative systems and beginning of the unitary-group matrix example",
+      "entry_ids": [
+        "operator-algebras/noncommutative-probability-space",
+        "operator-algebras/state-preserving-dynamical-system",
+        "operator-algebras/fixed-point-algebra",
+        "ergodic-theory/classical-operator-algebra-dictionary",
+        "operator-algebras/gns-implementation-dynamics",
+        "operator-algebras/tracial-mean-ergodic-theorem",
+        "operator-algebras/unitary-conjugation-ergodicity",
+        "operator-algebras/ergodic-operator-algebra-action"
+      ]
+    },
+    {
+      "source": "finite",
+      "topic": "Three-point probability, coordinate algebra, three-cycle, transposition, identity and general n-cycle",
+      "entry_ids": [
+        "algebra-groups/symmetric-group",
+        "algebra-groups/permutation-cycle",
+        "ergodic-theory/finite-uniform-system",
+        "ergodic-theory/classical-operator-algebra-dictionary"
+      ]
+    },
+    {
+      "source": "gaussian",
+      "topic": "Standard Gaussian, orthogonal linear maps, radial invariant, CDF coordinates, arbitrary measurable maps, conjugacy, invertibility and doubling",
+      "entry_ids": [
+        "ergodic-theory/doubling-map",
+        "ergodic-theory/cat-map",
+        "ergodic-theory/bernoulli-shift",
+        "probability/standard-gaussian-probability-space",
+        "probability/probability-integral-transform",
+        "ergodic-theory/linear-gaussian-dynamics",
+        "ergodic-theory/gaussian-conjugate-dynamics",
+        "ergodic-theory/gaussian-rotation-example",
+        "ergodic-theory/automorphism-group-probability-space",
+        "ergodic-theory/torus-translation-ergodicity"
+      ]
+    },
+    {
+      "source": "number-field",
+      "topic": "Embeddings, Archimedean algebra, trace pairing, lattice quotient, codifferent, Fourier characters, single and joint translation criteria, Gaussian integers",
+      "entry_ids": [
+        "algebra-fields-galois/archimedean-algebra",
+        "algebra-fields-galois/archimedean-trace-pairing",
+        "algebra-fields-galois/codifferent",
+        "ergodic-theory/number-field-torus",
+        "harmonic-analysis/number-field-torus-characters",
+        "ergodic-theory/number-field-translation-ergodicity",
+        "ergodic-theory/ring-of-integers-translation-action",
+        "ergodic-theory/gaussian-integer-translations",
+        "algebra-fields-galois/minkowski-embedding"
+      ]
+    },
+    {
+      "source": "koopman",
+      "topic": "Group action axioms, unitarity, reduced representation, fixed functions, mean and pointwise averages",
+      "entry_ids": [
+        "ergodic-theory/measure-preserving-transformation",
+        "ergodic-theory/measure-preserving-system",
+        "ergodic-theory/measure-preserving-action",
+        "ergodic-theory/automorphism-group-probability-space",
+        "ergodic-theory/invariant-sigma-algebra",
+        "ergodic-theory/ergodic-transformation",
+        "ergodic-theory/ergodic-action",
+        "ergodic-theory/observable",
+        "ergodic-theory/time-average",
+        "ergodic-theory/product-system",
+        "ergodic-theory/measurable-conjugacy",
+        "ergodic-theory/factor-map",
+        "ergodic-theory/measure-preserving-flow",
+        "measure-theory/l2-hilbert-space",
+        "ergodic-theory/koopman-operator",
+        "ergodic-theory/koopman-representation",
+        "ergodic-theory/reduced-koopman-representation",
+        "ergodic-theory/fixed-function-ergodicity-criterion",
+        "ergodic-theory/von-neumann-mean-ergodic-theorem",
+        "ergodic-theory/maximal-ergodic-theorem",
+        "ergodic-theory/birkhoff-ergodic-theorem",
+        "ergodic-theory/poincare-recurrence-theorem",
+        "ergodic-theory/space-average"
+      ]
+    },
+    {
+      "source": "koopman",
+      "topic": "Spectral resolution, correlation coefficients, eigenfunctions, weak and strong mixing, discrete spectrum and Halmos–von Neumann",
+      "entry_ids": [
+        "ergodic-theory/correlation-function",
+        "functional-analysis/spectral-theorem-unitary-operator",
+        "ergodic-theory/koopman-spectral-measure",
+        "ergodic-theory/koopman-eigenfunction",
+        "ergodic-theory/weak-mixing",
+        "ergodic-theory/strong-mixing",
+        "ergodic-theory/weak-mixing-spectral-criterion",
+        "ergodic-theory/discrete-spectrum",
+        "ergodic-theory/halmos-von-neumann-theorem",
+        "ergodic-theory/kronecker-factor"
+      ]
+    },
+    {
+      "source": "koopman",
+      "topic": "Finite, toral, cat-map and Gaussian examples",
+      "entry_ids": [
+        "ergodic-theory/finite-uniform-system",
+        "harmonic-analysis/characters-compact-abelian-fourier-basis",
+        "ergodic-theory/compact-abelian-rotation",
+        "ergodic-theory/torus-translation-ergodicity",
+        "ergodic-theory/doubling-map",
+        "ergodic-theory/cat-map",
+        "ergodic-theory/bernoulli-shift",
+        "probability/standard-gaussian-probability-space",
+        "probability/probability-integral-transform",
+        "ergodic-theory/linear-gaussian-dynamics",
+        "ergodic-theory/gaussian-conjugate-dynamics",
+        "ergodic-theory/gaussian-rotation-example"
+      ]
+    },
+    {
+      "source": "koopman",
+      "topic": "Continuous time, Stone generator, Hamiltonian transport, Howe–Moore, spectral gaps, property T",
+      "entry_ids": [
+        "ergodic-theory/measure-preserving-flow",
+        "ergodic-theory/koopman-generator",
+        "harmonic-analysis/invariant-vector",
+        "harmonic-analysis/almost-invariant-vectors",
+        "ergodic-theory/spectral-gap",
+        "harmonic-analysis/kazhdan-property-t",
+        "lie-groups/howe-moore-theorem",
+        "differential-geometry/liouville-volume-theorem",
+        "ergodic-theory/hamiltonian-koopman-dynamics"
+      ]
+    },
+    {
+      "source": "koopman",
+      "topic": "Visible beginning of multiple recurrence and arithmetic progressions",
+      "entry_ids": [
+        "ergodic-theory/furstenberg-multiple-recurrence",
+        "discrete-structures/upper-banach-density",
+        "ergodic-theory/furstenberg-correspondence-principle",
+        "discrete-structures/szemeredi-theorem"
+      ]
+    }
+  ],
+  "additional_theory_ids": [
+    "ergodic-theory/dynamic-mode-decomposition",
+    "ergodic-theory/ergodic-decomposition-theorem",
+    "ergodic-theory/extended-dynamic-mode-decomposition",
+    "ergodic-theory/folner-mean-ergodic-theorem",
+    "ergodic-theory/generating-partition",
+    "ergodic-theory/invariant-probability-measure",
+    "ergodic-theory/kingman-subadditive-ergodic-theorem",
+    "ergodic-theory/kolmogorov-sinai-entropy",
+    "ergodic-theory/kolmogorov-sinai-generator-theorem",
+    "ergodic-theory/koopman-equivalence-is-not-conjugacy",
+    "ergodic-theory/krylov-bogolyubov-theorem",
+    "ergodic-theory/linear-cocycle",
+    "ergodic-theory/lyapunov-exponent",
+    "ergodic-theory/measurable-partition",
+    "ergodic-theory/minimal-system",
+    "ergodic-theory/nonsingular-koopman-representation",
+    "ergodic-theory/oseledets-multiplicative-ergodic-theorem",
+    "ergodic-theory/shannon-mcmillan-breiman-theorem",
+    "ergodic-theory/subadditive-cocycle",
+    "ergodic-theory/total-ergodicity",
+    "ergodic-theory/transfer-operator",
+    "ergodic-theory/unique-ergodicity-uniform-averages",
+    "measure-theory/disintegration-theorem",
+    "measure-theory/probability-kernel"
+  ],
+  "groups": [
+    {
+      "id": "ergodic-theory/foundations-index",
+      "title": "Probability spaces and dynamical systems",
+      "new_concepts": [
+        "measure-theory/standard-borel-space",
+        "measure-theory/measure-space-isomorphism",
+        "measure-theory/standard-probability-space",
+        "measure-theory/atom-of-measure",
+        "measure-theory/atomless-probability-space",
+        "measure-theory/atomless-standard-isomorphism-theorem",
+        "ergodic-theory/measure-preserving-transformation",
+        "ergodic-theory/measure-preserving-system",
+        "ergodic-theory/measure-preserving-action",
+        "ergodic-theory/automorphism-group-probability-space",
+        "ergodic-theory/invariant-sigma-algebra",
+        "ergodic-theory/ergodic-transformation",
+        "ergodic-theory/ergodic-action",
+        "ergodic-theory/observable",
+        "ergodic-theory/time-average",
+        "ergodic-theory/space-average",
+        "ergodic-theory/product-system",
+        "ergodic-theory/measurable-conjugacy",
+        "ergodic-theory/factor-map",
+        "ergodic-theory/measure-preserving-flow",
+        "measure-theory/l2-hilbert-space",
+        "ergodic-theory/invariant-probability-measure",
+        "ergodic-theory/minimal-system",
+        "ergodic-theory/total-ergodicity"
+      ],
+      "reused_doorways": [
+        "shared-foundations/set",
+        "measure-theory/sigma-algebra",
+        "measure-theory/measurable-space",
+        "measure-theory/measure",
+        "probability/probability-space",
+        "measure-theory/measurable-function",
+        "measure-theory/null-set",
+        "measure-theory/almost-everywhere",
+        "measure-theory/pushforward-measure",
+        "algebra-groups/group-action"
+      ]
+    },
+    {
+      "id": "ergodic-theory/ergodic-theorems-index",
+      "title": "Averaging, recurrence, and decomposition",
+      "new_concepts": [
+        "ergodic-theory/von-neumann-mean-ergodic-theorem",
+        "ergodic-theory/maximal-ergodic-theorem",
+        "ergodic-theory/birkhoff-ergodic-theorem",
+        "ergodic-theory/poincare-recurrence-theorem",
+        "measure-theory/probability-kernel",
+        "measure-theory/disintegration-theorem",
+        "ergodic-theory/ergodic-decomposition-theorem",
+        "ergodic-theory/unique-ergodicity-uniform-averages",
+        "ergodic-theory/folner-mean-ergodic-theorem",
+        "ergodic-theory/krylov-bogolyubov-theorem"
+      ],
+      "reused_doorways": [
+        "measure-theory/lebesgue-integral",
+        "measure-theory/lp-space",
+        "probability/conditional-expectation",
+        "linear-algebra/orthogonal-projection",
+        "analysis/unique-ergodicity"
+      ]
+    },
+    {
+      "id": "ergodic-theory/koopman-spectrum-index",
+      "title": "Koopman operators, representations, and spectrum",
+      "new_concepts": [
+        "ergodic-theory/koopman-operator",
+        "ergodic-theory/koopman-representation",
+        "ergodic-theory/reduced-koopman-representation",
+        "ergodic-theory/fixed-function-ergodicity-criterion",
+        "ergodic-theory/correlation-function",
+        "functional-analysis/spectral-theorem-unitary-operator",
+        "ergodic-theory/koopman-spectral-measure",
+        "ergodic-theory/koopman-eigenfunction",
+        "ergodic-theory/weak-mixing",
+        "ergodic-theory/strong-mixing",
+        "ergodic-theory/weak-mixing-spectral-criterion",
+        "ergodic-theory/discrete-spectrum",
+        "ergodic-theory/halmos-von-neumann-theorem",
+        "ergodic-theory/kronecker-factor",
+        "ergodic-theory/koopman-generator",
+        "ergodic-theory/transfer-operator",
+        "harmonic-analysis/invariant-vector",
+        "harmonic-analysis/almost-invariant-vectors",
+        "ergodic-theory/spectral-gap",
+        "harmonic-analysis/kazhdan-property-t",
+        "lie-groups/howe-moore-theorem",
+        "ergodic-theory/nonsingular-koopman-representation"
+      ],
+      "reused_doorways": [
+        "linear-algebra/hilbert-space",
+        "functional-analysis/unitary-operator",
+        "lie-groups/strongly-continuous-unitary-representation",
+        "lie-groups/stone-theorem-one-parameter-unitary-groups",
+        "harmonic-analysis/coefficient-function",
+        "harmonic-analysis/folner-condition"
+      ]
+    },
+    {
+      "id": "ergodic-theory/examples-index",
+      "title": "Finite, toral, and Gaussian examples",
+      "new_concepts": [
+        "algebra-groups/symmetric-group",
+        "algebra-groups/permutation-cycle",
+        "ergodic-theory/finite-uniform-system",
+        "harmonic-analysis/characters-compact-abelian-fourier-basis",
+        "ergodic-theory/compact-abelian-rotation",
+        "ergodic-theory/torus-translation-ergodicity",
+        "ergodic-theory/doubling-map",
+        "ergodic-theory/cat-map",
+        "ergodic-theory/bernoulli-shift",
+        "probability/standard-gaussian-probability-space",
+        "probability/probability-integral-transform",
+        "ergodic-theory/linear-gaussian-dynamics",
+        "ergodic-theory/gaussian-conjugate-dynamics",
+        "ergodic-theory/gaussian-rotation-example"
+      ],
+      "reused_doorways": [
+        "shared-foundations/power-set",
+        "measure-theory/indicator-function",
+        "measure-theory/product-measure",
+        "probability/cumulative-distribution-function",
+        "lie-groups/orthogonal-group",
+        "harmonic-analysis/haar-measure",
+        "harmonic-analysis/fourier-character"
+      ]
+    },
+    {
+      "id": "ergodic-theory/arithmetic-index",
+      "title": "Number-field translations",
+      "new_concepts": [
+        "algebra-fields-galois/archimedean-algebra",
+        "algebra-fields-galois/minkowski-embedding",
+        "algebra-fields-galois/archimedean-trace-pairing",
+        "algebra-fields-galois/codifferent",
+        "ergodic-theory/number-field-torus",
+        "harmonic-analysis/number-field-torus-characters",
+        "ergodic-theory/number-field-translation-ergodicity",
+        "ergodic-theory/ring-of-integers-translation-action",
+        "ergodic-theory/gaussian-integer-translations"
+      ],
+      "reused_doorways": [
+        "algebra-fields-galois/number-field",
+        "algebra-fields-galois/ring-of-integers",
+        "algebra-fields-galois/trace-field",
+        "harmonic-analysis/pontryagin-dual"
+      ]
+    },
+    {
+      "id": "ergodic-theory/noncommutative-index",
+      "title": "Noncommutative dynamics and orbit spaces",
+      "new_concepts": [
+        "operator-algebras/noncommutative-probability-space",
+        "operator-algebras/state-preserving-dynamical-system",
+        "operator-algebras/fixed-point-algebra",
+        "operator-algebras/ergodic-operator-algebra-action",
+        "ergodic-theory/classical-operator-algebra-dictionary",
+        "operator-algebras/gns-implementation-dynamics",
+        "operator-algebras/tracial-mean-ergodic-theorem",
+        "operator-algebras/algebraic-crossed-product-z",
+        "operator-algebras/group-measure-space-construction",
+        "ergodic-theory/essentially-free-action",
+        "operator-algebras/maximal-abelian-subalgebra",
+        "operator-algebras/ergodicity-factor-criterion",
+        "ergodic-theory/irrational-rotation-orbit-space",
+        "noncommutative-geometry/rotation-algebra",
+        "algebra-rings/associative-algebra-derivation",
+        "noncommutative-geometry/rotation-algebra-derivations",
+        "differential-geometry/foliation",
+        "ergodic-theory/first-return-map",
+        "differential-geometry/kronecker-foliation",
+        "noncommutative-geometry/smooth-noncommutative-torus",
+        "operator-algebras/unitary-conjugation-ergodicity"
+      ],
+      "reused_doorways": [
+        "operator-algebras/cstar-algebra",
+        "operator-algebras/von-neumann-algebra",
+        "operator-algebras/state-cstar-algebra",
+        "operator-algebras/normal-state",
+        "operator-algebras/tracial-state",
+        "operator-algebras/gns-construction",
+        "operator-algebras/center-of-von-neumann-algebra",
+        "operator-algebras/von-neumann-factor",
+        "operator-algebras/von-neumann-crossed-product",
+        "operator-algebras/gelfand-duality",
+        "lie-groups/unitary-group"
+      ]
+    },
+    {
+      "id": "ergodic-theory/entropy-cocycles-index",
+      "title": "Entropy and growth along orbits",
+      "new_concepts": [
+        "ergodic-theory/subadditive-cocycle",
+        "ergodic-theory/kingman-subadditive-ergodic-theorem",
+        "ergodic-theory/linear-cocycle",
+        "ergodic-theory/lyapunov-exponent",
+        "ergodic-theory/oseledets-multiplicative-ergodic-theorem",
+        "ergodic-theory/measurable-partition",
+        "ergodic-theory/kolmogorov-sinai-entropy",
+        "ergodic-theory/generating-partition",
+        "ergodic-theory/kolmogorov-sinai-generator-theorem",
+        "ergodic-theory/shannon-mcmillan-breiman-theorem",
+        "ergodic-theory/koopman-equivalence-is-not-conjugacy"
+      ],
+      "reused_doorways": [
+        "probability/shannon-entropy",
+        "linear-algebra/linear-map",
+        "algebra-representation-theory/regular-representation"
+      ]
+    },
+    {
+      "id": "ergodic-theory/applications-index",
+      "title": "Arithmetic, Hamiltonian, and data applications",
+      "new_concepts": [
+        "ergodic-theory/furstenberg-multiple-recurrence",
+        "discrete-structures/upper-banach-density",
+        "ergodic-theory/furstenberg-correspondence-principle",
+        "discrete-structures/szemeredi-theorem",
+        "differential-geometry/liouville-volume-theorem",
+        "ergodic-theory/hamiltonian-koopman-dynamics",
+        "ergodic-theory/dynamic-mode-decomposition",
+        "ergodic-theory/extended-dynamic-mode-decomposition"
+      ],
+      "reused_doorways": [
+        "differential-geometry/symplectic-manifold",
+        "differential-geometry/hamiltonian-vector-field",
+        "differential-geometry/hamiltonian-flow",
+        "differential-geometry/poisson-bracket-symplectic",
+        "linear-algebra/eigenvalue"
+      ]
+    }
+  ],
+  "new_concept_count": 119,
+  "new_navigation_count": 9,
+  "new_entries": [
+    {
+      "id": "measure-theory/standard-borel-space",
+      "kind": "definition",
+      "file": "content/measure-theory/standard-borel-space.knowl.md",
+      "sha256": "948fa4076ca2eb94990b424c29053380fc3fb61700677a1ec5bf449b090a591e"
+    },
+    {
+      "id": "measure-theory/measure-space-isomorphism",
+      "kind": "definition",
+      "file": "content/measure-theory/measure-space-isomorphism.knowl.md",
+      "sha256": "49575ce5c63cf71ac0e4bedf6911b4b70eb7821ad87691aa8dc4f4230bbe6df4"
+    },
+    {
+      "id": "measure-theory/standard-probability-space",
+      "kind": "definition",
+      "file": "content/measure-theory/standard-probability-space.knowl.md",
+      "sha256": "d39432510224ff3a7a87c7ecca3e9bcac678ec5bcddb331130f0dbc9b520f833"
+    },
+    {
+      "id": "measure-theory/atom-of-measure",
+      "kind": "definition",
+      "file": "content/measure-theory/atom-of-measure.knowl.md",
+      "sha256": "32668dd7cca9c09f545be723de5580de5cdd7156ce73832728d68b2b711e86a3"
+    },
+    {
+      "id": "measure-theory/atomless-probability-space",
+      "kind": "definition",
+      "file": "content/measure-theory/atomless-probability-space.knowl.md",
+      "sha256": "b2cc2912f132c9d76c3980fa17d4a9a929cdd0e7b9b98345ae2d6fdf23d17c70"
+    },
+    {
+      "id": "measure-theory/atomless-standard-isomorphism-theorem",
+      "kind": "theorem",
+      "file": "content/measure-theory/atomless-standard-isomorphism-theorem.knowl.md",
+      "sha256": "522981fe0ff85de2ebba0d654cc2a6003fe7c901e22a4e849f1448c7a193de7f"
+    },
+    {
+      "id": "ergodic-theory/measure-preserving-transformation",
+      "kind": "definition",
+      "file": "content/ergodic-theory/measure-preserving-transformation.knowl.md",
+      "sha256": "e61bcf2eee8af8a03c0207dc41ea8a69e6c6a2292aa2ecb5288a84105a994a76"
+    },
+    {
+      "id": "ergodic-theory/measure-preserving-system",
+      "kind": "definition",
+      "file": "content/ergodic-theory/measure-preserving-system.knowl.md",
+      "sha256": "b7f7365ee8e7cf5621c640f8666f82862ccf651150c7638d3600a059aa81c58f"
+    },
+    {
+      "id": "ergodic-theory/measure-preserving-action",
+      "kind": "definition",
+      "file": "content/ergodic-theory/measure-preserving-action.knowl.md",
+      "sha256": "565a1d7f3ece6f3565d5c4d186d810e1ba654c378286633068fde35828309c3c"
+    },
+    {
+      "id": "ergodic-theory/automorphism-group-probability-space",
+      "kind": "definition",
+      "file": "content/ergodic-theory/automorphism-group-probability-space.knowl.md",
+      "sha256": "956b6af8ba940de6e1019914751f754c04a9672fca7793dd6c527052be0cd830"
+    },
+    {
+      "id": "ergodic-theory/invariant-sigma-algebra",
+      "kind": "definition",
+      "file": "content/ergodic-theory/invariant-sigma-algebra.knowl.md",
+      "sha256": "cd21b200536bb39f3719ea7e3b5559fc13284ca5a2b509b9f4ab63d7bd71cb48"
+    },
+    {
+      "id": "ergodic-theory/ergodic-transformation",
+      "kind": "definition",
+      "file": "content/ergodic-theory/ergodic-transformation.knowl.md",
+      "sha256": "2e08bd21e930f2067d45b9c1122481bea84338af57c128c95208ab0d7984c862"
+    },
+    {
+      "id": "ergodic-theory/ergodic-action",
+      "kind": "definition",
+      "file": "content/ergodic-theory/ergodic-action.knowl.md",
+      "sha256": "53079506a07c56a817faed5907102723f56ccf05990108c8e9d438755a99e742"
+    },
+    {
+      "id": "ergodic-theory/observable",
+      "kind": "definition",
+      "file": "content/ergodic-theory/observable.knowl.md",
+      "sha256": "f8a501a2719b472630c463b8001a2980df7c3c540964d1906a925ae7a4df7928"
+    },
+    {
+      "id": "ergodic-theory/time-average",
+      "kind": "definition",
+      "file": "content/ergodic-theory/time-average.knowl.md",
+      "sha256": "4dc374c20adc95d010a9273dd9736e9f2c01e28ada20d9e0f28addb9bfd1efa9"
+    },
+    {
+      "id": "ergodic-theory/product-system",
+      "kind": "definition",
+      "file": "content/ergodic-theory/product-system.knowl.md",
+      "sha256": "309427074955dd34910d715629ecbc94ce511521991a04f488b9b80e3612a655"
+    },
+    {
+      "id": "ergodic-theory/measurable-conjugacy",
+      "kind": "definition",
+      "file": "content/ergodic-theory/measurable-conjugacy.knowl.md",
+      "sha256": "e35dc29661963f0ea3389a10250ece9af61d5a07b9f40ae3bf2f5237fdc2f82a"
+    },
+    {
+      "id": "ergodic-theory/factor-map",
+      "kind": "definition",
+      "file": "content/ergodic-theory/factor-map.knowl.md",
+      "sha256": "c939d62f3864f190f695b0623287f048d9f3e04c3ab536d5418a57afec92a10f"
+    },
+    {
+      "id": "ergodic-theory/measure-preserving-flow",
+      "kind": "definition",
+      "file": "content/ergodic-theory/measure-preserving-flow.knowl.md",
+      "sha256": "bf341ea511669e17a4840bcebb6771489fa94b9851cc35eaf30d8ee0e001a6d9"
+    },
+    {
+      "id": "measure-theory/l2-hilbert-space",
+      "kind": "definition",
+      "file": "content/measure-theory/l2-hilbert-space.knowl.md",
+      "sha256": "8d2c512c1debfbdae518dddabbdc4cc4222ab321e42744590525195c88663276"
+    },
+    {
+      "id": "ergodic-theory/koopman-operator",
+      "kind": "definition",
+      "file": "content/ergodic-theory/koopman-operator.knowl.md",
+      "sha256": "d872d27abe90092d72af2fd6a2319641ee341133813052d3de45dc2a0741c5dd"
+    },
+    {
+      "id": "ergodic-theory/koopman-representation",
+      "kind": "definition",
+      "file": "content/ergodic-theory/koopman-representation.knowl.md",
+      "sha256": "cc643f07b449356e572148e7fe71cb8b2e19af9681ca5096edaed495ae961a98"
+    },
+    {
+      "id": "ergodic-theory/reduced-koopman-representation",
+      "kind": "definition",
+      "file": "content/ergodic-theory/reduced-koopman-representation.knowl.md",
+      "sha256": "3905d491bf42b50ac73af5583b0af8d4ed72f6044bd053666ce07aa2588d4aa5"
+    },
+    {
+      "id": "ergodic-theory/fixed-function-ergodicity-criterion",
+      "kind": "theorem",
+      "file": "content/ergodic-theory/fixed-function-ergodicity-criterion.knowl.md",
+      "sha256": "f0cfbfebcbc91aee49804da9850e8695c0dff60abb8b1ed97a30d8ad372d0990"
+    },
+    {
+      "id": "ergodic-theory/von-neumann-mean-ergodic-theorem",
+      "kind": "theorem",
+      "file": "content/ergodic-theory/von-neumann-mean-ergodic-theorem.knowl.md",
+      "sha256": "7b708962abdbb653581d7a7182aa06b7a763bc0df2116757446d951cd9cf74b7"
+    },
+    {
+      "id": "ergodic-theory/maximal-ergodic-theorem",
+      "kind": "theorem",
+      "file": "content/ergodic-theory/maximal-ergodic-theorem.knowl.md",
+      "sha256": "bc89cb7cb8f122baa0fce3ee6ba74f66130bb0e5aacffe90ae1d60b3c7e67e39"
+    },
+    {
+      "id": "ergodic-theory/birkhoff-ergodic-theorem",
+      "kind": "theorem",
+      "file": "content/ergodic-theory/birkhoff-ergodic-theorem.knowl.md",
+      "sha256": "6ae6eddffc26f7d50938980d74e952d488c839699fb91921629eae403d1029b2"
+    },
+    {
+      "id": "ergodic-theory/poincare-recurrence-theorem",
+      "kind": "theorem",
+      "file": "content/ergodic-theory/poincare-recurrence-theorem.knowl.md",
+      "sha256": "6faa33356176de3fc04bca5e6e332dba368962845ad39094905bbb50c66b5803"
+    },
+    {
+      "id": "ergodic-theory/correlation-function",
+      "kind": "definition",
+      "file": "content/ergodic-theory/correlation-function.knowl.md",
+      "sha256": "5fa86e5402784fdaf7aa015a2d2126b8f0900700aa5e904c92db1b66414b5255"
+    },
+    {
+      "id": "functional-analysis/spectral-theorem-unitary-operator",
+      "kind": "theorem",
+      "file": "content/functional-analysis/spectral-theorem-unitary-operator.knowl.md",
+      "sha256": "52cc26dd2447b40d5033830102e2ffdebea2d82077e42162f6f8e0fe6e651a44"
+    },
+    {
+      "id": "ergodic-theory/koopman-spectral-measure",
+      "kind": "definition",
+      "file": "content/ergodic-theory/koopman-spectral-measure.knowl.md",
+      "sha256": "e3fa1cb56524a0f62bf736c64349d74d17c695b9f1929f6d5440699568f3da4e"
+    },
+    {
+      "id": "ergodic-theory/koopman-eigenfunction",
+      "kind": "definition",
+      "file": "content/ergodic-theory/koopman-eigenfunction.knowl.md",
+      "sha256": "3a595b9df1da914be3583531ee600143a06cb41bd432672e018b5dc2a8181756"
+    },
+    {
+      "id": "ergodic-theory/weak-mixing",
+      "kind": "definition",
+      "file": "content/ergodic-theory/weak-mixing.knowl.md",
+      "sha256": "001eb2376494ed5172fc126594022886f05654343c6e04b63fb1366659f7c927"
+    },
+    {
+      "id": "ergodic-theory/strong-mixing",
+      "kind": "definition",
+      "file": "content/ergodic-theory/strong-mixing.knowl.md",
+      "sha256": "31bd95d1c4f35c801cc91cabcf7d56aba6c704cf2c3a67402abe6f140f123c00"
+    },
+    {
+      "id": "ergodic-theory/weak-mixing-spectral-criterion",
+      "kind": "theorem",
+      "file": "content/ergodic-theory/weak-mixing-spectral-criterion.knowl.md",
+      "sha256": "f6b21b04096943c091aac682bd595572e5c2160a9b1702bafcaf131a79293d31"
+    },
+    {
+      "id": "ergodic-theory/discrete-spectrum",
+      "kind": "definition",
+      "file": "content/ergodic-theory/discrete-spectrum.knowl.md",
+      "sha256": "4c7ad1b9b493fac9029a9f9d2d8268b0b94c9ca2a8c90314a147e876712718a9"
+    },
+    {
+      "id": "ergodic-theory/halmos-von-neumann-theorem",
+      "kind": "theorem",
+      "file": "content/ergodic-theory/halmos-von-neumann-theorem.knowl.md",
+      "sha256": "eeff3092edef97315ad779d6c32dd057649d40856c05c2429aaa29ffc6f7c207"
+    },
+    {
+      "id": "ergodic-theory/kronecker-factor",
+      "kind": "definition",
+      "file": "content/ergodic-theory/kronecker-factor.knowl.md",
+      "sha256": "4ebbf76abe63e2357962c3f143f2069311fe541f040839781d949632f5b45ece"
+    },
+    {
+      "id": "ergodic-theory/koopman-generator",
+      "kind": "definition",
+      "file": "content/ergodic-theory/koopman-generator.knowl.md",
+      "sha256": "a530c2675bc6fba7b3dcb6f7e9ca92e74d7a2cc6fcdffce64801b5d9a459608d"
+    },
+    {
+      "id": "ergodic-theory/transfer-operator",
+      "kind": "definition",
+      "file": "content/ergodic-theory/transfer-operator.knowl.md",
+      "sha256": "3fae02214037586c8e974f92331ddac685d645169d86a3ec87b76230db64490d"
+    },
+    {
+      "id": "ergodic-theory/finite-uniform-system",
+      "kind": "example",
+      "file": "content/ergodic-theory/finite-uniform-system.knowl.md",
+      "sha256": "e22bbb1b0dfb458dedf77796eb9f9568da5f370a2de8831343412bf141c27fcc"
+    },
+    {
+      "id": "harmonic-analysis/characters-compact-abelian-fourier-basis",
+      "kind": "theorem",
+      "file": "content/harmonic-analysis/characters-compact-abelian-fourier-basis.knowl.md",
+      "sha256": "c898bd91529ae48a81020c20b639b08bfb4ac4c9b7b572e535e1cfe8a73e445d"
+    },
+    {
+      "id": "ergodic-theory/compact-abelian-rotation",
+      "kind": "definition",
+      "file": "content/ergodic-theory/compact-abelian-rotation.knowl.md",
+      "sha256": "a1efd631ed85a3f938dbbe27e3fba8822df529b8930a13007d4d872744d337ba"
+    },
+    {
+      "id": "ergodic-theory/torus-translation-ergodicity",
+      "kind": "theorem",
+      "file": "content/ergodic-theory/torus-translation-ergodicity.knowl.md",
+      "sha256": "c18231cda47fb09883ec74553f39aba4bebcaa1e82966e0f42502a4c9937f983"
+    },
+    {
+      "id": "ergodic-theory/doubling-map",
+      "kind": "example",
+      "file": "content/ergodic-theory/doubling-map.knowl.md",
+      "sha256": "aa2af227da35ace71a641ca6e26c31c9a56f1f7da0a535e349adafb39790002d"
+    },
+    {
+      "id": "ergodic-theory/cat-map",
+      "kind": "example",
+      "file": "content/ergodic-theory/cat-map.knowl.md",
+      "sha256": "0a07cb2c6cb27d4db4de21a9b1bd7ab1696d32908aab4ac9a0e2798b2d648a23"
+    },
+    {
+      "id": "ergodic-theory/bernoulli-shift",
+      "kind": "example",
+      "file": "content/ergodic-theory/bernoulli-shift.knowl.md",
+      "sha256": "55b5e5f0fd31d69904ab5892023d1f5a8e2d13ed1cefba2fa537527e14268d20"
+    },
+    {
+      "id": "probability/standard-gaussian-probability-space",
+      "kind": "definition",
+      "file": "content/probability/standard-gaussian-probability-space.knowl.md",
+      "sha256": "34ac590b89c4c5cf5e3be8032958184ac0b075024bfd2d264478ddd8cb0a10e3"
+    },
+    {
+      "id": "probability/probability-integral-transform",
+      "kind": "theorem",
+      "file": "content/probability/probability-integral-transform.knowl.md",
+      "sha256": "6fe76c068ad028b1fa6874c63d7b088e1b70a8aa47e294dc4e0c2a0e46be47c1"
+    },
+    {
+      "id": "ergodic-theory/linear-gaussian-dynamics",
+      "kind": "theorem",
+      "file": "content/ergodic-theory/linear-gaussian-dynamics.knowl.md",
+      "sha256": "a603622248c7f639296049b432b09c1534d1725c2b051e6d5e9d0f0790d7585c"
+    },
+    {
+      "id": "ergodic-theory/gaussian-conjugate-dynamics",
+      "kind": "construction",
+      "file": "content/ergodic-theory/gaussian-conjugate-dynamics.knowl.md",
+      "sha256": "4c9639d30ff30efd01199ea32200a17a3c81303d7b347b25364594bd6d9abe0c"
+    },
+    {
+      "id": "ergodic-theory/gaussian-rotation-example",
+      "kind": "example",
+      "file": "content/ergodic-theory/gaussian-rotation-example.knowl.md",
+      "sha256": "cf9522c5cd8b00629ca36dad9ce119a1a17f33d5cf7c27cb61abcdede137aada"
+    },
+    {
+      "id": "algebra-fields-galois/archimedean-algebra",
+      "kind": "construction",
+      "file": "content/algebra-fields-galois/archimedean-algebra.knowl.md",
+      "sha256": "4b9dd970653ad9bf6f51126797769f5f9ea64bc01376d4277fbd4d0e45c9af73"
+    },
+    {
+      "id": "algebra-fields-galois/archimedean-trace-pairing",
+      "kind": "definition",
+      "file": "content/algebra-fields-galois/archimedean-trace-pairing.knowl.md",
+      "sha256": "1f839353143db3a969608b7bebe0afd24922316c11728ea719b3bfe8d308b828"
+    },
+    {
+      "id": "algebra-fields-galois/codifferent",
+      "kind": "definition",
+      "file": "content/algebra-fields-galois/codifferent.knowl.md",
+      "sha256": "fa3b5cbfa4dec2b48398c571c55d36c649b6c08bd4ed10a254307b20fabf4389"
+    },
+    {
+      "id": "ergodic-theory/number-field-torus",
+      "kind": "construction",
+      "file": "content/ergodic-theory/number-field-torus.knowl.md",
+      "sha256": "83f90c39b1797e335826a692fb4e1328f16c345aa1c334ffc753584891b6182c"
+    },
+    {
+      "id": "harmonic-analysis/number-field-torus-characters",
+      "kind": "theorem",
+      "file": "content/harmonic-analysis/number-field-torus-characters.knowl.md",
+      "sha256": "23f17a58ddc22883d06707486a965c1b67ee318b5668274f8c3ffc19a90afe30"
+    },
+    {
+      "id": "ergodic-theory/number-field-translation-ergodicity",
+      "kind": "theorem",
+      "file": "content/ergodic-theory/number-field-translation-ergodicity.knowl.md",
+      "sha256": "a436fa1445def4a2d4e78c0c18c4bcea259abf1a76da8b3d9e2f55af6f62b158"
+    },
+    {
+      "id": "ergodic-theory/ring-of-integers-translation-action",
+      "kind": "theorem",
+      "file": "content/ergodic-theory/ring-of-integers-translation-action.knowl.md",
+      "sha256": "b24c4754e1e03cc2a59ad25b9170f77b3a4bb0605727ac52a755892fb9bbb436"
+    },
+    {
+      "id": "ergodic-theory/gaussian-integer-translations",
+      "kind": "example",
+      "file": "content/ergodic-theory/gaussian-integer-translations.knowl.md",
+      "sha256": "bb4b635ec891a4eafcb1a30abb51765b62a0e10069756f626728cd25d7d80f3d"
+    },
+    {
+      "id": "operator-algebras/noncommutative-probability-space",
+      "kind": "definition",
+      "file": "content/operator-algebras/noncommutative-probability-space.knowl.md",
+      "sha256": "43fc914a271c60cbcd916c44fc0dedc8b839303ffa75549dd83b26fdc0f9e552"
+    },
+    {
+      "id": "operator-algebras/state-preserving-dynamical-system",
+      "kind": "definition",
+      "file": "content/operator-algebras/state-preserving-dynamical-system.knowl.md",
+      "sha256": "ff2f5560d4dba9f292816714d8ff96ab12ee0da4871fdfbd39a5dbddfbd8ecd7"
+    },
+    {
+      "id": "operator-algebras/fixed-point-algebra",
+      "kind": "definition",
+      "file": "content/operator-algebras/fixed-point-algebra.knowl.md",
+      "sha256": "eb56ee4294f9ddf7d3310299b981145b41b9510616c9e115aff557cb1072f49c"
+    },
+    {
+      "id": "ergodic-theory/classical-operator-algebra-dictionary",
+      "kind": "construction",
+      "file": "content/ergodic-theory/classical-operator-algebra-dictionary.knowl.md",
+      "sha256": "eed298b5fb3d9a76f2e72ce68a2cebf199d80083b5d78369925cf3b6b196755d"
+    },
+    {
+      "id": "operator-algebras/gns-implementation-dynamics",
+      "kind": "construction",
+      "file": "content/operator-algebras/gns-implementation-dynamics.knowl.md",
+      "sha256": "c3e6e7428dca2716184db257666f8c1c848304d7dcc24c6f0c8afc124957aae3"
+    },
+    {
+      "id": "operator-algebras/tracial-mean-ergodic-theorem",
+      "kind": "theorem",
+      "file": "content/operator-algebras/tracial-mean-ergodic-theorem.knowl.md",
+      "sha256": "a13406bb47f13e8de77b567d3c4d1412fb677f78aa2328b5a0f8b43ad8492d70"
+    },
+    {
+      "id": "operator-algebras/algebraic-crossed-product-z",
+      "kind": "construction",
+      "file": "content/operator-algebras/algebraic-crossed-product-z.knowl.md",
+      "sha256": "a4d5d0b3f1871fc7680c318f780ce6abf3ac5ed1190da5664fcc329528868317"
+    },
+    {
+      "id": "operator-algebras/group-measure-space-construction",
+      "kind": "construction",
+      "file": "content/operator-algebras/group-measure-space-construction.knowl.md",
+      "sha256": "aa20e64c863cfef933be9d547dfd562f304f3970f62979ad20ac9d379881c61d"
+    },
+    {
+      "id": "ergodic-theory/essentially-free-action",
+      "kind": "definition",
+      "file": "content/ergodic-theory/essentially-free-action.knowl.md",
+      "sha256": "220bd07d7a326a7ba942ee9d7a4b5a6e7cd7880a91f3363d52cdae68be981a8c"
+    },
+    {
+      "id": "operator-algebras/maximal-abelian-subalgebra",
+      "kind": "definition",
+      "file": "content/operator-algebras/maximal-abelian-subalgebra.knowl.md",
+      "sha256": "b528d6a6c19d74987f9cf91d862945547622156f9076fe2bcdfd2a07c8e032da"
+    },
+    {
+      "id": "operator-algebras/ergodicity-factor-criterion",
+      "kind": "theorem",
+      "file": "content/operator-algebras/ergodicity-factor-criterion.knowl.md",
+      "sha256": "4e06a653269e04e9cd4d94497fd24a517acd35cda95422b4b55dcf751490b9d2"
+    },
+    {
+      "id": "ergodic-theory/irrational-rotation-orbit-space",
+      "kind": "example",
+      "file": "content/ergodic-theory/irrational-rotation-orbit-space.knowl.md",
+      "sha256": "869aa5063603c77f894760e08a437fca40191ccd748a4e8072c9c5deebb64643"
+    },
+    {
+      "id": "noncommutative-geometry/rotation-algebra",
+      "kind": "definition",
+      "file": "content/noncommutative-geometry/rotation-algebra.knowl.md",
+      "sha256": "9d60b87df283280ed193882f1a3997529cfdd7e2f63a816ddf1572a4e42d309a"
+    },
+    {
+      "id": "algebra-rings/associative-algebra-derivation",
+      "kind": "definition",
+      "file": "content/algebra-rings/associative-algebra-derivation.knowl.md",
+      "sha256": "2a902bb2b07c8c08eaf793bbf535346cc6d768a254ef60c4f8721165c60c1f96"
+    },
+    {
+      "id": "noncommutative-geometry/rotation-algebra-derivations",
+      "kind": "construction",
+      "file": "content/noncommutative-geometry/rotation-algebra-derivations.knowl.md",
+      "sha256": "ca2095da718c2ec8f58a33d4b93588a0cea796461cef4a528ff742b721f0636b"
+    },
+    {
+      "id": "differential-geometry/foliation",
+      "kind": "definition",
+      "file": "content/differential-geometry/foliation.knowl.md",
+      "sha256": "e7478a711d37f8cafe4b31a4b1ea086da8886d9c22111aeae1d510f187d515ad"
+    },
+    {
+      "id": "ergodic-theory/first-return-map",
+      "kind": "definition",
+      "file": "content/ergodic-theory/first-return-map.knowl.md",
+      "sha256": "4f13b80d67ffe55c809ac62aa52088910c2da471bd70046affba4a56e5c5404d"
+    },
+    {
+      "id": "differential-geometry/kronecker-foliation",
+      "kind": "example",
+      "file": "content/differential-geometry/kronecker-foliation.knowl.md",
+      "sha256": "641472933f6a6c3ee18ca91741aad3d4efa8bf5cf236b5c7fa97389ff3849ed7"
+    },
+    {
+      "id": "algebra-groups/symmetric-group",
+      "kind": "definition",
+      "file": "content/algebra-groups/symmetric-group.knowl.md",
+      "sha256": "f2a1081e5a6a1e414cd7090c2b41a44ffa1b224e0aac184ccd3d5050323ad342"
+    },
+    {
+      "id": "algebra-groups/permutation-cycle",
+      "kind": "definition",
+      "file": "content/algebra-groups/permutation-cycle.knowl.md",
+      "sha256": "2404f5006f9ad74c9aeda57ec3da38d27aa104361c1495d5c830bc95df6c8f4e"
+    },
+    {
+      "id": "harmonic-analysis/invariant-vector",
+      "kind": "definition",
+      "file": "content/harmonic-analysis/invariant-vector.knowl.md",
+      "sha256": "b57e41c49aa5850e499c47d76d09a96f31b3808a8e152d501ba6948c5db1deb5"
+    },
+    {
+      "id": "harmonic-analysis/almost-invariant-vectors",
+      "kind": "definition",
+      "file": "content/harmonic-analysis/almost-invariant-vectors.knowl.md",
+      "sha256": "adad16f59c3fcbd6425d6f1ceb4be068838d0f7819fb2f45aee8914331ceed27"
+    },
+    {
+      "id": "ergodic-theory/spectral-gap",
+      "kind": "definition",
+      "file": "content/ergodic-theory/spectral-gap.knowl.md",
+      "sha256": "c28c1a769ba61daa6f97588e4131fe2f1f28fb289e755eac0ca0e8d36335d5fd"
+    },
+    {
+      "id": "harmonic-analysis/kazhdan-property-t",
+      "kind": "definition",
+      "file": "content/harmonic-analysis/kazhdan-property-t.knowl.md",
+      "sha256": "4249bf2d6b1546571374203ce44d93949d4affb88e33fab0590446d4764e516f"
+    },
+    {
+      "id": "lie-groups/howe-moore-theorem",
+      "kind": "theorem",
+      "file": "content/lie-groups/howe-moore-theorem.knowl.md",
+      "sha256": "a769d5f84c842773b2e674e82907de6530d372421a34aa344ab6be6299b57ffa"
+    },
+    {
+      "id": "ergodic-theory/furstenberg-multiple-recurrence",
+      "kind": "theorem",
+      "file": "content/ergodic-theory/furstenberg-multiple-recurrence.knowl.md",
+      "sha256": "cd0382a4756516ad2398f9e7dd45a1be55ecd0df096aef81c5d99f4b8d480ef3"
+    },
+    {
+      "id": "discrete-structures/upper-banach-density",
+      "kind": "definition",
+      "file": "content/discrete-structures/upper-banach-density.knowl.md",
+      "sha256": "67070a230ece8c9902fc51c6fd53d8ee853c197692a798579cc05f0fb5a68843"
+    },
+    {
+      "id": "ergodic-theory/furstenberg-correspondence-principle",
+      "kind": "theorem",
+      "file": "content/ergodic-theory/furstenberg-correspondence-principle.knowl.md",
+      "sha256": "aba5bb977f134c398ef8bb5980aa44b078f175436dbb8edea266fda8060d215a"
+    },
+    {
+      "id": "discrete-structures/szemeredi-theorem",
+      "kind": "theorem",
+      "file": "content/discrete-structures/szemeredi-theorem.knowl.md",
+      "sha256": "b85c277933c65a12af590db85c287b10cfbc41ace86f348c1492acd659e22632"
+    },
+    {
+      "id": "differential-geometry/liouville-volume-theorem",
+      "kind": "theorem",
+      "file": "content/differential-geometry/liouville-volume-theorem.knowl.md",
+      "sha256": "f73258966320b81f5b56a48690ba37c63f8482faa9de7c7fb0f9ffad00162075"
+    },
+    {
+      "id": "ergodic-theory/hamiltonian-koopman-dynamics",
+      "kind": "construction",
+      "file": "content/ergodic-theory/hamiltonian-koopman-dynamics.knowl.md",
+      "sha256": "971712de20721002b661433cc56c35a8a393f824d138f419ab83a5644d87208a"
+    },
+    {
+      "id": "measure-theory/probability-kernel",
+      "kind": "definition",
+      "file": "content/measure-theory/probability-kernel.knowl.md",
+      "sha256": "fc49e28062be637af829ba90841277fa549915a93ba5fbafb13c84f043b11662"
+    },
+    {
+      "id": "measure-theory/disintegration-theorem",
+      "kind": "theorem",
+      "file": "content/measure-theory/disintegration-theorem.knowl.md",
+      "sha256": "e2962c50ddd7a67a6ed57275c6af2091f563d27709d7d7c27edd85539d8f66db"
+    },
+    {
+      "id": "ergodic-theory/ergodic-decomposition-theorem",
+      "kind": "theorem",
+      "file": "content/ergodic-theory/ergodic-decomposition-theorem.knowl.md",
+      "sha256": "cb4a27db77ee6d235724866b0c55fff173832ac4e2d39fd5884c62ae46a6bc03"
+    },
+    {
+      "id": "ergodic-theory/nonsingular-koopman-representation",
+      "kind": "construction",
+      "file": "content/ergodic-theory/nonsingular-koopman-representation.knowl.md",
+      "sha256": "72d08a195231f3e72eb7a78adcfc65664b123348f8ba7bcbab7601071037889b"
+    },
+    {
+      "id": "ergodic-theory/invariant-probability-measure",
+      "kind": "definition",
+      "file": "content/ergodic-theory/invariant-probability-measure.knowl.md",
+      "sha256": "0f595a99d53673c9635798d8c6d8b324c232e98ad420c9e56ddd6ade120455b8"
+    },
+    {
+      "id": "ergodic-theory/minimal-system",
+      "kind": "definition",
+      "file": "content/ergodic-theory/minimal-system.knowl.md",
+      "sha256": "9faa0b6422696a54888b9ea972ea4ec4e04fea2ba39d888d464d7a5de96dda1f"
+    },
+    {
+      "id": "ergodic-theory/unique-ergodicity-uniform-averages",
+      "kind": "theorem",
+      "file": "content/ergodic-theory/unique-ergodicity-uniform-averages.knowl.md",
+      "sha256": "fcbda9a57ce99edc377f0ca9a98f5fbbf8b701e55f657eb83627511cabbbb2b1"
+    },
+    {
+      "id": "ergodic-theory/total-ergodicity",
+      "kind": "definition",
+      "file": "content/ergodic-theory/total-ergodicity.knowl.md",
+      "sha256": "f1cf0e10576c87d8016df750132eaa55ab69cce334f421bec2689e4740c04338"
+    },
+    {
+      "id": "ergodic-theory/folner-mean-ergodic-theorem",
+      "kind": "theorem",
+      "file": "content/ergodic-theory/folner-mean-ergodic-theorem.knowl.md",
+      "sha256": "908c606717c4afbf4b40870969acb33bc3758db1dcc682961b094b12dc16d851"
+    },
+    {
+      "id": "ergodic-theory/subadditive-cocycle",
+      "kind": "definition",
+      "file": "content/ergodic-theory/subadditive-cocycle.knowl.md",
+      "sha256": "5f9739bd70da527e769c1328839589dfe029abd7f6d05ca6632c8974a251efaa"
+    },
+    {
+      "id": "ergodic-theory/kingman-subadditive-ergodic-theorem",
+      "kind": "theorem",
+      "file": "content/ergodic-theory/kingman-subadditive-ergodic-theorem.knowl.md",
+      "sha256": "94c9330b9312394ecdefac8898506de8c7139c93c51d5f25052b616f905f3275"
+    },
+    {
+      "id": "ergodic-theory/linear-cocycle",
+      "kind": "definition",
+      "file": "content/ergodic-theory/linear-cocycle.knowl.md",
+      "sha256": "a79c6da4355b8ff14f3f1ecbe0aee06256975d0935d11b4e71514ddc9ed96d18"
+    },
+    {
+      "id": "ergodic-theory/lyapunov-exponent",
+      "kind": "definition",
+      "file": "content/ergodic-theory/lyapunov-exponent.knowl.md",
+      "sha256": "4ef41fee6caefbbada3a2e287ec4dc577b6d60914bcdd03075414620ee2b21c6"
+    },
+    {
+      "id": "ergodic-theory/oseledets-multiplicative-ergodic-theorem",
+      "kind": "theorem",
+      "file": "content/ergodic-theory/oseledets-multiplicative-ergodic-theorem.knowl.md",
+      "sha256": "d811b45f9503f59a9d19d64395559f5fcce1af24040ae11ac11c8f9cc96e49ee"
+    },
+    {
+      "id": "ergodic-theory/measurable-partition",
+      "kind": "definition",
+      "file": "content/ergodic-theory/measurable-partition.knowl.md",
+      "sha256": "95fa6007e11dcda881cf2f61e6eb9ca9e55a3c281cc2b0cf47c9b4db37f73215"
+    },
+    {
+      "id": "ergodic-theory/kolmogorov-sinai-entropy",
+      "kind": "definition",
+      "file": "content/ergodic-theory/kolmogorov-sinai-entropy.knowl.md",
+      "sha256": "9a355c3a31b5ef37e5ef73593b80592c032afd8b686502c7816a3fccb9f9701f"
+    },
+    {
+      "id": "ergodic-theory/generating-partition",
+      "kind": "definition",
+      "file": "content/ergodic-theory/generating-partition.knowl.md",
+      "sha256": "371cc1ee5d4f923f50a12852385e3791c4002953aaff9cd26af07ca91d1559a9"
+    },
+    {
+      "id": "ergodic-theory/kolmogorov-sinai-generator-theorem",
+      "kind": "theorem",
+      "file": "content/ergodic-theory/kolmogorov-sinai-generator-theorem.knowl.md",
+      "sha256": "743801d8ce3f7a465cbfcb17a860f9c8fe116d06b92ad8a75aa0c868ab5ac34d"
+    },
+    {
+      "id": "ergodic-theory/shannon-mcmillan-breiman-theorem",
+      "kind": "theorem",
+      "file": "content/ergodic-theory/shannon-mcmillan-breiman-theorem.knowl.md",
+      "sha256": "f4bcba73856e22628411b05e579cfc85cfd85d99fad3c588dcafcb1c2ae1e2be"
+    },
+    {
+      "id": "ergodic-theory/koopman-equivalence-is-not-conjugacy",
+      "kind": "example",
+      "file": "content/ergodic-theory/koopman-equivalence-is-not-conjugacy.knowl.md",
+      "sha256": "b203c2563a981fbb4685247fea76b2d338d687fd7f1ec517cba826e5051e1f90"
+    },
+    {
+      "id": "ergodic-theory/dynamic-mode-decomposition",
+      "kind": "construction",
+      "file": "content/ergodic-theory/dynamic-mode-decomposition.knowl.md",
+      "sha256": "a8b96a3af372c58f59b90e11637272372b65dcd58283ba4c9a49c41fa87e577c"
+    },
+    {
+      "id": "ergodic-theory/extended-dynamic-mode-decomposition",
+      "kind": "construction",
+      "file": "content/ergodic-theory/extended-dynamic-mode-decomposition.knowl.md",
+      "sha256": "2fce0131383ea94a8a50d2b3d116e7c040ca34971797da60da2f159038958919"
+    },
+    {
+      "id": "noncommutative-geometry/smooth-noncommutative-torus",
+      "kind": "definition",
+      "file": "content/noncommutative-geometry/smooth-noncommutative-torus.knowl.md",
+      "sha256": "9f1efe2ddee4e1947f4edaaa19ca3a198e986db811d76eb047f345f67ccf2231"
+    },
+    {
+      "id": "operator-algebras/unitary-conjugation-ergodicity",
+      "kind": "example",
+      "file": "content/operator-algebras/unitary-conjugation-ergodicity.knowl.md",
+      "sha256": "c054d27055cb619f375b243e0329e3892f0f6680ff500e1d35e363f7fbc006bf"
+    },
+    {
+      "id": "ergodic-theory/krylov-bogolyubov-theorem",
+      "kind": "theorem",
+      "file": "content/ergodic-theory/krylov-bogolyubov-theorem.knowl.md",
+      "sha256": "3128e3e3790f70f4754336578292ef41e8e6f0355e6e7a3703cae6b5df5c8bd0"
+    },
+    {
+      "id": "ergodic-theory/foundations-index",
+      "kind": "index",
+      "file": "content/ergodic-theory/foundations-index.knowl.md",
+      "sha256": "7c45f7b91831834e2215cfc69907f8269baf4cd4c45f49abb82f2312748164ef"
+    },
+    {
+      "id": "ergodic-theory/ergodic-theorems-index",
+      "kind": "index",
+      "file": "content/ergodic-theory/ergodic-theorems-index.knowl.md",
+      "sha256": "303d5d3b2c709ae16f8d7404e7a1a6238bc184b663e118b8515ce5421c5d4983"
+    },
+    {
+      "id": "ergodic-theory/koopman-spectrum-index",
+      "kind": "index",
+      "file": "content/ergodic-theory/koopman-spectrum-index.knowl.md",
+      "sha256": "398ead97635525ffec487830d749e09c23c955009418b8b1df8f41e9321bb082"
+    },
+    {
+      "id": "ergodic-theory/examples-index",
+      "kind": "index",
+      "file": "content/ergodic-theory/examples-index.knowl.md",
+      "sha256": "cbccc713007c50c2c7411c1a8607eda87735a771ffb7c0329d3c012288fff2bc"
+    },
+    {
+      "id": "ergodic-theory/arithmetic-index",
+      "kind": "index",
+      "file": "content/ergodic-theory/arithmetic-index.knowl.md",
+      "sha256": "d29e8e7683f06acb3c5a8222bd9e692f95f8bc5b79561a860fe63d1d00450095"
+    },
+    {
+      "id": "ergodic-theory/noncommutative-index",
+      "kind": "index",
+      "file": "content/ergodic-theory/noncommutative-index.knowl.md",
+      "sha256": "9527a188bacdfd16e9182c4ef9898e1d3df95a4180491481d78f10e8d0d83791"
+    },
+    {
+      "id": "ergodic-theory/entropy-cocycles-index",
+      "kind": "index",
+      "file": "content/ergodic-theory/entropy-cocycles-index.knowl.md",
+      "sha256": "5686b00f78044191411f5f442ba5f8c267d096510bea0cd9dfc31d515ab0cbea"
+    },
+    {
+      "id": "ergodic-theory/applications-index",
+      "kind": "index",
+      "file": "content/ergodic-theory/applications-index.knowl.md",
+      "sha256": "1d54a814b5fc96169f274ec1dc81582b3fe6d22d58acf4ff2b566a342d317947"
+    },
+    {
+      "id": "ergodic-theory",
+      "kind": "section",
+      "file": "content/ergodic-theory.knowl.md",
+      "sha256": "d0ea9c0d44fe5321196e487afba670fa80dc747eea4d7c32c17dee49d4d26534"
+    },
+    {
+      "id": "ergodic-theory/space-average",
+      "kind": "definition",
+      "file": "content/ergodic-theory/space-average.knowl.md",
+      "sha256": "f2c09de684c2d2fb40a9a0af017691208407c7ec6463571c01003da1646d25f0"
+    },
+    {
+      "id": "operator-algebras/ergodic-operator-algebra-action",
+      "kind": "definition",
+      "file": "content/operator-algebras/ergodic-operator-algebra-action.knowl.md",
+      "sha256": "f4d61c970315bfa6d9570dbf5852ffcc3e7be5af1dfa681e8e0ace6a2ee12cb5"
+    },
+    {
+      "id": "algebra-fields-galois/minkowski-embedding",
+      "kind": "construction",
+      "file": "content/algebra-fields-galois/minkowski-embedding.knowl.md",
+      "sha256": "ab4184a6d0b973b7ed078f3e650a7cd7c056eb71a43c5d82c9b2dc733c3227d3"
+    }
+  ],
+  "reused_prerequisite_closure": [
+    "algebra-category-theory/category",
+    "algebra-commutative/integral-closure",
+    "algebra-commutative/integral-element",
+    "algebra-fields-galois/algebraic-element",
+    "algebra-fields-galois/algebraic-integer",
+    "algebra-fields-galois/degree-of-extension",
+    "algebra-fields-galois/field-embedding",
+    "algebra-fields-galois/field-extension",
+    "algebra-fields-galois/integral-basis",
+    "algebra-fields-galois/number-field",
+    "algebra-fields-galois/ring-of-integers",
+    "algebra-fields-galois/trace-field",
+    "algebra-groups/abelian-group",
+    "algebra-groups/group",
+    "algebra-groups/group-action",
+    "algebra-groups/group-homomorphism",
+    "algebra-groups/monoid",
+    "algebra-groups/orbit",
+    "algebra-groups/semigroup",
+    "algebra-groups/subgroup",
+    "algebra-modules/algebra-over-ring",
+    "algebra-modules/basis-module",
+    "algebra-modules/bilinear-map",
+    "algebra-modules/free-module",
+    "algebra-modules/module",
+    "algebra-modules/module-axioms",
+    "algebra-modules/simple-module",
+    "algebra-modules/submodule",
+    "algebra-representation-theory/character",
+    "algebra-representation-theory/group-algebra",
+    "algebra-representation-theory/group-representation",
+    "algebra-representation-theory/irreducible-representation",
+    "algebra-representation-theory/regular-representation",
+    "algebra-representation-theory/subrepresentation",
+    "algebra-rings/commutative-ring",
+    "algebra-rings/field",
+    "algebra-rings/ideal",
+    "algebra-rings/idempotent-element",
+    "algebra-rings/polynomial-ring",
+    "algebra-rings/ring",
+    "algebra-rings/ring-axioms",
+    "algebra-rings/ring-homomorphism",
+    "algebra-rings/two-sided-ideal",
+    "algebra-rings/unit",
+    "algebra-rings/unital-ring",
+    "analysis/unique-ergodicity",
+    "convex-analysis/basis-hamel-basis-and-dimension",
+    "convex-analysis/bounded-linear-functional-norm-of-a-functional",
+    "convex-analysis/convex-set",
+    "convex-analysis/dual-space-and-duality-pairing",
+    "convex-analysis/extended-real-number-system-and-conventions",
+    "convex-analysis/line-segments-in-a-vector-space",
+    "convex-analysis/linear-combination",
+    "convex-analysis/linear-operator-linear-transformation",
+    "convex-analysis/linear-subspace",
+    "convex-analysis/linearly-independent-and-linearly-dependent-sets",
+    "convex-analysis/norm-normed-vector-space",
+    "convex-analysis/seminorm",
+    "convex-analysis/subspace-generated-by-a-set-span",
+    "differential-geometry/almost-symplectic-manifold",
+    "differential-geometry/hamiltonian-flow",
+    "differential-geometry/hamiltonian-function",
+    "differential-geometry/hamiltonian-vector-field",
+    "differential-geometry/poisson-bracket-symplectic",
+    "differential-geometry/product-manifold",
+    "differential-geometry/symplectic-manifold",
+    "differential-geometry/symplectic-vector-space",
+    "differential-geometry/tangent-space",
+    "discrete-structures/lattice-zd",
+    "fiber-bundles/closed-differential-form",
+    "fiber-bundles/coordinate-transition-map",
+    "fiber-bundles/cotangent-bundle",
+    "fiber-bundles/diffeomorphism",
+    "fiber-bundles/differential-k-form",
+    "fiber-bundles/differential-pushforward-of-a-smooth-map",
+    "fiber-bundles/dual-vector-bundle",
+    "fiber-bundles/exterior-derivative",
+    "fiber-bundles/exterior-power-bundle",
+    "fiber-bundles/lie-bracket",
+    "fiber-bundles/lie-group",
+    "fiber-bundles/local-trivialization",
+    "fiber-bundles/maximal-smooth-atlas",
+    "fiber-bundles/orbit-map",
+    "fiber-bundles/section-of-a-fiber-bundle",
+    "fiber-bundles/smooth-action-of-a-lie-group-on-a-manifold",
+    "fiber-bundles/smooth-atlas",
+    "fiber-bundles/smooth-chart",
+    "fiber-bundles/smooth-chart-coordinate-chart",
+    "fiber-bundles/smooth-compatibility-of-charts-and-atlases",
+    "fiber-bundles/smooth-fiber-bundle",
+    "fiber-bundles/smooth-immersion",
+    "fiber-bundles/smooth-manifold",
+    "fiber-bundles/smooth-map",
+    "fiber-bundles/smooth-structure",
+    "fiber-bundles/tangent-bundle",
+    "fiber-bundles/tangent-space-at-a-point",
+    "fiber-bundles/typical-fiber",
+    "fiber-bundles/vector-bundle",
+    "fiber-bundles/vector-field",
+    "fiber-bundles/wedge-product-of-differential-forms",
+    "functional-analysis/adjoint-bounded-operator",
+    "functional-analysis/adjoint-unbounded-operator",
+    "functional-analysis/banach-algebra",
+    "functional-analysis/banach-algebra-invertible-element",
+    "functional-analysis/banach-algebra-spectrum",
+    "functional-analysis/bounded-linear-operator",
+    "functional-analysis/closed-linear-operator",
+    "functional-analysis/densely-defined-operator",
+    "functional-analysis/finite-rank-operator",
+    "functional-analysis/graph-of-operator",
+    "functional-analysis/locally-convex-space",
+    "functional-analysis/multiplication-operator",
+    "functional-analysis/partial-isometry",
+    "functional-analysis/projection-valued-measure",
+    "functional-analysis/riesz-representation-hilbert-space",
+    "functional-analysis/self-adjoint-unbounded-operator",
+    "functional-analysis/singular-values",
+    "functional-analysis/spectral-integral",
+    "functional-analysis/topological-dual",
+    "functional-analysis/topological-vector-space",
+    "functional-analysis/topology-generated-by-seminorms",
+    "functional-analysis/trace-class-operator",
+    "functional-analysis/unitary-operator",
+    "functional-analysis/weak-star-topology",
+    "harmonic-analysis/coefficient-function",
+    "harmonic-analysis/folner-condition",
+    "harmonic-analysis/haar-measure",
+    "harmonic-analysis/modular-function",
+    "harmonic-analysis/pontryagin-dual",
+    "harmonic-analysis/positive-definite-function",
+    "harmonic-analysis/quasi-invariant-measure",
+    "lie-groups/abelian-lie-algebra",
+    "lie-groups/adjoint-representation-of-a-lie-algebra",
+    "lie-groups/closed-subgroup-lie-group",
+    "lie-groups/closed-subgroup-theorem",
+    "lie-groups/compact-lie-group",
+    "lie-groups/general-linear-group",
+    "lie-groups/ideal-lie-algebra",
+    "lie-groups/lie-algebra",
+    "lie-groups/lie-algebra-homomorphism",
+    "lie-groups/lie-algebra-of-subgroup-lemma",
+    "lie-groups/lie-group-homomorphism",
+    "lie-groups/lie-subalgebra",
+    "lie-groups/lie-subgroup",
+    "lie-groups/one-parameter-subgroup",
+    "lie-groups/orbit-lie-group",
+    "lie-groups/orbit-space",
+    "lie-groups/orthogonal-group",
+    "lie-groups/right-translation",
+    "lie-groups/simple-lie-algebra",
+    "lie-groups/smooth-action-lie-group",
+    "lie-groups/stabilizer-lie-group",
+    "lie-groups/stone-theorem-one-parameter-unitary-groups",
+    "lie-groups/strongly-continuous-unitary-representation",
+    "lie-groups/unitary-group",
+    "linear-algebra/alternating-multilinear-map",
+    "linear-algebra/banach-space",
+    "linear-algebra/bilinear-form",
+    "linear-algebra/closed-linear-subspace",
+    "linear-algebra/compact-operator",
+    "linear-algebra/determinant",
+    "linear-algebra/eigenvalue",
+    "linear-algebra/euclidean-lattice",
+    "linear-algebra/euclidean-norm",
+    "linear-algebra/euclidean-space",
+    "linear-algebra/exterior-power",
+    "linear-algebra/hilbert-space",
+    "linear-algebra/inner-product",
+    "linear-algebra/inner-product-space",
+    "linear-algebra/linear-map",
+    "linear-algebra/linear-operator",
+    "linear-algebra/matrix",
+    "linear-algebra/matrix-inverse",
+    "linear-algebra/multilinear-map",
+    "linear-algebra/norm",
+    "linear-algebra/normed-vector-space",
+    "linear-algebra/operator-norm",
+    "linear-algebra/orthogonal-complement",
+    "linear-algebra/orthogonal-projection",
+    "linear-algebra/orthonormal-basis",
+    "linear-algebra/positive-semidefinite-matrix",
+    "linear-algebra/signature-of-symmetric-bilinear-form",
+    "linear-algebra/trace",
+    "linear-algebra/vector-space",
+    "measure-theory/ae-equality",
+    "measure-theory/almost-everywhere",
+    "measure-theory/borel-measure",
+    "measure-theory/borel-sigma-algebra",
+    "measure-theory/caratheodory-measurable-set",
+    "measure-theory/complete-measure",
+    "measure-theory/continuity-from-below-measure",
+    "measure-theory/essential-supremum",
+    "measure-theory/generated-sigma-algebra",
+    "measure-theory/indicator-function",
+    "measure-theory/l-infinity-function",
+    "measure-theory/l1-function",
+    "measure-theory/lebesgue-integrable-function",
+    "measure-theory/lebesgue-integral",
+    "measure-theory/lebesgue-integral-nonnegative",
+    "measure-theory/lebesgue-measure",
+    "measure-theory/lp-norm",
+    "measure-theory/lp-space",
+    "measure-theory/measurable-function",
+    "measure-theory/measurable-rectangle",
+    "measure-theory/measurable-set",
+    "measure-theory/measurable-space",
+    "measure-theory/measure",
+    "measure-theory/measure-completion",
+    "measure-theory/measure-space",
+    "measure-theory/null-set",
+    "measure-theory/outer-measure",
+    "measure-theory/product-measure",
+    "measure-theory/product-sigma-algebra",
+    "measure-theory/pushforward-measure",
+    "measure-theory/radon-nikodym-derivative",
+    "measure-theory/sigma-algebra",
+    "measure-theory/sigma-finite-measure",
+    "measure-theory/simple-function",
+    "operator-algebras/affiliated-operator",
+    "operator-algebras/bicommutant",
+    "operator-algebras/bounded-operator-cstar-algebra",
+    "operator-algebras/center-of-von-neumann-algebra",
+    "operator-algebras/closed-two-sided-ideal",
+    "operator-algebras/commutant",
+    "operator-algebras/commutative-cstar-algebra",
+    "operator-algebras/commutative-von-neumann-algebra",
+    "operator-algebras/completely-bounded-map",
+    "operator-algebras/completely-positive-contraction",
+    "operator-algebras/completely-positive-map",
+    "operator-algebras/conditional-expectation",
+    "operator-algebras/continuous-functional-calculus",
+    "operator-algebras/covariant-representation-cstar-dynamical-system",
+    "operator-algebras/crossed-product-convolution-star-algebra",
+    "operator-algebras/cstar-algebra",
+    "operator-algebras/cstar-dynamical-system",
+    "operator-algebras/cstar-identity",
+    "operator-algebras/cstar-representation",
+    "operator-algebras/cstar-subalgebra",
+    "operator-algebras/cyclic-cstar-representation",
+    "operator-algebras/cyclic-vector",
+    "operator-algebras/double-centralizer",
+    "operator-algebras/essential-ideal",
+    "operator-algebras/faithful-normal-semifinite-trace",
+    "operator-algebras/faithful-weight",
+    "operator-algebras/finite-projection",
+    "operator-algebras/finite-von-neumann-algebra",
+    "operator-algebras/full-crossed-product",
+    "operator-algebras/gns-construction",
+    "operator-algebras/integrated-form-covariant-representation",
+    "operator-algebras/involutive-algebra",
+    "operator-algebras/matrix-cstar-algebra",
+    "operator-algebras/multiplier-algebra",
+    "operator-algebras/murray-von-neumann-equivalence",
+    "operator-algebras/n-positive-map",
+    "operator-algebras/nondegenerate-star-homomorphism",
+    "operator-algebras/normal-conditional-expectation",
+    "operator-algebras/normal-functional",
+    "operator-algebras/normal-linear-map",
+    "operator-algebras/normal-positive-map",
+    "operator-algebras/normal-semifinite-faithful-weight",
+    "operator-algebras/normal-weight",
+    "operator-algebras/positive-cone",
+    "operator-algebras/positive-element",
+    "operator-algebras/positive-linear-functional",
+    "operator-algebras/positive-linear-map",
+    "operator-algebras/positive-square-root",
+    "operator-algebras/predual",
+    "operator-algebras/projection-cstar-algebra",
+    "operator-algebras/self-adjoint-element",
+    "operator-algebras/semifinite-weight",
+    "operator-algebras/star-automorphism",
+    "operator-algebras/star-homomorphism",
+    "operator-algebras/star-isomorphism",
+    "operator-algebras/state-cstar-algebra",
+    "operator-algebras/strong-operator-topology",
+    "operator-algebras/tau-measurable-operator",
+    "operator-algebras/trace-cstar-algebra",
+    "operator-algebras/tracial-noncommutative-lp-space",
+    "operator-algebras/tracial-state",
+    "operator-algebras/tracial-weight",
+    "operator-algebras/transformation-group-cstar-algebra",
+    "operator-algebras/ultraweak-topology",
+    "operator-algebras/unital-cstar-algebra",
+    "operator-algebras/unital-star-homomorphism",
+    "operator-algebras/unitary-element",
+    "operator-algebras/unitization",
+    "operator-algebras/universal-cstar-algebra",
+    "operator-algebras/von-neumann-algebra",
+    "operator-algebras/von-neumann-crossed-product",
+    "operator-algebras/von-neumann-factor",
+    "operator-algebras/weak-operator-topology",
+    "operator-algebras/weight-on-von-neumann-algebra",
+    "probability/conditional-expectation",
+    "probability/cumulative-distribution-function",
+    "probability/expectation",
+    "probability/normal-distribution",
+    "probability/probability-density-function",
+    "probability/probability-mass-function",
+    "probability/probability-measure",
+    "probability/probability-space",
+    "probability/random-variable",
+    "probability/shannon-entropy",
+    "real-analysis/absolute-value",
+    "real-analysis/bounded-above",
+    "real-analysis/bounded-below",
+    "real-analysis/chain-rule",
+    "real-analysis/class-ck-map",
+    "real-analysis/convergent-series",
+    "real-analysis/derivative",
+    "real-analysis/difference-quotient",
+    "real-analysis/differentiability-1d",
+    "real-analysis/differentiable-map",
+    "real-analysis/exponential-function",
+    "real-analysis/frechet-derivative",
+    "real-analysis/infimum",
+    "real-analysis/interval",
+    "real-analysis/inverse-function-theorem-1d",
+    "real-analysis/jacobian-matrix",
+    "real-analysis/limit-of-a-function-at-a-point",
+    "real-analysis/modulus-on-c",
+    "real-analysis/natural-logarithm",
+    "real-analysis/nonnegative-extended-series",
+    "real-analysis/nonnegative-square-root",
+    "real-analysis/partial-derivative",
+    "real-analysis/partial-sums",
+    "real-analysis/power-series",
+    "real-analysis/real-power",
+    "real-analysis/series",
+    "real-analysis/supremum",
+    "shared-foundations/bijective-function",
+    "shared-foundations/binary-operation",
+    "shared-foundations/cardinality",
+    "shared-foundations/cartesian-product",
+    "shared-foundations/complement",
+    "shared-foundations/complex-conjugate",
+    "shared-foundations/complex-numbers-c",
+    "shared-foundations/composition",
+    "shared-foundations/countable-set",
+    "shared-foundations/empty-set",
+    "shared-foundations/equivalence-class",
+    "shared-foundations/equivalence-relation",
+    "shared-foundations/factorial",
+    "shared-foundations/finite-permutation",
+    "shared-foundations/finite-set",
+    "shared-foundations/finite-sum",
+    "shared-foundations/first-order-logic",
+    "shared-foundations/function",
+    "shared-foundations/indexed-family-of-sets",
+    "shared-foundations/injective-function",
+    "shared-foundations/integers",
+    "shared-foundations/intersection",
+    "shared-foundations/inverse-function",
+    "shared-foundations/lower-bound",
+    "shared-foundations/natural-numbers",
+    "shared-foundations/ordered-pair",
+    "shared-foundations/partial-order",
+    "shared-foundations/partition",
+    "shared-foundations/permutation-sign",
+    "shared-foundations/power-set",
+    "shared-foundations/preimage",
+    "shared-foundations/quotient-set",
+    "shared-foundations/rational-numbers",
+    "shared-foundations/real-numbers",
+    "shared-foundations/relation",
+    "shared-foundations/restriction-of-a-function",
+    "shared-foundations/sequence",
+    "shared-foundations/set",
+    "shared-foundations/set-difference",
+    "shared-foundations/subset",
+    "shared-foundations/surjective-function",
+    "shared-foundations/symmetric-difference",
+    "shared-foundations/total-order",
+    "shared-foundations/union",
+    "shared-foundations/upper-bound",
+    "shared-foundations/zfc-axioms",
+    "topology/basis-of-topology",
+    "topology/cauchy-sequence",
+    "topology/closed-set",
+    "topology/closure",
+    "topology/compact-set",
+    "topology/complete-metric-space",
+    "topology/continuous-map",
+    "topology/convergent-sequence",
+    "topology/cover",
+    "topology/dense-set",
+    "topology/flat-torus",
+    "topology/hausdorff-space",
+    "topology/homeomorphism",
+    "topology/limit-point",
+    "topology/locally-compact-group",
+    "topology/locally-compact-space",
+    "topology/metric",
+    "topology/metric-induced-topology",
+    "topology/metric-space",
+    "topology/neighborhood",
+    "topology/open-ball",
+    "topology/open-cover",
+    "topology/open-set",
+    "topology/polish-space",
+    "topology/product-topology",
+    "topology/quotient-topology",
+    "topology/second-countable-space",
+    "topology/separable-space",
+    "topology/subbasis-of-topology",
+    "topology/topological-group",
+    "topology/topological-manifold",
+    "topology/topological-space",
+    "topology/topology"
+  ],
+  "reused_prerequisite_closure_count": 408,
+  "review_scope": "Authorship with mathematical source checks and structural validation. Formal full reviews have not been performed; no review-ledger counts are claimed.",
+  "reused_internal_link_targets": [
+    "algebra-fields-galois/number-field",
+    "algebra-fields-galois/ring-of-integers",
+    "algebra-fields-galois/trace-field",
+    "algebra-groups/group-action",
+    "algebra-groups/monoid",
+    "algebra-modules/algebra-over-ring",
+    "algebra-modules/torsion-element",
+    "algebra-representation-theory/regular-representation",
+    "analysis/unique-ergodicity",
+    "differential-geometry/differentiable-flow",
+    "differential-geometry/hamiltonian-flow",
+    "differential-geometry/hamiltonian-vector-field",
+    "differential-geometry/poisson-bracket-symplectic",
+    "differential-geometry/symplectic-manifold",
+    "fiber-bundles/orbit-of-a-group-action",
+    "fiber-bundles/smooth-manifold",
+    "functional-analysis/adjoint-bounded-operator",
+    "functional-analysis/projection-valued-measure",
+    "functional-analysis/unitary-operator",
+    "harmonic-analysis/coefficient-function",
+    "harmonic-analysis/folner-condition",
+    "harmonic-analysis/fourier-character",
+    "harmonic-analysis/haar-measure",
+    "harmonic-analysis/plancherel-theorem-lca",
+    "harmonic-analysis/pontryagin-dual",
+    "harmonic-analysis/unitary-character",
+    "lie-groups/irreducible-unitary-representation",
+    "lie-groups/orbit-space",
+    "lie-groups/orthogonal-group",
+    "lie-groups/stone-theorem-one-parameter-unitary-groups",
+    "lie-groups/strongly-continuous-unitary-representation",
+    "lie-groups/unitary-group",
+    "linear-algebra/dual-basis",
+    "linear-algebra/eigenvalue",
+    "linear-algebra/hilbert-space",
+    "linear-algebra/linear-map",
+    "linear-algebra/orthogonal-projection",
+    "measure-theory/almost-everywhere",
+    "measure-theory/borel-sigma-algebra",
+    "measure-theory/indicator-function",
+    "measure-theory/lebesgue-integral",
+    "measure-theory/lebesgue-measure",
+    "measure-theory/lp-space",
+    "measure-theory/measurable-function",
+    "measure-theory/measurable-space",
+    "measure-theory/measure",
+    "measure-theory/measure-completion",
+    "measure-theory/measure-space",
+    "measure-theory/null-set",
+    "measure-theory/product-measure",
+    "measure-theory/pushforward-measure",
+    "measure-theory/radon-nikodym-derivative",
+    "measure-theory/sigma-algebra",
+    "operator-algebras/center-of-von-neumann-algebra",
+    "operator-algebras/crossed-product-convolution-star-algebra",
+    "operator-algebras/cstar-algebra",
+    "operator-algebras/cstar-algebra-generators-relations",
+    "operator-algebras/faithful-normal-state",
+    "operator-algebras/full-crossed-product",
+    "operator-algebras/gelfand-duality",
+    "operator-algebras/gns-construction",
+    "operator-algebras/hyperfinite-ii-one-factor",
+    "operator-algebras/normal-conditional-expectation",
+    "operator-algebras/normal-state",
+    "operator-algebras/projection-cstar-algebra",
+    "operator-algebras/star-automorphism",
+    "operator-algebras/state-cstar-algebra",
+    "operator-algebras/tracial-state",
+    "operator-algebras/unital-cstar-algebra",
+    "operator-algebras/von-neumann-algebra",
+    "operator-algebras/von-neumann-crossed-product",
+    "operator-algebras/von-neumann-factor",
+    "probability/conditional-expectation",
+    "probability/cumulative-distribution-function",
+    "probability/expectation",
+    "probability/normal-distribution",
+    "probability/probability-measure",
+    "probability/probability-space",
+    "probability/shannon-entropy",
+    "shared-foundations/bijective-function",
+    "shared-foundations/finite-permutation",
+    "shared-foundations/integers",
+    "shared-foundations/power-set",
+    "shared-foundations/set",
+    "shared-foundations/symmetric-difference",
+    "topology/continuous-map",
+    "topology/flat-torus",
+    "topology/polish-space"
+  ],
+  "reused_internal_link_target_count": 88,
+  "validation": {
+    "source_files_checked": 142,
+    "source_section_order": {
+      "passed": true,
+      "extracted_sections": 243
+    },
+    "external_link_placement": {
+      "passed": true,
+      "violations": 0
+    },
+    "dependency_graph": {
+      "cycles": 0,
+      "edges": 13847,
+      "invalid": 0,
+      "missing_targets": 0,
+      "nodes": 4152
+    },
+    "exact_development_build": {
+      "passed": true,
+      "profile": "development",
+      "knowls": 5330
+    },
+    "exact_production_build": {
+      "passed": true,
+      "profile": "production",
+      "knowls": 4142
+    },
+    "production_rendering_scan": {
+      "passed": true,
+      "rendered_diagrams_required": true
+    },
+    "browser": {
+      "newPages": 128,
+      "newFragments": 128,
+      "representativePages": [
+        "ergodic-theory",
+        "ergodic-theory/birkhoff-ergodic-theorem",
+        "ergodic-theory/koopman-representation",
+        "ergodic-theory/finite-uniform-system",
+        "ergodic-theory/gaussian-integer-translations",
+        "operator-algebras/ergodicity-factor-criterion",
+        "noncommutative-geometry/smooth-noncommutative-torus",
+        "ergodic-theory/oseledets-multiplicative-ergodic-theorem",
+        "ergodic-theory/extended-dynamic-mode-decomposition"
+      ],
+      "nestedExpansion": true,
+      "inlineSection": true,
+      "search": true,
+      "mobileOverflow": [],
+      "javascriptErrors": []
+    },
+    "scope_review": {
+      "exact_label_mismatches": 0,
+      "retained_candidate": "operator-algebras/noncommutative-probability-space",
+      "assessment": "The C*-algebraic and von Neumann settings are variants of the same probability-space concept."
+    },
+    "known_existing_section_audit_failure": {
+      "id": "fiber-bundles/construction-splitting-of-atiyah-sequence-from-a-principal-connection",
+      "unchanged_from_HEAD": true
+    },
+    "inventory_hashes_verified": true,
+    "preview": {
+      "url": "https://optiplex.taildb538a.ts.net:8443/ergodic-theory/",
+      "service": "devserver-knowlpedia-astra-benchmark.service",
+      "reused_existing_service": true
+    },
+    "development_rendering_scan": {
+      "passed": false,
+      "finding_count": 726,
+      "affected_file_count": 141,
+      "new_entry_findings": 0,
+      "findings_by_top_level": {
+        "conjectures": 363,
+        "fragments": 128,
+        "index": 235
+      },
+      "scope": "Full composed development preview includes the existing conjectures catalog. The primary-only production scan passes. No new-entry rendering findings.",
+      "all_findings_in_existing_conjectures_or_their_index_entries": true,
+      "conjectures_source_worktree_clean": true
+    },
+    "new_entry_rendering_scan": {
+      "passed": true,
+      "new_entries_checked": 128
+    }
+  }
+}

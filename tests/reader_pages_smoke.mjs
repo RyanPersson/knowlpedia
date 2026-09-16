@@ -64,11 +64,11 @@ try {
         const before = await paragraph.textContent();
         await trigger.click();
         await page.locator(".knowl-panel .knowl-content").waitFor();
-        assert.equal(await paragraph.textContent(), before, "Expanded prerequisite interrupts its sentence");
-        assert.equal(await page.locator(".core-section").evaluate((core) => {
-          const panel = core.querySelector(".knowl-panel");
-          return panel && core.lastElementChild === panel;
-        }), true, "Expansion separates definition prose from its displayed equation");
+        const panel = page.locator(".knowl-panel").first();
+        assert.equal(await panel.evaluate((element) => element.previousElementSibling?.lastElementChild?.getAttribute("aria-controls") === element.id), true, "Definition opens immediately after its trigger");
+        assert.equal(await panel.evaluate((element) => element.previousElementSibling.textContent + element.nextElementSibling.textContent), before, "Text resumes below the definition without loss");
+        await trigger.click();
+        assert.equal(await paragraph.textContent(), before, "Closing rejoins the sentence");
       }
       await page.screenshot({ path: path.join(artifacts, `${id.split("/").pop()}-${width}.png`), fullPage: true });
     }
