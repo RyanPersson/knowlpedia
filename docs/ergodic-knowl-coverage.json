@@ -1828,7 +1828,7 @@
     },
     "inventory_hashes_verified": true,
     "preview": {
-      "url": "http://100.69.17.72:8015/ergodic-theory/",
+      "url": "https://optiplex.taildb538a.ts.net:8443/ergodic-theory/",
       "service": "devserver-knowlpedia-astra-benchmark.service",
       "reused_existing_service": true
     },

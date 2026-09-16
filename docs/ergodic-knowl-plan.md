@@ -119,6 +119,30 @@ the new entries.
 
 The existing persistent service `devserver-knowlpedia-astra-benchmark.service`
 serves this checkout's `public-imported` directory on port 8015. The entry point
-is [Ergodic Theory](http://100.69.17.72:8015/ergodic-theory/).
+is [Ergodic Theory](https://optiplex.taildb538a.ts.net:8443/ergodic-theory/).
+The HTTPS route proxies the development feedback server; its setup is in
+[the preview guide](knowl-feedback-ui.md).
 The production build is a local validation artifact; no deployment is needed
 to view the development preview.
+
+## Follow-up from complete pasted messages
+
+The [smooth-vector follow-up](smooth-vectors-knowl-plan.md) compares the full
+number-field and smooth-vector messages supplied on September 15, 2026. The
+number-field material was already covered. The follow-up fills gaps in the
+smooth-vector material and links the new reading path from this collection.
+The original inventory and validation above describe the committed first
+batch; the follow-up inventory records the later changes and their hashes.
+
+## Inline expansion
+
+Opening a knowl now splits prose immediately after its link. Closing it
+rejoins the original nodes and formatting. Nested knowls, multiple open links
+within a sentence, lists, table cells, and existing index placement are covered
+by `tests/reading_flow_smoke.mjs`; that regression check passes. Live browser
+checks at 390px and 1280px also pass, as does the runtime smoke suite.
+
+The reader-page suite retains a pre-existing 320px GNS vertical-spacing
+failure, reproduced with the previous committed runtime. The later reader
+checks, including split/rejoin behavior, pass when that baseline assertion is
+bypassed for diagnosis; the committed spacing assertion remains unchanged.
