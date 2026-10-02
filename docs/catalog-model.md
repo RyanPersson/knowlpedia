@@ -124,6 +124,66 @@ column input finds the construction as well as searching the row input.
 Construction participation does not create a Hom-space record. The full
 multi-input table is preserved in both exports.
 
+## Finite-group table metadata
+
+Finite-group records may additionally include `properties.finite_group`.
+The ordinary catalogue remains valid without this optional metadata. When
+any object includes it, a full build adds `/catalog/finite-groups/table/` and
+its browser assets. The table reads the existing `indexes/catalog.json`;
+it does not maintain another mathematical dataset. Object tiles link to
+their knowls and can be compared through the existing category explorer.
+The simple-group classification view distinguishes constrained families,
+the sporadic groups, and the Tits group. The familiar-family view includes
+groups that are not simple or whose simplicity depends on parameters.
+
+The metadata requires these fields:
+
+| Field | Contract |
+| --- | --- |
+| `table_role` | `simple-family`, `sporadic`, `tits`, `family`, or `example` |
+| `section` | `cyclic`, `alternating`, `classical`, `exceptional`, `sporadic`, or `familiar` |
+| `order_tex` | Nonempty LaTeX formula without math delimiters |
+| `order_decimal` | Exact positive decimal string without leading zeroes, or null |
+| `simple` | Boolean, or null for a parameter-dependent entry |
+| `simple_condition` | Nonempty statement of simplicity and its conditions |
+| `parameter_summary` | Nonempty parameter scope or fixed-object description |
+| `construction_summary` | Nonempty description of the construction |
+
+Optional `sporadic_cluster` is `mathieu`, `leech`, `monster`, or `pariah` on
+a sporadic record. These are display groups, not asserted containment
+relations. Optional `rank_label` is a nonempty string. Optional
+`display_order` is a nonnegative integer (booleans are rejected) for
+conventional family ordering within a table region. It is only a sorting
+hint and is never displayed as an atomic number. Optional
+`order_factors` contains distinct integer factor bases at least two paired
+with positive integer exponents. The validator checks their structure and,
+when an exact order is supplied, their exact product. It does not prove the
+bases prime or verify that the displayed group actually has that order.
+An empty factor list represents the product one.
+
+Exact orders stay decimal strings in both JSON and SQLite so large orders
+never pass through a floating-point number. A browser can use `BigInt` for
+order comparisons; unknown or symbolic orders remain null and cannot be
+placed in a numerical order by treating a formula as executable code.
+Finite order is separate from vector-space dimension.
+
+Finite metadata requires explicit `sets`, `groups`, and `finite-groups`
+memberships. `simple: true` must agree with `finite-simple-groups` membership,
+and order one cannot be marked simple. A `simple-family` entry has family
+status and simplicity throughout its stated constraints. Sporadic and Tits
+entries have defined status, a fixed exact order, and simplicity; the Tits
+entry belongs in the exceptional section rather than the sporadic section.
+These checks catch inconsistent metadata, not incorrect mathematical claims.
+The validator accepts partial catalogues and does not hard-code global
+classification counts as a schema requirement.
+
+The navigation generator recognizes `finite-sporadic.json`,
+`finite-lie-type.json`, and `finite-elementary.json`. It adds an order-based
+index for each present object-bearing shard, links the table from the main
+catalogue, and retains the existing generated-file overwrite guard. The
+default new-knowl baseline remains `d1ad541e`, so the existing created-knowl
+list continues to cover the whole catalogue branch.
+
 ## Querying
 
 Normal builds export the catalogue automatically. Standalone commands from
@@ -180,7 +240,7 @@ product of object pairs is allocated.
 Let V count objects, categories, memberships and views; E count relationship
 and construction participation records; and M count morphism records. Graph
 validation and index assembly use O(V + E + M) space and work, excluding the
-length of authored text. Deterministic ID ordering adds O(S log S) sorting
+length of authored text and exact-integer factor arithmetic. Deterministic ID ordering adds O(S log S) sorting
 for S total records, and SQLite B-tree insertion also has logarithmic costs.
 The build therefore makes no claim of a strictly linear total export time.
 Two-input table coverage checks scale with the explicitly authored cells.

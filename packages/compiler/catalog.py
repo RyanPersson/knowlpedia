@@ -30,6 +30,9 @@ STRUCTURAL_KINDS = frozenset({"construction", "scalar-restriction", "complexific
 MORPHISM_KINDS = frozenset({"isomorphism", "embedding", "quotient", "covering"})
 EVIDENCE_STATUSES = frozenset({"definition", "proved-in-text", "literature", "conjectural"})
 OPERATIONS = frozenset({"hom", "end", "aut"})
+FINITE_GROUP_ROLES = frozenset({"simple-family", "sporadic", "tits", "family", "example"})
+FINITE_GROUP_SECTIONS = frozenset({"cyclic", "alternating", "classical", "exceptional", "sporadic", "familiar"})
+SPORADIC_CLUSTERS = frozenset({"mathieu", "leech", "monster", "pariah"})
 
 
 class CatalogValidationError(ValueError):
@@ -114,6 +117,84 @@ def _knowl(record: dict[str, Any], registry: Mapping[str, Any], location: str) -
     record["knowl"] = canonical
 
 
+def _finite_group(record: dict[str, Any], location: str) -> None:
+    """Check display metadata and internal consistency, not group-theoretic truth."""
+    value = record["properties"]["finite_group"]
+    loc = location + ".properties.finite_group"
+    _require(isinstance(value, dict), loc, "expected a finite-group metadata object")
+    required = "table_role section order_tex order_decimal simple simple_condition parameter_summary construction_summary"
+    _required(value, required, loc)
+    unknown = value.keys() - set(required.split()) - {"sporadic_cluster", "order_factors", "rank_label", "display_order"}
+    _require(not unknown, loc, "unknown finite-group fields: " + ", ".join(sorted(unknown)))
+    for key in ("table_role", "section", "order_tex", "simple_condition", "parameter_summary", "construction_summary"):
+        _text(value[key], loc + "." + key)
+    _require(value["table_role"] in FINITE_GROUP_ROLES, loc + ".table_role", "unknown table role")
+    _require(value["section"] in FINITE_GROUP_SECTIONS, loc + ".section", "unknown table section")
+    _require(not any(delimiter in value["order_tex"] for delimiter in ("$", r"\(", r"\)", r"\[", r"\]")),
+             loc + ".order_tex", "write LaTeX without math delimiters")
+    order = value["order_decimal"]
+    _require(order is None or (isinstance(order, str) and re.fullmatch(r"[1-9][0-9]*", order) is not None),
+             loc + ".order_decimal", "expected null or an exact positive decimal string without leading zeroes")
+    simple = value["simple"]
+    _require(simple is None or type(simple) is bool, loc + ".simple", "expected a boolean or null")
+    memberships = set(record["category_ids"])
+    _require({"sets", "groups", "finite-groups"} <= memberships, loc,
+             "finite-group objects must declare sets, groups, and finite-groups memberships")
+    _require((simple is True) == ("finite-simple-groups" in memberships), loc,
+             "simple=true must agree with finite-simple-groups membership")
+    _require(simple is not None or record["status"] == "family", loc,
+             "parameter-dependent simplicity requires a family entry")
+    _require(not (simple is True and order == "1"), loc, "the order-one group cannot be declared simple")
+    role = value["table_role"]
+    if role == "simple-family":
+        _require(record["status"] == "family" and simple is True, loc,
+                 "simple-family requires family status and simple=true throughout its constraints")
+        _require(value["section"] in {"cyclic", "alternating", "classical", "exceptional"}, loc,
+                 "simple-family must use a simple-group classification section")
+    elif role in {"sporadic", "tits"}:
+        _require(record["status"] == "defined" and simple is True and order is not None, loc,
+                 "sporadic and Tits entries require a defined simple object and an exact order")
+        expected_section = "sporadic" if role == "sporadic" else "exceptional"
+        _require(value["section"] == expected_section, loc, f"{role} entries require section {expected_section!r}")
+    elif role == "family":
+        _require(record["status"] == "family", loc, "family table role requires family object status")
+    elif role == "example":
+        _require(record["status"] == "defined", loc, "example table role requires defined object status")
+    if "sporadic_cluster" in value:
+        _text(value["sporadic_cluster"], loc + ".sporadic_cluster")
+        _require(role == "sporadic" and value["sporadic_cluster"] in SPORADIC_CLUSTERS, loc + ".sporadic_cluster",
+                 "expected a recognized cluster on a sporadic entry")
+    if "rank_label" in value:
+        _text(value["rank_label"], loc + ".rank_label")
+    if "display_order" in value:
+        _require(type(value["display_order"]) is int and value["display_order"] >= 0,
+                 loc + ".display_order", "expected a nonnegative integer")
+    if "order_factors" in value:
+        factors = value["order_factors"]
+        _require(isinstance(factors, list), loc + ".order_factors", "expected an array of integer factor/exponent pairs")
+        bases = set()
+        for index, pair in enumerate(factors):
+            factor_loc = f"{loc}.order_factors[{index}]"
+            _require(isinstance(pair, list) and len(pair) == 2 and type(pair[0]) is int and pair[0] >= 2
+                     and type(pair[1]) is int and pair[1] > 0, factor_loc,
+                     "expected [prime >= 2, positive exponent] with integer entries")
+            _require(pair[0] not in bases, factor_loc, "duplicate factor base")
+            bases.add(pair[0])
+        if order is not None:
+            try:
+                expected = int(order)
+            except ValueError as exc:
+                raise CatalogValidationError(f"{loc}.order_decimal: order exceeds this runtime's exact factor-check limit") from exc
+            product = 1
+            for base, exponent in factors:
+                # Bound obviously impossible powers before constructing large integers.
+                _require(exponent * (base.bit_length() - 1) <= expected.bit_length(), loc + ".order_factors",
+                         "factor product does not match order_decimal")
+                product *= base ** exponent
+                _require(product <= expected, loc + ".order_factors", "factor product does not match order_decimal")
+            _require(product == expected, loc + ".order_factors", "factor product does not match order_decimal")
+
+
 def _shape(record: dict[str, Any], collection: str, registry: Mapping[str, Any], location: str) -> None:
     if collection == "objects":
         _required(record, "name notation kind family parameters knowl dimensions category_ids constraints properties status references", location)
@@ -133,6 +214,8 @@ def _shape(record: dict[str, Any], collection: str, registry: Mapping[str, Any],
         _references(record["references"], location + ".references")
         if "related_ids" in record:
             _strings(record["related_ids"], location + ".related_ids", unique=True)
+        if "finite_group" in record["properties"]:
+            _finite_group(record, location)
     elif collection == "categories":
         _required(record, "name knowl scalar object_axioms morphism_axioms unit_policy regularity", location)
         for key in ("name", "unit_policy", "regularity"):

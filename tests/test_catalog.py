@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 import json
 import sqlite3
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -43,6 +44,26 @@ def fixture() -> dict:
     return data
 
 
+def finite_fixture() -> dict:
+    data = fixture()
+    for ident in ("sets", "groups", "finite-groups", "finite-simple-groups"):
+        data["categories"].append({"id": ident, "name": ident, "knowl": "sample/category", "scalar": None,
+                                   "object_axioms": [], "morphism_axioms": [], "unit_policy": "group identity",
+                                   "regularity": "algebraic"})
+    data["objects"].append({
+        "id": "fg-example", "name": "Cyclic group of order six", "notation": "C_6", "kind": "finite-group",
+        "family": "cyclic", "parameters": {"n": 6}, "knowl": "sample/object", "dimensions": {},
+        "category_ids": ["sets", "groups", "finite-groups"], "constraints": [], "status": "defined", "references": [],
+        "properties": {"finite_group": {
+            "table_role": "example", "section": "familiar", "order_tex": "6", "order_decimal": "6", "simple": False,
+            "simple_condition": "This group is not simple because its order is composite.",
+            "parameter_summary": "A fixed cyclic group.", "construction_summary": "Integers modulo six under addition.",
+            "order_factors": [[2, 1], [3, 1]],
+        }},
+    })
+    return data
+
+
 REGISTRY = {name: {"visibility": "production"} for name in ("sample/category", "sample/object", "sample/relation")}
 
 
@@ -68,6 +89,137 @@ class CatalogTests(unittest.TestCase):
         self.assertEqual(views["a@jord-r"]["scalar"], "R")
         self.assertEqual(views["b@jord-c"]["scalar"], "C")
         self.assertNotEqual(views["a-twisted"]["id"], views["a@jord-r"]["id"])
+
+    def test_finite_group_exact_order_survives_both_exports(self) -> None:
+        data = finite_fixture()
+        finite = data["objects"][-1]["properties"]["finite_group"]
+        exact_order = str(2 ** 90 * 3 ** 7)
+        finite.update(order_decimal=exact_order, order_tex=r"2^{90}3^7", order_factors=[[2, 90], [3, 7]], display_order=0)
+        normalized = self.load(data)
+        catalog.export_catalog(normalized, self.root / "finite")
+        browser = json.loads((self.root / "finite" / "catalog.json").read_text())
+        obj = browser["objects"][browser["indexes"]["by_id"]["objects"]["fg-example"]]
+        self.assertEqual(obj["properties"]["finite_group"]["order_decimal"], exact_order)
+        self.assertEqual(obj["properties"]["finite_group"]["display_order"], 0)
+        with catalog.CatalogQuery(self.root / "finite" / "catalog.sqlite") as query:
+            self.assertEqual(query.get("objects", "fg-example")["properties"]["finite_group"]["order_decimal"], exact_order)
+            self.assertEqual(query.get("objects", "fg-example")["properties"]["finite_group"]["display_order"], 0)
+
+    def test_finite_group_display_order_is_optional_and_accepts_positive_integers(self) -> None:
+        data = finite_fixture()
+        self.load(data)
+        data["objects"][-1]["properties"]["finite_group"]["display_order"] = 7
+        self.load(data)
+
+    def test_finite_group_metadata_requires_exact_types_and_known_fields(self) -> None:
+        cases = [
+            ("order_decimal", 6, "positive decimal string"), ("order_decimal", 6.0, "positive decimal string"),
+            ("order_decimal", "0", "positive decimal string"), ("order_decimal", "06", "positive decimal string"),
+            ("order_decimal", "1e6", "positive decimal string"), ("simple", 1, "boolean or null"),
+            ("simple", None, "parameter-dependent simplicity requires a family"),
+            ("simple", "false", "boolean or null"), ("table_role", "atomic", "unknown table role"),
+            ("section", "pariah", "unknown table section"), ("order_tex", "$6$", "without math delimiters"),
+            ("simple_condition", "", "nonempty string"), ("sporadic_cluster", "mathieu", "sporadic entry"),
+            ("rank_label", "", "nonempty string"), ("exactorder_decimal", "6", "unknown finite-group fields"),
+            *[("display_order", value, "nonnegative integer") for value in (-1, False, True, 0.0, 1.5, "0", None)],
+        ]
+        for key, value, message in cases:
+            with self.subTest(key=key, value=value):
+                data = finite_fixture()
+                data["objects"][-1]["properties"]["finite_group"][key] = value
+                with self.assertRaisesRegex(catalog.CatalogValidationError, message):
+                    self.load(data)
+        data = finite_fixture()
+        del data["objects"][-1]["properties"]["finite_group"]["construction_summary"]
+        with self.assertRaisesRegex(catalog.CatalogValidationError, "missing required fields: construction_summary"):
+            self.load(data)
+
+    def test_finite_group_factor_structure_and_exact_product_are_checked(self) -> None:
+        for factors, message in (([[True, 1]], "integer entries"), ([[2, True]], "integer entries"),
+                                  ([[2, 0]], "integer entries"), ([[1, 3]], "integer entries"),
+                                  ([[2, 1], [2, 2]], "duplicate factor"), ([[2, 2], [3, 1]], "does not match"),
+                                  ([[2, 1000000000]], "does not match")):
+            with self.subTest(factors=factors):
+                data = finite_fixture()
+                data["objects"][-1]["properties"]["finite_group"]["order_factors"] = factors
+                with self.assertRaisesRegex(catalog.CatalogValidationError, message):
+                    self.load(data)
+        data = finite_fixture()
+        data["objects"][-1]["properties"]["finite_group"].update(order_decimal="1", order_tex="1", order_factors=[])
+        self.load(data)
+
+    def test_finite_group_roles_and_simplicity_agree_with_memberships(self) -> None:
+        data = finite_fixture()
+        obj = data["objects"][-1]
+        obj["category_ids"].remove("groups")
+        with self.assertRaisesRegex(catalog.CatalogValidationError, "must declare sets, groups"):
+            self.load(data)
+        for simple, membership in ((True, False), (False, True), (None, True)):
+            data = finite_fixture()
+            obj = data["objects"][-1]
+            obj["properties"]["finite_group"]["simple"] = simple
+            if membership:
+                obj["category_ids"].append("finite-simple-groups")
+            with self.assertRaisesRegex(catalog.CatalogValidationError, "must agree"):
+                self.load(data)
+        data = finite_fixture()
+        obj = data["objects"][-1]
+        finite = obj["properties"]["finite_group"]
+        obj["category_ids"].append("finite-simple-groups")
+        obj.update(status="family", constraints=["p is prime"], parameters={"p": "prime"})
+        finite.update(table_role="simple-family", section="cyclic", simple=True, order_tex="p", order_decimal=None)
+        del finite["order_factors"]
+        self.load(data)
+        obj["status"] = "defined"
+        with self.assertRaisesRegex(catalog.CatalogValidationError, "simple-family requires family"):
+            self.load(data)
+        finite.update(table_role="tits", section="exceptional", order_tex="17971200", order_decimal="17971200")
+        self.load(data)
+        finite["section"] = "sporadic"
+        with self.assertRaisesRegex(catalog.CatalogValidationError, "tits entries require section"):
+            self.load(data)
+        finite.update(table_role="sporadic", sporadic_cluster="mathieu")
+        self.load(data)
+        finite["sporadic_cluster"] = "tits"
+        with self.assertRaisesRegex(catalog.CatalogValidationError, "recognized cluster"):
+            self.load(data)
+
+    def test_finite_navigation_uses_order_and_preserves_generated_guard(self) -> None:
+        repo = self.root / "navigation-package"
+        content = repo / "content"
+        data_dir = content / "catalog" / "data"
+        data_dir.mkdir(parents=True)
+        (content / "seed.md").write_text("Initial content package.\n")
+        for args in (("init",), ("config", "user.name", "Test User"),
+                     ("config", "user.email", "test@example.com"), ("add", "content"),
+                     ("commit", "-m", "baseline")):
+            subprocess.run(["git", *args], cwd=repo, check=True, capture_output=True)
+        (data_dir / "finite-elementary.json").write_text(json.dumps({
+            "schema_version": 1, "objects": [finite_fixture()["objects"][-1]],
+        }))
+        # Category-only supplemental shards require no object navigation lane.
+        (data_dir / "finite-core.json").write_text(json.dumps({"schema_version": 1, "objects": []}))
+        script = Path(__file__).resolve().parents[1] / "scripts" / "generate_catalog_indexes.py"
+        command = [sys.executable, str(script), "--content-package", str(repo), "--baseline", "HEAD"]
+        result = subprocess.run(command, check=True, capture_output=True, text=True)
+        self.assertIn("Generated 8 indexes for 1 objects", result.stdout)
+        index = content / "catalog" / "finite-elementary-index.knowl.md"
+        rendered = index.read_text()
+        self.assertIn("| Object | Order | Simplicity | Kind of entry |", rendered)
+        self.assertIn(r"| \(6\) | not simple |", rendered)
+        self.assertNotIn("Dimensions", rendered)
+        self.assertIn("/catalog/finite-groups/table/", (content / "catalog.knowl.md").read_text())
+        self.assertFalse((content / "catalog" / "finite-sporadic-index.knowl.md").exists())
+        for args in (("add", "content"), ("commit", "-m", "generated catalogue")):
+            subprocess.run(["git", *args], cwd=repo, check=True, capture_output=True)
+        subprocess.run(command, check=True, capture_output=True, text=True)
+        self.assertIn("**0 catalogue knowls", (content / "catalog" / "created-knowls.knowl.md").read_text())
+        authored = index.read_text().replace('generated_by = "scripts/generate_catalog_indexes.py"\n', "")
+        index.write_text(authored)
+        refused = subprocess.run(command, capture_output=True, text=True)
+        self.assertNotEqual(refused.returncode, 0)
+        self.assertIn("Refusing to overwrite an independently authored knowl", refused.stderr)
+        self.assertEqual(index.read_text(), authored)
 
     def test_unknown_reference_diagnostics_identify_record(self) -> None:
         cases = [
@@ -291,12 +443,39 @@ class CatalogTests(unittest.TestCase):
         shard.write_text(json.dumps(fixture()))
         self.assertEqual(compiler.write_site(package, output, profile=compiler.BUILD_PROFILES["production"]), 0)
         self.assertTrue((output / "indexes" / "catalog.sqlite").is_file())
+        self.assertFalse((output / "catalog" / "finite-groups" / "table" / "index.html").exists())
+        self.assertFalse((output / "assets" / "finite-groups.js").exists())
         original = (output / "indexes" / "catalog.json").read_bytes()
         bad = fixture()
         bad["objects"][0]["knowl"] = "missing"
         shard.write_text(json.dumps(bad))
         self.assertEqual(compiler.write_site(package, output, allow_validation_errors=True), 1)
         self.assertEqual((output / "indexes" / "catalog.json").read_bytes(), original)
+
+    def test_compiler_emits_finite_table_only_while_metadata_is_present(self) -> None:
+        package = self.root / "finite-package"
+        shard_dir = package / "content" / "catalog" / "data"
+        shard_dir.mkdir(parents=True)
+        (package / "knowlpack.toml").write_text('id = "finite-test"\ntitle = "Finite test"\ncontent_dir = "content"\n')
+        for index, ident in enumerate(REGISTRY):
+            (package / "content" / f"{index}.knowl.md").write_text(
+                f'+++\nid = "{ident}"\ntitle = "Test {index}"\nkind = "definition"\nsummary = "Test."\n+++\nA definition.\n')
+        shard = shard_dir / "test.json"
+        shard.write_text(json.dumps(finite_fixture()))
+        output = self.root / "finite-site"
+        self.assertEqual(compiler.write_site(package, output, profile=compiler.BUILD_PROFILES["production"]), 0)
+        table = output / "catalog" / "finite-groups" / "table" / "index.html"
+        self.assertTrue(table.is_file())
+        self.assertIn("/indexes/catalog.json", table.read_text())
+        self.assertIn("/assets/finite-groups.js", table.read_text())
+        self.assertTrue((output / "assets" / "finite-groups.js").is_file())
+        self.assertTrue((output / "assets" / "finite-groups.css").is_file())
+        if '/assets/katex.min.js' in table.read_text():
+            self.assertTrue((output / "assets" / "katex.min.js").is_file())
+        shard.write_text(json.dumps(fixture()))
+        self.assertEqual(compiler.write_site(package, output, profile=compiler.BUILD_PROFILES["production"]), 0)
+        self.assertFalse(table.exists())
+        self.assertFalse((output / "assets" / "finite-groups.js").exists())
 
 
 if __name__ == "__main__":

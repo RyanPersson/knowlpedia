@@ -56,30 +56,51 @@ def main() -> None:
         "lie-groups": "Lie groups", "lie-algebras": "Lie algebras",
         "algebras": "Scalar, associative, and Jordan algebras", "arithmetic": "Fields, local objects, and orders",
         "magic-square": "Magic-square outputs and triality representations",
+        "finite-sporadic": "Sporadic finite simple groups",
+        "finite-lie-type": "Finite groups of Lie type",
+        "finite-elementary": "Elementary finite groups and families",
     }
     unmapped = sorted(name for name, shard in shards.items()
                       if shard.get("objects") and name not in lane_labels)
     if unmapped:
         raise ValueError(f"Object shards need navigation labels before index generation: {', '.join(unmapped)}")
     links = []
+    generated_count = 0
     for lane, title in lane_labels.items():
         lane_objects = shards.get(lane, {}).get("objects", [])
+        finite_lane = lane.startswith("finite-")
+        if finite_lane and not lane_objects:
+            continue
         groups: dict[str, list] = defaultdict(list)
         for obj in lane_objects:
             groups[obj["family"]].append(obj)
-        body = [f"{len(lane_objects)} separately identified objects and parameterized families. "
-                "Real and complex scalar choices have distinct entries. An isomorphism is a recorded relationship, "
-                "not a reason to collapse the entries.\n\n[Explore pairs and categories](/catalog/explorer/) · "
+        scope = ("Individual finite groups and constrained families retain distinct entries. "
+                 "Orders are exact integers or formulas; simplicity is stated under each entry's parameter restrictions. "
+                 if finite_lane else "Real and complex scalar choices have distinct entries. ")
+        body = [f"{len(lane_objects)} separately identified objects and parameterized families. " + scope +
+                "An isomorphism is a recorded relationship, not a reason to collapse the entries.\n\n"
+                + ("[Open the finite-group table](/catalog/finite-groups/table/) · " if finite_lane else "")
+                + "[Explore pairs and categories](/catalog/explorer/) · "
                 "[[catalog|Catalogue overview]]\n"]
         for family, members in sorted(groups.items()):
             body += [f"\n## {family.replace('-', ' ').capitalize()}\n",
-                     "| Object | Dimensions | Kind of entry |\n| --- | --- | --- |"]
+                     ("| Object | Order | Simplicity | Kind of entry |\n| --- | --- | --- | --- |" if finite_lane
+                      else "| Object | Dimensions | Kind of entry |\n| --- | --- | --- |")]
             for obj in sorted(members, key=lambda o: o["id"]):
-                dimensions = "; ".join(f"{k}: {v}" for k, v in obj["dimensions"].items()) or "not specified"
                 status = "parameterized family" if obj["status"] == "family" else "specified object"
-                body.append(f"| [[{obj['knowl']}|\\({obj['notation']}\\)]] | {label(dimensions)} | {status} |")
+                if finite_lane:
+                    finite = obj["properties"]["finite_group"]
+                    order_tex = finite["order_tex"].replace("|", r"\vert")
+                    simplicity = ("simple under the stated constraints" if finite["simple"] is True
+                                  else "not simple" if finite["simple"] is False else "parameter-dependent")
+                    body.append(f"| [[{obj['knowl']}|\\({obj['notation']}\\)]] | \\({order_tex}\\) | {simplicity} | {status} |")
+                else:
+                    dimensions = "; ".join(f"{k}: {v}" for k, v in obj["dimensions"].items()) or "not specified"
+                    body.append(f"| [[{obj['knowl']}|\\({obj['notation']}\\)]] | {label(dimensions)} | {status} |")
         ident = f"catalog/{lane}-index"
-        write_index(content, ident, title + " catalogue", f"A catalogue of {len(lane_objects)} objects with explicit fields, dimensions, and category views.", "\n".join(body))
+        details = "orders, simplicity conditions, and category views" if finite_lane else "fields, dimensions, and category views"
+        write_index(content, ident, title + " catalogue", f"A catalogue of {len(lane_objects)} objects with explicit {details}.", "\n".join(body))
+        generated_count += 1
         links.append(f"- [[{ident}|{title} catalogue]] — {len(lane_objects)} entries.")
 
     body = [
@@ -88,7 +109,9 @@ def main() -> None:
         f"**{len(morphisms)} Hom/End/Aut records**. Real and complex versions, split and compact forms, and the "
         "requested small sizes are explicit entries. A family entry states its parameter restrictions; "
         "it does not silently treat every parameter value as the same object.",
-        "\n[Open the category explorer](/catalog/explorer/) · [[catalog/created-knowls|List of newly created knowls]]",
+        "\n[Open the category explorer](/catalog/explorer/) · [[catalog/created-knowls|List of newly created knowls]]"
+        + (" · [Explore the finite-group table](/catalog/finite-groups/table/)"
+           if any("finite_group" in obj.get("properties", {}) for obj in objects) else ""),
         "\n## Long lists of objects\n", *links,
         "\n## How to compare objects\n",
         "[[catalog/morphisms/hom-end-aut-by-category|Hom, End, and Aut depend on the chosen category]]. "
@@ -165,7 +188,7 @@ def main() -> None:
         for meta in sorted(pages, key=lambda m: (m["title"].casefold(), m["id"])):
             listing.append(f"- [[{meta['id']}|{meta['title']}]]")
     write_index(content, "catalog/created-knowls", "New knowls in the catalogue batch", "The complete list of new catalogue definitions, examples, relationships, and navigation pages.", "\n".join(listing))
-    print(f"Generated 7 indexes for {len(objects)} objects and {new_count} new catalogue pages.")
+    print(f"Generated {generated_count + 2} indexes for {len(objects)} objects and {new_count} new catalogue pages.")
 
 
 if __name__ == "__main__":

@@ -147,7 +147,7 @@ def runtime_asset_version() -> str:
     """Return a stable cache key for the browser runtime shipped by this build."""
     runtime_dir = Path(__file__).resolve().parents[1] / "static-runtime"
     digest = hashlib.sha256()
-    for filename in ("knowl.css", "knowl.js", "graph.js", "knowl-testing.js", "facsimile.js", "document-math.js", "catalog.js", "catalog.css"):
+    for filename in ("knowl.css", "knowl.js", "graph.js", "knowl-testing.js", "facsimile.js", "document-math.js", "catalog.js", "catalog.css", "finite-groups.js", "finite-groups.css"):
         path = runtime_dir / filename
         if not path.is_file():
             continue
@@ -2889,6 +2889,16 @@ def write_site_for_ids(
             explorer_path = out_dir / "catalog" / "explorer" / "index.html"
             explorer_path.parent.mkdir(parents=True, exist_ok=True)
             explorer_path.write_text(explorer, encoding="utf-8")
+            if any("finite_group" in obj["properties"] for obj in catalog_data["objects"]):
+                from finite_groups_html import render_finite_groups_table
+                for filename in ("finite-groups.js", "finite-groups.css"):
+                    shutil.copyfile(runtime_dir / filename, out_dir / "assets" / filename)
+                finite_table = render_finite_groups_table(html_document, profile, asset_version=runtime_asset_version())
+                if not has_browser_katex:
+                    finite_table = re.sub(r'<script defer src="/assets/katex\.min\.js[^\"]*"></script>\s*', '', finite_table)
+                finite_table_path = out_dir / "catalog" / "finite-groups" / "table" / "index.html"
+                finite_table_path.parent.mkdir(parents=True, exist_ok=True)
+                finite_table_path.write_text(finite_table, encoding="utf-8")
         write_json(out_dir / "indexes" / "registry.json", registry_json(registry))
         write_compact_json(out_dir / "indexes" / "search.json", search_json(registry))
         write_json(out_dir / "indexes" / "relations.json", relations_json(registry))
