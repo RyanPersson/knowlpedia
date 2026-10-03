@@ -92,6 +92,7 @@ try {
   await page.locator('[data-catalog-ready="true"]').waitFor();
   assert.match(await page.locator("#catalog-coverage").textContent(), /Complete description/);
   assert.equal(await page.locator("#catalog-target-card").isVisible(), false);
+  assert.equal(await page.locator("#catalog-swap").isVisible(), false);
   assert.equal(await page.locator("#catalog-view-controls").isVisible(), false, "Single canonical structures need no selector");
   assert.equal(await page.locator("#catalog-morphisms .katex").count(), 1);
   assert.equal(await page.locator('#catalog-morphisms a[href="/test/b/"]').count(), 1);
@@ -99,6 +100,7 @@ try {
   assert.match(await page.locator("#catalog-coverage").textContent(), /Partial/);
   assert.equal(await page.locator("#catalog-morphisms [data-record-id=real-aut]").count(), 0);
   await page.locator("#catalog-operation").selectOption("end");
+  assert.equal(await page.locator("#catalog-swap").isVisible(), false);
   assert.match(await page.locator("#catalog-morphisms").textContent(), /maps may still exist/);
   await page.locator("#catalog-source-view").selectOption("a-twisted");
   assert.equal(await page.locator("#catalog-target-view").inputValue(), "a-twisted");
@@ -106,6 +108,13 @@ try {
   assert.match(await page.locator("#catalog-coverage").textContent(), /Coverage unspecified/);
   assert.match(await page.locator("#catalog-morphisms").textContent(), /conjugated structure/);
   await page.locator("#catalog-operation").selectOption("hom");
+  await page.locator("#catalog-target-view").selectOption("a@vectors-c");
+  await page.locator("#catalog-swap").focus();
+  await page.keyboard.press("Enter");
+  assert.equal(await page.locator("#catalog-source-view").inputValue(), "a@vectors-c");
+  assert.equal(await page.locator("#catalog-target-view").inputValue(), "a-twisted", "Swap exchanges distinct structures even on the same object");
+  assert.equal(new URL(page.url()).searchParams.get("target_view"), "a-twisted");
+  assert.equal(await page.evaluate(() => document.activeElement.id), "catalog-swap");
   await chooseObject(page, "target", "B real", "b");
   assert.equal(await page.locator("#catalog-category").inputValue(), "vectors-r");
   assert.match(await page.locator("#catalog-morphisms").textContent(), /recorded Hom description/);
@@ -114,6 +123,17 @@ try {
   assert.equal(await page.locator(".catalog-edge:not(.construction)").count(), 1);
   assert.match(await page.locator('[data-relationship-id="two-input"] .catalog-relation-title').textContent(), /C group \+ A complex object/);
   assert.equal(new URL(page.url()).searchParams.get("target"), "b");
+  const forwardQuery = page.url();
+  await page.locator("#catalog-swap").click();
+  assert.equal(await page.locator("#catalog-source-card").getAttribute("data-object-id"), "b");
+  assert.equal(await page.locator("#catalog-target-card").getAttribute("data-object-id"), "a");
+  assert.equal(await page.locator("#catalog-category").inputValue(), "vectors-r");
+  assert.equal(new URL(page.url()).searchParams.get("source"), "b");
+  assert.equal(await page.locator('#catalog-morphisms [data-record-id="real-hom"]').count(), 0, "Swapping must query the reverse direction, not reuse forward maps");
+  assert.match(await page.locator("#catalog-coverage").textContent(), /Not catalogued/);
+  await page.locator("#catalog-swap").click();
+  assert.equal(page.url(), forwardQuery, "Swapping twice restores the full query");
+  assert.equal(await page.locator('#catalog-morphisms [data-record-id="real-hom"]').count(), 1);
   await page.locator("#catalog-operation").selectOption("aut");
   assert.equal(await page.locator("#catalog-target-card").isVisible(), false);
   await page.locator("#catalog-operation").selectOption("hom");

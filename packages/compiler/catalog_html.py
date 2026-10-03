@@ -37,6 +37,7 @@ def render_catalog_explorer(
     <section class="catalog-panel catalog-query" aria-label="Choose objects and maps">
       <div class="catalog-pair catalog-object-cards" id="catalog-object-cards">
         <article id="catalog-source-card" aria-label="Source object"></article>
+        <button type="button" id="catalog-swap" class="catalog-button catalog-swap" aria-label="Swap domain and codomain" title="Swap domain and codomain" hidden><span aria-hidden="true">⇄</span> Swap</button>
         <article id="catalog-target-card" aria-label="Target object"></article>
       </div>
       <div class="catalog-map-controls">

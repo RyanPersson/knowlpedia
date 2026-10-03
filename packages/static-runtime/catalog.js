@@ -472,6 +472,7 @@
       previousPair = pairKey();
       $("operation").value = state.operation;
       $("target-card").hidden = state.operation !== "hom";
+      $("swap").hidden = state.operation !== "hom";
       $("object-cards").classList.toggle("catalog-single-object", state.operation !== "hom");
       renderCategory(common);
       renderView("source", sourceChoices); renderView("target", targetChoices);
@@ -506,6 +507,12 @@
     });
     $("picker-close").addEventListener("click", () => $("picker").close());
     $("picker").addEventListener("close", () => $(`${pickerEndpoint}-change`).focus());
+    $("swap").addEventListener("click", () => {
+      if (state.operation !== "hom") return;
+      [state.source, state.target] = [state.target, state.source];
+      [state.sourceView, state.targetView] = [state.targetView, state.sourceView];
+      render();
+    });
     $("operation").addEventListener("change", event => {
       if (state.operation === "hom") { homTarget = state.target; homTargetView = state.targetView; }
       state.operation = event.target.value;

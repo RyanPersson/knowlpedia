@@ -22,6 +22,8 @@ category, and result together. **Change** opens a searchable object picker with
 keyboard navigation. Aut and End show one object; Hom shows both endpoints and
 remembers its target when temporarily switching operations. Selection changes
 update shareable URLs and participate in browser Back/Forward navigation.
+In Hom mode, **Swap** exchanges the domain and codomain together with their
+selected structures, retaining the category and querying maps in the new direction.
 
 Categories with descriptions for the current objects and operation appear
 first. Other common categories remain available. A structure selector appears
