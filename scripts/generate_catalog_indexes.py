@@ -80,6 +80,8 @@ def main() -> None:
         body = [f"{len(lane_objects)} separately identified objects and parameterized families. " + scope +
                 "An isomorphism is a recorded relationship, not a reason to collapse the entries.\n\n"
                 + ("[Open the finite-group table](/catalog/finite-groups/table/) · " if finite_lane else "")
+                + ("[Open the Lie-group table](/catalog/lie-groups/table/) · "
+                   if any("lie_group" in obj.get("properties", {}) for obj in lane_objects) else "")
                 + "[Explore pairs and categories](/catalog/explorer/) · "
                 "[[catalog|Catalogue overview]]\n"]
         for family, members in sorted(groups.items()):
@@ -111,7 +113,9 @@ def main() -> None:
         "it does not silently treat every parameter value as the same object.",
         "\n[Open the category explorer](/catalog/explorer/) · [[catalog/created-knowls|List of newly created knowls]]"
         + (" · [Explore the finite-group table](/catalog/finite-groups/table/)"
-           if any("finite_group" in obj.get("properties", {}) for obj in objects) else ""),
+           if any("finite_group" in obj.get("properties", {}) for obj in objects) else "")
+        + (" · [Explore the Lie-group table](/catalog/lie-groups/table/)"
+           if any("lie_group" in obj.get("properties", {}) for obj in objects) else ""),
         "\n## Long lists of objects\n", *links,
         "\n## How to compare objects\n",
         "[[catalog/morphisms/hom-end-aut-by-category|Hom, End, and Aut depend on the chosen category]]. "

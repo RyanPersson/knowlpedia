@@ -8,6 +8,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "packages" / "compiler"))
 import catalog
@@ -64,6 +65,47 @@ def finite_fixture() -> dict:
     return data
 
 
+def lie_fixture(*, complex_group: bool = False) -> dict:
+    data = fixture()
+    data["categories"].append({
+        "id": "real-lie-groups", "name": "Real Lie groups", "knowl": "sample/category", "scalar": None,
+        "object_axioms": [], "morphism_axioms": [], "unit_policy": "group identity", "regularity": "smooth",
+    })
+    data["objects"].append({
+        "id": "lg-su-n", "name": "Special unitary groups", "notation": "SU(n)", "kind": "lie-group",
+        "family": "special-unitary", "parameters": {"n": "integer"}, "knowl": "sample/object",
+        "dimensions": {"real": "n^2-1"}, "category_ids": ["real-lie-groups"],
+        "constraints": ["n >= 2"], "status": "family", "references": [],
+        "properties": {"compact": True, "connected": True, "lie_group": {
+            "section": "classical", "form": "compact", "parameter_summary": "Integer n >= 2.",
+            "construction_summary": "Unitary matrices of determinant one.",
+            "global_form_summary": "The simply connected compact matrix group SU(n).",
+            "classification_cells": [{
+                "series": "A", "form": "compact", "notation": "SU(r+1)",
+                "dimension_tex": "r(r+2)", "dimension_field": "real", "parameter_summary": "Integer r >= 1.",
+                "specialization": "Set n = r+1.", "global_form": "The simply connected compact group SU(r+1).",
+            }],
+        }},
+    })
+    if complex_group:
+        data["categories"].append({
+            "id": "complex-lie-groups", "name": "Complex Lie groups", "knowl": "sample/category", "scalar": None,
+            "object_axioms": [], "morphism_axioms": [], "unit_policy": "group identity", "regularity": "holomorphic",
+        })
+        obj = data["objects"][-1]
+        obj.update(id="lg-sl-n-c", name="Complex special linear groups", notation=r"SL(n,\mathbb C)",
+                   family="special-linear", dimensions={"real": "2*(n^2-1)", "complex": "n^2-1"})
+        obj["category_ids"].append("complex-lie-groups")
+        obj["properties"]["compact"] = False
+        metadata = obj["properties"]["lie_group"]
+        metadata.update(form="complex", construction_summary="Complex matrices of determinant one.",
+                        global_form_summary="The simply connected complex matrix group SL(n,C).")
+        metadata["classification_cells"][0].update(
+            form="complex", notation=r"SL(r+1,\mathbb C)", dimension_field="complex",
+            global_form="The simply connected complex group SL(r+1,C).")
+    return data
+
+
 REGISTRY = {name: {"visibility": "production"} for name in ("sample/category", "sample/object", "sample/relation")}
 
 
@@ -89,6 +131,116 @@ class CatalogTests(unittest.TestCase):
         self.assertEqual(views["a@jord-r"]["scalar"], "R")
         self.assertEqual(views["b@jord-c"]["scalar"], "C")
         self.assertNotEqual(views["a-twisted"]["id"], views["a@jord-r"]["id"])
+
+    def test_lie_group_partial_cells_and_metadata_survive_both_exports(self) -> None:
+        data = lie_fixture()
+        metadata = data["objects"][-1]["properties"]["lie_group"]
+        metadata["display_order"] = 0
+        normalized = self.load(data)
+        catalog.export_catalog(normalized, self.root / "lie")
+        browser = json.loads((self.root / "lie" / "catalog.json").read_text())
+        obj = browser["objects"][browser["indexes"]["by_id"]["objects"]["lg-su-n"]]
+        self.assertEqual(obj["properties"]["lie_group"], metadata)
+        self.assertEqual(obj["dimensions"], {"real": "n^2-1"})
+        with catalog.CatalogQuery(self.root / "lie" / "catalog.sqlite") as query:
+            self.assertEqual(query.get("objects", "lg-su-n")["properties"]["lie_group"], metadata)
+        # Display-only metadata and entirely unannotated Lie groups remain valid.
+        del metadata["classification_cells"]
+        del metadata["display_order"]
+        self.load(data)
+        del data["objects"][-1]["properties"]["lie_group"]
+        self.load(data)
+
+    def test_lie_group_metadata_requires_exact_types_known_fields_and_scope(self) -> None:
+        cases = [
+            ("section", "finite", "unknown Lie-group section"), ("section", [], "nonempty string"),
+            ("form", "split", "unknown Lie-group form"), ("form", {}, "nonempty string"),
+            ("parameter_summary", " ", "nonempty string"), ("construction_summary", None, "nonempty string"),
+            ("global_form_summary", 1, "nonempty string"), ("global_form", "SU(n)", "unknown Lie-group fields"),
+            *[("display_order", value, "nonnegative integer") for value in (-1, False, True, 0.0, "0", None)],
+            *[("classification_cells", value, "nonempty array") for value in ([], {}, None, "A")],
+        ]
+        for key, value, message in cases:
+            with self.subTest(key=key, value=value):
+                data = lie_fixture()
+                data["objects"][-1]["properties"]["lie_group"][key] = value
+                with self.assertRaisesRegex(catalog.CatalogValidationError, message):
+                    self.load(data)
+        for metadata in (None, [], "compact"):
+            data = lie_fixture()
+            data["objects"][-1]["properties"]["lie_group"] = metadata
+            with self.assertRaisesRegex(catalog.CatalogValidationError, "metadata object"):
+                self.load(data)
+        data = lie_fixture()
+        del data["objects"][-1]["properties"]["lie_group"]["global_form_summary"]
+        with self.assertRaisesRegex(catalog.CatalogValidationError, "missing required fields: global_form_summary"):
+            self.load(data)
+        for field, value in (("kind", "lie-algebra"), ("category_ids", [])):
+            data = lie_fixture()
+            data["objects"][-1][field] = value
+            with self.assertRaisesRegex(catalog.CatalogValidationError, "requires kind lie-group and real-lie-groups"):
+                self.load(data)
+
+    def test_lie_classification_cells_validate_fields_and_dimension_convention(self) -> None:
+        cases = [
+            ("series", "A2", "unknown Dynkin series"), ("series", [], "nonempty string"),
+            ("form", "real", "unknown classification form"), ("form", False, "nonempty string"),
+            ("dimension_field", "complex", "compact column requires real dimension"),
+            ("dimension_tex", "$r(r+2)$", "without math delimiters"),
+            ("notation", r"\(SU(r+1)\)", "without math delimiters"),
+            ("dimension_tex", r"\[r(r+2)\]", "without math delimiters"),
+            ("parameter_summary", "", "nonempty string"), ("specialization", {}, "nonempty string"),
+            ("global_form", None, "nonempty string"), ("rank", 1, "unknown classification-cell fields"),
+        ]
+        for key, value, message in cases:
+            with self.subTest(key=key, value=value):
+                data = lie_fixture()
+                data["objects"][-1]["properties"]["lie_group"]["classification_cells"][0][key] = value
+                with self.assertRaisesRegex(catalog.CatalogValidationError, message):
+                    self.load(data)
+        data = lie_fixture()
+        cells = data["objects"][-1]["properties"]["lie_group"]["classification_cells"]
+        cells[0]["form"] = "complex"
+        with self.assertRaisesRegex(catalog.CatalogValidationError, "complex column requires complex dimension"):
+            self.load(data)
+        data = lie_fixture(complex_group=True)
+        cells = data["objects"][-1]["properties"]["lie_group"]["classification_cells"]
+        self.load(data)
+        del cells[0]["global_form"]
+        with self.assertRaisesRegex(catalog.CatalogValidationError, "missing required fields: global_form"):
+            self.load(data)
+        cells[0] = []
+        with self.assertRaisesRegex(catalog.CatalogValidationError, "expected a classification cell object"):
+            self.load(data)
+
+    def test_lie_classification_dimension_matches_owning_object_structure(self) -> None:
+        for complex_group, dimension in ((False, "real"), (True, "complex")):
+            data = lie_fixture(complex_group=complex_group)
+            del data["objects"][-1]["dimensions"][dimension]
+            with self.assertRaisesRegex(catalog.CatalogValidationError, f"must declare a {dimension} dimension"):
+                self.load(data)
+        data = lie_fixture(complex_group=True)
+        data["objects"][-1]["category_ids"].remove("complex-lie-groups")
+        with self.assertRaisesRegex(catalog.CatalogValidationError, "requires complex-lie-groups membership"):
+            self.load(data)
+
+    def test_lie_classification_cells_are_unique_within_and_across_shards(self) -> None:
+        data = lie_fixture()
+        cells = data["objects"][-1]["properties"]["lie_group"]["classification_cells"]
+        cells.append(copy.deepcopy(cells[0]))
+        with self.assertRaisesRegex(catalog.CatalogValidationError, "duplicate Lie-group classification cell"):
+            self.load(data)
+        data = lie_fixture()
+        self.load(data)
+        other = copy.deepcopy(data["objects"][-1])
+        other["id"] = "lg-another-global-form"
+        second = self.root / "second.json"
+        second.write_text(json.dumps({"schema_version": 1, "objects": [other]}))
+        with self.assertRaisesRegex(catalog.CatalogValidationError, "duplicate Lie-group classification cell") as caught:
+            catalog.load_catalog([self.root / "shard.json", second], REGISTRY)
+        self.assertIn("shard.json:", str(caught.exception))
+        self.assertIn("second.json:", str(caught.exception))
+        self.assertIn("lg-another-global-form", str(caught.exception))
 
     def test_finite_group_exact_order_survives_both_exports(self) -> None:
         data = finite_fixture()
@@ -220,6 +372,33 @@ class CatalogTests(unittest.TestCase):
         self.assertNotEqual(refused.returncode, 0)
         self.assertIn("Refusing to overwrite an independently authored knowl", refused.stderr)
         self.assertEqual(index.read_text(), authored)
+
+    def test_lie_navigation_links_table_only_with_display_metadata(self) -> None:
+        repo = self.root / "lie-navigation-package"
+        content = repo / "content"
+        data_dir = content / "catalog" / "data"
+        data_dir.mkdir(parents=True)
+        (content / "seed.md").write_text("Initial content package.\n")
+        for args in (("init",), ("config", "user.name", "Test User"),
+                     ("config", "user.email", "test@example.com"), ("add", "content"),
+                     ("commit", "-m", "baseline")):
+            subprocess.run(["git", *args], cwd=repo, check=True, capture_output=True)
+        shard = data_dir / "lie-groups.json"
+        obj = lie_fixture()["objects"][-1]
+        metadata = obj["properties"].pop("lie_group")
+        shard.write_text(json.dumps({"schema_version": 1, "objects": [obj]}))
+        script = Path(__file__).resolve().parents[1] / "scripts" / "generate_catalog_indexes.py"
+        command = [sys.executable, str(script), "--content-package", str(repo), "--baseline", "HEAD"]
+        subprocess.run(command, check=True, capture_output=True, text=True)
+        indexes = [content / "catalog.knowl.md", content / "catalog" / "lie-groups-index.knowl.md"]
+        for index in indexes:
+            self.assertNotIn("/catalog/lie-groups/table/", index.read_text())
+        obj["properties"]["lie_group"] = metadata
+        shard.write_text(json.dumps({"schema_version": 1, "objects": [obj]}))
+        subprocess.run(command, check=True, capture_output=True, text=True)
+        for index in indexes:
+            self.assertIn("/catalog/lie-groups/table/", index.read_text())
+        self.assertIn("| Object | Dimensions | Kind of entry |", indexes[1].read_text())
 
     def test_unknown_reference_diagnostics_identify_record(self) -> None:
         cases = [
@@ -445,6 +624,8 @@ class CatalogTests(unittest.TestCase):
         self.assertTrue((output / "indexes" / "catalog.sqlite").is_file())
         self.assertFalse((output / "catalog" / "finite-groups" / "table" / "index.html").exists())
         self.assertFalse((output / "assets" / "finite-groups.js").exists())
+        self.assertFalse((output / "catalog" / "lie-groups" / "table" / "index.html").exists())
+        self.assertFalse((output / "assets" / "lie-groups.js").exists())
         original = (output / "indexes" / "catalog.json").read_bytes()
         bad = fixture()
         bad["objects"][0]["knowl"] = "missing"
@@ -476,6 +657,40 @@ class CatalogTests(unittest.TestCase):
         self.assertEqual(compiler.write_site(package, output, profile=compiler.BUILD_PROFILES["production"]), 0)
         self.assertFalse(table.exists())
         self.assertFalse((output / "assets" / "finite-groups.js").exists())
+
+    def test_compiler_emits_lie_table_and_assets_only_while_metadata_is_present(self) -> None:
+        package = self.root / "lie-package"
+        shard_dir = package / "content" / "catalog" / "data"
+        shard_dir.mkdir(parents=True)
+        (package / "knowlpack.toml").write_text('id = "lie-test"\ntitle = "Lie test"\ncontent_dir = "content"\n')
+        for index, ident in enumerate(REGISTRY):
+            (package / "content" / f"{index}.knowl.md").write_text(
+                f'+++\nid = "{ident}"\ntitle = "Test {index}"\nkind = "definition"\nsummary = "Test."\n+++\nA definition.\n')
+        shard = shard_dir / "test.json"
+        data = lie_fixture()
+        shard.write_text(json.dumps(data))
+        output = self.root / "lie-site"
+        self.assertEqual(compiler.write_site(package, output, profile=compiler.BUILD_PROFILES["production"]), 0)
+        table = output / "catalog" / "lie-groups" / "table" / "index.html"
+        rendered = table.read_text()
+        self.assertIn("/indexes/catalog.json", rendered)
+        self.assertIn("/assets/lie-groups.js", rendered)
+        self.assertIn("/assets/lie-groups.css?v=" + compiler.runtime_asset_version(), rendered)
+        self.assertTrue((output / "assets" / "lie-groups.js").is_file())
+        self.assertTrue((output / "assets" / "lie-groups.css").is_file())
+        self.assertFalse((output / "catalog" / "finite-groups" / "table" / "index.html").exists())
+        if '/assets/katex.min.js' in rendered:
+            self.assertTrue((output / "assets" / "katex.min.js").is_file())
+        with patch.object(compiler, "find_katex_assets_dir", return_value=None):
+            self.assertEqual(compiler.write_site(package, output, profile=compiler.BUILD_PROFILES["production"]), 0)
+        self.assertNotIn("/assets/katex.min.js", table.read_text())
+        del data["objects"][-1]["properties"]["lie_group"]
+        shard.write_text(json.dumps(data))
+        self.assertEqual(compiler.write_site(package, output, profile=compiler.BUILD_PROFILES["production"]), 0)
+        self.assertFalse(table.exists())
+        self.assertFalse((output / "assets" / "lie-groups.js").exists())
+        self.assertFalse((output / "assets" / "lie-groups.css").exists())
+        self.assertTrue((output / "catalog" / "explorer" / "index.html").is_file())
 
 
 if __name__ == "__main__":

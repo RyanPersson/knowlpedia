@@ -33,6 +33,10 @@ OPERATIONS = frozenset({"hom", "end", "aut"})
 FINITE_GROUP_ROLES = frozenset({"simple-family", "sporadic", "tits", "family", "example"})
 FINITE_GROUP_SECTIONS = frozenset({"cyclic", "alternating", "classical", "exceptional", "sporadic", "familiar"})
 SPORADIC_CLUSTERS = frozenset({"mathieu", "leech", "monster", "pariah"})
+LIE_GROUP_SECTIONS = frozenset({"classical", "exceptional", "abelian", "nilpotent", "geometric", "product"})
+LIE_GROUP_FORMS = frozenset({"compact", "complex", "real", "mixed"})
+LIE_GROUP_SERIES = frozenset({"A", "B", "C", "D", "G2", "F4", "E6", "E7", "E8"})
+LIE_GROUP_CELL_FORMS = frozenset({"compact", "split", "complex"})
 
 
 class CatalogValidationError(ValueError):
@@ -195,6 +199,52 @@ def _finite_group(record: dict[str, Any], location: str) -> None:
             _require(product == expected, loc + ".order_factors", "factor product does not match order_decimal")
 
 
+def _lie_group(record: dict[str, Any], location: str) -> None:
+    """Validate display fields and cell coordinates without inferring mathematical facts."""
+    value = record["properties"]["lie_group"]
+    loc = location + ".properties.lie_group"
+    _require(isinstance(value, dict), loc, "expected a Lie-group metadata object")
+    _require(record["kind"] == "lie-group" and "real-lie-groups" in record["category_ids"], loc,
+             "Lie-group metadata requires kind lie-group and real-lie-groups membership")
+    required = "section form parameter_summary construction_summary global_form_summary"
+    _required(value, required, loc)
+    unknown = value.keys() - set(required.split()) - {"display_order", "classification_cells"}
+    _require(not unknown, loc, "unknown Lie-group fields: " + ", ".join(sorted(unknown)))
+    for key in required.split():
+        _text(value[key], loc + "." + key)
+    _require(value["section"] in LIE_GROUP_SECTIONS, loc + ".section", "unknown Lie-group section")
+    _require(value["form"] in LIE_GROUP_FORMS, loc + ".form", "unknown Lie-group form")
+    if "display_order" in value:
+        _require(type(value["display_order"]) is int and value["display_order"] >= 0,
+                 loc + ".display_order", "expected a nonnegative integer")
+    if "classification_cells" in value:
+        cells = value["classification_cells"]
+        cells_loc = loc + ".classification_cells"
+        _require(isinstance(cells, list) and bool(cells), cells_loc, "expected a nonempty array of classification cells")
+        required_cell = "series form notation dimension_tex dimension_field parameter_summary specialization global_form"
+        for index, cell in enumerate(cells):
+            cell_loc = f"{cells_loc}[{index}]"
+            _require(isinstance(cell, dict), cell_loc, "expected a classification cell object")
+            _required(cell, required_cell, cell_loc)
+            unknown = cell.keys() - set(required_cell.split())
+            _require(not unknown, cell_loc, "unknown classification-cell fields: " + ", ".join(sorted(unknown)))
+            for key in required_cell.split():
+                _text(cell[key], cell_loc + "." + key)
+            _require(cell["series"] in LIE_GROUP_SERIES, cell_loc + ".series", "unknown Dynkin series")
+            _require(cell["form"] in LIE_GROUP_CELL_FORMS, cell_loc + ".form", "unknown classification form")
+            expected_field = "complex" if cell["form"] == "complex" else "real"
+            _require(cell["dimension_field"] == expected_field, cell_loc + ".dimension_field",
+                     f"{cell['form']} column requires {expected_field} dimension")
+            _require(expected_field in record["dimensions"], cell_loc + ".dimension_field",
+                     f"owning object must declare a {expected_field} dimension")
+            if cell["form"] == "complex":
+                _require("complex-lie-groups" in record["category_ids"], cell_loc + ".form",
+                         "complex column requires complex-lie-groups membership on the owning object")
+            for key in ("notation", "dimension_tex"):
+                _require(not any(delimiter in cell[key] for delimiter in ("$", r"\(", r"\)", r"\[", r"\]")),
+                         cell_loc + "." + key, "write LaTeX without math delimiters")
+
+
 def _shape(record: dict[str, Any], collection: str, registry: Mapping[str, Any], location: str) -> None:
     if collection == "objects":
         _required(record, "name notation kind family parameters knowl dimensions category_ids constraints properties status references", location)
@@ -216,6 +266,8 @@ def _shape(record: dict[str, Any], collection: str, registry: Mapping[str, Any],
             _strings(record["related_ids"], location + ".related_ids", unique=True)
         if "finite_group" in record["properties"]:
             _finite_group(record, location)
+        if "lie_group" in record["properties"]:
+            _lie_group(record, location)
     elif collection == "categories":
         _required(record, "name knowl scalar object_axioms morphism_axioms unit_policy regularity", location)
         for key in ("name", "unit_policy", "regularity"):
@@ -307,8 +359,15 @@ def load_catalog(paths: Iterable[Path], registry: Mapping[str, Any]) -> dict[str
                 locations[collection, ident] = location
 
     objects, categories, views = (records[key] for key in ("objects", "categories", "views"))
+    lie_cells: dict[tuple[str, str], str] = {}
     for obj in objects.values():
         loc = locations["objects", obj["id"]]
+        for index, cell in enumerate(obj["properties"].get("lie_group", {}).get("classification_cells", [])):
+            cell_loc = f"{loc}.properties.lie_group.classification_cells[{index}]"
+            coordinate = cell["series"], cell["form"]
+            _require(coordinate not in lie_cells, cell_loc,
+                     f"duplicate Lie-group classification cell {coordinate!r}; first declared at {lie_cells.get(coordinate)}")
+            lie_cells[coordinate] = cell_loc
         for category_id in obj["category_ids"]:
             _require(category_id in categories, loc, f"unknown category {category_id!r}")
             ident = f'{obj["id"]}@{category_id}'

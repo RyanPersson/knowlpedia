@@ -184,6 +184,65 @@ catalogue, and retains the existing generated-file overwrite guard. The
 default new-knowl baseline remains `d1ad541e`, so the existing created-knowl
 list continues to cover the whole catalogue branch.
 
+## Lie-group table metadata
+
+Lie-group records may include `properties.lie_group`. This metadata is valid
+only on objects with `kind: "lie-group"` and explicit `real-lie-groups`
+membership, including complex Lie groups viewed as real Lie groups. When
+present, a full build adds `/catalog/lie-groups/table/` and its assets. The
+page reads `indexes/catalog.json`; its scripts contain no mathematical
+records. The navigation generator links the table from the main catalogue
+and the Lie-group index when their records include this metadata.
+
+The required fields are:
+
+| Field | Contract |
+| --- | --- |
+| `section` | `classical`, `exceptional`, `abelian`, `nilpotent`, `geometric`, or `product` |
+| `form` | `compact`, `complex`, `real`, or `mixed` |
+| `parameter_summary` | Nonempty parameter scope or fixed-object description |
+| `construction_summary` | Nonempty description of the construction |
+| `global_form_summary` | Nonempty statement identifying the chosen global group |
+
+Optional `display_order` is a nonnegative integer, with booleans rejected.
+It controls presentation only. The existing object `dimensions`,
+`properties.compact`, `properties.connected`, and category memberships
+remain the source for these facts; a display section or form does not imply
+them. Parameter-dependent and unknown values must remain explicit.
+
+Optional `classification_cells` is a nonempty array of selections of the
+owning object or family. Each cell requires these fields:
+
+| Field | Contract |
+| --- | --- |
+| `series` | `A`, `B`, `C`, `D`, `G2`, `F4`, `E6`, `E7`, or `E8` |
+| `form` | `compact`, `split`, or `complex` |
+| `notation` | Nonempty LaTeX for the selected group, without math delimiters |
+| `dimension_tex` | Nonempty LaTeX dimension formula, without math delimiters |
+| `dimension_field` | `real` for compact/split columns; `complex` for the complex column |
+| `parameter_summary` | Nonempty, exact rank range or fixed-group scope |
+| `specialization` | Nonempty explanation of substitution into the owner, or the whole fixed group |
+| `global_form` | Nonempty identification of the selected global group |
+
+No two cells across any objects or shards may occupy the same `(series,
+form)` position. A partial table is valid; the schema does not demand a
+fixed number of cells. Unknown metadata and cell fields are rejected.
+The owning object must declare the cell's real or complex dimension field;
+complex cells also require `complex-lie-groups` membership. A real Lie group
+defined using complex matrices is not thereby a complex Lie group.
+Validation checks structure and internal consistency, not mathematical
+truth or equivalence of symbolic formulas.
+
+The table shows chosen global groups with the indicated Lie-algebra type;
+it does not classify all Lie groups, all global forms, or all real forms.
+The classical rank conventions are A with rank at least 1, B at least 2,
+C at least 3, and D at least 4, avoiding repeated low-rank types. Authors
+must explain the overlaps and preserve the actual covering, quotient, and
+isomorphism relationship kinds. In particular, algebraic simple connectivity
+does not imply topological simple connectivity of a split matrix group.
+Cell details identify the selected slice and the complete owning family;
+the full catalogue includes each owning object once.
+
 ## Querying
 
 Normal builds export the catalogue automatically. Standalone commands from
