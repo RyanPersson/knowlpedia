@@ -5,6 +5,7 @@
   const pending = new Map();
   const preloadQueue = [];
   const observedKnowls = new WeakSet();
+  const splitOrigins = new WeakMap();
   const themeKey = "knowl-theme";
   const maxPreloads = 6;
   let activePreloads = 0;
@@ -29,37 +30,43 @@
     return depth;
   }
 
-  function findInsertionPoint(trigger) {
-    const boundary = trigger.closest(".knowl-panel");
+  function insertInlinePanel(trigger, panel) {
     let current = trigger;
-    let paragraph = null;
-    while (current && current.parentElement) {
+    let continuation = null;
+    while (current.parentElement) {
       const parent = current.parentElement;
-      if (boundary && !boundary.contains(parent)) break;
-      // A compact core can put a display equation between two paragraphs.
-      // Keep that whole unit together; optional sections still fall back to
-      // the paragraph boundary below.
-      if (parent.classList.contains("core-section") && parent.dataset.compactCore === "true") {
-        return { element: parent, append: true };
-      }
-      if (parent.classList.contains("knowl-body") && parent.dataset.compactCore === "true") {
-        return { element: parent, append: true };
-      }
-      if (parent.tagName === "P") {
-        paragraph = parent;
-        current = parent;
-        continue;
-      }
-      if (["LI", "TD", "TH"].includes(parent.tagName)) {
-        return { element: paragraph || parent, append: !paragraph };
-      }
-      const display = window.getComputedStyle(parent).display;
-      if (display === "block" || display === "flex") {
-        return { element: paragraph || parent, append: false };
+      const paragraph = parent.matches("p, h1, h2, h3, h4, h5, h6");
+      const inline = ["inline", "inline-block", "contents"].includes(window.getComputedStyle(parent).display);
+      if (!paragraph && !inline) break;
+
+      // Move the remaining nodes, cloning only the wrappers that cross the
+      // break. Links, math, and their listeners retain their original nodes.
+      const tail = parent.cloneNode(false);
+      tail.removeAttribute("id");
+      if (continuation) tail.appendChild(continuation);
+      while (current.nextSibling) tail.appendChild(current.nextSibling);
+      continuation = tail.hasChildNodes() ? tail : null;
+      if (continuation) {
+        const origin = splitOrigins.get(parent) || parent;
+        splitOrigins.set(parent, origin);
+        splitOrigins.set(tail, origin);
       }
       current = parent;
+      // Paragraphs must contain phrasing content, so the panel is a sibling.
+      // List items, cells, and other flow containers instead keep it inside.
+      if (paragraph) break;
     }
-    return { element: current || trigger, append: true };
+    current.after(panel);
+    if (continuation) panel.after(continuation);
+  }
+
+  function rejoinSplit(left, right) {
+    if (!left || !right || !splitOrigins.has(left) || splitOrigins.get(left) !== splitOrigins.get(right)) return;
+    // Match shared origins rather than saved siblings: other knowls in this
+    // same sentence may have opened or closed in any order since the split.
+    rejoinSplit(left.lastChild, right.firstChild);
+    while (right.firstChild) left.appendChild(right.firstChild);
+    right.remove();
   }
 
   function insertPanel(trigger, panel) {
@@ -106,9 +113,7 @@
         return;
       }
     }
-    const insertion = findInsertionPoint(trigger);
-    if (insertion.append) insertion.element.appendChild(panel);
-    else insertion.element.parentNode.insertBefore(panel, insertion.element.nextSibling);
+    insertInlinePanel(trigger, panel);
   }
 
   function closePanel(panel, restoreFocus) {
@@ -122,7 +127,12 @@
       if (child._knowlTableObserver) child._knowlTableObserver.disconnect();
     });
     if (panel._knowlTableRow) panel._knowlTableRow.remove();
-    else panel.remove();
+    else {
+      const before = panel.previousSibling;
+      const after = panel.nextSibling;
+      panel.remove();
+      rejoinSplit(before, after);
+    }
     if (restoreFocus && trigger) trigger.focus({ preventScroll: true });
   }
 
@@ -281,6 +291,7 @@
     panel.setAttribute("aria-label", "Loading definition");
     trigger.setAttribute("aria-expanded", "true");
     trigger.setAttribute("aria-controls", panel.id);
+    panel._knowlTrigger = trigger;
     insertPanel(trigger, panel);
 
     try {
@@ -290,7 +301,7 @@
         panel.innerHTML = '<div class="loading" role="status">Loading definition…</div>';
         panel.innerHTML = await fetchFragment(trigger.dataset.knowl);
       }
-      afterPanelRender(panel, trigger, event.isTrusted && event.detail === 0);
+      if (panel.isConnected) afterPanelRender(panel, trigger, event.isTrusted && event.detail === 0);
     } catch (error) {
       panel.innerHTML = '<div class="error">This definition could not be loaded. <a href="' + trigger.href + '">Open its full page</a>.</div>';
     }

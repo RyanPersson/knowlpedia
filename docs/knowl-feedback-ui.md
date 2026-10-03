@@ -1,10 +1,45 @@
 # Knowl feedback preview
 
+## Current main-checkout preview
+
+Use [the Tailscale HTTPS preview](https://optiplex.taildb538a.ts.net:8443/)
+for the current `knowlpedia` checkout, including
+[ergodic theory](https://optiplex.taildb538a.ts.net:8443/ergodic-theory/) and
+[smooth vectors](https://optiplex.taildb538a.ts.net:8443/lie-groups/smooth-unitary-representations-index/).
+HTTPS DNS links are the default, superseding the earlier numeric-IP preference.
+Tailscale Serve terminates HTTPS on port 8443 and proxies the persistent
+`devserver-knowlpedia-astra-benchmark.service` on backend port 8015.
+That service now runs the feedback server against this checkout's
+`public-imported` directory, with its existing access key and feedback state.
+
+From the main `knowlpedia` checkout:
+
+```bash
+devserver status knowlpedia-astra-benchmark
+devserver restart knowlpedia-astra-benchmark -- .venv/bin/python scripts/knowl_feedback_server.py --host 0.0.0.0 --port 8015 --directory public-imported --token-file .preview-server/codex-access-token
+tailscale serve status
+```
+
+Rebuild with `make build-content`. Reuse the existing HTTPS route and verify
+the exact page before sharing it. Browser access-key storage is per origin,
+so enter the existing key once if this HTTPS origin has not stored it yet.
+The HTTPS endpoint without `:8443` still serves the separate `ab-tests`
+checkout through port 8012. Its historical setup is recorded below.
+
+Validation on September 16, 2026: both reading paths return HTTP 200 over
+HTTPS with normal certificate verification. The feedback browser check passes
+at 320, 390, and 1440px, including authenticated ledger access and isolation
+of delayed replies. Unauthenticated API access returns 401. All 11 feedback
+server unit tests pass. Browser message submissions are intercepted; these
+checks do not send a model request.
+
+## Earlier feedback integration
+
 The recovered feedback UI is integrated on `knowl-feedback-ui`, based on develop at e516a40, in `ab-tests/knowlpedia`. Its sibling content repository remains on the merged develop revision 959d9768. The original checkout's uncommitted files and its September 4 stashes were left intact.
 
 ## Live service
 
-[Open Knowlpedia with feedback](http://100.69.17.72:8012/). Use **Ask Codex** on a full page or an expanded knowl. Ask uses a read-only turn. Flag issue records and investigates a concern in the knowl’s `[[issues]]` metadata; Request change can apply corrections. Both use a workspace-write turn, with Flag constrained by its instructions to issue metadata. The current knowl ID, title, selected text and reviewer message are sent to the local bridge.
+[Open the separate feedback checkout](https://optiplex.taildb538a.ts.net/). Use **Ask Codex** on a full page or an expanded knowl. Ask uses a read-only turn. Flag issue records and investigates a concern in the knowl’s `[[issues]]` metadata; Request change can apply corrections. Both use a workspace-write turn, with Flag constrained by its instructions to issue metadata. The current knowl ID, title, selected text and reviewer message are sent to the local bridge.
 
 The persistent service is `devserver-knowlpedia-feedback.service`, serving `ab-tests/knowlpedia/public-imported`. The existing rendered content and review pages were retained; the compiler's runtime-asset copier refreshed the feedback JavaScript and CSS. No content rebuild or mathematical edits were needed.
 

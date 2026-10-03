@@ -1,0 +1,1103 @@
+{
+  "version": 1,
+  "date": "2026-09-15",
+  "baseline": {
+    "content_commit": "2ac94f6d",
+    "app_commit": "3970b79",
+    "branch": "ergodic"
+  },
+  "scope": "Both complete pasted messages. This inventory does not claim access to other messages or to missing tails from earlier conversation exports.",
+  "sources": [
+    {
+      "title": "Number-field translations",
+      "input_sha256": "2090b33488dcbca6be4647b4b085e390443f54a09ae31f248561b36643121a0d",
+      "input_characters": 14684,
+      "coverage": [
+        {
+          "topic": "All Archimedean embeddings, real dimension, integral basis and lattice quotient",
+          "baseline": "covered",
+          "existing_coverage": [
+            "algebra-fields-galois/number-field",
+            "algebra-fields-galois/ring-of-integers",
+            "algebra-fields-galois/integral-basis",
+            "algebra-fields-galois/archimedean-algebra",
+            "algebra-fields-galois/minkowski-embedding",
+            "ergodic-theory/number-field-torus"
+          ],
+          "batch_additions": [],
+          "note": ""
+        },
+        {
+          "topic": "K/O_K is the torsion subgroup; increments from K^d are periodic",
+          "baseline": "covered",
+          "existing_coverage": [
+            "ergodic-theory/number-field-torus",
+            "algebra-modules/torsion-element"
+          ],
+          "batch_additions": [],
+          "note": ""
+        },
+        {
+          "topic": "Haar probability, translation, inverse pullback, and scalar fixed algebra",
+          "baseline": "covered",
+          "existing_coverage": [
+            "harmonic-analysis/haar-measure",
+            "ergodic-theory/compact-abelian-rotation",
+            "ergodic-theory/classical-operator-algebra-dictionary",
+            "operator-algebras/fixed-point-algebra",
+            "ergodic-theory/fixed-function-ergodicity-criterion"
+          ],
+          "batch_additions": [],
+          "note": ""
+        },
+        {
+          "topic": "Archimedean trace, codifferent, dual basis, all characters, and Fourier completeness",
+          "baseline": "covered",
+          "existing_coverage": [
+            "algebra-fields-galois/archimedean-trace-pairing",
+            "algebra-fields-galois/codifferent",
+            "harmonic-analysis/number-field-torus-characters",
+            "harmonic-analysis/pontryagin-dual",
+            "harmonic-analysis/characters-compact-abelian-fourier-basis"
+          ],
+          "batch_additions": [],
+          "note": ""
+        },
+        {
+          "topic": "Single-translation trace criterion and equivalent integral-coefficient test",
+          "baseline": "covered",
+          "existing_coverage": [
+            "ergodic-theory/number-field-translation-ergodicity"
+          ],
+          "batch_additions": [],
+          "note": ""
+        },
+        {
+          "topic": "Gaussian-integer examples and the failure of the proposed single-translation test",
+          "baseline": "covered",
+          "existing_coverage": [
+            "ergodic-theory/gaussian-integer-translations"
+          ],
+          "batch_additions": [],
+          "note": ""
+        },
+        {
+          "topic": "Joint additive O_K-action, codifferent proof, K-linear independence, and the Q special case",
+          "baseline": "covered",
+          "existing_coverage": [
+            "ergodic-theory/ring-of-integers-translation-action",
+            "ergodic-theory/gaussian-integer-translations"
+          ],
+          "batch_additions": [],
+          "note": ""
+        }
+      ]
+    },
+    {
+      "title": "Smooth vectors of a unitary representation",
+      "input_sha256": "2e269a994fc4549f6a6187ab117b8b71ac4f9672daff677c33fd8ed9e53992fa",
+      "input_characters": 16318,
+      "coverage": [
+        {
+          "topic": "Noncompactness does not force infinite-dimensional irreducibles",
+          "baseline": "partly_covered",
+          "existing_coverage": [
+            "lie-groups/irreducible-unitary-representation",
+            "lie-groups/type-i-locally-compact-group"
+          ],
+          "batch_additions": [
+            "lie-groups/noncompact-finite-dimensional-unitary-example"
+          ],
+          "note": "The trivial example existed; the nontrivial R × SU(2) example is new."
+        },
+        {
+          "topic": "Strong continuity, closed-subspace irreducibility, and weak–strong equivalence",
+          "baseline": "covered",
+          "existing_coverage": [
+            "lie-groups/strongly-continuous-unitary-representation",
+            "lie-groups/irreducible-unitary-representation",
+            "lie-groups/weak-strong-continuity-equivalence-unitary-representations"
+          ],
+          "batch_additions": [],
+          "note": ""
+        },
+        {
+          "topic": "Smooth orbit maps, density, and finite versus infinite differentiability",
+          "baseline": "partly_covered",
+          "existing_coverage": [
+            "lie-groups/smooth-vector-unitary-representation",
+            "lie-groups/garding-density-theorem"
+          ],
+          "batch_additions": [
+            "lie-groups/ck-vector-unitary-representation"
+          ],
+          "note": "Removed differentiable vector as an alias for smooth vector and linked the finite-order definition."
+        },
+        {
+          "topic": "Operator-norm Banach–Lie group versus vectorwise smoothness",
+          "baseline": "missing",
+          "existing_coverage": [],
+          "batch_additions": [
+            "differential-geometry/banach-manifold",
+            "lie-groups/banach-lie-group",
+            "lie-groups/norm-unitary-group"
+          ],
+          "note": ""
+        },
+        {
+          "topic": "Derived action, common invariant smooth domain, and commutator identity",
+          "baseline": "covered",
+          "existing_coverage": [
+            "lie-groups/derived-representation-on-smooth-vectors",
+            "lie-groups/universal-enveloping-algebra-action-on-smooth-vectors"
+          ],
+          "batch_additions": [],
+          "note": "Explicit real-linearity in X and complex-linearity on vectors added to the existing definition."
+        },
+        {
+          "topic": "Smooth vectors as all finite iterated maximal-generator domains",
+          "baseline": "missing",
+          "existing_coverage": [
+            "lie-groups/infinitesimal-generator-unitary-representation",
+            "lie-groups/nelson-laplacian"
+          ],
+          "batch_additions": [
+            "lie-groups/smooth-vectors-iterated-generator-domains"
+          ],
+          "note": "Generators and the Laplacian formulation existed; the ordered-product characterization is now explicit."
+        },
+        {
+          "topic": "Fréchet topology, basis-independent norms, completeness, and derivative estimates",
+          "baseline": "partly_covered",
+          "existing_coverage": [
+            "lie-groups/distribution-vectors-of-a-representation",
+            "functional-analysis/frechet-space"
+          ],
+          "batch_additions": [
+            "lie-groups/smooth-vector-frechet-topology"
+          ],
+          "note": "Existing seminorm discussion extracted to its own canonical entry and supplemented with the explicit p_k formula and estimate."
+        },
+        {
+          "topic": "Stone generators, essential skew-adjointness, graph closure, and cores",
+          "baseline": "covered",
+          "existing_coverage": [
+            "lie-groups/stone-theorem-one-parameter-unitary-groups",
+            "lie-groups/infinitesimal-generator-unitary-representation",
+            "lie-groups/essentially-skew-adjoint-derived-operators",
+            "functional-analysis/core-of-closed-operator"
+          ],
+          "batch_additions": [],
+          "note": ""
+        },
+        {
+          "topic": "Gårding averaging, approximate identities, and absence of irreducibility/type I assumptions",
+          "baseline": "covered",
+          "existing_coverage": [
+            "harmonic-analysis/integrated-form-unitary-representation",
+            "lie-groups/garding-subspace",
+            "lie-groups/garding-density-theorem"
+          ],
+          "batch_additions": [],
+          "note": "Existing proof retained; independence from irreducibility and type I made explicit."
+        },
+        {
+          "topic": "Continuous anti-dual, Hilbert embedding, and extended group/Lie-algebra actions",
+          "baseline": "partly_covered",
+          "existing_coverage": [
+            "lie-groups/distribution-vectors-of-a-representation",
+            "functional-analysis/strong-dual",
+            "functional-analysis/rigged-hilbert-space"
+          ],
+          "batch_additions": [
+            "functional-analysis/continuous-antidual"
+          ],
+          "note": "The extension formulas existed. Added a reusable anti-dual definition and explicit linear Hilbert embedding using the repository inner-product convention."
+        },
+        {
+          "topic": "Nuclearity iff trace class; type I is insufficient",
+          "baseline": "missing",
+          "existing_coverage": [
+            "functional-analysis/nuclear-space",
+            "functional-analysis/trace-class-operator",
+            "lie-groups/type-i-locally-compact-group"
+          ],
+          "batch_additions": [
+            "lie-groups/trace-class-representation",
+            "lie-groups/nuclear-smooth-vectors-trace-class"
+          ],
+          "note": ""
+        },
+        {
+          "topic": "Heisenberg group and Schrödinger action in the pasted coordinate convention",
+          "baseline": "partly_covered",
+          "existing_coverage": [
+            "lie-groups/heisenberg-group",
+            "mathematical-physics/schrodinger-representation"
+          ],
+          "batch_additions": [
+            "lie-groups/heisenberg-derived-representation"
+          ],
+          "note": "Existing symmetric/Weyl conventions retained; added c=z+ab/2 conversion and the infinitesimal operators."
+        },
+        {
+          "topic": "Heisenberg smooth vectors are Schwartz space with its usual topology",
+          "baseline": "missing",
+          "existing_coverage": [
+            "functional-analysis/schwartz-space"
+          ],
+          "batch_additions": [
+            "lie-groups/schrodinger-smooth-vectors"
+          ],
+          "note": ""
+        },
+        {
+          "topic": "Modulation is strongly continuous but norm distance two from identity",
+          "baseline": "missing",
+          "existing_coverage": [
+            "lie-groups/strongly-continuous-unitary-representation"
+          ],
+          "batch_additions": [
+            "lie-groups/modulation-unitary-group"
+          ],
+          "note": ""
+        },
+        {
+          "topic": "Pointwise smooth square-integrable function that is not a smooth vector",
+          "baseline": "missing",
+          "existing_coverage": [
+            "functional-analysis/schwartz-space"
+          ],
+          "batch_additions": [
+            "lie-groups/schrodinger-smooth-vectors"
+          ],
+          "note": "Added (1+x²)^(-1/2) and the failure of the modulation-generator domain condition."
+        },
+        {
+          "topic": "Tempered-distribution rigging and anti-linear point evaluation",
+          "baseline": "partly_covered",
+          "existing_coverage": [
+            "functional-analysis/rigged-hilbert-space",
+            "functional-analysis/tempered-distribution",
+            "functional-analysis/dirac-delta-distribution",
+            "lie-groups/distribution-vectors-of-a-representation"
+          ],
+          "batch_additions": [
+            "lie-groups/schrodinger-smooth-vectors"
+          ],
+          "note": "Made the anti-linear convention consistent and added the point-evaluation distribution-vector example."
+        },
+        {
+          "topic": "Unitary irreducibility need not imply algebraic irreducibility on smooth vectors",
+          "baseline": "missing",
+          "existing_coverage": [
+            "lie-groups/irreducible-unitary-representation",
+            "lie-groups/irreducible-representation-lie-algebra"
+          ],
+          "batch_additions": [
+            "lie-groups/heisenberg-derived-representation"
+          ],
+          "note": "Extended existing algebraic irreducibility/subrepresentation definitions to arbitrary-dimensional modules; kept finite-dimensional hypotheses for Weyl’s theorem."
+        },
+        {
+          "topic": "Derived inverse pullback is minus the Lie derivative",
+          "baseline": "missing",
+          "existing_coverage": [
+            "lie-groups/smooth-action-lie-group",
+            "fiber-bundles/lie-derivative",
+            "ergodic-theory/koopman-generator"
+          ],
+          "batch_additions": [
+            "lie-groups/fundamental-vector-field-left-action",
+            "lie-groups/derived-pullback-representation"
+          ],
+          "note": ""
+        }
+      ]
+    }
+  ],
+  "new_entries": [
+    {
+      "id": "differential-geometry/banach-manifold",
+      "title": "Smooth Banach manifold",
+      "kind": "definition",
+      "sha256": "7c566c3ee6de5ed9297331062047a4d5b76f0fad4eaf09e792f31add8d670a50"
+    },
+    {
+      "id": "lie-groups/banach-lie-group",
+      "title": "Banach–Lie group",
+      "kind": "definition",
+      "sha256": "bdcec310f543ce481fe2ccd5e574fe387cbae0ad74beec21e14bed5ea594c433"
+    },
+    {
+      "id": "lie-groups/norm-unitary-group",
+      "title": "Unitary group with operator-norm topology",
+      "kind": "construction",
+      "sha256": "b97eb7cb13181ddf6872ace9afb5e35fb1245891f7c5a63fb7e0db5df4d00052"
+    },
+    {
+      "id": "lie-groups/ck-vector-unitary-representation",
+      "title": "Differentiable vector of order k",
+      "kind": "definition",
+      "sha256": "1545bf8a18f28c64264c586bce564abeb6a0799ec607b0d574cd302ad30a6fcf"
+    },
+    {
+      "id": "lie-groups/smooth-vector-frechet-topology",
+      "title": "Fréchet topology on smooth vectors",
+      "kind": "definition",
+      "sha256": "7e97461596f7a269469ba4dff50fa4b9a3731be805b1aa9982b34ce35f28fbf1"
+    },
+    {
+      "id": "lie-groups/smooth-vectors-iterated-generator-domains",
+      "title": "Smooth vectors as iterated generator domains",
+      "kind": "theorem",
+      "sha256": "c7c5bf9d4111f41b3d9b96b1b9d137e4792c187bf93ecfb4e67e7bde7f777f0a"
+    },
+    {
+      "id": "functional-analysis/continuous-antidual",
+      "title": "Continuous anti-dual",
+      "kind": "definition",
+      "sha256": "dc6749ef8d38ede5a9f7b0b76874c7bb2da5e9d14dfcfe8b92ec3ce56f3ff2eb"
+    },
+    {
+      "id": "lie-groups/trace-class-representation",
+      "title": "Trace-class unitary representation",
+      "kind": "definition",
+      "sha256": "ad2c25970d698d5282680ebb5898b30d3e3cdffa1574a4eef2bf8a656beb3d23"
+    },
+    {
+      "id": "lie-groups/nuclear-smooth-vectors-trace-class",
+      "title": "Nuclear smooth vectors and trace-class representations",
+      "kind": "theorem",
+      "sha256": "c2a8193aed7bb1a7d63b8069dc1c8e495ee62671334e03e259e466c0343e2a31"
+    },
+    {
+      "id": "lie-groups/noncompact-finite-dimensional-unitary-example",
+      "title": "A finite-dimensional irreducible representation of a noncompact group",
+      "kind": "example",
+      "sha256": "f8034287805541e7f16a8e48fd7d9d0a0281c8a3c77c781da2f8099023ee9304"
+    },
+    {
+      "id": "lie-groups/modulation-unitary-group",
+      "title": "Modulation as a strongly continuous unitary group",
+      "kind": "example",
+      "sha256": "b4f3becbc1322709f727ff21a18f76b3e86d5faf475e0883d776d6037f131218"
+    },
+    {
+      "id": "lie-groups/schrodinger-smooth-vectors",
+      "title": "Smooth vectors of the Schrödinger representation",
+      "kind": "theorem",
+      "sha256": "f0d2122541f6e50fef0f2a1c0c68291e67a18d4f1c812f47afed0061cbc005e8"
+    },
+    {
+      "id": "lie-groups/heisenberg-derived-representation",
+      "title": "Derived Heisenberg representation on Schwartz space",
+      "kind": "example",
+      "sha256": "91ddfb41fad061b5018cf6cca7d077ea30eec6eb7b1a13d38766c9754c2747e3"
+    },
+    {
+      "id": "lie-groups/fundamental-vector-field-left-action",
+      "title": "Fundamental vector field of a left action",
+      "kind": "definition",
+      "sha256": "1feba1941d09623ab6ae3e71c630ec7594eb7a0601d16bd6b77ab5f36830fd31"
+    },
+    {
+      "id": "lie-groups/derived-pullback-representation",
+      "title": "Derived inverse-pullback representation",
+      "kind": "theorem",
+      "sha256": "1fa47acbf7be4b83107fee1d2b48b29fc67b2c686fdbfb700a65c5eca97200a4"
+    },
+    {
+      "id": "lie-groups/smooth-unitary-representations-index",
+      "title": "Smooth and distribution vectors: a reading path",
+      "kind": "index",
+      "sha256": "c902623ea4103aafbb00277b2bff13a983ecf05c962f59a8fd6cffee9dfd304e"
+    }
+  ],
+  "changed_sources": [
+    {
+      "id": "differential-geometry",
+      "path": "content/differential-geometry.knowl.md",
+      "sha256": "11ba9901f619afef12de3ec2603f93f42dacf43fa22ccc4484e37976f51513c0",
+      "status": "updated"
+    },
+    {
+      "id": "differential-geometry/banach-manifold",
+      "path": "content/differential-geometry/banach-manifold.knowl.md",
+      "sha256": "7c566c3ee6de5ed9297331062047a4d5b76f0fad4eaf09e792f31add8d670a50",
+      "status": "new"
+    },
+    {
+      "id": "ergodic-theory",
+      "path": "content/ergodic-theory.knowl.md",
+      "sha256": "fad152976a5509b3a61244d691f1c4e307a2ee9088d3b5bcc8409128aca9dbb2",
+      "status": "updated"
+    },
+    {
+      "id": "ergodic-theory/koopman-generator",
+      "path": "content/ergodic-theory/koopman-generator.knowl.md",
+      "sha256": "e5fe8184f4f90d526e9e778f43f174467ab6caf7e8604e8645fa3bafd605919f",
+      "status": "updated"
+    },
+    {
+      "id": "ergodic-theory/koopman-spectrum-index",
+      "path": "content/ergodic-theory/koopman-spectrum-index.knowl.md",
+      "sha256": "4fbd956c573ce2257f97b652f0459cfe143134afb0aca4cb75779765eb2bba95",
+      "status": "updated"
+    },
+    {
+      "id": "functional-analysis",
+      "path": "content/functional-analysis.knowl.md",
+      "sha256": "3758d7f1d30a9e29ff62f88546297a6483fb356b9a7c0e2fcfff434f203cc13a",
+      "status": "updated"
+    },
+    {
+      "id": "functional-analysis/continuous-antidual",
+      "path": "content/functional-analysis/continuous-antidual.knowl.md",
+      "sha256": "dc6749ef8d38ede5a9f7b0b76874c7bb2da5e9d14dfcfe8b92ec3ce56f3ff2eb",
+      "status": "new"
+    },
+    {
+      "id": "functional-analysis/rigged-hilbert-space",
+      "path": "content/functional-analysis/rigged-hilbert-space.knowl.md",
+      "sha256": "d99cb070b1e90adadc8c609e580fc62571be1f8291887292e8e2ebd3cc2f4dfb",
+      "status": "updated"
+    },
+    {
+      "id": "harmonic-analysis",
+      "path": "content/harmonic-analysis.knowl.md",
+      "sha256": "6ba7bee30bd42cf002af7ada181797c4c638e2c2fce63751bb260b6a189f6e4d",
+      "status": "updated"
+    },
+    {
+      "id": "lie-groups",
+      "path": "content/lie-groups.knowl.md",
+      "sha256": "3e64d023023df752644eceec273f7a5ecbbed8fb07b4b8a2ab8646e99c3a5d9a",
+      "status": "updated"
+    },
+    {
+      "id": "lie-groups/banach-lie-group",
+      "path": "content/lie-groups/banach-lie-group.knowl.md",
+      "sha256": "bdcec310f543ce481fe2ccd5e574fe387cbae0ad74beec21e14bed5ea594c433",
+      "status": "new"
+    },
+    {
+      "id": "lie-groups/ck-vector-unitary-representation",
+      "path": "content/lie-groups/ck-vector-unitary-representation.knowl.md",
+      "sha256": "1545bf8a18f28c64264c586bce564abeb6a0799ec607b0d574cd302ad30a6fcf",
+      "status": "new"
+    },
+    {
+      "id": "lie-groups/derived-pullback-representation",
+      "path": "content/lie-groups/derived-pullback-representation.knowl.md",
+      "sha256": "1fa47acbf7be4b83107fee1d2b48b29fc67b2c686fdbfb700a65c5eca97200a4",
+      "status": "new"
+    },
+    {
+      "id": "lie-groups/derived-representation-on-smooth-vectors",
+      "path": "content/lie-groups/derived-representation-on-smooth-vectors.knowl.md",
+      "sha256": "e5c17952ba4f0d1f27234b60727d6a758e51c1d785db4271c35dac934a7212b0",
+      "status": "updated"
+    },
+    {
+      "id": "lie-groups/distribution-vectors-of-a-representation",
+      "path": "content/lie-groups/distribution-vectors-of-a-representation.knowl.md",
+      "sha256": "17eac58dda4ed5bc6ed09f472407941a6fd33b0e550c54fca5eb5472ed81041a",
+      "status": "updated"
+    },
+    {
+      "id": "lie-groups/fundamental-vector-field-left-action",
+      "path": "content/lie-groups/fundamental-vector-field-left-action.knowl.md",
+      "sha256": "1feba1941d09623ab6ae3e71c630ec7594eb7a0601d16bd6b77ab5f36830fd31",
+      "status": "new"
+    },
+    {
+      "id": "lie-groups/garding-density-theorem",
+      "path": "content/lie-groups/garding-density-theorem.knowl.md",
+      "sha256": "3a3c2ba3dab84b802a964007db97a5b668e94476c2e49f135c2c41ecfd539b14",
+      "status": "updated"
+    },
+    {
+      "id": "lie-groups/heisenberg-derived-representation",
+      "path": "content/lie-groups/heisenberg-derived-representation.knowl.md",
+      "sha256": "91ddfb41fad061b5018cf6cca7d077ea30eec6eb7b1a13d38766c9754c2747e3",
+      "status": "new"
+    },
+    {
+      "id": "lie-groups/irreducible-representation-lie-algebra",
+      "path": "content/lie-groups/irreducible-representation-lie-algebra.knowl.md",
+      "sha256": "7471098948c84003ffe4f98f310c9fde3e50307964f47384e1ce6cfa0655f668",
+      "status": "updated"
+    },
+    {
+      "id": "lie-groups/irreducible-unitary-representation",
+      "path": "content/lie-groups/irreducible-unitary-representation.knowl.md",
+      "sha256": "63256ac69b880b4acdf0bee682ef2cdabe1200078cd5cf76ac35b0736ea45b62",
+      "status": "updated"
+    },
+    {
+      "id": "lie-groups/modulation-unitary-group",
+      "path": "content/lie-groups/modulation-unitary-group.knowl.md",
+      "sha256": "b4f3becbc1322709f727ff21a18f76b3e86d5faf475e0883d776d6037f131218",
+      "status": "new"
+    },
+    {
+      "id": "lie-groups/noncompact-finite-dimensional-unitary-example",
+      "path": "content/lie-groups/noncompact-finite-dimensional-unitary-example.knowl.md",
+      "sha256": "f8034287805541e7f16a8e48fd7d9d0a0281c8a3c77c781da2f8099023ee9304",
+      "status": "new"
+    },
+    {
+      "id": "lie-groups/norm-unitary-group",
+      "path": "content/lie-groups/norm-unitary-group.knowl.md",
+      "sha256": "b97eb7cb13181ddf6872ace9afb5e35fb1245891f7c5a63fb7e0db5df4d00052",
+      "status": "new"
+    },
+    {
+      "id": "lie-groups/nuclear-smooth-vectors-trace-class",
+      "path": "content/lie-groups/nuclear-smooth-vectors-trace-class.knowl.md",
+      "sha256": "c2a8193aed7bb1a7d63b8069dc1c8e495ee62671334e03e259e466c0343e2a31",
+      "status": "new"
+    },
+    {
+      "id": "lie-groups/schrodinger-smooth-vectors",
+      "path": "content/lie-groups/schrodinger-smooth-vectors.knowl.md",
+      "sha256": "f0d2122541f6e50fef0f2a1c0c68291e67a18d4f1c812f47afed0061cbc005e8",
+      "status": "new"
+    },
+    {
+      "id": "lie-groups/smooth-unitary-representations-index",
+      "path": "content/lie-groups/smooth-unitary-representations-index.knowl.md",
+      "sha256": "c902623ea4103aafbb00277b2bff13a983ecf05c962f59a8fd6cffee9dfd304e",
+      "status": "new"
+    },
+    {
+      "id": "lie-groups/smooth-vector-frechet-topology",
+      "path": "content/lie-groups/smooth-vector-frechet-topology.knowl.md",
+      "sha256": "7e97461596f7a269469ba4dff50fa4b9a3731be805b1aa9982b34ce35f28fbf1",
+      "status": "new"
+    },
+    {
+      "id": "lie-groups/smooth-vector-unitary-representation",
+      "path": "content/lie-groups/smooth-vector-unitary-representation.knowl.md",
+      "sha256": "a2ddb3af15f5e08614051889fb665286e130bd21815c959a2a05b30baeff1923",
+      "status": "updated"
+    },
+    {
+      "id": "lie-groups/smooth-vectors-iterated-generator-domains",
+      "path": "content/lie-groups/smooth-vectors-iterated-generator-domains.knowl.md",
+      "sha256": "c7c5bf9d4111f41b3d9b96b1b9d137e4792c187bf93ecfb4e67e7bde7f777f0a",
+      "status": "new"
+    },
+    {
+      "id": "lie-groups/strongly-continuous-unitary-representation",
+      "path": "content/lie-groups/strongly-continuous-unitary-representation.knowl.md",
+      "sha256": "7a023d237e46066d9ebf29b391149e059ee26d4ff0bbc2181468e4a341347bd6",
+      "status": "updated"
+    },
+    {
+      "id": "lie-groups/subrepresentation-lie-algebra",
+      "path": "content/lie-groups/subrepresentation-lie-algebra.knowl.md",
+      "sha256": "060b95d8f77c950bf79a65e3ac4fd653cfe3a150277084af3b79fc2f74f6e054",
+      "status": "updated"
+    },
+    {
+      "id": "lie-groups/trace-class-representation",
+      "path": "content/lie-groups/trace-class-representation.knowl.md",
+      "sha256": "ad2c25970d698d5282680ebb5898b30d3e3cdffa1574a4eef2bf8a656beb3d23",
+      "status": "new"
+    },
+    {
+      "id": "mathematical-physics",
+      "path": "content/mathematical-physics.knowl.md",
+      "sha256": "3dc5374cfbf6f8d4cabf371b1af6b0d2162891eda8e0095c24679f5e672680d2",
+      "status": "updated"
+    },
+    {
+      "id": "mathematical-physics/schrodinger-representation",
+      "path": "content/mathematical-physics/schrodinger-representation.knowl.md",
+      "sha256": "f2d87475fabdad8701b46e330c093b9d9e4dcf717c86fc50b2755621441f9e8b",
+      "status": "updated"
+    }
+  ],
+  "reused_prerequisites": [
+    "algebra-groups/abelian-group",
+    "algebra-groups/group",
+    "algebra-groups/group-homomorphism",
+    "algebra-groups/monoid",
+    "algebra-groups/semigroup",
+    "algebra-groups/subgroup",
+    "algebra-modules/algebra-over-ring",
+    "algebra-modules/bilinear-map",
+    "algebra-modules/module",
+    "algebra-modules/module-axioms",
+    "algebra-modules/module-homomorphism",
+    "algebra-modules/tensor-algebra",
+    "algebra-modules/tensor-product",
+    "algebra-modules/tensor-product-universal-property",
+    "algebra-rings/commutative-ring",
+    "algebra-rings/field",
+    "algebra-rings/ideal",
+    "algebra-rings/ring",
+    "algebra-rings/ring-axioms",
+    "algebra-rings/ring-homomorphism",
+    "algebra-rings/two-sided-ideal",
+    "algebra-rings/unit",
+    "algebra-rings/unital-ring",
+    "convex-analysis/balanced-and-absorbing-sets",
+    "convex-analysis/basis-hamel-basis-and-dimension",
+    "convex-analysis/bounded-linear-functional-norm-of-a-functional",
+    "convex-analysis/complete-metric-space-complete-subset",
+    "convex-analysis/convergence-of-a-sequence",
+    "convex-analysis/convex-set",
+    "convex-analysis/dual-space-and-duality-pairing",
+    "convex-analysis/extended-real-number-system-and-conventions",
+    "convex-analysis/line-segments-in-a-vector-space",
+    "convex-analysis/linear-combination",
+    "convex-analysis/linear-operator-linear-transformation",
+    "convex-analysis/linear-subspace",
+    "convex-analysis/linearly-independent-and-linearly-dependent-sets",
+    "convex-analysis/metric-metric-space",
+    "convex-analysis/norm-normed-vector-space",
+    "convex-analysis/quotient-vector-space-codimension",
+    "convex-analysis/seminorm",
+    "convex-analysis/subspace-generated-by-a-set-span",
+    "differential-geometry/clifford-algebra",
+    "differential-geometry/product-manifold",
+    "differential-geometry/tangent-space",
+    "fiber-bundles/coordinate-transition-map",
+    "fiber-bundles/cotangent-bundle",
+    "fiber-bundles/diffeomorphism",
+    "fiber-bundles/differential-k-form",
+    "fiber-bundles/differential-pushforward-of-a-smooth-map",
+    "fiber-bundles/dual-vector-bundle",
+    "fiber-bundles/exterior-power-bundle",
+    "fiber-bundles/lie-bracket",
+    "fiber-bundles/lie-derivative",
+    "fiber-bundles/lie-group",
+    "fiber-bundles/local-trivialization",
+    "fiber-bundles/maximal-smooth-atlas",
+    "fiber-bundles/orbit-map",
+    "fiber-bundles/pullback-of-differential-forms",
+    "fiber-bundles/section-of-a-fiber-bundle",
+    "fiber-bundles/smooth-action-of-a-lie-group-on-a-manifold",
+    "fiber-bundles/smooth-atlas",
+    "fiber-bundles/smooth-chart",
+    "fiber-bundles/smooth-chart-coordinate-chart",
+    "fiber-bundles/smooth-compatibility-of-charts-and-atlases",
+    "fiber-bundles/smooth-fiber-bundle",
+    "fiber-bundles/smooth-immersion",
+    "fiber-bundles/smooth-manifold",
+    "fiber-bundles/smooth-map",
+    "fiber-bundles/smooth-structure",
+    "fiber-bundles/tangent-bundle",
+    "fiber-bundles/tangent-space-at-a-point",
+    "fiber-bundles/typical-fiber",
+    "fiber-bundles/vector-bundle",
+    "fiber-bundles/vector-field",
+    "functional-analysis/adjoint-bounded-operator",
+    "functional-analysis/adjoint-unbounded-operator",
+    "functional-analysis/banach-algebra",
+    "functional-analysis/banach-algebra-invertible-element",
+    "functional-analysis/banach-algebra-spectrum",
+    "functional-analysis/bounded-linear-operator",
+    "functional-analysis/bounded-subset-tvs",
+    "functional-analysis/closed-linear-operator",
+    "functional-analysis/densely-defined-operator",
+    "functional-analysis/finite-rank-operator",
+    "functional-analysis/frechet-space",
+    "functional-analysis/graph-of-operator",
+    "functional-analysis/locally-convex-space",
+    "functional-analysis/multiplication-operator",
+    "functional-analysis/nuclear-operator",
+    "functional-analysis/nuclear-space",
+    "functional-analysis/riesz-representation-hilbert-space",
+    "functional-analysis/schwartz-space",
+    "functional-analysis/self-adjoint-unbounded-operator",
+    "functional-analysis/seminorm-quotient-completion",
+    "functional-analysis/singular-values",
+    "functional-analysis/strong-dual",
+    "functional-analysis/symplectic-hilbert-space",
+    "functional-analysis/topological-dual",
+    "functional-analysis/topological-vector-space",
+    "functional-analysis/topology-generated-by-seminorms",
+    "functional-analysis/trace-class-operator",
+    "functional-analysis/unitary-operator",
+    "harmonic-analysis/coefficient-function",
+    "harmonic-analysis/convolution-involution",
+    "harmonic-analysis/convolution-on-locally-compact-group",
+    "harmonic-analysis/haar-measure",
+    "harmonic-analysis/integrated-form-unitary-representation",
+    "harmonic-analysis/l1-group-algebra",
+    "harmonic-analysis/modular-function",
+    "harmonic-analysis/pontryagin-dual",
+    "harmonic-analysis/positive-definite-function",
+    "harmonic-analysis/unitary-dual",
+    "lie-groups/adjoint-representation-of-a-lie-algebra",
+    "lie-groups/closed-subgroup-lie-group",
+    "lie-groups/closed-subgroup-theorem",
+    "lie-groups/compact-lie-group",
+    "lie-groups/connected-lie-group",
+    "lie-groups/covering-lie-group",
+    "lie-groups/derived-representation-on-smooth-vectors",
+    "lie-groups/derived-subalgebra",
+    "lie-groups/discrete-subgroup",
+    "lie-groups/example-heisenberg-algebra",
+    "lie-groups/example-so3",
+    "lie-groups/exponential-map-lie-group",
+    "lie-groups/general-linear-group",
+    "lie-groups/general-linear-lie-algebra",
+    "lie-groups/heisenberg-group",
+    "lie-groups/ideal-lie-algebra",
+    "lie-groups/infinitesimal-generator-unitary-representation",
+    "lie-groups/intertwining-operator-unitary-representations",
+    "lie-groups/invariant-closed-subspace-unitary-representation",
+    "lie-groups/irreducible-unitary-representation",
+    "lie-groups/lie-algebra",
+    "lie-groups/lie-algebra-homomorphism",
+    "lie-groups/lie-algebra-of-a-lie-group",
+    "lie-groups/lie-algebra-of-subgroup-lemma",
+    "lie-groups/lie-group-homomorphism",
+    "lie-groups/lie-subalgebra",
+    "lie-groups/lie-subgroup",
+    "lie-groups/lower-central-series-lie-algebra",
+    "lie-groups/nilpotent-lie-algebra",
+    "lie-groups/one-parameter-subgroup",
+    "lie-groups/orthogonal-group",
+    "lie-groups/orthogonal-lie-algebra",
+    "lie-groups/product-lie-group",
+    "lie-groups/representation-of-a-lie-algebra",
+    "lie-groups/right-translation",
+    "lie-groups/simply-connected-lie-group",
+    "lie-groups/smooth-action-lie-group",
+    "lie-groups/smooth-vector-unitary-representation",
+    "lie-groups/special-orthogonal-group",
+    "lie-groups/special-unitary-group",
+    "lie-groups/spin-group",
+    "lie-groups/stone-theorem-one-parameter-unitary-groups",
+    "lie-groups/strongly-continuous-unitary-representation",
+    "lie-groups/type-i-locally-compact-group",
+    "lie-groups/unitary-equivalence-of-representations",
+    "lie-groups/unitary-group",
+    "lie-groups/universal-covering-group",
+    "linear-algebra/alternating-multilinear-map",
+    "linear-algebra/banach-space",
+    "linear-algebra/bilinear-form",
+    "linear-algebra/closed-linear-subspace",
+    "linear-algebra/compact-operator",
+    "linear-algebra/determinant",
+    "linear-algebra/eigenvalue",
+    "linear-algebra/euclidean-norm",
+    "linear-algebra/euclidean-space",
+    "linear-algebra/exterior-power",
+    "linear-algebra/hilbert-space",
+    "linear-algebra/inner-product",
+    "linear-algebra/inner-product-space",
+    "linear-algebra/linear-map",
+    "linear-algebra/linear-operator",
+    "linear-algebra/matrix",
+    "linear-algebra/multilinear-map",
+    "linear-algebra/norm",
+    "linear-algebra/normed-vector-space",
+    "linear-algebra/operator-invariant-subspace",
+    "linear-algebra/operator-norm",
+    "linear-algebra/orthogonal-complement",
+    "linear-algebra/positive-semidefinite-matrix",
+    "linear-algebra/quadratic-form",
+    "linear-algebra/signature-of-symmetric-bilinear-form",
+    "linear-algebra/symplectic-form",
+    "linear-algebra/vector-space",
+    "mathematical-physics/schrodinger-representation",
+    "mathematical-physics/weyl-ccr-quantization",
+    "measure-theory/ae-equality",
+    "measure-theory/almost-everywhere",
+    "measure-theory/borel-measure",
+    "measure-theory/borel-sigma-algebra",
+    "measure-theory/dominated-convergence-theorem",
+    "measure-theory/essential-supremum",
+    "measure-theory/indicator-function",
+    "measure-theory/l1-function",
+    "measure-theory/lebesgue-integrable-function",
+    "measure-theory/lebesgue-integral",
+    "measure-theory/lebesgue-integral-nonnegative",
+    "measure-theory/lp-norm",
+    "measure-theory/lp-space",
+    "measure-theory/measurable-function",
+    "measure-theory/measurable-set",
+    "measure-theory/measurable-space",
+    "measure-theory/measure",
+    "measure-theory/measure-space",
+    "measure-theory/null-set",
+    "measure-theory/sigma-algebra",
+    "measure-theory/simple-function",
+    "operator-algebras/abelian-projection",
+    "operator-algebras/bicommutant",
+    "operator-algebras/bounded-operator-cstar-algebra",
+    "operator-algebras/center-of-von-neumann-algebra",
+    "operator-algebras/central-support",
+    "operator-algebras/closed-two-sided-ideal",
+    "operator-algebras/commutant",
+    "operator-algebras/commutative-cstar-algebra",
+    "operator-algebras/compact-operator-cstar-algebra",
+    "operator-algebras/continuous-functional-calculus",
+    "operator-algebras/cstar-algebra",
+    "operator-algebras/cstar-identity",
+    "operator-algebras/cstar-representation",
+    "operator-algebras/factorial-representation",
+    "operator-algebras/full-group-cstar-algebra",
+    "operator-algebras/involutive-algebra",
+    "operator-algebras/irreducible-cstar-representation",
+    "operator-algebras/positive-element",
+    "operator-algebras/positive-square-root",
+    "operator-algebras/self-adjoint-element",
+    "operator-algebras/star-homomorphism",
+    "operator-algebras/strong-operator-topology",
+    "operator-algebras/type-i-cstar-algebra",
+    "operator-algebras/type-i-factor",
+    "operator-algebras/type-i-von-neumann-algebra",
+    "operator-algebras/unital-cstar-algebra",
+    "operator-algebras/unitization",
+    "operator-algebras/von-neumann-algebra",
+    "operator-algebras/von-neumann-algebra-generated-by-representation",
+    "operator-algebras/von-neumann-bicommutant-theorem",
+    "operator-algebras/von-neumann-factor",
+    "operator-algebras/weak-operator-topology",
+    "real-analysis/absolute-value",
+    "real-analysis/bounded-above",
+    "real-analysis/bounded-below",
+    "real-analysis/chain-rule",
+    "real-analysis/class-ck-map",
+    "real-analysis/convergent-series",
+    "real-analysis/derivative",
+    "real-analysis/difference-quotient",
+    "real-analysis/differentiability-1d",
+    "real-analysis/differentiable-map",
+    "real-analysis/exponential-function",
+    "real-analysis/frechet-derivative",
+    "real-analysis/infimum",
+    "real-analysis/interval",
+    "real-analysis/inverse-function-theorem-1d",
+    "real-analysis/jacobian-matrix",
+    "real-analysis/limit-of-a-function-at-a-point",
+    "real-analysis/modulus-on-c",
+    "real-analysis/natural-logarithm",
+    "real-analysis/nonnegative-extended-series",
+    "real-analysis/nonnegative-square-root",
+    "real-analysis/partial-derivative",
+    "real-analysis/partial-sums",
+    "real-analysis/power-series",
+    "real-analysis/real-power",
+    "real-analysis/series",
+    "real-analysis/supremum",
+    "real-analysis/uniform-convergence",
+    "shared-foundations/bijective-function",
+    "shared-foundations/binary-operation",
+    "shared-foundations/cartesian-product",
+    "shared-foundations/complement",
+    "shared-foundations/complex-conjugate",
+    "shared-foundations/complex-numbers-c",
+    "shared-foundations/composition",
+    "shared-foundations/countable-set",
+    "shared-foundations/equivalence-class",
+    "shared-foundations/equivalence-relation",
+    "shared-foundations/factorial",
+    "shared-foundations/finite-permutation",
+    "shared-foundations/finite-set",
+    "shared-foundations/finite-sum",
+    "shared-foundations/first-order-logic",
+    "shared-foundations/function",
+    "shared-foundations/indexed-family-of-sets",
+    "shared-foundations/injective-function",
+    "shared-foundations/intersection",
+    "shared-foundations/inverse-function",
+    "shared-foundations/lower-bound",
+    "shared-foundations/natural-numbers",
+    "shared-foundations/ordered-pair",
+    "shared-foundations/partial-order",
+    "shared-foundations/permutation-sign",
+    "shared-foundations/power-set",
+    "shared-foundations/preimage",
+    "shared-foundations/quotient-set",
+    "shared-foundations/real-numbers",
+    "shared-foundations/relation",
+    "shared-foundations/restriction-of-a-function",
+    "shared-foundations/sequence",
+    "shared-foundations/set",
+    "shared-foundations/set-difference",
+    "shared-foundations/subset",
+    "shared-foundations/surjective-function",
+    "shared-foundations/total-order",
+    "shared-foundations/union",
+    "shared-foundations/upper-bound",
+    "shared-foundations/zfc-axioms",
+    "topology/basis-of-topology",
+    "topology/cauchy-sequence",
+    "topology/closed-set",
+    "topology/closure",
+    "topology/compact-set",
+    "topology/complete-metric-space",
+    "topology/connected-set",
+    "topology/continuous-map",
+    "topology/convergent-sequence",
+    "topology/cover",
+    "topology/dense-set",
+    "topology/fundamental-group",
+    "topology/hausdorff-space",
+    "topology/homeomorphism",
+    "topology/homotopy",
+    "topology/limit-point",
+    "topology/locally-compact-group",
+    "topology/locally-compact-space",
+    "topology/metric",
+    "topology/metric-space",
+    "topology/neighborhood",
+    "topology/open-cover",
+    "topology/open-set",
+    "topology/path",
+    "topology/product-topology",
+    "topology/second-countable-space",
+    "topology/subbasis-of-topology",
+    "topology/subspace-topology",
+    "topology/topological-group",
+    "topology/topological-manifold",
+    "topology/topological-space"
+  ],
+  "conventions": [
+    "Inner product linear in the first variable; j(v)(w)=<v,w> is anti-linear in the test vector.",
+    "Stone convention pi(exp(tX))=exp(it A_X), K_X=i A_X, d pi(X)=K_X restricted to smooth vectors.",
+    "Symmetric Heisenberg coordinates are preserved; c=z+ab/2 gives the pasted unsymmetrized coordinates.",
+    "Positive-exponential left fundamental fields reverse brackets; inverse pullback differentiates to minus the field.",
+    "Nuclearity is an additional condition on the smooth-vector rigging, equivalent to trace class in finite-dimensional Lie-group representations."
+  ],
+  "mathematical_evidence": [
+    {
+      "url": "https://arxiv.org/abs/1002.1602",
+      "checked_locators": [
+        "Section 2 / Definition 2.1",
+        "Definition 3.1",
+        "Theorem 4.4",
+        "Proposition 5.4",
+        "Theorem 9.4"
+      ]
+    },
+    {
+      "url": "https://arxiv.org/abs/1512.02451",
+      "checked_locators": [
+        "Section 1 opening topology discussion",
+        "Theorem 1.3",
+        "Lemma 1.9",
+        "Proposition 1.11"
+      ]
+    },
+    {
+      "url": "https://arxiv.org/abs/1501.02375",
+      "checked_locators": [
+        "Examples 1.5 first bullet",
+        "Theorem 1.7",
+        "Proposition 1.9(b)",
+        "Proposition 1.10(a)"
+      ]
+    },
+    {
+      "url": "https://arxiv.org/abs/1006.3265",
+      "checked_locators": [
+        "Section 2 Schrödinger formula and smooth-vector identification",
+        "Theorem 2.2"
+      ]
+    },
+    {
+      "url": "https://arxiv.org/abs/1407.1869",
+      "checked_locators": [
+        "Section 1 page 2 before Theorem 1.2"
+      ]
+    },
+    {
+      "method": "Direct calculations",
+      "claims": [
+        "modulation norm distance and generator domain",
+        "Heisenberg coordinate conversion and commutators",
+        "finite-dimensional SU(2) irreducibility",
+        "anti-dual embedding",
+        "inverse-pullback derivative sign",
+        "weighted Sobolev equivalence of Schwartz and smooth-vector topologies"
+      ]
+    }
+  ],
+  "validation": {
+    "new_ordinary": 15,
+    "new_indexes": 1,
+    "changed_source_files": 34,
+    "section_count": 97,
+    "section_preservation": "passed",
+    "external_link_placement": "passed",
+    "reused_prerequisite_count": 340,
+    "development_build": {
+      "status": "passed",
+      "knowls": 5346,
+      "command": "make build-content"
+    },
+    "production_build": {
+      "status": "passed",
+      "knowls": 4158,
+      "command": "make build-production OUTPUT_DIR=tmp/smooth-vectors-production",
+      "rendering_scan": "passed, full primary production output with rendered diagrams required"
+    },
+    "dependency_graph": {
+      "cycles": 0,
+      "edges": 13905,
+      "invalid": 0,
+      "missing_targets": 0,
+      "nodes": 4168
+    },
+    "browser": {
+      "changedPages": 34,
+      "newFragments": 16,
+      "newPagesChecked": [
+        "differential-geometry/banach-manifold",
+        "lie-groups/banach-lie-group",
+        "lie-groups/norm-unitary-group",
+        "lie-groups/ck-vector-unitary-representation",
+        "lie-groups/smooth-vector-frechet-topology",
+        "lie-groups/smooth-vectors-iterated-generator-domains",
+        "functional-analysis/continuous-antidual",
+        "lie-groups/trace-class-representation",
+        "lie-groups/nuclear-smooth-vectors-trace-class",
+        "lie-groups/noncompact-finite-dimensional-unitary-example",
+        "lie-groups/modulation-unitary-group",
+        "lie-groups/schrodinger-smooth-vectors",
+        "lie-groups/heisenberg-derived-representation",
+        "lie-groups/fundamental-vector-field-left-action",
+        "lie-groups/derived-pullback-representation",
+        "lie-groups/smooth-unitary-representations-index"
+      ],
+      "mobilePagesChecked": [
+        "differential-geometry/banach-manifold",
+        "lie-groups/banach-lie-group",
+        "lie-groups/norm-unitary-group",
+        "lie-groups/ck-vector-unitary-representation",
+        "lie-groups/smooth-vector-frechet-topology",
+        "lie-groups/smooth-vectors-iterated-generator-domains",
+        "functional-analysis/continuous-antidual",
+        "lie-groups/trace-class-representation",
+        "lie-groups/nuclear-smooth-vectors-trace-class",
+        "lie-groups/noncompact-finite-dimensional-unitary-example",
+        "lie-groups/modulation-unitary-group",
+        "lie-groups/schrodinger-smooth-vectors",
+        "lie-groups/heisenberg-derived-representation",
+        "lie-groups/fundamental-vector-field-left-action",
+        "lie-groups/derived-pullback-representation",
+        "lie-groups/smooth-unitary-representations-index"
+      ],
+      "nestedExpansion": true,
+      "inlineSection": true,
+      "search": true,
+      "javascriptErrors": []
+    },
+    "source_hashes": "all matched",
+    "git_diff_check": "passed in both repositories",
+    "scope_audit": "one assessed anti-dual/topology construction; no exact-label mismatches in changed entries",
+    "development_catalog_note": "The unrelated imported conjectures catalog retains its previously documented rendering findings; the primary production scan is clean."
+  },
+  "formal_review_note": "Authorship and targeted mathematical checks only; no full-review or dependency-review counts incremented.",
+  "scope_audit_assessment": "The continuous anti-dual and its strong topology form one canonical dual-space construction; strong-dual topology itself is reused through its existing entry. No exact-label mismatches in the changed entries."
+}

@@ -28,6 +28,7 @@ SCREENSHOT ?= tmp/screenshots/page.png
 .PHONY: compose-content compose-production-content build-content serve-content build-page preview-diagram
 .PHONY: preview-start preview-status preview-stop preview-restart preview-scan preview-adopt
 .PHONY: check-rendering check-rendering-knowls check-rendering-content review-content normalize-math
+.PHONY: catalog-validate
 
 $(VENV_STAMP): requirements.txt
 	python3 -m venv .venv
@@ -42,6 +43,9 @@ deps: $(VENV_STAMP) $(NODE_MODULES_STAMP)
 
 test:
 	$(PYTHON) -m unittest discover -s tests -p 'test_*.py'
+
+catalog-validate:
+	$(PYTHON) scripts/catalog.py validate --content-package $(CONTENT_PACKAGE)
 
 test-ui:
 	PREVIEW_URL=$(PREVIEW_URL) node tests/runtime_smoke.mjs
