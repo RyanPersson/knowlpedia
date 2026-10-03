@@ -13,6 +13,7 @@ from scripts.generate_content_review import (
     write_review_notes,
     added_knowl_paths,
     build_diff_plan,
+    build_ref_comparison,
     changed_character_count,
     modified_knowl_paths,
     parse_text,
@@ -83,6 +84,57 @@ class GenerateContentReviewTests(unittest.TestCase):
         self.assertIn('class="review-note-history" open>', rendered)
         self.assertNotIn("Notes matching the displayed", rendered)
 
+    def test_canonical_batch_notes_keep_scope_provenance_and_structured_evidence(self):
+        item = self.note_item()
+        reference = {"url": "https://example.com/source", "title": "A source <title>", "locator": "Section 2 & 3"}
+        current = {
+            "id": "test/item", "scope": "targeted", "outcome": "new",
+            "source_sha256": hashlib.sha256(item.current_text.encode()).hexdigest(),
+            "evidence": {"method": "Checked the stated scalar convention. <script>bad()</script>", "references": [reference]},
+            "references": [reference],
+        }
+        historical = {**current, "source_sha256": "different-source", "evidence": "Earlier bounded check."}
+        triage = {**current, "evidence": "Unreviewed triage must stay out."}
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            ledger = root / "reviews/refactor-ledger.json"
+            ledger.parent.mkdir()
+            ledger.write_text(json.dumps({
+                "batches": [{"id": "catalog-arithmetic-targeted", "review_shard": "reviews/catalog/arithmetic.json",
+                             "entries": [historical, current], "triage_records": [triage]}],
+                "triage_records": [triage],
+            }))
+            shard = root / "reviews/catalog/arithmetic.json"
+            shard.parent.mkdir()
+            shard.write_text(json.dumps({"reviews": [current], "entries": [current]}))
+            attach_review_notes([item], root, "pinned-catalogue-commit")
+            self.assertEqual(len(item.review_notes), 2)
+            rendered = render_review_notes(item, {})
+            self.assertIn("Notes matching the displayed proposed source", rendered)
+            self.assertIn("targeted check", rendered)
+            self.assertIn("Checked the stated scalar convention.", rendered)
+            self.assertIn("&lt;script&gt;bad()&lt;/script&gt;", rendered)
+            self.assertNotIn("<script>bad()</script>", rendered)
+            self.assertIn('href="https://example.com/source"', rendered)
+            self.assertIn("A source &lt;title&gt;", rendered)
+            self.assertIn("Section 2 &amp; 3", rendered)
+            self.assertIn("batch catalog-arithmetic-targeted", rendered)
+            self.assertIn("batches[0].entries[1]", rendered)
+            self.assertNotIn("Unreviewed triage", rendered)
+            # The same reference in two fields is rendered once per review.
+            self.assertEqual(rendered.count("A source &lt;title&gt;"), 2)
+            write_review_notes([item], root / "output")
+            exported = json.loads((root / "output/notes/0001-item.json").read_text())
+            self.assertEqual([row["matches_displayed_source"] for row in exported["records"]], [False, True])
+            note = exported["records"][1]
+            self.assertEqual(note["record"], current)
+            self.assertEqual(note["ledger"], "reviews/refactor-ledger.json")
+            self.assertEqual(note["batch_id"], "catalog-arithmetic-targeted")
+            self.assertEqual(note["record_locator"], "batches[0].entries[1]")
+            self.assertEqual(exported["ledger_revision"], "pinned-catalogue-commit")
+            item.current_text += "An unreviewed edit.\n"
+            self.assertNotIn("Notes matching the displayed proposed source", render_review_notes(item, {}))
+
     def test_deleted_knowl_notes_match_baseline(self):
         item = self.note_item("deleted")
         item.current_text = ""
@@ -90,6 +142,46 @@ class GenerateContentReviewTests(unittest.TestCase):
                               "record": {"source_sha256": hashlib.sha256(item.old_text.encode()).hexdigest(),
                                          "evidence": "Removal context"}}]
         self.assertIn("Notes matching the displayed baseline source", render_review_notes(item, {}))
+
+    def test_canonical_targeted_claims_direct_reasoning_and_checked_sources_are_recorded(self):
+        item = self.note_item()
+        source_review = {
+            "id": "test/item", "path": item.path, "scope": "targeted", "outcome": "new",
+            "targeted_claims": "Definition core and stated convention; not a complete review.",
+            "source_sha256": hashlib.sha256(item.current_text.encode()).hexdigest(),
+            "sources": [{"url": "https://example.com/lecture.pdf", "locator": "Definition 1.1, §1.2",
+                         "checked": "Checked the stated convention. <script>bad()</script>"}],
+            "direct_reasoning": "", "prerequisites_reviewed": [],
+        }
+        direct_review = {**source_review, "targeted_claims": "", "sources": [],
+                         "direct_reasoning": "The defining operations preserve the stated subset."}
+        checked_only_review = {**source_review, "targeted_claims": ""}
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            ledger = root / "reviews/refactor-ledger.json"
+            ledger.parent.mkdir()
+            ledger.write_text(json.dumps({"batches": [{
+                "id": "transcript-connections-targeted", "entries": [source_review, direct_review, checked_only_review],
+                "triage_records": [{**direct_review, "direct_reasoning": "Unreviewed triage"}],
+            }]}))
+            attach_review_notes([item], root, "pinned-transcript-commit")
+            self.assertEqual(len(item.review_notes), 3)
+            rendered = render_review_notes(item, {})
+            self.assertIn("Notes matching the displayed proposed source", rendered)
+            self.assertIn("Targeted claims:", rendered)
+            self.assertIn("Definition core and stated convention; not a complete review.", rendered)
+            self.assertIn("Recorded direct reasoning:", rendered)
+            self.assertIn(direct_review["direct_reasoning"], rendered)
+            self.assertIn("Recorded check:", rendered)
+            self.assertIn("Definition 1.1, §1.2", rendered)
+            self.assertIn("&lt;script&gt;bad()&lt;/script&gt;", rendered)
+            self.assertNotIn("<script>bad()</script>", rendered)
+            self.assertNotIn("Unreviewed triage", rendered)
+            write_review_notes([item], root / "output")
+            exported = json.loads((root / "output/notes/0001-item.json").read_text())
+            self.assertTrue(all(row["matches_displayed_source"] for row in exported["records"]))
+            self.assertEqual([row["record"] for row in exported["records"]],
+                             [source_review, direct_review, checked_only_review])
 
     def test_ref_notes_come_from_compared_commit_not_worktree(self):
         with tempfile.TemporaryDirectory() as temp:
@@ -108,14 +200,29 @@ class GenerateContentReviewTests(unittest.TestCase):
             record = {"id": "test/item", "source_sha256": hashlib.sha256(item.current_text.encode()).hexdigest(),
                       "evidence": "Committed explanation"}
             ledger.write_text(json.dumps({"reviews": [record]}))
+            canonical = repo / "reviews/refactor-ledger.json"
+            canonical_record = {**record, "scope": "targeted", "evidence": {"method": "Committed canonical explanation", "references": []}}
+            canonical.write_text(json.dumps({"batches": [{"id": "canonical-batch", "entries": [canonical_record]}]}))
             self.git(repo, "add", ".")
             self.git(repo, "commit", "-m", "Reviewed version")
             ledger.write_text(json.dumps({"reviews": [{**record, "evidence": "Uncommitted replacement"}]}))
+            canonical.write_text(json.dumps({"batches": [{"id": "uncommitted-batch", "entries": [
+                {**canonical_record, "evidence": "Uncommitted canonical replacement"}]}]}))
             tree = root / "extracted"
             tree.mkdir()
             extract_ref(repo, "HEAD", tree)
             attach_review_notes([item], tree, "HEAD")
             self.assertEqual(item.review_notes[0]["record"]["evidence"], "Committed explanation")
+            self.assertEqual(len(item.review_notes), 2)
+            canonical_note = item.review_notes[1]
+            self.assertEqual(canonical_note["ledger"], "reviews/refactor-ledger.json")
+            self.assertEqual(canonical_note["batch_id"], "canonical-batch")
+            self.assertEqual(canonical_note["record_locator"], "batches[0].entries[0]")
+            self.assertEqual(canonical_note["record"], canonical_record)
+            rendered = render_review_notes(item, {})
+            self.assertIn("Committed canonical explanation", rendered)
+            self.assertNotIn("Uncommitted", rendered)
+            self.assertIn("Notes matching the displayed proposed source", rendered)
 
     def test_ref_comparison_selects_only_modified_existing_knowls(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
@@ -144,6 +251,59 @@ class GenerateContentReviewTests(unittest.TestCase):
                 added_knowl_paths(repo, "baseline", "HEAD"),
                 ["content/added.knowl.md"],
             )
+
+    def test_ref_comparison_manifest_limits_all_change_kinds_without_limiting_link_resolution(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            repo = root / "repo"
+            repo.mkdir()
+            self.git(repo, "init")
+            self.git(repo, "config", "user.name", "Test User")
+            self.git(repo, "config", "user.email", "test@example.com")
+            self.git(repo, "config", "diff.renames", "false")
+            content = repo / "content"
+            content.mkdir()
+
+            def write(name: str, body: str) -> None:
+                (content / f"{name}.knowl.md").write_text(
+                    f'+++\nid = "test/{name}"\ntitle = "{name}"\nkind = "definition"\n'
+                    f'summary = "Example {name}."\n+++\n{body}\n', encoding="utf-8",
+                )
+
+            for prefix in ("selected", "excluded"):
+                write(f"{prefix}-modified", "Original definition.")
+                write(f"{prefix}-deleted", "Definition to remove.")
+            self.git(repo, "add", "content")
+            self.git(repo, "commit", "-m", "baseline")
+            self.git(repo, "branch", "baseline")
+            for prefix in ("selected", "excluded"):
+                write(f"{prefix}-modified", "Updated definition with [[test/excluded-added|a new prerequisite]].")
+                write(f"{prefix}-added", "New definition.")
+                (content / f"{prefix}-deleted.knowl.md").unlink()
+            self.git(repo, "add", "content")
+            self.git(repo, "commit", "-m", "changes")
+
+            selected = {f"content/selected-{kind}.knowl.md": kind for kind in ("modified", "added", "deleted")}
+            manifest = root / "paths.txt"
+            manifest.write_text("\n" + "\n".join(f"  {path}  " for path in selected) + "\nREADME.md\n")
+            empty_manifest = root / "empty-paths.txt"
+            empty_manifest.write_text("\nREADME.md\n")
+            all_changes = {f"content/{prefix}-{kind}.knowl.md": kind
+                           for prefix in ("selected", "excluded") for kind in ("modified", "added", "deleted")}
+            for name, paths_file, expected in (("filtered", manifest, selected), ("unfiltered", None, all_changes),
+                                                ("empty", empty_manifest, {})):
+                with self.subTest(manifest=name):
+                    output = root / name
+                    count = build_ref_comparison(repo, output, "baseline", "HEAD", paths_file,
+                                                 "Before", "After", "Selected changes",
+                                                 include_added=True, include_deleted=True)
+                    notes = [json.loads(path.read_text()) for path in (output / "notes").glob("*.json")]
+                    self.assertEqual(count, len(expected))
+                    self.assertEqual({note["path"]: note["comparison"]["change_kind"] for note in notes}, expected)
+                    self.assertEqual(len(list((output / "items").glob("*.html"))), len(expected))
+            selected_page = next((root / "filtered" / "items").glob("*selected-modified.html")).read_text()
+            self.assertIn('data-knowl="/fragments/test/excluded-added/core.html"', selected_page)
+            self.assertNotIn("missing-knowl", selected_page)
 
     def test_source_diff_is_open_and_precedes_rendered_comparison(self) -> None:
         old_text = """+++

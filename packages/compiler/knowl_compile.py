@@ -33,6 +33,8 @@ _COMPILER_DIR = str(Path(__file__).resolve().parent)
 if _COMPILER_DIR not in sys.path:
     sys.path.insert(0, _COMPILER_DIR)
 from graph_algorithms import cycle_witnesses
+import catalog
+import catalog_html
 import private_facsimile
 import private_markdown
 
@@ -145,7 +147,7 @@ def runtime_asset_version() -> str:
     """Return a stable cache key for the browser runtime shipped by this build."""
     runtime_dir = Path(__file__).resolve().parents[1] / "static-runtime"
     digest = hashlib.sha256()
-    for filename in ("knowl.css", "knowl.js", "graph.js", "knowl-testing.js", "facsimile.js", "document-math.js"):
+    for filename in ("knowl.css", "knowl.js", "graph.js", "knowl-testing.js", "facsimile.js", "document-math.js", "catalog.js", "catalog.css", "finite-groups.js", "finite-groups.css", "lie-groups.js", "lie-groups.css"):
         path = runtime_dir / filename
         if not path.is_file():
             continue
@@ -2771,6 +2773,15 @@ def write_site_for_ids(
         knowls.extend(private_documents)
         content_roots.append((private_root, "private"))
     registry, messages = build_registry(knowls)
+    # Reject malformed catalogue references before replacing the current site.
+    # Catalogue shards are public content, never private/development metadata.
+    try:
+        catalog_data = catalog.discover_catalog(
+            (root for root, visibility in content_roots if visibility == "production"), registry
+        )
+    except catalog.CatalogValidationError as exc:
+        print(f"ERROR: catalogue: {exc}", file=sys.stderr)
+        return 1
     redirects = {knowl.id: knowl for knowl in knowls if knowl.redirect_to}
     errors = [msg for msg in messages if msg.severity == "error"]
     has_cycle = any("prerequisite cycle" in msg.message for msg in messages)
@@ -2861,6 +2872,43 @@ def write_site_for_ids(
                     section_path.write_text(render_section(section, registry), encoding="utf-8")
 
     if not only_ids:
+        if catalog_data is not None:
+            catalog.export_catalog(catalog_data, out_dir / "indexes")
+            runtime_dir = Path(__file__).resolve().parents[1] / "static-runtime"
+            for filename in ("catalog.js", "catalog.css"):
+                shutil.copyfile(runtime_dir / filename, out_dir / "assets" / filename)
+            katex_assets = find_katex_assets_dir()
+            has_browser_katex = bool(katex_assets and (katex_assets / "katex.min.js").is_file())
+            if has_browser_katex:
+                shutil.copyfile(katex_assets / "katex.min.js", out_dir / "assets" / "katex.min.js")
+            explorer = catalog_html.render_catalog_explorer(html_document, profile, asset_version=runtime_asset_version())
+            if not has_browser_katex:
+                # The compiler supports environments without npm dependencies;
+                # catalogue text still works using its runtime's plain fallback.
+                explorer = re.sub(r'<script defer src="/assets/katex\.min\.js[^\"]*"></script>\s*', '', explorer)
+            explorer_path = out_dir / "catalog" / "explorer" / "index.html"
+            explorer_path.parent.mkdir(parents=True, exist_ok=True)
+            explorer_path.write_text(explorer, encoding="utf-8")
+            if any("finite_group" in obj["properties"] for obj in catalog_data["objects"]):
+                from finite_groups_html import render_finite_groups_table
+                for filename in ("finite-groups.js", "finite-groups.css"):
+                    shutil.copyfile(runtime_dir / filename, out_dir / "assets" / filename)
+                finite_table = render_finite_groups_table(html_document, profile, asset_version=runtime_asset_version())
+                if not has_browser_katex:
+                    finite_table = re.sub(r'<script defer src="/assets/katex\.min\.js[^\"]*"></script>\s*', '', finite_table)
+                finite_table_path = out_dir / "catalog" / "finite-groups" / "table" / "index.html"
+                finite_table_path.parent.mkdir(parents=True, exist_ok=True)
+                finite_table_path.write_text(finite_table, encoding="utf-8")
+            if any("lie_group" in obj["properties"] for obj in catalog_data["objects"]):
+                from lie_groups_html import render_lie_groups_table
+                for filename in ("lie-groups.js", "lie-groups.css"):
+                    shutil.copyfile(runtime_dir / filename, out_dir / "assets" / filename)
+                lie_table = render_lie_groups_table(html_document, profile, asset_version=runtime_asset_version())
+                if not has_browser_katex:
+                    lie_table = re.sub(r'<script defer src="/assets/katex\.min\.js[^\"]*"></script>\s*', '', lie_table)
+                lie_table_path = out_dir / "catalog" / "lie-groups" / "table" / "index.html"
+                lie_table_path.parent.mkdir(parents=True, exist_ok=True)
+                lie_table_path.write_text(lie_table, encoding="utf-8")
         write_json(out_dir / "indexes" / "registry.json", registry_json(registry))
         write_compact_json(out_dir / "indexes" / "search.json", search_json(registry))
         write_json(out_dir / "indexes" / "relations.json", relations_json(registry))

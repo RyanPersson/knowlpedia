@@ -48,16 +48,40 @@ class ReviewItem:
 def load_review_notes(tree: Path) -> dict[str, list[dict]]:
     """Load recorded reviews, never triage records or inferred explanations."""
     by_id: dict[str, list[dict]] = {}
+
+    def add(record: dict, provenance: dict, *, canonical: bool = False) -> None:
+        has_explanation = any(record.get(key) for key in ("evidence", "changes", "reason"))
+        if canonical:
+            has_explanation = has_explanation or any(record.get(key) for key in ("direct_reasoning", "targeted_claims"))
+            has_explanation = has_explanation or any(
+                isinstance(source, dict) and source.get("checked") for source in record.get("sources", [])
+            )
+        if not record.get("id") or not has_explanation:
+            return
+        by_id.setdefault(record["id"], []).append({**provenance, "record": record})
+
     for path in sorted((tree / "reviews" / "dependency-structure").glob("*.json")):
         data = json.loads(path.read_text(encoding="utf-8"))
         for index, record in enumerate(data.get("reviews", [])):
-            if not record.get("id") or not any(record.get(key) for key in ("evidence", "changes", "reason")):
-                continue
-            by_id.setdefault(record["id"], []).append({
+            add(record, {
                 "ledger": path.relative_to(tree).as_posix(),
                 "record_index": index,
-                "record": record,
+                "record_locator": f"reviews[{index}]",
             })
+    # This is the canonical content-review ledger. Its supporting review_shard
+    # files are intentionally not reloaded: doing so would duplicate entries.
+    canonical = tree / "reviews" / "refactor-ledger.json"
+    if canonical.is_file():
+        data = json.loads(canonical.read_text(encoding="utf-8"))
+        for batch_index, batch in enumerate(data.get("batches", [])):
+            for index, record in enumerate(batch.get("entries", [])):
+                add(record, {
+                    "ledger": canonical.relative_to(tree).as_posix(),
+                    "batch_id": batch.get("id"),
+                    "batch_index": batch_index,
+                    "record_index": index,
+                    "record_locator": f"batches[{batch_index}].entries[{index}]",
+                }, canonical=True)
     return by_id
 
 
@@ -118,27 +142,56 @@ def render_review_notes(item: ReviewItem, registry: dict[str, compiler.Knowl]) -
         label = labels.get(record.get("outcome"), "Review note")
         if record.get("scope") == "targeted":
             label += " · targeted check"
+        elif record.get("scope") == "dependencies":
+            label += " · prerequisite check"
         paragraphs = []
         seen = set()
-        for key in ("changes", "reason", "evidence"):
+        for key in ("changes", "reason", "evidence", "targeted_claims", "direct_reasoning"):
             values = record.get(key, [])
+            if key == "evidence" and isinstance(values, dict):
+                values = values.get("method", [])
             for value in values if isinstance(values, list) else [values]:
                 if isinstance(value, str) and value.strip() and value not in seen:
-                    paragraphs.append(f'<p class="review-reason-text">{html.escape(value)}</p>')
+                    prefix = {"targeted_claims": "<strong>Targeted claims:</strong> ",
+                              "direct_reasoning": "<strong>Recorded direct reasoning:</strong> "}.get(key, "")
+                    paragraphs.append(f'<p class="review-reason-text">{prefix}{html.escape(value)}</p>')
                     seen.add(value)
-        sources = record.get("sources", [])
+        sources = list(record.get("sources", [])) + list(record.get("references", []))
+        evidence = record.get("evidence")
+        if isinstance(evidence, dict):
+            sources.extend(evidence.get("references", []))
         if sources:
             paragraphs.append('<p><strong>Recorded sources:</strong></p><ul>')
+            seen_sources = set()
             for source in sources:
-                text = source if isinstance(source, str) else json.dumps(source, ensure_ascii=False)
-                escaped = html.escape(text)
-                link = (f'<a href="{escaped}" target="_blank" rel="noopener noreferrer">{escaped}</a>'
-                        if text.startswith(("https://", "http://")) else escaped)
+                signature = json.dumps(source, ensure_ascii=False, sort_keys=True)
+                if signature in seen_sources:
+                    continue
+                seen_sources.add(signature)
+                if isinstance(source, dict) and isinstance(source.get("url"), str):
+                    url = source["url"]
+                    title = source.get("title") or url
+                    link = (f'<a href="{html.escape(url)}" target="_blank" rel="noopener noreferrer">{html.escape(str(title))}</a>'
+                            if url.startswith(("https://", "http://"))
+                            else html.escape(str(title) + (f" — {url}" if title != url else "")))
+                    if source.get("locator"):
+                        link += " — " + html.escape(str(source["locator"]))
+                    if isinstance(source.get("checked"), str) and source["checked"].strip():
+                        link += '<br><strong>Recorded check:</strong> ' + html.escape(source["checked"])
+                else:
+                    text = source if isinstance(source, str) else json.dumps(source, ensure_ascii=False)
+                    escaped = html.escape(text)
+                    link = (f'<a href="{escaped}" target="_blank" rel="noopener noreferrer">{escaped}</a>'
+                            if text.startswith(("https://", "http://")) else escaped)
                 paragraphs.append(f"<li>{link}</li>")
             paragraphs.append("</ul>")
+        provenance = html.escape(note["ledger"])
+        if note.get("batch_id") is not None:
+            provenance += " · batch " + html.escape(str(note["batch_id"]))
+        provenance += " · " + html.escape(note.get("record_locator", f'record {note["record_index"] + 1}'))
         return (f'<article class="review-note"><p class="review-note-label">{label}</p>'
                 + "".join(paragraphs)
-                + f'<p class="review-note-source">{html.escape(note["ledger"])} · record {note["record_index"] + 1}</p></article>')
+                + f'<p class="review-note-source">{provenance}</p></article>')
 
     matching = [note for note in item.review_notes if note_matches_item(note, item)]
     other = [note for note in item.review_notes if not note_matches_item(note, item)]
@@ -146,8 +199,8 @@ def render_review_notes(item: ReviewItem, registry: dict[str, compiler.Knowl]) -
     matching.sort(key=lambda note: priority.get(note["record"].get("outcome"), 3))
     parts = ['<section class="review-reasons" aria-labelledby="review-reasons-heading">',
              '<h2 id="review-reasons-heading">Why this changed</h2>',
-             '<p class="review-note-context">Saved review notes explain the change and the checks made. '
-             'They describe the knowl as a whole, rather than each individual diff line.</p>']
+             '<p class="review-note-context">Saved review notes explain recorded changes and their stated review scope. '
+             'A matching source hash identifies the reviewed version; it does not turn a targeted or prerequisite check into a full review.</p>']
     if matching:
         version = "baseline" if item.current_knowl is None else "proposed"
         parts.append(f'<p class="review-note-status">Notes matching the displayed {version} source</p>')
@@ -163,7 +216,7 @@ def render_review_notes(item: ReviewItem, registry: dict[str, compiler.Knowl]) -
         parts.extend(record_html(note) for note in other)
         parts.append('</details>')
     if not item.review_notes:
-        parts.append('<p>No justification was recorded in the dependency review ledgers for this knowl.</p>')
+        parts.append('<p>No justification was recorded in the content review ledgers for this knowl.</p>')
 
     old = set(item.old_knowl.prerequisites if item.old_knowl else [])
     new = set(item.current_knowl.prerequisites if item.current_knowl else [])
@@ -814,8 +867,9 @@ def build(content_repo: Path, output: Path) -> int:
 
 def extract_ref(content_repo: Path, ref: str, destination: Path) -> None:
     paths = ["content"]
-    if path_exists_at_ref(content_repo, ref, "reviews/dependency-structure"):
-        paths.append("reviews/dependency-structure")
+    for path in ("reviews/dependency-structure", "reviews/refactor-ledger.json"):
+        if path_exists_at_ref(content_repo, ref, path):
+            paths.append(path)
     archive = git("archive", ref, *paths, cwd=content_repo).stdout
     with tarfile.open(fileobj=io.BytesIO(archive), mode="r:") as bundle:
         bundle.extractall(destination)
@@ -955,10 +1009,17 @@ def build_ref_comparison(
         right_ref,
         paths_file,
     )
+    requested_paths = None if paths_file is None else {
+        line.strip()
+        for line in paths_file.read_text(encoding="utf-8").splitlines()
+        if line.strip().endswith(".knowl.md")
+    }
     added_paths: set[str] = set()
     deleted_paths: set[str] = set()
     if include_added:
         added_paths = set(added_knowl_paths(content_repo, left_ref, right_ref))
+        if requested_paths is not None:
+            added_paths.intersection_update(requested_paths)
         comparisons.extend(
             (
                 path,
@@ -969,6 +1030,8 @@ def build_ref_comparison(
         )
     if include_deleted:
         deleted_paths = set(deleted_knowl_paths(content_repo, left_ref, right_ref))
+        if requested_paths is not None:
+            deleted_paths.intersection_update(requested_paths)
         comparisons.extend(
             (
                 path,
