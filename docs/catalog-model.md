@@ -15,6 +15,32 @@ browser explorer at `/catalog/explorer/`. No catalogue artifacts are created
 when no shards exist. Selected-page builds validate data but do not replace
 the complete catalogue exports.
 
+## Explorer interaction
+
+The explorer at `/catalog/explorer/` puts the object selection, map operation,
+category, and result together. **Change** opens a searchable object picker with
+keyboard navigation. Aut and End show one object; Hom shows both endpoints and
+remembers its target when temporarily switching operations. Selection changes
+update shareable URLs and participate in browser Back/Forward navigation.
+
+Categories with descriptions for the current objects and operation appear
+first. Other common categories remain available. A structure selector appears
+only when there is a choice; explicit structure parameters and constraints
+remain visible. Missing descriptions offer available recorded alternatives
+without interpreting an absent record as an empty collection of maps.
+
+Object metadata, category axioms, evidence, and the pair diagram are expandable.
+Related objects appear six relationships at a time, with statements, conditions,
+source definitions, and explanation links inside each row. Conjectural labels
+remain visible before expansion. Descriptions and conditions are taken from the
+existing catalogue records; the UI does not create mathematical conclusions.
+
+`node tests/catalog_browser_smoke.mjs` checks the interaction against a small
+fixture. Set `PREVIEW_URL` to the existing HTTPS preview to also check every
+exported morphism-space record, result links, object search pagination, related
+objects, and the mobile layout. `CATALOG_DATA_PATH` can instead supply an exported
+JSON index to test the current source without a running server.
+
 ## Authoring contract
 
 Each shard has `schema_version: 1` and any of these arrays:

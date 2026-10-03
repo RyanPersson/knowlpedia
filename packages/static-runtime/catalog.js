@@ -10,7 +10,7 @@
     if (className) node.className = className;
     return node;
   };
-  const humanize = (s) => String(s).replaceAll("-", " ");
+  const humanize = (s) => String(s).replace(/[-_]/g, " ");
   const display = (value) => typeof value === "object" ? JSON.stringify(value) : String(value);
   const badge = (text) => el("span", text, "catalog-badge");
   const knowlLink = (id, label = "Read definition") => {
@@ -54,7 +54,10 @@
 
   function evidence(record) {
     const detail = el("details");
-    detail.append(el("summary", "Evidence and proof status"));
+    detail.append(el("summary", "Evidence"));
+    const proof = badge(humanize(record.evidence.status));
+    proof.dataset.evidence = record.evidence.status;
+    detail.append(proof);
     detail.append(prose(record.evidence.method));
     for (const ref of record.evidence.references || []) {
       const p = el("p");
@@ -64,7 +67,7 @@
       detail.append(p);
     }
     const lean = record.evidence.lean;
-    detail.append(el("p", lean ? `Lean reference: ${lean.module} · ${lean.declaration} · ${lean.revision}` : "Lean proof: not yet recorded.", "catalog-muted"));
+    if (lean) detail.append(el("p", `Lean: ${lean.module} · ${lean.declaration} · ${lean.revision}`, "catalog-muted"));
     return detail;
   }
 
@@ -79,31 +82,49 @@
     const sortedObjects = [...objects.values()].sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
     const searchText = new Map(sortedObjects.map(obj => [obj.id, `${obj.name} ${obj.notation} ${obj.id} ${obj.kind} ${obj.family} ${JSON.stringify(obj.parameters)}`.toLowerCase()]));
     const state = { source: null, target: null, category: null, operation: "hom", sourceView: null, targetView: null };
-    let showAllRelations = false;
+    let relationLimit = 6;
+    let pickerEndpoint = "source", pickerLimit = 40;
+    let homTarget = null, homTargetView = null;
     const objectViews = (id, category = null) => (indexes.views_by_object[id] || []).map(viewId => views.get(viewId)).filter(view => !category || view.category_id === category);
     const matchesCategory = (record) => !state.category || !record.category_id || record.category_id === state.category;
     const pairKey = () => `${state.source}\0${state.target}\0${state.category || ""}`;
     let previousPair;
 
-    function filterObjects(endpoint) {
-      const search = $(`${endpoint}-search`).value.trim().toLowerCase();
+    function renderPicker() {
+      const search = $("picker-search").value.trim().toLowerCase();
       const tokens = search.split(/\s+/).filter(Boolean);
       const matches = sortedObjects.filter(obj => tokens.every(token => searchText.get(obj.id).includes(token)));
-      const selected = state[endpoint];
-      const select = $(endpoint);
-      select.replaceChildren();
-      if (!matches.some(obj => obj.id === selected) && objects.has(selected)) {
-        const option = el("option", `${objects.get(selected).name} (current selection)`);
-        option.value = selected;
-        select.append(option);
+      const wrapper = $("picker-results");
+      wrapper.replaceChildren();
+      $("picker-count").textContent = `${matches.length} object${matches.length === 1 ? "" : "s"}${matches.length > pickerLimit ? ` · showing ${pickerLimit}` : ""}`;
+      if (!matches.length) wrapper.append(el("p", "No matches. Try a shorter name or a different notation.", "catalog-empty"));
+      for (const obj of matches.slice(0, pickerLimit)) {
+        const button = el("button", null, "catalog-picker-option");
+        button.type = "button";
+        button.dataset.objectId = obj.id;
+        button.setAttribute("aria-label", `${obj.name}${obj.status === "family" ? ", symbolic family" : ""}`);
+        button.setAttribute("aria-pressed", String(obj.id === state[pickerEndpoint]));
+        const title = el("span", obj.name, "catalog-picker-name");
+        const meta = el("span", `${humanize(obj.kind)}${obj.status === "family" ? " · family" : ""}`, "catalog-muted");
+        button.append(title, meta);
+        button.addEventListener("click", () => {
+          state[pickerEndpoint] = obj.id;
+          $("picker").close();
+          render();
+        });
+        wrapper.append(button);
       }
-      for (const obj of matches) {
-        const option = el("option", `${obj.name}${obj.status === "family" ? " · family" : ""}`);
-        option.value = obj.id;
-        select.append(option);
-      }
-      select.value = selected;
-      $(`${endpoint}-matches`).textContent = `${matches.length} matching object${matches.length === 1 ? "" : "s"}${search ? "; choose from the list below" : ""}.`;
+      $("picker-more").hidden = matches.length <= pickerLimit;
+    }
+
+    function openPicker(endpoint) {
+      pickerEndpoint = endpoint;
+      pickerLimit = 40;
+      $("picker-title").textContent = state.operation !== "hom" ? "Choose an object" : `Choose the ${endpoint}`;
+      $("picker-search").value = "";
+      renderPicker();
+      $("picker").showModal();
+      $("picker-search").focus();
     }
 
     function readUrl() {
@@ -114,8 +135,7 @@
       state.category = query.get("category");
       state.sourceView = query.get("source_view");
       state.targetView = query.get("target_view");
-      $("source-search").value = "";
-      $("target-search").value = "";
+      homTarget = null; homTargetView = null;
       render(false);
     }
 
@@ -125,7 +145,7 @@
         if (value) url.searchParams.set(key, value);
         else url.searchParams.delete(key);
       }
-      history.replaceState(null, "", url);
+      if (url.href !== location.href) history.pushState(null, "", url);
     }
 
     function reconcile() {
@@ -158,12 +178,16 @@
       }
       if (!choices.length) select.append(el("option", "No common category"));
       select.value = selected || "";
+      select.hidden = choices.length <= 1;
       select.disabled = !choices.length || (endpoint === "target" && state.operation !== "hom");
+      const meaningful = choices.length > 1 || choices.some(view => view.constraints?.length || (view.parameters && Object.keys(view.parameters).length) || view.description);
+      $(`${endpoint}-view-field`).hidden = !meaningful || (endpoint === "target" && state.operation !== "hom");
+      select.previousElementSibling.hidden = select.hidden;
       const info = $(`${endpoint}-view-info`);
       info.replaceChildren();
       if (!selected) return;
       const view = views.get(selected);
-      info.append(prose(`Scalars: ${view.scalar ?? "not specified / not applicable"}.`, "span"));
+      if (view.description && choices.length <= 1) info.append(prose(view.description));
       if (view.parameters && Object.keys(view.parameters).length) info.append(prose(` Parameters: ${Object.entries(view.parameters).map(([key, value]) => `${key} = ${display(value)}`).join("; ")}.`, "span"));
       if (view.constraints?.length) info.append(conditions(view.constraints, "Structure constraints"));
     }
@@ -171,23 +195,31 @@
     function renderCategory(common) {
       const select = $("category");
       select.replaceChildren();
-      for (const category of common) {
-        const option = el("option", category.name);
-        option.value = category.id;
-        select.append(option);
+      const withResults = new Set(objectViews(state.source).flatMap(view => (indexes.morphisms_by_source[view.id] || []).map(id => spaces.get(id)))
+        .filter(space => space.operation === state.operation && views.get(space.target_view).object_id === state.target)
+        .map(space => views.get(space.source_view).category_id));
+      for (const [label, hasResult] of [["With results", true], ["Other categories", false]]) {
+        const choices = common.filter(category => withResults.has(category.id) === hasResult);
+        if (!choices.length) continue;
+        const group = el("optgroup"); group.label = label;
+        for (const category of choices) {
+          const option = el("option", category.name); option.value = category.id; group.append(option);
+        }
+        select.append(group);
       }
       if (!common.length) select.append(el("option", "No common category recorded"));
       select.value = state.category || "";
       select.disabled = !common.length;
+      select.title = state.category ? categories.get(state.category).name : "No common category recorded";
       const wrapper = $("category-info");
       wrapper.replaceChildren();
       if (!state.category) {
-        wrapper.append(el("p", "These objects have no common category recorded in this catalogue. Their available structures are listed on the object cards. This does not assert that no common category exists.", "catalog-empty"));
+        wrapper.append(el("p", "These objects have no common category recorded. Choose another object to compare their maps.", "catalog-empty"));
         return;
       }
       const category = categories.get(state.category);
       const details = el("details");
-      details.append(el("summary", `What maps preserve in ${category.name}`));
+      details.append(el("summary", "What these maps preserve"));
       details.append(conditions(category.object_axioms, "Objects"), conditions(category.morphism_axioms, "Morphisms"));
       details.append(prose(`Units: ${category.unit_policy}. Regularity: ${category.regularity}.`));
       details.append(knowlLink(category.knowl, "Read category definition"));
@@ -197,26 +229,43 @@
     function renderObject(endpoint) {
       const obj = objects.get(state[endpoint]);
       const wrapper = $(`${endpoint}-card`);
-      wrapper.replaceChildren();
-      wrapper.append(el("p", endpoint === "source" ? "Source object" : "Target object", "kind"));
-      const title = el("h2", obj.name);
-      wrapper.append(title);
+      // Keep the opener and disclosure stable so updates preserve keyboard focus.
+      if (!wrapper.firstChild) {
+        const heading = el("div", null, "catalog-section-heading");
+        const change = el("button", "Change", "catalog-button");
+        change.type = "button";
+        change.id = `catalog-${endpoint}-change`;
+        change.setAttribute("aria-haspopup", "dialog");
+        change.addEventListener("click", () => openPicker(endpoint));
+        heading.append(el("div", null, "catalog-object-selected"), change);
+        wrapper.append(heading, el("details", null, "catalog-object-details"));
+      }
+      const label = state.operation === "hom" ? (endpoint === "source" ? "From" : "To") : "Object";
+      $(`${endpoint}-change`).setAttribute("aria-label", `Change ${state.operation === "hom" ? endpoint : "object"}: ${obj.name}`);
+      const selected = wrapper.querySelector(".catalog-object-selected");
+      selected.replaceChildren();
       const notation = el("div", null, "catalog-object-notation");
       notation.append(math(obj.notation));
-      wrapper.append(notation);
-      const badges = el("div", null, "catalog-badges");
-      badges.append(badge(humanize(obj.kind)), badge(obj.status === "family" ? "Symbolic family" : "Individual object"));
-      wrapper.append(badges);
-      if (obj.description) wrapper.append(prose(obj.description));
+      const name = el("div");
+      const title = el("h2"); title.append(knowlLink(obj.knowl, obj.name));
+      name.append(el("span", label, "catalog-object-label"), title);
+      if (obj.status === "family") name.append(badge("Symbolic family"));
+      selected.append(notation, name);
+      const details = wrapper.querySelector("details");
+      if (wrapper.dataset.objectId !== obj.id) details.open = false;
+      wrapper.dataset.objectId = obj.id;
+      details.replaceChildren(el("summary", "Object details"));
+      if (obj.description) details.append(prose(obj.description));
       const facts = el("dl", null, "catalog-facts");
       const addFact = (key, value) => facts.append(el("dt", key), prose(value, "dd"));
+      addFact("Type", humanize(obj.kind));
       addFact("Family", humanize(obj.family));
       for (const [key, value] of Object.entries(obj.parameters)) addFact(humanize(key), display(value));
       for (const [key, value] of Object.entries(obj.dimensions)) addFact(`${humanize(key)} dimension`, display(value));
-      wrapper.append(facts, conditions(obj.constraints, "Object constraints"));
-      const catDetails = el("details");
+      details.append(facts, conditions(obj.constraints, "Object constraints"));
       const categoryIds = [...new Set(objectViews(obj.id).map(v => v.category_id))];
-      catDetails.append(el("summary", `${categoryIds.length} recorded categor${categoryIds.length === 1 ? "y" : "ies"}`));
+      const catDetails = el("details");
+      catDetails.append(el("summary", `${categoryIds.length} categories`));
       const list = el("ul", null, "catalog-constraints");
       for (const id of categoryIds) {
         const item = el("li");
@@ -224,14 +273,39 @@
         list.append(item);
       }
       catDetails.append(list);
-      wrapper.append(catDetails);
+      details.append(catDetails);
       if (Object.keys(obj.properties).length) {
         const properties = el("details");
-        properties.append(el("summary", "Recorded properties"));
+        properties.append(el("summary", "Properties"));
         for (const [key, value] of Object.entries(obj.properties)) properties.append(prose(`${humanize(key)}: ${display(value)}`));
-        wrapper.append(properties);
+        details.append(properties);
       }
-      wrapper.append(el("p", obj.id, "catalog-object-id"), knowlLink(obj.knowl));
+      details.append(el("p", obj.id, "catalog-object-id"));
+    }
+
+    function renderSuggestions() {
+      const wrapper = $("suggestions");
+      wrapper.replaceChildren();
+      // Offer recorded results, without pretending that uncatalogued maps do not exist.
+      const alternatives = objectViews(state.source).flatMap(view => (indexes.morphisms_by_source[view.id] || []).map(id => spaces.get(id)))
+        .filter(space => space.operation === state.operation && views.get(space.target_view).object_id === state.target && (space.source_view !== state.sourceView || space.target_view !== state.targetView));
+      const unique = [...new Map(alternatives.map(space => [`${space.source_view}\0${space.target_view}`, space])).values()];
+      if (!unique.length) return;
+      const details = el("details");
+      details.open = !(indexes.morphism_lookup[state.sourceView]?.[state.targetView]?.[state.operation]?.length);
+      details.append(el("summary", `Explore ${unique.length} other structure${unique.length === 1 ? "" : "s"} with results`));
+      const list = el("div", null, "catalog-suggestions");
+      for (const record of unique) {
+        const view = views.get(record.source_view), target = views.get(record.target_view);
+        const button = el("button", categories.get(view.category_id).name + (view.description ? ` · ${view.description}` : "") + (target.id !== view.id && target.description ? ` → ${target.description}` : ""), "catalog-button");
+        button.type = "button";
+        button.addEventListener("click", () => {
+          state.category = view.category_id; state.sourceView = view.id; state.targetView = record.target_view;
+          render(); $("category").focus();
+        });
+        list.append(button);
+      }
+      details.append(list); wrapper.append(details);
     }
 
     function renderSpaces() {
@@ -242,10 +316,18 @@
       const complete = records.some(record => record.coverage === "complete");
       const partial = records.some(record => record.coverage === "partial");
       coverage.dataset.coverage = complete ? "complete" : partial ? "partial" : "unknown";
-      coverage.textContent = !state.category ? "No common category recorded" : !records.length ? "Not catalogued" : complete ? "Complete description recorded" : partial ? "Partial descriptions" : "Completeness not specified";
-      $("query-label").textContent = state.category ? `${state.operation[0].toUpperCase()}${state.operation.slice(1)} in ${categories.get(state.category).name}: ${objects.get(state.source).name}${state.operation === "hom" ? ` → ${objects.get(state.target).name}` : ""}` : "Choose objects with a common recorded category to query their maps.";
+      coverage.textContent = !state.category ? "" : !records.length ? "Not catalogued" : complete ? "Complete description" : partial ? "Partial description" : "Coverage unspecified";
+      coverage.hidden = !state.category;
+      $("morphisms-title").textContent = { aut: "Automorphisms", end: "Endomorphisms", hom: "Maps between objects" }[state.operation];
+      const queryLabel = $("query-label");
+      queryLabel.replaceChildren();
+      if (state.category) {
+        queryLabel.append(math(`\\operatorname{${state.operation[0].toUpperCase()}${state.operation.slice(1)}}(${objects.get(state.source).notation}${state.operation === "hom" ? `, ${objects.get(state.target).notation}` : ""})`));
+        queryLabel.append(document.createTextNode(` · ${categories.get(state.category).name}`));
+      }
+      renderSuggestions();
       if (!records.length) {
-        result.append(el("p", state.category ? "No description is catalogued for this collection of maps. This does not mean that it is empty. Try another category, or follow the object definitions." : "A Hom/End/Aut query requires both endpoints to carry structures in the same category.", "catalog-empty"));
+        result.append(el("p", state.category ? "No description yet. The maps may still exist; try another category or open the object definition." : "Choose objects with structures in the same category to see their maps.", "catalog-empty"));
         return;
       }
       for (const record of records) {
@@ -256,10 +338,13 @@
         completeness.dataset.coverage = record.coverage || "unknown";
         const proof = badge(humanize(record.evidence.status));
         proof.dataset.evidence = record.evidence.status;
-        badges.append(completeness, proof);
-        article.append(badges, prose(record.description), conditions(record.conditions));
+        // A single result already carries its coverage in the section heading.
+        if (records.length > 1) badges.append(completeness);
+        if (record.evidence.status === "conjectural") badges.append(proof);
+        if (badges.childElementCount) article.append(badges);
+        article.append(prose(record.description), conditions(record.conditions));
         if (record.result_object_ids?.length) {
-          const results = el("p", "Objects in this description: ");
+          const results = el("p", "See also: ");
           record.result_object_ids.forEach((id, index) => {
             if (index) results.append(document.createTextNode(", "));
             const obj = objects.get(id);
@@ -267,7 +352,7 @@
           });
           article.append(results);
         }
-        article.append(knowlLink(record.knowl, "Read the explanation"), evidence(record));
+        article.append(knowlLink(record.knowl, "Explanation"), evidence(record));
         result.append(article);
       }
     }
@@ -283,9 +368,10 @@
       const wrapper = $("diagram");
       wrapper.replaceChildren();
       if (!records.length) {
-        wrapper.append(el("p", "No relationship between this pair is recorded in the selected category or as a construction. Nearby relationships are listed below.", "catalog-muted"));
+        $("diagram-details").hidden = true;
         return;
       }
+      $("diagram-details").hidden = false;
       const displayed = records.slice(0, 8);
       const same = state.source === state.target;
       const height = Math.max(160, 100 + displayed.length * 36);
@@ -331,74 +417,110 @@
       const pair = all.filter(record => (inputs(record).includes(state.source) && record.target === state.target) || (inputs(record).includes(state.target) && record.target === state.source));
       renderDiagram(pair);
       const ordered = [...pair, ...all.filter(record => !pair.includes(record))];
-      const shown = showAllRelations ? ordered : ordered.slice(0, 30);
-      $("relations-status").textContent = `${all.length} adjacent relationship${all.length === 1 ? "" : "s"}${state.category ? ` in ${categories.get(state.category).name} or recorded as constructions` : " across recorded categories"}. No inverse or composition is inferred.`;
+      const shown = ordered.slice(0, relationLimit);
+      $("relations-status").textContent = `${all.length} relationship${all.length === 1 ? "" : "s"}`;
       const wrapper = $("relations");
       wrapper.replaceChildren();
       for (const record of shown) {
-        const article = el("article", null, "catalog-record");
+        const article = el("details", null, "catalog-record catalog-relation");
         article.dataset.relationshipId = record.id;
-        const heading = el("div", null, "catalog-relation-title");
+        const summary = el("summary");
+        const heading = el("span", null, "catalog-relation-title");
         const source = objects.get(record.source), target = objects.get(record.target);
         const arrow = el("span", isConstruction(record) ? "⇢" : "→", "catalog-relation-arrow");
         arrow.dataset.construction = String(isConstruction(record));
-        heading.append(knowlLink(source.knowl, source.name));
+        heading.append(el("span", source.name));
         if (record.parameters?.other_input_id) {
           const other = objects.get(record.parameters.other_input_id);
-          heading.append(document.createTextNode(" + "), knowlLink(other.knowl, other.name));
+          heading.append(document.createTextNode(" + "), el("span", other.name));
         }
-        heading.append(arrow, knowlLink(target.knowl, target.name));
+        heading.append(arrow, el("span", target.name));
         const badges = el("div", null, "catalog-badges");
-        badges.append(badge(humanize(record.kind)), badge(isConstruction(record) ? "Construction / structural relationship" : categories.get(record.category_id).name));
+        badges.append(badge(humanize(record.kind)), badge(isConstruction(record) ? "Structural" : categories.get(record.category_id).name));
         const proof = badge(humanize(record.evidence.status));
         proof.dataset.evidence = record.evidence.status;
-        badges.append(proof);
-        article.append(heading, badges, prose(record.statement), conditions(record.conditions));
+        if (record.evidence.status === "conjectural") badges.append(proof);
+        summary.append(heading, badges);
+        article.append(summary, prose(record.statement), conditions(record.conditions));
         const footer = el("div", null, "catalog-record-footer");
         const explore = el("a", "Explore this pair");
         const params = new URLSearchParams({ source: record.source, target: record.target, operation: "hom" });
         if (record.category_id) params.set("category", record.category_id);
         explore.href = `/catalog/explorer/?${params}`;
-        footer.append(knowlLink(record.knowl, "Read the relationship"), explore);
+        footer.append(knowlLink(record.knowl, "Explanation"), explore, knowlLink(source.knowl, "Source definition"), knowlLink(target.knowl, "Target definition"));
+        if (record.parameters?.other_input_id) footer.append(knowlLink(objects.get(record.parameters.other_input_id).knowl, "Other input definition"));
         article.append(footer, evidence(record));
         wrapper.append(article);
       }
-      if (!all.length) wrapper.append(el("p", "No adjacent relationships are catalogued for these selections.", "catalog-empty"));
+      if (!all.length) wrapper.append(el("p", "No related objects catalogued yet.", "catalog-empty"));
       if (all.length > shown.length) {
-        const more = el("button", `Show all ${all.length} relationships`, "catalog-show-more");
+        const more = el("button", `Show ${Math.min(6, all.length - shown.length)} more (${all.length - shown.length} remaining)`, "catalog-show-more");
         more.type = "button";
-        more.addEventListener("click", () => { showAllRelations = true; renderRelations(); });
+        more.addEventListener("click", () => {
+          const expanded = [...wrapper.querySelectorAll("details[data-relationship-id][open]")].map(node => node.dataset.relationshipId);
+          relationLimit += 6; renderRelations();
+          for (const node of wrapper.querySelectorAll("details[data-relationship-id]")) if (expanded.includes(node.dataset.relationshipId)) node.open = true;
+          wrapper.querySelectorAll(".catalog-relation > summary")[shown.length]?.focus();
+        });
         wrapper.append(more);
       }
     }
 
     function render(updateUrl = true) {
       const { common, sourceChoices, targetChoices } = reconcile();
-      if (previousPair !== pairKey()) showAllRelations = false;
+      if (previousPair !== pairKey()) { relationLimit = 6; $("diagram-details").open = false; }
       previousPair = pairKey();
       $("operation").value = state.operation;
-      $("target").disabled = state.operation !== "hom";
-      $("target-search").disabled = state.operation !== "hom";
-      $("end-note").hidden = state.operation === "hom";
-      filterObjects("source"); filterObjects("target");
+      $("target-card").hidden = state.operation !== "hom";
+      $("object-cards").classList.toggle("catalog-single-object", state.operation !== "hom");
       renderCategory(common);
       renderView("source", sourceChoices); renderView("target", targetChoices);
+      $("view-controls").hidden = $("source-view-field").hidden && $("target-view-field").hidden;
       renderObject("source"); renderObject("target");
       renderSpaces(); renderRelations();
       if (updateUrl) writeUrl();
     }
 
     for (const endpoint of ["source", "target"]) {
-      $(`${endpoint}-search`).addEventListener("input", () => filterObjects(endpoint));
-      $(endpoint).addEventListener("change", event => { state[endpoint] = event.target.value; render(); });
       $(`${endpoint}-view`).addEventListener("change", event => { state[`${endpoint}View`] = event.target.value; render(); });
     }
-    $("operation").addEventListener("change", event => { state.operation = event.target.value; render(); });
+    $("picker-search").addEventListener("input", () => { pickerLimit = 40; renderPicker(); });
+    $("picker-search").addEventListener("keydown", event => {
+      if (event.key === "ArrowDown") { event.preventDefault(); $("picker-results").querySelector("button")?.focus(); }
+      if (event.key === "Enter") { event.preventDefault(); $("picker-results").querySelector("button")?.click(); }
+    });
+    $("picker-results").addEventListener("keydown", event => {
+      const options = [...$("picker-results").querySelectorAll("button")];
+      const index = options.indexOf(document.activeElement);
+      if (event.key === "ArrowDown") { event.preventDefault(); options[Math.min(index + 1, options.length - 1)]?.focus(); }
+      if (event.key === "ArrowUp") { event.preventDefault(); (index > 0 ? options[index - 1] : $("picker-search")).focus(); }
+      if (event.key === "Home") { event.preventDefault(); options[0]?.focus(); }
+      if (event.key === "End") { event.preventDefault(); options.at(-1)?.focus(); }
+    });
+    $("picker-more").addEventListener("click", () => {
+      const previous = pickerLimit; pickerLimit += 40; renderPicker();
+      $("picker-results").querySelectorAll("button")[previous]?.focus();
+    });
+    $("picker").addEventListener("keydown", event => {
+      if (event.key === "Escape") { event.preventDefault(); event.stopPropagation(); $("picker").close(); }
+    });
+    $("picker-close").addEventListener("click", () => $("picker").close());
+    $("picker").addEventListener("close", () => $(`${pickerEndpoint}-change`).focus());
+    $("operation").addEventListener("change", event => {
+      if (state.operation === "hom") { homTarget = state.target; homTargetView = state.targetView; }
+      state.operation = event.target.value;
+      if (state.operation === "hom" && objects.has(homTarget)) { state.target = homTarget; state.targetView = homTargetView; }
+      render();
+    });
     $("category").addEventListener("change", event => { state.category = event.target.value; render(); });
     window.addEventListener("popstate", readUrl);
     readUrl();
     $("controls").hidden = false;
-    $("status").textContent = `${objects.size} objects · ${categories.size} categories · ${relationships.size} relationships · ${spaces.size} recorded collections of maps. Selectors include symbolic families as well as individual objects.`;
+    $("status").textContent = "";
+    $("status").hidden = true;
+    $("finite-link").hidden = !sortedObjects.some(obj => obj.properties.finite_group);
+    $("lie-link").hidden = !sortedObjects.some(obj => obj.properties.lie_group);
+    $("counts").textContent = `${objects.size} objects · ${categories.size} categories · ${spaces.size} map descriptions`;
     root.dataset.catalogReady = "true";
   }
 

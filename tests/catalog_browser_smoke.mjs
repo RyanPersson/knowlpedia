@@ -61,6 +61,14 @@ def shell(title, body, **kwargs):
 print(render_catalog_explorer(shell, None))
 `], { cwd: repo, encoding: "utf8" });
 
+async function chooseObject(page, endpoint, search, id) {
+  await page.locator(`#catalog-${endpoint}-change`).click();
+  await page.locator("#catalog-picker-search").fill(search);
+  await page.locator(`#catalog-picker-results [data-object-id="${id}"]`).click();
+  assert.equal(await page.locator("#catalog-picker").isVisible(), false);
+  assert.equal(await page.evaluate(() => document.activeElement.id), `catalog-${endpoint}-change`, "Choosing an object restores focus");
+}
+
 async function installStaticFixture(page, records) {
   await page.route("https://catalog.test/**", async route => {
     const url = new URL(route.request().url());
@@ -83,21 +91,22 @@ try {
   await page.goto("https://catalog.test/catalog/explorer/?source=a&target=a&operation=aut&category=vectors-r");
   await page.locator('[data-catalog-ready="true"]').waitFor();
   assert.match(await page.locator("#catalog-coverage").textContent(), /Complete description/);
-  assert.equal(await page.locator("#catalog-target").isDisabled(), true);
+  assert.equal(await page.locator("#catalog-target-card").isVisible(), false);
+  assert.equal(await page.locator("#catalog-view-controls").isVisible(), false, "Single canonical structures need no selector");
   assert.equal(await page.locator("#catalog-morphisms .katex").count(), 1);
   assert.equal(await page.locator('#catalog-morphisms a[href="/test/b/"]').count(), 1);
   await page.locator("#catalog-category").selectOption("vectors-c");
   assert.match(await page.locator("#catalog-coverage").textContent(), /Partial/);
   assert.equal(await page.locator("#catalog-morphisms [data-record-id=real-aut]").count(), 0);
   await page.locator("#catalog-operation").selectOption("end");
-  assert.match(await page.locator("#catalog-morphisms").textContent(), /does not mean that it is empty/);
+  assert.match(await page.locator("#catalog-morphisms").textContent(), /maps may still exist/);
   await page.locator("#catalog-source-view").selectOption("a-twisted");
   assert.equal(await page.locator("#catalog-target-view").inputValue(), "a-twisted");
   assert.match(await page.locator("#catalog-source-view-info").textContent(), /conjugated action/);
-  assert.match(await page.locator("#catalog-coverage").textContent(), /Completeness not specified/);
+  assert.match(await page.locator("#catalog-coverage").textContent(), /Coverage unspecified/);
   assert.match(await page.locator("#catalog-morphisms").textContent(), /conjugated structure/);
   await page.locator("#catalog-operation").selectOption("hom");
-  await page.locator("#catalog-target").selectOption("b");
+  await chooseObject(page, "target", "B real", "b");
   assert.equal(await page.locator("#catalog-category").inputValue(), "vectors-r");
   assert.match(await page.locator("#catalog-morphisms").textContent(), /recorded Hom description/);
   assert.equal(await page.locator("#catalog-morphisms img").count(), 0, "Record text must not inject HTML");
@@ -105,14 +114,36 @@ try {
   assert.equal(await page.locator(".catalog-edge:not(.construction)").count(), 1);
   assert.match(await page.locator('[data-relationship-id="two-input"] .catalog-relation-title').textContent(), /C group \+ A complex object/);
   assert.equal(new URL(page.url()).searchParams.get("target"), "b");
-  await page.locator("#catalog-source-search").fill("C group");
-  assert.match(await page.locator("#catalog-source-matches").textContent(), /1 matching object/);
-  await page.locator("#catalog-source").selectOption("c");
+  await page.locator("#catalog-operation").selectOption("aut");
+  assert.equal(await page.locator("#catalog-target-card").isVisible(), false);
+  await page.locator("#catalog-operation").selectOption("hom");
+  assert.equal(new URL(page.url()).searchParams.get("target"), "b", "Hom target survives an Aut round trip");
+  const beforeChange = page.url();
+  await chooseObject(page, "source", "C group", "c");
+  await page.goBack();
+  assert.equal(page.url(), beforeChange);
+  assert.equal(await page.locator("#catalog-source-card").getAttribute("data-object-id"), "a");
+  await page.goForward();
+  assert.equal(await page.locator("#catalog-source-card").getAttribute("data-object-id"), "c");
   assert.equal(await page.locator("#catalog-category").isDisabled(), true);
   assert.match(await page.locator("#catalog-category-info").textContent(), /no common category recorded/);
   assert.match(await page.locator("#catalog-morphisms").textContent(), /same category/);
-  await page.locator("#catalog-source-search").fill("");
-  await page.locator("#catalog-source").selectOption("d");
+  await page.locator("#catalog-source-change").click();
+  assert.equal(await page.evaluate(() => document.activeElement.id), "catalog-picker-search");
+  await page.locator("#catalog-picker-search").fill("no such object");
+  assert.equal(await page.locator("#catalog-picker-results button").count(), 0);
+  assert.match(await page.locator("#catalog-picker-results").textContent(), /No matches/);
+  await page.keyboard.press("Enter");
+  assert.equal(await page.locator("#catalog-picker").isVisible(), true, "Enter with no results leaves the search open");
+  await page.keyboard.press("Escape");
+  assert.equal(await page.evaluate(() => document.activeElement.id), "catalog-source-change");
+  await page.locator("#catalog-source-change").click();
+  await page.locator("#catalog-picker-search").fill("D symbolic");
+  await page.keyboard.press("ArrowDown");
+  assert.equal(await page.locator(":focus").getAttribute("data-object-id"), "d");
+  await page.keyboard.press("ArrowUp");
+  assert.equal(await page.evaluate(() => document.activeElement.id), "catalog-picker-search");
+  await page.keyboard.press("Enter");
   assert.match(await page.locator("#catalog-source-card").textContent(), /Symbolic family/);
   assert.match(await page.locator("#catalog-source-card").textContent(), /n >= 1/);
   await page.setViewportSize({ width: 390, height: 844 });
@@ -146,10 +177,15 @@ try {
     await actual.goto(`${base}/catalog/explorer/`);
     await actual.locator('[data-catalog-ready="true"]').waitFor();
     actualData ||= await actual.evaluate(async () => (await fetch("/indexes/catalog.json")).json());
-    const count = await actual.locator("#catalog-source option").count();
+    const count = actualData.objects.length;
     assert.ok(count > 100, `Expected a substantial actual catalogue, got ${count} objects`);
+    await actual.locator("#catalog-source-change").click();
+    assert.equal(await actual.locator("#catalog-picker-results button").count(), 40);
+    await actual.locator("#catalog-picker-more").click();
+    assert.equal(await actual.locator("#catalog-picker-results button").count(), 80);
+    await actual.locator("#catalog-picker-close").click();
     assert.equal(await actual.locator("#catalog-source-card .katex-error").count(), 0);
-    assert.ok(await actual.locator("#catalog-source-card a").count() > 0);
+    assert.equal(await actual.locator("#catalog-source-card .catalog-object-selected a").isVisible(), true, "Object definitions stay one click away");
     for (const record of actualData.morphism_spaces) {
       const source = actualData.views.find(view => view.id === record.source_view);
       const target = actualData.views.find(view => view.id === record.target_view);
@@ -158,6 +194,7 @@ try {
       await actual.locator('[data-catalog-ready="true"]').waitFor();
       assert.equal(await actual.locator(`[data-record-id="${record.id}"]`).count(), 1, `Actual record ${record.id} should be reachable by its declared views`);
       assert.equal(await actual.locator("#catalog-morphisms .katex-error").count(), 0, `Actual record ${record.id} should render its mathematics`);
+      assert.equal(await actual.locator("#catalog-query-label .katex-error").count(), 0, `Actual record ${record.id} should render its query notation`);
       for (const resultId of record.result_object_ids || []) {
         const result = actualData.objects.find(object => object.id === resultId);
         const href = `/${result.knowl.split("/").map(encodeURIComponent).join("/")}/`;
@@ -167,12 +204,38 @@ try {
     await actual.goto(`${base}/catalog/explorer/`);
     await actual.locator('[data-catalog-ready="true"]').waitFor();
     if (process.env.CATALOG_SCREENSHOT) await actual.screenshot({ path: process.env.CATALOG_SCREENSHOT, fullPage: true });
+    for (const width of [768, 390, 320]) {
+      await actual.setViewportSize({ width, height: 844 });
+      assert.equal(await actual.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false, `No page overflow at ${width}px`);
+      await actual.locator(".catalog-resources > summary").click();
+      const menu = await actual.locator(".catalog-resources > div").boundingBox();
+      assert.ok(menu.x >= 0 && menu.x + menu.width <= width, "Resources stay on screen when navigation wraps");
+      await actual.locator(".catalog-resources > summary").click();
+    }
     await actual.setViewportSize({ width: 390, height: 844 });
+    assert.ok(await actual.locator("#catalog-morphisms-title").evaluate(node => node.getBoundingClientRect().top) < 750, "The default result should begin in the first mobile viewport");
+    const resultCategories = await actual.locator('#catalog-category optgroup[label="With results"] option').count();
+    assert.ok(resultCategories > 1, "Recorded categories are easy to find");
+    assert.equal(await actual.locator("#catalog-relations > details").count(), 6);
+    await actual.locator("#catalog-relations > details > summary").first().click();
+    const openId = await actual.locator("#catalog-relations > details[open]").first().getAttribute("data-relationship-id");
+    await actual.locator(".catalog-show-more").click();
+    assert.equal(await actual.locator("#catalog-relations > details").count(), 12);
+    assert.equal(await actual.locator(`#catalog-relations > details[data-relationship-id="${openId}"]`).getAttribute("open"), "", "Loading more preserves expanded relationships");
+    await actual.locator("#catalog-suggestions > details > summary").click();
+    await actual.locator("#catalog-suggestions button").first().click();
+    assert.equal(await actual.locator("#catalog-morphisms [data-record-id]").count() > 0, true);
+    await actual.evaluate(() => document.documentElement.dataset.theme = "dark");
     assert.equal(await actual.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false);
+    const identity = actualData.objects.find(obj => obj.name === "SO0(p,q)");
+    if (identity) {
+      await chooseObject(actual, "source", "SO0(p,q)", identity.id);
+      assert.equal(await actual.locator("#catalog-source-card").getAttribute("data-object-id"), identity.id);
+    }
     assert.deepEqual(actualErrors, []);
     await actual.close();
   }
-  console.log("Catalogue browser smoke passed: category and structure switching, sparse queries, coverage, End/Aut identity, construction arrows, escaping, search, family constraints, and mobile layout.");
+  console.log("Catalogue browser smoke passed: searchable picker, keyboard/focus, history, category and structure switching, sparse queries, coverage, End/Aut identity, construction arrows, escaping, family constraints, and responsive layouts.");
 } finally {
   await browser.close();
 }
