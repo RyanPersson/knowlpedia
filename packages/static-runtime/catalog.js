@@ -322,7 +322,10 @@
       const queryLabel = $("query-label");
       queryLabel.replaceChildren();
       if (state.category) {
-        queryLabel.append(math(`\\operatorname{${state.operation[0].toUpperCase()}${state.operation.slice(1)}}(${objects.get(state.source).notation}${state.operation === "hom" ? `, ${objects.get(state.target).notation}` : ""})`));
+        const categoryNotation = categories.get(state.category).notation;
+        const sourceNotation = views.get(state.sourceView)?.notation || objects.get(state.source).notation;
+        const targetNotation = views.get(state.targetView)?.notation || objects.get(state.target).notation;
+        queryLabel.append(math(`\\operatorname{${state.operation[0].toUpperCase()}${state.operation.slice(1)}}${categoryNotation ? `_{${categoryNotation}}` : ""}(${sourceNotation}${state.operation === "hom" ? `, ${targetNotation}` : ""})`));
         queryLabel.append(document.createTextNode(` · ${categories.get(state.category).name}`));
       }
       renderSuggestions();

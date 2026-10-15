@@ -355,3 +355,44 @@ mean times were 44 microseconds for a Hom lookup, 111 microseconds for common
 categories, and 227 microseconds for octonion adjacency including two-input
 constructions. These are a corpus snapshot and local timings, not performance
 guarantees; ordinary knowl discovery/rendering is outside this measurement.
+
+## Sided regular modules over M₂(R)
+
+The fixed categories `left-modules-m-2-r` and `right-modules-m-2-r` use
+`assoc-m-2-r` as their base ring. Its default views carry the left and right
+regular actions, respectively. These are separate categories, not two
+interchangeable structures inside one category. No categories for other base
+rings are generated. View parameters identify the base ring and action for
+readers; parameters are metadata, not executable rules or inferred memberships.
+
+Categories and views may supply a nonempty `notation` string (LaTeX without
+delimiters). The explorer uses category notation as the Hom/End/Aut subscript
+and view notation for each argument. Older records retain their object
+notation and category-name label. These display fields never change lookup keys.
+
+Six explicit records describe self-Hom, End and Aut on the two regular views.
+The left endomorphism ring is `assoc-m-2-r-op`, with opposite multiplication;
+the right endomorphism ring is `assoc-m-2-r`. The proof knowl checks evaluation
+at 1, addition, composition, and units. In particular, R_a composed with R_b
+is R_(ba), whereas L_a composed with L_b is L_(ab). Transpose gives an
+isomorphism between the opposite matrix ring and the original ring, but the
+identity on their matrices does not. No record is synthesized from another
+operation, and missing Hom records still return `not-catalogued`.
+
+Reproduce from adjacent application and content checkouts on
+`feat/sided-regular-modules`:
+
+```bash
+make deps catalog-validate
+.venv/bin/python -m unittest discover -s tests -p 'test_catalog*.py'
+.venv/bin/python scripts/catalog.py export --output-dir tmp/catalog-export
+npx playwright install chromium
+CATALOG_DATA_PATH=tmp/catalog-export/catalog.json node tests/catalog_browser_smoke.mjs
+```
+
+`KNOWLPEDIA_CONTENT_PACKAGE` overrides the companion checkout path for the
+module regression test. `PLAYWRIGHT_CHROME_PATH` can select an installed
+Chromium executable. The browser suite visits every exported morphism record
+and checks sided notation, category switching, URL restoration, swaps, and
+unrecorded queries. Matrix-unit tests check the bilinear composition identities
+and use E12 and E21 to reject the wrong sidedness and multiplication order.

@@ -221,6 +221,36 @@ try {
         assert.ok(await actual.locator(`[data-record-id="${record.id}"] a[href="${href}"]`).count() > 0, `Actual record ${record.id} should link its result object ${resultId}`);
       }
     }
+    // Exercise the authored regular-module views through category changes and history.
+    if (actualData.categories.some(c => c.id === "left-modules-m-2-r")) {
+      await actual.goto(`${base}/catalog/explorer/?source=assoc-m-2-r&target=assoc-m-2-r&operation=end&category=left-modules-m-2-r`);
+      await actual.locator('[data-catalog-ready="true"]').waitFor();
+      for (const side of ["left", "right"]) {
+        await actual.locator("#catalog-category").selectOption(`${side}-modules-m-2-r`);
+        for (const operation of ["end", "aut", "hom"]) {
+          await actual.locator("#catalog-operation").selectOption(operation);
+          assert.equal(await actual.locator(`[data-record-id="${operation}-m-2-r-${side}-regular"]`).count(), 1);
+          assert.equal(await actual.locator("#catalog-query-label .katex-error").count(), 0);
+          const tex = await actual.locator('#catalog-query-label annotation[encoding="application/x-tex"]').textContent();
+          assert.ok(tex.includes(side === "left" ? "_{A-\\mathrm{Mod}}({}_A A" : "_{\\mathrm{Mod}-A}(A_A"), tex);
+        }
+        await actual.locator("#catalog-swap").click();
+        assert.equal(await actual.locator(`[data-record-id="hom-m-2-r-${side}-regular"]`).count(), 1);
+        await actual.reload();
+        await actual.locator('[data-catalog-ready="true"]').waitFor();
+        assert.equal(await actual.locator("#catalog-source-view").inputValue(), `assoc-m-2-r@${side}-modules-m-2-r`);
+      }
+      await actual.locator("#catalog-category").selectOption("left-modules-m-2-r");
+      await actual.goBack();
+      assert.equal(await actual.locator("#catalog-category").inputValue(), "right-modules-m-2-r");
+      await actual.goto(`${base}/catalog/explorer/?source=assoc-m-2-r&target=assoc-m-2-r-op&operation=hom&category=real-vector-spaces`);
+      await actual.locator('[data-catalog-ready="true"]').waitFor();
+      for (let i = 0; i < 2; i++) {
+        assert.match(await actual.locator("#catalog-coverage").textContent(), /Not catalogued/);
+        assert.match(await actual.locator("#catalog-morphisms").textContent(), /maps may still exist/);
+        await actual.locator("#catalog-swap").click();
+      }
+    }
     await actual.goto(`${base}/catalog/explorer/`);
     await actual.locator('[data-catalog-ready="true"]').waitFor();
     if (process.env.CATALOG_SCREENSHOT) await actual.screenshot({ path: process.env.CATALOG_SCREENSHOT, fullPage: true });

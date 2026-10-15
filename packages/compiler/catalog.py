@@ -275,6 +275,8 @@ def _shape(record: dict[str, Any], collection: str, registry: Mapping[str, Any],
         _text(record["scalar"], location + ".scalar", nullable=True)
         for key in ("object_axioms", "morphism_axioms"):
             _strings(record[key], location + "." + key)
+        if "notation" in record:
+            _text(record["notation"], location + ".notation")
     elif collection == "views":
         _required(record, "object_id category_id", location)
         for key in ("object_id", "category_id"):
@@ -285,6 +287,8 @@ def _shape(record: dict[str, Any], collection: str, registry: Mapping[str, Any],
             _require(isinstance(record["parameters"], dict), location + ".parameters", "expected an object")
         if "constraints" in record:
             _strings(record["constraints"], location + ".constraints")
+        if "notation" in record:
+            _text(record["notation"], location + ".notation")
     elif collection == "relationships":
         _required(record, "source target kind category_id statement knowl conditions evidence", location)
         for key in ("source", "target", "statement"):

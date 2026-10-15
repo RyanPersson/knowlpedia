@@ -124,6 +124,19 @@ class CatalogTests(unittest.TestCase):
         catalog.export_catalog(self.load(), self.root / "indexes")
         return self.root / "indexes" / "catalog.sqlite"
 
+    def test_optional_category_and_view_notation(self) -> None:
+        data = fixture()
+        data["categories"][0]["notation"] = r"A-\mathrm{Mod}"
+        data["views"][0]["notation"] = r"{}_A A"
+        normalized = self.load(data)
+        self.assertEqual(next(c for c in normalized["categories"] if c["id"] == "jord-r")["notation"], r"A-\mathrm{Mod}")
+        for collection in ("categories", "views"):
+            for invalid in (None, "", 1, []):
+                broken = copy.deepcopy(data)
+                broken[collection][0]["notation"] = invalid
+                with self.assertRaisesRegex(catalog.CatalogValidationError, "nonempty string"):
+                    self.load(broken)
+
     def test_default_views_and_named_structures_are_distinct(self) -> None:
         data = self.load()
         views = {row["id"]: row for row in data["views"]}
