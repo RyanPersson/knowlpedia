@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import argparse
 import atexit
-import base64
 import functools
 import hashlib
 import html
@@ -19,7 +18,6 @@ import re
 import shutil
 import subprocess
 import sys
-import tempfile
 import tomllib
 import unicodedata
 from dataclasses import dataclass, field
@@ -35,6 +33,7 @@ if _COMPILER_DIR not in sys.path:
 from graph_algorithms import cycle_witnesses
 import catalog
 import catalog_html
+import diagrams
 import private_facsimile
 import private_markdown
 
@@ -176,6 +175,11 @@ def find_katex_module() -> Path | None:
     return None
 
 
+def find_mathjax_module() -> Path | None:
+    module = repo_root() / "node_modules" / "mathjax"
+    return module if (module / "package.json").is_file() else None
+
+
 def find_katex_assets_dir() -> Path | None:
     repo_dir = repo_root()
     local_assets = repo_dir / "node_modules" / "katex" / "dist"
@@ -188,10 +192,6 @@ def find_katex_assets_dir() -> Path | None:
         if (assets_dir / "katex.min.css").is_file():
             return assets_dir
     return None
-
-
-def executable(name: str) -> str | None:
-    return shutil.which(name)
 
 
 def contains_diagram_environment(tex: str) -> bool:
@@ -226,274 +226,50 @@ def diagram_end_for_kind(kind: str) -> str:
 
 
 class DiagramRenderer:
+    """Render diagram blocks without TeX.
+
+    tikz-cd and the supported TikZ subset become inline SVG (see diagrams.py),
+    typeset by a MathJax worker that starts on the first diagram of a build.
+    amscd ``CD`` diagrams go to KaTeX, which supports them directly.
+    """
+
     def __init__(self) -> None:
-        self._png_engine = executable("pdflatex")
-        self._png_converter = executable("gs")
-        self._converter = executable("dvisvgm") or executable("pdftocairo")
-        if self._converter and Path(self._converter).name == "dvisvgm" and executable("latex"):
-            self._engine = executable("latex")
-            self._engine_output = "dvi"
-        else:
-            self._engine = executable("tectonic") or executable("pdflatex")
-            self._engine_output = "pdf"
         self._cache: dict[tuple[str, str], str] = {}
-        self._disk_cache_dir: Path | None = None
-        self._prebuilt_dir: Path | None = None
-        self._refresh_prebuilt = False
+        self._typesetter: diagrams.MathJaxTypesetter | None = None
+        self._unavailable = False
 
-    @property
-    def backend(self) -> str:
-        if self._png_engine and self._png_converter:
-            return "image"
-        if self._engine and self._converter:
-            return "svg"
-        return "source"
-
-    def configure_cache(self, cache_dir: Path | None) -> None:
-        self._disk_cache_dir = cache_dir
-        if self._disk_cache_dir:
-            self._disk_cache_dir.mkdir(parents=True, exist_ok=True)
-
-    def configure_prebuilt(self, prebuilt_dir: Path | None, *, refresh: bool = False) -> None:
-        self._prebuilt_dir = prebuilt_dir
-        self._refresh_prebuilt = refresh
-        self._cache.clear()
-        if self._prebuilt_dir:
-            self._prebuilt_dir.mkdir(parents=True, exist_ok=True)
-
-    def disable_local_rendering(self) -> None:
-        self._png_engine = None
-        self._png_converter = None
-        self._engine = None
-        self._converter = None
-        self._cache.clear()
+    def _get_typesetter(self) -> diagrams.MathJaxTypesetter | None:
+        if self._typesetter is None and not self._unavailable:
+            node, module = find_node(), find_mathjax_module()
+            if node and module:
+                self._typesetter = diagrams.MathJaxTypesetter(node, module)
+            else:
+                self._unavailable = True
+        return self._typesetter
 
     def render(self, source: str, kind: str = "tikz") -> str:
         source = source.strip()
         cache_key = (kind, source)
-        if cache_key in self._cache:
-            return self._cache[cache_key]
+        if cache_key not in self._cache:
+            self._cache[cache_key] = self._render(source, kind)
+        return self._cache[cache_key]
 
-        prebuilt_path = self._prebuilt_path(source, kind)
-        if not self._refresh_prebuilt and prebuilt_path and prebuilt_path.is_file():
-            rendered = prebuilt_path.read_text(encoding="utf-8")
-            self._cache[cache_key] = rendered
-            return rendered
-
-        disk_cache_path = self._disk_cache_path(source, kind)
-        if disk_cache_path and disk_cache_path.is_file():
-            rendered = disk_cache_path.read_text(encoding="utf-8")
-            self._cache[cache_key] = rendered
-            return rendered
-
-        rendered: str | None = None
-        if self._png_engine and self._png_converter:
-            rendered = self._render_png(source, kind)
-        elif self._engine and self._converter:
-            rendered = self._render_svg(source, kind)
-
-        if rendered is None:
-            rendered = self._render_source(source, kind)
-        self._cache[cache_key] = rendered
-        if disk_cache_path and "diagram-error" not in rendered and "diagram-source" not in rendered:
-            disk_cache_path.parent.mkdir(parents=True, exist_ok=True)
-            disk_cache_path.write_text(rendered, encoding="utf-8")
-        if (
-            self._refresh_prebuilt
-            and prebuilt_path
-            and "diagram-error" not in rendered
-            and "diagram-source" not in rendered
-        ):
-            prebuilt_path.write_text(rendered, encoding="utf-8")
-        return rendered
-
-    def _prebuilt_path(self, source: str, kind: str) -> Path | None:
-        if not self._prebuilt_dir:
-            return None
-        payload = {
-            "version": 1,
-            "kind": kind,
-            "source": source,
-            "document": self._document(source, kind),
-        }
-        digest = hashlib.sha256(json.dumps(payload, sort_keys=True).encode("utf-8")).hexdigest()
-        return self._prebuilt_dir / f"{digest}.html"
-
-    def _disk_cache_path(self, source: str, kind: str) -> Path | None:
-        if not self._disk_cache_dir or self.backend == "source":
-            return None
-        payload = {
-            "version": 1,
-            "backend": self.backend,
-            "kind": kind,
-            "source": source,
-            "document": self._document(source, kind),
-            "png_engine": self._png_engine,
-            "png_converter": self._png_converter,
-            "engine": self._engine,
-            "engine_output": self._engine_output,
-            "converter": self._converter,
-        }
-        digest = hashlib.sha256(json.dumps(payload, sort_keys=True).encode("utf-8")).hexdigest()
-        return self._disk_cache_dir / self.backend / f"{digest}.html"
-
-    def _render_png(self, source: str, kind: str) -> str | None:
-        with tempfile.TemporaryDirectory(prefix="knowl-diagram-") as tmp:
-            tmp_path = Path(tmp)
-            tex_path = tmp_path / "diagram.tex"
-            pdf_path = tmp_path / "diagram.pdf"
-            png_path = tmp_path / "diagram.png"
-            tex_path.write_text(self._document(source, kind), encoding="utf-8")
-
-            try:
-                compile_result = subprocess.run(
-                    [
-                        self._png_engine,
-                        "-halt-on-error",
-                        "-interaction=nonstopmode",
-                        tex_path.name,
-                    ],
-                    cwd=tmp_path,
-                    text=True,
-                    capture_output=True,
-                    timeout=30,
-                    check=False,
-                )
-            except Exception as exc:
-                return self._render_error(source, kind, str(exc))
-
-            if compile_result.returncode != 0 or not pdf_path.is_file():
-                log = (compile_result.stdout + "\n" + compile_result.stderr).strip()
-                return self._render_error(source, kind, log)
-
-            try:
-                convert_result = subprocess.run(
-                    [
-                        self._png_converter,
-                        "-dSAFER",
-                        "-dBATCH",
-                        "-dNOPAUSE",
-                        "-sDEVICE=pngalpha",
-                        "-r220",
-                        "-dTextAlphaBits=4",
-                        "-dGraphicsAlphaBits=4",
-                        f"-sOutputFile={png_path}",
-                        str(pdf_path),
-                    ],
-                    cwd=tmp_path,
-                    text=True,
-                    capture_output=True,
-                    timeout=30,
-                    check=False,
-                )
-            except Exception as exc:
-                return self._render_error(source, kind, str(exc))
-
-            if convert_result.returncode != 0 or not png_path.is_file():
-                log = (convert_result.stdout + "\n" + convert_result.stderr).strip()
-                return self._render_error(source, kind, log)
-
-            diagram_hash = hashlib.sha256(source.encode("utf-8")).hexdigest()[:12]
-            encoded = base64.b64encode(png_path.read_bytes()).decode("ascii")
-            return (
-                f'<figure class="diagram diagram-image diagram-{escape_attr(kind)}" '
-                f'data-diagram-hash="{diagram_hash}">'
-                '<div class="diagram-frame">'
-                f'<img src="data:image/png;base64,{encoded}" alt="Rendered {escape_attr(kind)} diagram" loading="lazy">'
-                "</div>"
-                "</figure>"
-            )
-
-    def _render_svg(self, source: str, kind: str) -> str | None:
-        with tempfile.TemporaryDirectory(prefix="knowl-diagram-") as tmp:
-            tmp_path = Path(tmp)
-            tex_path = tmp_path / "diagram.tex"
-            compiled_path = tmp_path / f"diagram.{self._engine_output}"
-            svg_path = tmp_path / "diagram.svg"
-            tex_path.write_text(self._document(source, kind), encoding="utf-8")
-
-            if self._engine and Path(self._engine).name == "tectonic":
-                command = [self._engine, "--outdir", str(tmp_path), str(tex_path)]
-            else:
-                command = [
-                    self._engine,
-                    "-halt-on-error",
-                    "-interaction=nonstopmode",
-                    tex_path.name,
-                ]
-            try:
-                compile_result = subprocess.run(
-                    command,
-                    cwd=tmp_path,
-                    text=True,
-                    capture_output=True,
-                    timeout=30,
-                    check=False,
-                )
-            except Exception as exc:
-                return self._render_error(source, kind, str(exc))
-
-            if compile_result.returncode != 0 or not compiled_path.is_file():
-                log = (compile_result.stdout + "\n" + compile_result.stderr).strip()
-                return self._render_error(source, kind, log)
-
-            try:
-                if self._converter and Path(self._converter).name == "dvisvgm":
-                    convert_command = [self._converter, "--bbox=min", str(compiled_path), "-o", str(svg_path)]
-                    if compiled_path.suffix == ".pdf":
-                        convert_command.insert(1, "--pdf")
-                else:
-                    convert_command = [self._converter, "-svg", str(compiled_path), str(svg_path)]
-                convert_result = subprocess.run(
-                    convert_command,
-                    cwd=tmp_path,
-                    text=True,
-                    capture_output=True,
-                    timeout=30,
-                    check=False,
-                )
-            except Exception as exc:
-                return self._render_error(source, kind, str(exc))
-
-            if convert_result.returncode != 0 or not svg_path.is_file():
-                log = (convert_result.stdout + "\n" + convert_result.stderr).strip()
-                return self._render_error(source, kind, log)
-
-            svg = svg_path.read_text(encoding="utf-8")
-            svg = re.sub(r"<\?xml[^>]*>\s*", "", svg).strip()
-            svg = re.sub(r"<!DOCTYPE[^>]*>\s*", "", svg).strip()
-            diagram_hash = hashlib.sha256(source.encode("utf-8")).hexdigest()[:12]
-            return (
-                f'<figure class="diagram diagram-svg diagram-{escape_attr(kind)}" '
-                f'data-diagram-hash="{diagram_hash}">'
-                f'<div class="diagram-frame">{svg}</div>'
-                "</figure>"
-            )
-
-    def _document(self, source: str, kind: str) -> str:
-        body = source
-        if kind == "tikz" and r"\begin{tikzpicture}" not in source:
-            body = "\\begin{tikzpicture}\n" + source + "\n\\end{tikzpicture}"
-        elif kind in {"tikz-cd", "tikzcd"} and r"\begin{tikzcd}" not in source:
-            body = "\\begin{tikzcd}\n" + source + "\n\\end{tikzcd}"
-        elif kind == "cd":
-            if r"\begin{CD}" not in source:
-                body = "\\begin{CD}\n" + source + "\n\\end{CD}"
-            if not body.lstrip().startswith((r"\[", "$$")):
-                body = "\\(\n\\displaystyle\n" + body + "\n\\)"
-
-        return "\n".join(
-            [
-                r"\documentclass[tikz,border=8pt]{standalone}",
-                r"\usepackage{amsmath,amssymb,amscd}",
-                r"\usepackage{tikz}",
-                r"\usepackage{tikz-cd}",
-                r"\usetikzlibrary{arrows.meta,calc,cd,decorations.pathmorphing,matrix,positioning}",
-                r"\begin{document}",
-                body,
-                r"\end{document}",
-                "",
-            ]
+    def _render(self, source: str, kind: str) -> str:
+        if kind == "cd":
+            body = source if r"\begin{CD}" in source else "\\begin{CD}\n" + source + "\n\\end{CD}"
+            return f'<figure class="diagram diagram-cd">{MATH_RENDERER.render(body, True)}</figure>'
+        typesetter = self._get_typesetter()
+        if typesetter is None:
+            return self._render_source(source, kind)
+        try:
+            svg = diagrams.render(source, kind, typesetter)
+        except diagrams.DiagramError as exc:
+            return self._render_error(source, kind, str(exc))
+        diagram_hash = hashlib.sha256(source.encode("utf-8")).hexdigest()[:12]
+        return (
+            f'<figure class="diagram diagram-vector diagram-{escape_attr(kind)}" data-diagram-hash="{diagram_hash}">'
+            f'<div class="diagram-frame">{svg}</div>'
+            "</figure>"
         )
 
     def _render_source(self, source: str, kind: str) -> str:
@@ -504,16 +280,11 @@ class DiagramRenderer:
             "</figure>"
         )
 
-    def _render_error(self, source: str, kind: str, log: str) -> str:
-        if not log:
-            log = "Diagram renderer failed without diagnostic output."
+    def _render_error(self, source: str, kind: str, message: str) -> str:
         return (
             f'<figure class="diagram diagram-error diagram-{escape_attr(kind)}">'
-            "<figcaption>Diagram render failed</figcaption>"
+            f"<figcaption>Diagram render failed: {html.escape(message)}</figcaption>"
             f"<pre><code>{html.escape(source)}</code></pre>"
-            "<details><summary>Render log</summary>"
-            f"<pre><code>{html.escape(log[-6000:])}</code></pre>"
-            "</details>"
             "</figure>"
         )
 
@@ -577,8 +348,8 @@ class MathRenderer:
         tex = tex.strip()
         if private_markdown.ACTIVE.get() is not None:
             return private_markdown.render_math(tex, display)
-        if display and contains_diagram_environment(tex):
-            kind = "cd" if "\\begin{CD}" in tex else "tikz-cd" if "\\begin{tikzcd}" in tex else "tikz"
+        if display and contains_diagram_environment(tex) and "\\begin{CD}" not in tex:
+            kind = "tikz-cd" if "\\begin{tikzcd}" in tex else "tikz"
             return DIAGRAM_RENDERER.render(tex, kind)
 
         cache_key = (tex, display)
@@ -666,6 +437,7 @@ class Knowl:
     sections: list[dict[str, Any]] = field(default_factory=list)
     relations: list[dict[str, Any]] = field(default_factory=list)
     knowls_open: bool = False
+    learning_path: bool = False
     visibility: str = "production"
     content_source: str = ""
     anchors: set[str] = field(default_factory=set)
@@ -995,6 +767,7 @@ def knowl_from_meta(
         sections=sections or [],
         relations=list(meta.get("relations", [])),
         knowls_open=bool(meta.get("knowls_open", False)),
+        learning_path=bool(meta.get("learning_path", False)),
         redirect_to=redirect_to,
         redirect_sections=dict(redirect_sections),
         facsimile_manifest=meta.get("facsimile_manifest"),
@@ -1238,13 +1011,14 @@ def is_markdown_table_separator(line: str) -> bool:
     return bool(cells) and all(re.fullmatch(r":?-{3,}:?", cell) for cell in cells)
 
 
-def render_markdown(markdown: str, registry: dict[str, Knowl]) -> str:
+def render_markdown(markdown: str, registry: dict[str, Knowl], heading_ids: bool = False) -> str:
     lines = markdown.splitlines()
     out: list[str] = []
     i = 0
     list_mode: str | None = None
     in_code = False
     code_lines: list[str] = []
+    used_heading_ids: set[str] = set()
 
     def close_list() -> None:
         nonlocal list_mode
@@ -1362,7 +1136,16 @@ def render_markdown(markdown: str, registry: dict[str, Knowl]) -> str:
         if heading:
             close_list()
             level = len(heading.group(1))
-            out.append(f"<h{level}>{render_inline(heading.group(2), registry)}</h{level}>")
+            id_attr = ""
+            if heading_ids and level > 1:
+                base_id = heading_id = section_id_from_title(heading.group(2))
+                suffix = 2
+                while heading_id in used_heading_ids:
+                    heading_id = f"{base_id}-{suffix}"
+                    suffix += 1
+                used_heading_ids.add(heading_id)
+                id_attr = f' id="{escape_attr(heading_id)}"'
+            out.append(f"<h{level}{id_attr}>{render_inline(heading.group(2), registry)}</h{level}>")
             i += 1
             continue
 
@@ -1832,7 +1615,7 @@ def render_page(
                 f'<header class="page-header">{kind_html}<h1>{render_inline(knowl.title, registry)}</h1><p class="page-summary">{render_inline(knowl.summary, registry)}</p></header>',
                 f'<section class="core-section" id="section.core"{compact_core_attr}>',
                 core_heading_html,
-                render_markdown(without_redundant_leading_h1(knowl.core_markdown), registry),
+                render_markdown(without_redundant_leading_h1(knowl.core_markdown), registry, heading_ids=True),
                 render_structured_core(knowl, registry),
                 "</section>",
                 "\n".join(section_html),
@@ -2033,12 +1816,26 @@ def directory_groups(registry: dict[str, Knowl]) -> dict[str, list[Knowl]]:
     return dict(sorted(grouped.items(), key=lambda item: directory_title(item[0]).casefold()))
 
 
+def learning_paths(registry: dict[str, Knowl]) -> list[Knowl]:
+    return sorted(
+        (
+            knowl for knowl in registry.values()
+            if knowl.learning_path and knowl.visibility == "production" and not knowl.redirect_to
+        ),
+        key=lambda knowl: knowl.title.casefold(),
+    )
+
+
 def render_homepage(
     registry: dict[str, Knowl],
     package: dict[str, Any],
     profile: BuildProfile = BUILD_PROFILES["development"],
 ) -> str:
     grouped = directory_groups(registry)
+    path_links = "".join(
+        f'<li><a href="{escape_attr(target_href(knowl.id))}"><span>{render_inline(knowl.title, registry)}</span></a></li>'
+        for knowl in learning_paths(registry)
+    )
     knowl_count = sum(len(knowls) for knowls in grouped.values())
     subject_links = []
     collection_links = []
@@ -2062,6 +1859,10 @@ def render_homepage(
             '<a href="/graph/"><strong>Dependency graph</strong><small>Explore prerequisites and dependents</small><span aria-hidden="true">&#8594;</span></a>',
             f'<a href="/index/"><strong>Complete index</strong><small>Browse all {knowl_count:,} knowls</small><span aria-hidden="true">&#8594;</span></a>',
             '</nav>',
+            '<section class="start-subjects start-paths" aria-labelledby="paths-title">'
+            '<div class="start-section-heading"><h2 id="paths-title">Learning paths</h2>'
+            '<p>Read a subject in prerequisite order, with each definition and theorem shown in place.</p></div>'
+            f'<ul>{path_links}</ul></section>' if path_links else "",
             '<section class="start-subjects" aria-labelledby="subjects-title">',
             '<div class="start-section-heading"><h2 id="subjects-title">Subjects</h2><p>Compact definitions first; examples, proofs, and references when needed.</p></div>',
             '<ul>' + "".join(subject_links) + '</ul>',
@@ -2976,45 +2777,11 @@ def main() -> int:
         metavar="KNOWL_ID",
         help="Rewrite only the selected knowl page and fragments. Index artifacts are left untouched.",
     )
-    parser.add_argument(
-        "--diagram-cache-dir",
-        type=Path,
-        default=Path(".knowl-cache/diagrams"),
-        help="Directory for persistent rendered diagram cache entries",
-    )
-    parser.add_argument(
-        "--no-diagram-cache",
-        action="store_true",
-        help="Disable the persistent rendered diagram cache for this run",
-    )
-    parser.add_argument(
-        "--prebuilt-diagram-dir",
-        type=Path,
-        default=Path("prebuilt/diagrams"),
-        help="Directory containing portable checked-in rendered diagram fragments",
-    )
-    parser.add_argument(
-        "--refresh-prebuilt-diagrams",
-        action="store_true",
-        help="Render diagrams locally and replace portable checked-in diagram fragments",
-    )
-    parser.add_argument(
-        "--prebuilt-only-diagrams",
-        action="store_true",
-        help="Disable local TeX rendering and use only portable prebuilt diagram fragments",
-    )
     args = parser.parse_args()
     try:
         profile = resolve_profile(args.profile)
     except ValueError as exc:
         parser.error(str(exc))
-    DIAGRAM_RENDERER.configure_cache(None if args.no_diagram_cache else args.diagram_cache_dir)
-    DIAGRAM_RENDERER.configure_prebuilt(
-        args.prebuilt_diagram_dir,
-        refresh=args.refresh_prebuilt_diagrams,
-    )
-    if args.prebuilt_only_diagrams:
-        DIAGRAM_RENDERER.disable_local_rendering()
     return write_site_for_ids(
         args.package_dir,
         args.out,

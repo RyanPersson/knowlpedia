@@ -89,7 +89,7 @@ class RenderedHtmlCheckerTests(unittest.TestCase):
         issues = self.scan('<a class="missing-knowl" href="/missing/">missing</a>')
         self.assertEqual([issue.kind for issue in issues], ["missing-knowl", "broken_local_link"])
 
-    def test_can_require_diagrams_to_be_prebuilt(self) -> None:
+    def test_can_require_diagrams_to_be_rendered(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             (root / "index.html").write_text(

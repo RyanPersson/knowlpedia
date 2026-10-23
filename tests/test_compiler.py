@@ -289,6 +289,15 @@ class RenderContractTests(unittest.TestCase):
             compiler.render_markdown("$$x^2$$", {}),
         )
 
+    def test_page_headings_get_unique_ids_only_when_requested(self) -> None:
+        markdown = "# Title\n\n## 1. Modules\n\n### Exercises\n\n## 2. Hom\n\n### Exercises"
+        rendered = compiler.render_markdown(markdown, {}, heading_ids=True)
+        self.assertIn("<h1>Title</h1>", rendered)
+        self.assertIn('<h2 id="1-modules">', rendered)
+        self.assertIn('<h3 id="exercises">', rendered)
+        self.assertIn('<h3 id="exercises-2">', rendered)
+        self.assertNotIn(" id=", compiler.render_markdown(markdown, {}))
+
     def test_power_series_brackets_inside_math_are_not_wikilinks(self) -> None:
         rendered = compiler.render_inline(r"$\mathbb{F}_q[[t]]$", {})
         self.assertIn('class="katex"', rendered)
@@ -567,6 +576,36 @@ class RenderContractTests(unittest.TestCase):
         self.assertNotIn('subject-search', homepage)
         self.assertNotIn('subject-search', index)
 
+    def test_learning_paths_are_listed_above_subjects(self) -> None:
+        registry = {}
+        for knowl_id, visibility, flagged in (
+            ("analysis/concept", "production", False),
+            ("posts/path", "production", True),
+            ("posts/draft-path", "development", True),
+        ):
+            knowl = self.make_knowl()
+            knowl.id = knowl_id
+            knowl.title = knowl_id
+            knowl.visibility = visibility
+            knowl.learning_path = flagged
+            registry[knowl_id] = knowl
+        homepage = compiler.render_homepage(registry, {"title": "Knowlpedia"})
+        self.assertIn('class="start-subjects start-paths"', homepage)
+        self.assertIn('<a href="/posts/path/">', homepage)
+        self.assertNotIn("/posts/draft-path/", homepage)
+        self.assertLess(homepage.index('id="paths-title"'), homepage.index('id="subjects-title"'))
+
+        registry["posts/path"].learning_path = False
+        homepage = compiler.render_homepage(registry, {"title": "Knowlpedia"})
+        self.assertNotIn("start-paths", homepage)
+
+    def test_learning_path_flag_is_read_from_front_matter(self) -> None:
+        meta = {"id": "posts/path", "title": "Path", "kind": "page", "summary": "A path.", "learning_path": True}
+        knowl = compiler.knowl_from_meta(meta, Path("posts/path.knowl.md"), "Body.")
+        self.assertTrue(knowl.learning_path)
+        del meta["learning_path"]
+        self.assertFalse(compiler.knowl_from_meta(meta, Path("posts/path.knowl.md"), "Body.").learning_path)
+
     def test_large_knowl_index_uses_visible_lazy_loading_without_inline_templates(self) -> None:
         targets = {
             f"sample/target-{index}": compiler.Knowl(
@@ -599,30 +638,35 @@ class RenderContractTests(unittest.TestCase):
         self.assertNotIn("<template data-knowl-fragment=", rendered)
 
 
-class PrebuiltDiagramTests(unittest.TestCase):
-    def test_prebuilt_diagram_is_used_without_local_tex_tools(self) -> None:
-        with tempfile.TemporaryDirectory() as directory, patch.object(compiler, "executable", return_value=None):
-            renderer = compiler.DiagramRenderer()
-            renderer.configure_prebuilt(Path(directory))
-            source = r"A \arrow[r] & B"
-            prebuilt_path = renderer._prebuilt_path(source, "tikz-cd")
-            assert prebuilt_path is not None
-            expected = '<figure class="diagram diagram-image">prebuilt</figure>'
-            prebuilt_path.write_text(expected, encoding="utf-8")
-            self.assertEqual(renderer.render(source, "tikz-cd"), expected)
+class DiagramRendererTests(unittest.TestCase):
+    def test_tikz_cd_fence_renders_inline_svg(self) -> None:
+        renderer = compiler.DiagramRenderer()
+        rendered = renderer.render(r'A \arrow[r, "f"] & B', "tikz-cd")
+        if "diagram-source" in rendered:
+            self.skipTest("node or the mathjax package is not installed")
+        self.assertIn('<figure class="diagram diagram-vector diagram-tikz-cd"', rendered)
+        self.assertIn("<svg ", rendered)
+        self.assertNotIn("<img", rendered)
 
-    def test_refresh_writes_portable_prebuilt_fragment(self) -> None:
-        with tempfile.TemporaryDirectory() as directory, patch.object(compiler, "executable", return_value=None):
+    def test_unsupported_syntax_renders_an_error_naming_it(self) -> None:
+        renderer = compiler.DiagramRenderer()
+        rendered = renderer.render(r"A \arrow[r, squiggly] & B", "tikz-cd")
+        if "diagram-source" in rendered:
+            self.skipTest("node or the mathjax package is not installed")
+        self.assertIn('class="diagram diagram-error diagram-tikz-cd"', rendered)
+        self.assertIn("squiggly", rendered)
+
+    def test_source_is_shown_without_mathjax(self) -> None:
+        with patch.object(compiler, "find_mathjax_module", return_value=None):
             renderer = compiler.DiagramRenderer()
-            renderer._png_engine = "pdflatex"
-            renderer._png_converter = "gs"
-            renderer._render_png = lambda source, kind: '<figure class="diagram diagram-image">fresh</figure>'
-            renderer.configure_prebuilt(Path(directory), refresh=True)
-            source = r"A \arrow[r] & B"
-            rendered = renderer.render(source, "tikz-cd")
-            prebuilt_path = renderer._prebuilt_path(source, "tikz-cd")
-            assert prebuilt_path is not None
-            self.assertEqual(prebuilt_path.read_text(encoding="utf-8"), rendered)
+            rendered = renderer.render(r"A \arrow[r] & B", "tikz-cd")
+        self.assertIn('class="diagram diagram-source diagram-tikz-cd"', rendered)
+
+    def test_amscd_goes_to_the_math_renderer(self) -> None:
+        with patch.object(compiler.MATH_RENDERER, "render", return_value="<span>cd</span>") as render:
+            rendered = compiler.DiagramRenderer().render(r"A @>f>> B", "cd")
+        render.assert_called_once_with("\\begin{CD}\nA @>f>> B\n\\end{CD}", True)
+        self.assertEqual(rendered, '<figure class="diagram diagram-cd"><span>cd</span></figure>')
 
 
 if __name__ == "__main__":
