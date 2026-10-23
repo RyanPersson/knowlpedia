@@ -599,6 +599,14 @@ class RenderContractTests(unittest.TestCase):
         homepage = compiler.render_homepage(registry, {"title": "Knowlpedia"})
         self.assertNotIn("start-paths", homepage)
 
+    def test_learning_path_page_has_no_kind_label(self) -> None:
+        knowl = self.make_knowl()
+        knowl.kind = "page"
+        registry = {knowl.id: knowl}
+        self.assertIn('<p class="kind">Page</p>', compiler.render_page(knowl, registry, {"title": "Sample"}))
+        knowl.learning_path = True
+        self.assertNotIn('<p class="kind">Page</p>', compiler.render_page(knowl, registry, {"title": "Sample"}))
+
     def test_learning_path_flag_is_read_from_front_matter(self) -> None:
         meta = {"id": "posts/path", "title": "Path", "kind": "page", "summary": "A path.", "learning_path": True}
         knowl = compiler.knowl_from_meta(meta, Path("posts/path.knowl.md"), "Body.")
