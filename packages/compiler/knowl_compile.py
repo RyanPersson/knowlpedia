@@ -1589,7 +1589,8 @@ def render_page(
 
     kind = display_kind(knowl.kind)
     compact_core_attr = ' data-compact-core="true"' if knowl.progressive_sections else ""
-    kind_html = f'<p class="kind">{html.escape(kind)}</p>' if kind else ""
+    # A learning path is introduced by its title alone.
+    kind_html = f'<p class="kind">{html.escape(kind)}</p>' if kind and not knowl.learning_path else ""
     core_heading = core_heading_for_kind(knowl.kind)
     core_heading_html = (
         f'<h2 class="core-heading">{html.escape(core_heading)}</h2>' if core_heading else ""
