@@ -289,6 +289,15 @@ class RenderContractTests(unittest.TestCase):
             compiler.render_markdown("$$x^2$$", {}),
         )
 
+    def test_page_headings_get_unique_ids_only_when_requested(self) -> None:
+        markdown = "# Title\n\n## 1. Modules\n\n### Exercises\n\n## 2. Hom\n\n### Exercises"
+        rendered = compiler.render_markdown(markdown, {}, heading_ids=True)
+        self.assertIn("<h1>Title</h1>", rendered)
+        self.assertIn('<h2 id="1-modules">', rendered)
+        self.assertIn('<h3 id="exercises">', rendered)
+        self.assertIn('<h3 id="exercises-2">', rendered)
+        self.assertNotIn(" id=", compiler.render_markdown(markdown, {}))
+
     def test_power_series_brackets_inside_math_are_not_wikilinks(self) -> None:
         rendered = compiler.render_inline(r"$\mathbb{F}_q[[t]]$", {})
         self.assertIn('class="katex"', rendered)

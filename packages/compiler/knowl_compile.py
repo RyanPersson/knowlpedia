@@ -1238,13 +1238,14 @@ def is_markdown_table_separator(line: str) -> bool:
     return bool(cells) and all(re.fullmatch(r":?-{3,}:?", cell) for cell in cells)
 
 
-def render_markdown(markdown: str, registry: dict[str, Knowl]) -> str:
+def render_markdown(markdown: str, registry: dict[str, Knowl], heading_ids: bool = False) -> str:
     lines = markdown.splitlines()
     out: list[str] = []
     i = 0
     list_mode: str | None = None
     in_code = False
     code_lines: list[str] = []
+    used_heading_ids: set[str] = set()
 
     def close_list() -> None:
         nonlocal list_mode
@@ -1362,7 +1363,16 @@ def render_markdown(markdown: str, registry: dict[str, Knowl]) -> str:
         if heading:
             close_list()
             level = len(heading.group(1))
-            out.append(f"<h{level}>{render_inline(heading.group(2), registry)}</h{level}>")
+            id_attr = ""
+            if heading_ids and level > 1:
+                base_id = heading_id = section_id_from_title(heading.group(2))
+                suffix = 2
+                while heading_id in used_heading_ids:
+                    heading_id = f"{base_id}-{suffix}"
+                    suffix += 1
+                used_heading_ids.add(heading_id)
+                id_attr = f' id="{escape_attr(heading_id)}"'
+            out.append(f"<h{level}{id_attr}>{render_inline(heading.group(2), registry)}</h{level}>")
             i += 1
             continue
 
@@ -1832,7 +1842,7 @@ def render_page(
                 f'<header class="page-header">{kind_html}<h1>{render_inline(knowl.title, registry)}</h1><p class="page-summary">{render_inline(knowl.summary, registry)}</p></header>',
                 f'<section class="core-section" id="section.core"{compact_core_attr}>',
                 core_heading_html,
-                render_markdown(without_redundant_leading_h1(knowl.core_markdown), registry),
+                render_markdown(without_redundant_leading_h1(knowl.core_markdown), registry, heading_ids=True),
                 render_structured_core(knowl, registry),
                 "</section>",
                 "\n".join(section_html),

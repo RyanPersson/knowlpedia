@@ -860,6 +860,8 @@ kbd {
   margin: 0 auto;
 }
 
+.core-section :is(h2, h3, h4)[id] { scroll-margin-top: 7rem; }
+
 .breadcrumb {
   width: min(100%, 780px);
   display: flex;
