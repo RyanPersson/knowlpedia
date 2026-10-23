@@ -437,6 +437,7 @@ class Knowl:
     sections: list[dict[str, Any]] = field(default_factory=list)
     relations: list[dict[str, Any]] = field(default_factory=list)
     knowls_open: bool = False
+    learning_path: bool = False
     visibility: str = "production"
     content_source: str = ""
     anchors: set[str] = field(default_factory=set)
@@ -766,6 +767,7 @@ def knowl_from_meta(
         sections=sections or [],
         relations=list(meta.get("relations", [])),
         knowls_open=bool(meta.get("knowls_open", False)),
+        learning_path=bool(meta.get("learning_path", False)),
         redirect_to=redirect_to,
         redirect_sections=dict(redirect_sections),
         facsimile_manifest=meta.get("facsimile_manifest"),
@@ -1814,12 +1816,26 @@ def directory_groups(registry: dict[str, Knowl]) -> dict[str, list[Knowl]]:
     return dict(sorted(grouped.items(), key=lambda item: directory_title(item[0]).casefold()))
 
 
+def learning_paths(registry: dict[str, Knowl]) -> list[Knowl]:
+    return sorted(
+        (
+            knowl for knowl in registry.values()
+            if knowl.learning_path and knowl.visibility == "production" and not knowl.redirect_to
+        ),
+        key=lambda knowl: knowl.title.casefold(),
+    )
+
+
 def render_homepage(
     registry: dict[str, Knowl],
     package: dict[str, Any],
     profile: BuildProfile = BUILD_PROFILES["development"],
 ) -> str:
     grouped = directory_groups(registry)
+    path_links = "".join(
+        f'<li><a href="{escape_attr(target_href(knowl.id))}"><span>{render_inline(knowl.title, registry)}</span></a></li>'
+        for knowl in learning_paths(registry)
+    )
     knowl_count = sum(len(knowls) for knowls in grouped.values())
     subject_links = []
     collection_links = []
@@ -1843,6 +1859,10 @@ def render_homepage(
             '<a href="/graph/"><strong>Dependency graph</strong><small>Explore prerequisites and dependents</small><span aria-hidden="true">&#8594;</span></a>',
             f'<a href="/index/"><strong>Complete index</strong><small>Browse all {knowl_count:,} knowls</small><span aria-hidden="true">&#8594;</span></a>',
             '</nav>',
+            '<section class="start-subjects start-paths" aria-labelledby="paths-title">'
+            '<div class="start-section-heading"><h2 id="paths-title">Learning paths</h2>'
+            '<p>Read a subject in prerequisite order, with each definition and theorem shown in place.</p></div>'
+            f'<ul>{path_links}</ul></section>' if path_links else "",
             '<section class="start-subjects" aria-labelledby="subjects-title">',
             '<div class="start-section-heading"><h2 id="subjects-title">Subjects</h2><p>Compact definitions first; examples, proofs, and references when needed.</p></div>',
             '<ul>' + "".join(subject_links) + '</ul>',

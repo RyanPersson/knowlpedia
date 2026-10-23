@@ -576,6 +576,36 @@ class RenderContractTests(unittest.TestCase):
         self.assertNotIn('subject-search', homepage)
         self.assertNotIn('subject-search', index)
 
+    def test_learning_paths_are_listed_above_subjects(self) -> None:
+        registry = {}
+        for knowl_id, visibility, flagged in (
+            ("analysis/concept", "production", False),
+            ("posts/path", "production", True),
+            ("posts/draft-path", "development", True),
+        ):
+            knowl = self.make_knowl()
+            knowl.id = knowl_id
+            knowl.title = knowl_id
+            knowl.visibility = visibility
+            knowl.learning_path = flagged
+            registry[knowl_id] = knowl
+        homepage = compiler.render_homepage(registry, {"title": "Knowlpedia"})
+        self.assertIn('class="start-subjects start-paths"', homepage)
+        self.assertIn('<a href="/posts/path/">', homepage)
+        self.assertNotIn("/posts/draft-path/", homepage)
+        self.assertLess(homepage.index('id="paths-title"'), homepage.index('id="subjects-title"'))
+
+        registry["posts/path"].learning_path = False
+        homepage = compiler.render_homepage(registry, {"title": "Knowlpedia"})
+        self.assertNotIn("start-paths", homepage)
+
+    def test_learning_path_flag_is_read_from_front_matter(self) -> None:
+        meta = {"id": "posts/path", "title": "Path", "kind": "page", "summary": "A path.", "learning_path": True}
+        knowl = compiler.knowl_from_meta(meta, Path("posts/path.knowl.md"), "Body.")
+        self.assertTrue(knowl.learning_path)
+        del meta["learning_path"]
+        self.assertFalse(compiler.knowl_from_meta(meta, Path("posts/path.knowl.md"), "Body.").learning_path)
+
     def test_large_knowl_index_uses_visible_lazy_loading_without_inline_templates(self) -> None:
         targets = {
             f"sample/target-{index}": compiler.Knowl(
