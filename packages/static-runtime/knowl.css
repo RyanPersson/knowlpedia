@@ -1404,43 +1404,17 @@ pre {
   isolation: isolate;
 }
 
-.diagram-svg .diagram-frame,
-.diagram-image .diagram-frame {
+/* Vector diagrams draw in currentColor, so they follow the theme directly.
+   Label backgrounds and line gaps are painted in --diagram-knockout. */
+.diagram-vector .diagram-frame {
   padding: 0.55rem;
-  background: #ffffff;
-  color: #111111;
-}
-
-:root[data-theme="dark"] .diagram-svg .diagram-frame,
-:root[data-theme="dark"] .diagram-image .diagram-frame {
-  background: var(--canvas);
+  background: var(--surface);
   color: var(--ink);
+  --diagram-knockout: var(--surface);
 }
 
-:root[data-theme="dark"] .diagram-svg .diagram-frame svg,
-:root[data-theme="dark"] .diagram-image .diagram-frame img {
-  filter: invert(1) hue-rotate(180deg);
-  mix-blend-mode: screen;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme]) .diagram-svg .diagram-frame,
-  :root:not([data-theme]) .diagram-image .diagram-frame {
-    background: var(--canvas);
-    color: var(--ink);
-  }
-
-  :root:not([data-theme]) .diagram-svg .diagram-frame svg,
-  :root:not([data-theme]) .diagram-image .diagram-frame img {
-    filter: invert(1) hue-rotate(180deg);
-    mix-blend-mode: screen;
-  }
-}
-
-.diagram svg,
-.diagram img {
+.diagram-vector svg {
   display: block;
-  min-width: min(100%, 12rem);
   max-width: 100%;
   height: auto;
 }

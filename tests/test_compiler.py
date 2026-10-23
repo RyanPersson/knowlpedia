@@ -608,30 +608,35 @@ class RenderContractTests(unittest.TestCase):
         self.assertNotIn("<template data-knowl-fragment=", rendered)
 
 
-class PrebuiltDiagramTests(unittest.TestCase):
-    def test_prebuilt_diagram_is_used_without_local_tex_tools(self) -> None:
-        with tempfile.TemporaryDirectory() as directory, patch.object(compiler, "executable", return_value=None):
-            renderer = compiler.DiagramRenderer()
-            renderer.configure_prebuilt(Path(directory))
-            source = r"A \arrow[r] & B"
-            prebuilt_path = renderer._prebuilt_path(source, "tikz-cd")
-            assert prebuilt_path is not None
-            expected = '<figure class="diagram diagram-image">prebuilt</figure>'
-            prebuilt_path.write_text(expected, encoding="utf-8")
-            self.assertEqual(renderer.render(source, "tikz-cd"), expected)
+class DiagramRendererTests(unittest.TestCase):
+    def test_tikz_cd_fence_renders_inline_svg(self) -> None:
+        renderer = compiler.DiagramRenderer()
+        rendered = renderer.render(r'A \arrow[r, "f"] & B', "tikz-cd")
+        if "diagram-source" in rendered:
+            self.skipTest("node or the mathjax package is not installed")
+        self.assertIn('<figure class="diagram diagram-vector diagram-tikz-cd"', rendered)
+        self.assertIn("<svg ", rendered)
+        self.assertNotIn("<img", rendered)
 
-    def test_refresh_writes_portable_prebuilt_fragment(self) -> None:
-        with tempfile.TemporaryDirectory() as directory, patch.object(compiler, "executable", return_value=None):
+    def test_unsupported_syntax_renders_an_error_naming_it(self) -> None:
+        renderer = compiler.DiagramRenderer()
+        rendered = renderer.render(r"A \arrow[r, squiggly] & B", "tikz-cd")
+        if "diagram-source" in rendered:
+            self.skipTest("node or the mathjax package is not installed")
+        self.assertIn('class="diagram diagram-error diagram-tikz-cd"', rendered)
+        self.assertIn("squiggly", rendered)
+
+    def test_source_is_shown_without_mathjax(self) -> None:
+        with patch.object(compiler, "find_mathjax_module", return_value=None):
             renderer = compiler.DiagramRenderer()
-            renderer._png_engine = "pdflatex"
-            renderer._png_converter = "gs"
-            renderer._render_png = lambda source, kind: '<figure class="diagram diagram-image">fresh</figure>'
-            renderer.configure_prebuilt(Path(directory), refresh=True)
-            source = r"A \arrow[r] & B"
-            rendered = renderer.render(source, "tikz-cd")
-            prebuilt_path = renderer._prebuilt_path(source, "tikz-cd")
-            assert prebuilt_path is not None
-            self.assertEqual(prebuilt_path.read_text(encoding="utf-8"), rendered)
+            rendered = renderer.render(r"A \arrow[r] & B", "tikz-cd")
+        self.assertIn('class="diagram diagram-source diagram-tikz-cd"', rendered)
+
+    def test_amscd_goes_to_the_math_renderer(self) -> None:
+        with patch.object(compiler.MATH_RENDERER, "render", return_value="<span>cd</span>") as render:
+            rendered = compiler.DiagramRenderer().render(r"A @>f>> B", "cd")
+        render.assert_called_once_with("\\begin{CD}\nA @>f>> B\n\\end{CD}", True)
+        self.assertEqual(rendered, '<figure class="diagram diagram-cd"><span>cd</span></figure>')
 
 
 if __name__ == "__main__":
