@@ -60,8 +60,9 @@ try {
     Number.parseFloat(getComputedStyle(heading).fontSize)
   );
   if (desktopHeadingSize > 32) throw new Error("Desktop homepage heading is oversized");
-  if ((await page.locator(".start-subjects:not(.start-collections)").evaluate((section) => section.getBoundingClientRect().top)) > 650) {
-    throw new Error("Homepage subjects do not begin in the first desktop viewport");
+  const firstSection = page.locator(".start-subjects").first();
+  if ((await firstSection.evaluate((section) => section.getBoundingClientRect().top)) > 650) {
+    throw new Error("Homepage directory does not begin in the first desktop viewport");
   }
 
   await page.setViewportSize({ width: 390, height: 844 });

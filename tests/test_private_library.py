@@ -45,7 +45,7 @@ class PrivateLibraryTests(unittest.TestCase):
         page = (self.output / "documents/reading/index.html").read_text()
         self.assertIn('data-knowl-visibility="private"', page)
         self.assertIn('data-knowl="/fragments/sample/group/core.html"', page)
-        self.assertIn('<h2>Later heading</h2>', page)
+        self.assertIn('<h2 id="later-heading">Later heading</h2>', page)
         self.assertNotIn('<details class="knowl-section"', page)
         group = (self.output / "fragments/sample/group/core.html").read_text()
         self.assertIn('data-knowl="/fragments/sample/set/core.html"', group)

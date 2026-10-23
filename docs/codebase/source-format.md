@@ -47,6 +47,10 @@ The stable `id` determines the page URL and link target. `title`, `summary`, and
 
 With progressive sections, the text before the first level-two heading is the compact core; subsequent sections can open independently. The core must retain every qualification needed to interpret its statement. Documents use continuous reading by default; `section_mode = "continuous"` makes that intention explicit.
 
+On a knowl's full page, level-two to level-four headings in the core get an `id` derived from their text, such as `1-modules` for `## 1. Modules`; repeated headings get `-2`, `-3`, and so on. A contents list links to them with ordinary links that include the page path, such as `[1. Modules](/posts/module-theory-learning-path/#1-modules)`. Headings inside inline knowl panels get no `id`.
+
+A reading page made of inline knowls sets `knowls_open = true` so that its top-level knowl links start expanded. Adding `learning_path = true` also lists the page under “Learning paths” on the home page, above the subject directory. Only production pages are listed.
+
 ## Expandable links and prerequisites
 
 ```text
