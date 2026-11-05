@@ -78,6 +78,28 @@ class TitleTests(unittest.TestCase):
         item = knowl(id="posts/modules", title="Modules", kind="page", learning_path=True)
         self.assertEqual(self.full(item, "posts", "Long-form documents"), "Modules: learning path | Knowlpedia")
 
+    def test_subject_page_has_its_own_format(self):
+        item = knowl(id="algebra-commutative", title="Algebra: Commutative Algebra", kind="section")
+        self.assertEqual(
+            self.full(item, "algebra-commutative", "Commutative algebra"),
+            "Commutative algebra: definitions and theorems | Knowlpedia",
+        )
+
+    def test_subject_page_name_overrides_an_awkward_label(self):
+        item = knowl(id="analysis", title="Analysis", kind="section")
+        self.assertEqual(
+            self.full(item, "analysis", "Analysis: geometric and quantitative tools"),
+            "Analysis: definitions and theorems | Knowlpedia",
+        )
+
+    def test_landing_page_that_is_not_a_subject_uses_its_title(self):
+        item = knowl(id="shale-paper", title="Shale's Paper", kind="section")
+        self.assertEqual(self.full(item, "shale-paper", "Shale's paper"), "Shale's Paper | Knowlpedia")
+
+    def test_sub_index_page_keeps_the_subject_qualifier(self):
+        item = knowl(id="ergodic-theory/examples-index", title="Examples", kind="index")
+        self.assertEqual(self.full(item, "ergodic-theory", "Ergodic theory"), "Examples (ergodic theory) | Knowlpedia")
+
     def test_title_matching_its_subject_is_not_repeated(self):
         item = knowl(id="algebra-category-theory/index", title="Category Theory", kind="index")
         self.assertEqual(self.full(item, "algebra-category-theory", "Category theory"), "Category Theory | Knowlpedia")

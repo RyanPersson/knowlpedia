@@ -48,6 +48,11 @@ SUBJECT_QUALIFIERS = {
 # Long-form documents stand on their own; a subject would add nothing.
 UNQUALIFIED_SUBJECTS = frozenset({"knowlification", "posts"})
 
+# Landing pages that do not list a subject's results use their own title alone.
+NON_SUBJECT_LANDING_PAGES = frozenset({"catalog", "knowlification", "langlands-letter", "posts", "search", "shale-paper"})
+# Names for a subject's landing page where the index label would read badly.
+SUBJECT_PAGE_NAMES = {"analysis": "Analysis", "langlands": "Langlands program"}
+
 # Kinds shown after the title. Structural kinds (index, page, ...) have no label.
 LABELLED_KINDS = frozenset(
     {"calculation", "construction", "corollary", "definition", "example", "identity", "lemma", "notation", "proposition", "theorem"}
@@ -177,6 +182,10 @@ def subject_qualifier(subject_id: str, subject_label: str) -> str | None:
 def short_title(knowl: Any, subject_id: str, subject_label: str) -> str:
     """The page title without the site suffix, used for Open Graph."""
     title = plain_text(knowl.title)
+    if knowl.id == subject_id:
+        if subject_id in NON_SUBJECT_LANDING_PAGES:
+            return title
+        return f"{SUBJECT_PAGE_NAMES.get(subject_id, subject_label)}: definitions and theorems"
     qualifier = None if knowl.learning_path else subject_qualifier(subject_id, subject_label)
     label = kind_label(knowl)
     if qualifier and qualifier.casefold() == title.casefold():
