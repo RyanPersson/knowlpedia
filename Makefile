@@ -22,7 +22,7 @@ PREVIEW_URL ?= http://127.0.0.1:8001
 PREVIEW_PATH ?= /algebra-groups/group/
 SCREENSHOT ?= tmp/screenshots/page.png
 
-.PHONY: deps build build-production serve clean screenshot test test-ui test-home-ui test-graph-ui test-local-sources-ui audit-sections audit-external-links audit-scope
+.PHONY: deps build build-production serve clean screenshot test test-ui test-home-ui test-graph-ui test-local-sources-ui audit-sections audit-external-links audit-scope audit-subject-pages
 .PHONY: compose-content compose-production-content build-content serve-content build-page preview-diagram
 .PHONY: preview-start preview-status preview-stop preview-restart preview-scan preview-adopt
 .PHONY: check-rendering check-rendering-knowls check-rendering-content review-content normalize-math
@@ -64,6 +64,11 @@ audit-sections:
 audit-external-links:
 	$(PYTHON) scripts/audit_external_links.py $(CONTENT_PACKAGE)/content
 	@if [ -d "$(CONTENT_PACKAGE)/testing" ]; then $(PYTHON) scripts/audit_external_links.py $(CONTENT_PACKAGE)/testing; fi
+
+# Lists knowls that no subject or sub-index page links to. Placement needs a
+# decision, so pass --fail-on-findings directly to enforce it.
+audit-subject-pages:
+	$(PYTHON) scripts/audit_subject_pages.py $(CONTENT_PACKAGE)/content
 
 # Scope findings require semantic review and therefore do not fail by default.
 # Pass --fail-on-findings directly to the script when enforcing a reviewed set.
