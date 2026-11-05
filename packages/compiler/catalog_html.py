@@ -5,6 +5,8 @@ from __future__ import annotations
 from html import escape
 from typing import Callable, Any
 
+import seo
+
 
 def render_catalog_explorer(
     html_document: Callable[..., str],
@@ -84,6 +86,9 @@ def render_catalog_explorer(
         preload_mode="none",
         profile=profile,
         page_script="catalog.js",
+        seo_head=seo.site_page_head(
+            "/catalog/explorer/", "Category explorer", "Browse mathematical objects and the morphisms between them, category by category."
+        ),
     )
     version = escape(str(asset_version), quote=True)
     # KaTeX is already a pinned local site dependency; this page never loads a CDN.

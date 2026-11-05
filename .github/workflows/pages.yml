@@ -28,6 +28,8 @@ jobs:
           repository: RyanPersson/knowlpedia-content
           ref: main
           path: knowlpedia-content
+          # The sitemap's lastmod dates come from full commit history.
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v6

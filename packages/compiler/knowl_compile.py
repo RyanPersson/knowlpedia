@@ -36,20 +36,10 @@ import catalog_html
 import diagrams
 import private_facsimile
 import private_markdown
+import seo
+from knowl_patterns import FENCED_CODE_RE, INLINE_CODE_RE, MARKDOWN_LINK_RE, MATH_RE, WIKILINK_RE
 
 
-WIKILINK_RE = re.compile(
-    r"\[\[([A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)*(?:#[^\]|]+)?)(?:\|((?:[^\]]|\](?=\]\])|\](?!\]))*?))?\]\](?!\])"
-)
-MARKDOWN_LINK_RE = re.compile(r"\[([^\]\n]+)\]\(([^)\n]+)\)")
-INLINE_CODE_RE = re.compile(r"(?<!`)`([^`\n]+)`(?!`)")
-FENCED_CODE_RE = re.compile(
-    r"(?ms)^[ \t]*(`{3,})[^\n]*\n.*?^[ \t]*\1`*[ \t]*(?:\n|$)|"
-    r"^[ \t]*(~{3,})[^\n]*\n.*?^[ \t]*\2~*[ \t]*(?:\n|$)"
-)
-MATH_RE = re.compile(
-    r"(?s)(\$\$(.+?)\$\$|\\\[(.+?)\\\]|\\\((.+?)\\\)|(?<!\\)\$(?!\$)(.+?)(?<!\\)\$)"
-)
 DISPLAY_MATH_RE = re.compile(r"(?s)(\\\[(.+?)\\\]|\$\$(.+?)\$\$)")
 DIAGRAM_ENV_RE = re.compile(r"\\begin\{(tikzpicture|tikzcd|CD)\}")
 AGENT_STATUS_RE = re.compile(r"^\d+[smhd]\d+[smhd]\s+·\s+gpt-[^·]+·.*[↑↓↻Δ]")
@@ -557,7 +547,7 @@ def render_redirect_page(redirect: Knowl, destination: str, profile: BuildProfil
         body,
         preload_mode="none",
         profile=profile,
-        canonical_url=destination,
+        canonical_url=seo.absolute_url(destination),
         redirect_url=destination,
     )
 
@@ -1587,6 +1577,12 @@ def render_page(
             "</details>"
         )
 
+    page_title = f"{knowl.title} - {package['title']}"
+    seo_head = ""
+    if knowl.visibility == "production":
+        subject_id = knowl.id.split("/", 1)[0]
+        page_title, seo_head = seo.knowl_head(knowl, target_href(knowl.id), subject_id, directory_title(subject_id))
+
     kind = display_kind(knowl.kind)
     compact_core_attr = ' data-compact-core="true"' if knowl.progressive_sections else ""
     # A learning path is introduced by its title alone.
@@ -1606,7 +1602,7 @@ def render_page(
     )
 
     return html_document(
-        title=f"{knowl.title} - {package['title']}",
+        title=page_title,
         body="\n".join(
             [
                 '<main class="page-shell" id="main-content">',
@@ -1628,6 +1624,7 @@ def render_page(
         ),
         preload_mode=preload_mode,
         profile=profile,
+        seo_head=seo_head,
     )
 
 
@@ -1639,6 +1636,7 @@ def html_document(
     page_script: str | None = None,
     canonical_url: str | None = None,
     redirect_url: str | None = None,
+    seo_head: str = "",
 ) -> str:
     asset_version = runtime_asset_version()
     math_script = ""
@@ -1729,7 +1727,7 @@ __PALETTE_SCRIPT__
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{html.escape(title)}</title>
-{canonical_tags}{redirect_script}
+{seo_head}{canonical_tags}{redirect_script}
 {config_script}
 {theme_script}
   <link rel="stylesheet" href="/assets/katex.min.css?v={asset_version}">
@@ -1880,6 +1878,10 @@ def render_homepage(
         body,
         preload_mode="none",
         profile=profile,
+        seo_head=seo.homepage_head(
+            f"A linked library of {knowl_count:,} mathematical concepts and reading guides: "
+            "compact definitions first, with prerequisites, examples, and proofs."
+        ),
     )
 
 
@@ -1941,6 +1943,11 @@ def render_graph_page(
         preload_mode="visible",
         profile=profile,
         page_script="graph.js",
+        seo_head=seo.site_page_head(
+            "/graph/",
+            "Dependency graph",
+            f"Explore the prerequisites and dependents of {sum(len(items) for items in directory_groups(registry).values()):,} mathematical concepts.",
+        ),
     )
 
 
@@ -1985,7 +1992,17 @@ def render_index(
             )
         parts.append("</ul></details>")
     parts.append("</main>")
-    return html_document(f"Index - {package['title']}", "\n".join(parts), preload_mode="visible", profile=profile)
+    return html_document(
+        f"Index - {package['title']}",
+        "\n".join(parts),
+        preload_mode="visible",
+        profile=profile,
+        seo_head=seo.site_page_head(
+            "/index/",
+            "Index",
+            f"{knowl_count:,} definitions, theorems, and reading guides, grouped by subject and linked by prerequisite.",
+        ),
+    )
 
 
 def render_testing_hub(
@@ -2042,7 +2059,13 @@ def render_old_topics_page(
             "</main>",
         ]
     )
-    return html_document(f"Topics - {package['title']}", body, preload_mode="none", profile=profile)
+    return html_document(
+        f"Topics - {package['title']}",
+        body,
+        preload_mode="none",
+        profile=profile,
+        seo_head=seo.site_page_head("/topics/", "Topics", "Browse Knowlpedia's mathematical topics."),
+    )
 
 
 def validate(registry: dict[str, Knowl]) -> list[ValidationMessage]:
@@ -2495,6 +2518,65 @@ def copy_runtime_assets(out_dir: Path, profile: BuildProfile, include_document_m
         shutil.copytree(fonts_source, assets_dir / "fonts", dirs_exist_ok=True)
 
 
+def write_markdown_alternate(knowl: Knowl, out_dir: Path, registry: dict[str, Knowl]) -> None:
+    """Publish a public page's source beside its HTML, linking to canonical pages."""
+
+    def resolve(target: str) -> str | None:
+        canonical = canonical_target(registry, target)
+        destination = registry.get(split_target(canonical)[0])
+        if destination is None or destination.visibility != "production":
+            return None
+        return seo.absolute_url(target_href(canonical))
+
+    path = out_dir / slug_to_relpath(knowl.id) / "index.md"
+    path.write_text(
+        seo.markdown_document(knowl, target_href(knowl.id), without_redundant_leading_h1(knowl.core_markdown), resolve),
+        encoding="utf-8",
+    )
+
+
+def write_discovery_files(out_dir: Path, registry: dict[str, Knowl], package_dir: Path, content_root: Path) -> None:
+    """Write robots.txt, sitemap.xml, and llms.txt from public site data."""
+    manifest_path = package_dir / ".knowl-source-manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8")) if manifest_path.exists() else {}
+    source_roots = [Path(entry["content_root"]) for entry in manifest.get("sources", [])] or [content_root]
+    lastmods = seo.git_lastmods(source_roots)
+
+    grouped = directory_groups(registry)
+    entries: list[tuple[str, str | None]] = [("/", None), ("/index/", None), ("/graph/", None)]
+    for path in ("/catalog/explorer/", "/catalog/finite-groups/table/", "/catalog/lie-groups/table/"):
+        if (out_dir / path.strip("/") / "index.html").is_file():
+            entries.append((path, None))
+    for knowl in sorted((knowl for knowls in grouped.values() for knowl in knowls), key=lambda item: item.id):
+        relative = knowl.source_path.relative_to(content_root).as_posix() if knowl.source_path.is_relative_to(content_root) else ""
+        entries.append((target_href(knowl.id), lastmods.get(relative)))
+
+    knowl_count = sum(len(knowls) for knowls in grouped.values())
+    paths = learning_paths(registry)
+    posts = [knowl for knowl in sorted(grouped.get("posts", []), key=lambda item: item.title.casefold()) if knowl not in paths]
+    long_form = [
+        (seo.plain_text(knowl.title), target_href(knowl.id), seo.page_description(knowl))
+        for knowl in [*paths, *posts]
+    ]
+    rows = [(subject_id, directory_title(subject_id), len(knowls)) for subject_id, knowls in grouped.items()]
+    example = "algebra-modules/module" if "algebra-modules/module" in registry else next(iter(sorted(
+        knowl.id for knowls in grouped.values() for knowl in knowls
+    )), "")
+    (out_dir / "robots.txt").write_text(seo.ROBOTS_TXT, encoding="utf-8")
+    (out_dir / "sitemap.xml").write_text(seo.sitemap_xml(entries), encoding="utf-8")
+    (out_dir / "llms.txt").write_text(
+        seo.llms_txt(
+            knowl_count,
+            target_href(example),
+            long_form,
+            [row for row in rows if row[0] not in SOURCE_COLLECTIONS],
+            [row for row in rows if row[0] in SOURCE_COLLECTIONS],
+        ),
+        encoding="utf-8",
+    )
+    print(f"Wrote sitemap with {len(entries)} URLs, {sum(1 for _, lastmod in entries if lastmod)} with lastmod")
+
+
 def write_site(
     package_dir: Path,
     out_dir: Path,
@@ -2632,6 +2714,8 @@ def write_site_for_ids(
         page_path = out_dir / slug_to_relpath(knowl.id) / "index.html"
         page_path.parent.mkdir(parents=True, exist_ok=True)
         page_path.write_text(render_page(knowl, registry, package, fragment_cache, profile), encoding="utf-8")
+        if knowl.visibility == "production":
+            write_markdown_alternate(knowl, out_dir, registry)
         if knowl.facsimile:
             private_facsimile.write_assets_and_pages(knowl, out_dir, registry, render_ref, render_markdown, html_document, profile)
         if knowl.reading:
@@ -2711,6 +2795,7 @@ def write_site_for_ids(
                 lie_table_path = out_dir / "catalog" / "lie-groups" / "table" / "index.html"
                 lie_table_path.parent.mkdir(parents=True, exist_ok=True)
                 lie_table_path.write_text(lie_table, encoding="utf-8")
+        write_discovery_files(out_dir, registry, package_dir, content_roots[0][0])
         write_json(out_dir / "indexes" / "registry.json", registry_json(registry))
         write_compact_json(out_dir / "indexes" / "search.json", search_json(registry))
         write_json(out_dir / "indexes" / "relations.json", relations_json(registry))

@@ -5,6 +5,8 @@ from __future__ import annotations
 from html import escape
 from typing import Any, Callable
 
+import seo
+
 
 def render_finite_groups_table(
     html_document: Callable[..., str],
@@ -61,6 +63,9 @@ def render_finite_groups_table(
         preload_mode="none",
         profile=profile,
         page_script="finite-groups.js",
+        seo_head=seo.site_page_head(
+            "/catalog/finite-groups/table/", "A table of finite groups", "A sortable table of finite groups and their properties."
+        ),
     )
     version = escape(str(asset_version), quote=True)
     return page.replace(

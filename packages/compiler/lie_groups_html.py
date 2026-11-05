@@ -5,6 +5,8 @@ from __future__ import annotations
 from html import escape
 from typing import Any, Callable
 
+import seo
+
 
 def render_lie_groups_table(
     html_document: Callable[..., str],
@@ -64,6 +66,9 @@ def render_lie_groups_table(
     page = html_document(
         "A table of Lie groups · Knowlpedia", body,
         preload_mode="none", profile=profile, page_script="lie-groups.js",
+        seo_head=seo.site_page_head(
+            "/catalog/lie-groups/table/", "A table of Lie groups", "A sortable table of Lie groups and their properties."
+        ),
     )
     version = escape(str(asset_version), quote=True)
     return page.replace(
