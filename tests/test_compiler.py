@@ -599,6 +599,24 @@ class RenderContractTests(unittest.TestCase):
         homepage = compiler.render_homepage(registry, {"title": "Knowlpedia"})
         self.assertNotIn("start-paths", homepage)
 
+    def test_home_subject_links_to_its_page_or_else_its_index_section(self) -> None:
+        def knowl(knowl_id: str) -> compiler.Knowl:
+            item = compiler.Knowl(
+                id=knowl_id, title=knowl_id, kind="index", summary="s", aliases=[], domains=[],
+                source_path=Path("x.knowl.md"), core_markdown="",
+            )
+            return item
+
+        registry = {
+            knowl_id: knowl(knowl_id)
+            for knowl_id in ("convex-analysis", "convex-analysis/set", "algebra-coalgebras/coalgebra", "shale-paper", "shale-paper/one")
+        }
+        homepage = compiler.render_homepage(registry, {"title": "Knowlpedia"})
+        self.assertIn('<a href="/convex-analysis/">', homepage)
+        self.assertNotIn('href="/index/#subject-convex-analysis"', homepage)
+        self.assertIn('<a href="/index/#subject-algebra-coalgebras">', homepage)
+        self.assertIn('<a href="/index/#subject-shale-paper">', homepage)
+
     def test_learning_path_page_has_no_kind_label(self) -> None:
         knowl = self.make_knowl()
         knowl.kind = "page"

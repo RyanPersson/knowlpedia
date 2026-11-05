@@ -1840,9 +1840,17 @@ def render_homepage(
     collection_links = []
     for subject_id, knowls in grouped.items():
         title = directory_title(subject_id)
-        links = collection_links if subject_id in SOURCE_COLLECTIONS else subject_links
+        collection = subject_id in SOURCE_COLLECTIONS
+        links = collection_links if collection else subject_links
+        # A subject links to its own page; one without a page uses its index section.
+        subject_page = None if collection else registry.get(subject_id)
+        href = (
+            target_href(subject_page.id)
+            if subject_page and subject_page.visibility == "production"
+            else f"/index/#subject-{subject_id}"
+        )
         links.append(
-            f'<li><a href="/index/#subject-{escape_attr(subject_id)}">'
+            f'<li><a href="{escape_attr(href)}">'
             f'<span>{render_inline(title, registry)}</span><small>{len(knowls):,}</small></a></li>'
         )
 

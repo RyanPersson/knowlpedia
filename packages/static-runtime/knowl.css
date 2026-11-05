@@ -1062,6 +1062,11 @@ kbd {
   border-top: 1px solid var(--line);
 }
 
+/* Keep a linked subject clear of the sticky site header. */
+.index-section {
+  scroll-margin-top: 7rem;
+}
+
 .knowl-section > summary,
 .index-section > summary {
   min-height: 58px;
