@@ -43,6 +43,15 @@ class RenderedHtmlCheckerTests(unittest.TestCase):
         )
         self.assertEqual(issues, [])
 
+    def test_flags_a_thematic_break_rendered_as_text(self) -> None:
+        for rule in ("---", "***", "_____"):
+            issues = self.scan(f"<html><body><p>{rule}</p></body></html>")
+            self.assertEqual([issue.kind for issue in issues], ["raw_thematic_break"])
+
+    def test_allows_dashes_within_text_and_code(self) -> None:
+        issues = self.scan("<html><body><p>a --- b</p><pre>---</pre><code>---</code></body></html>")
+        self.assertEqual(issues, [])
+
     def test_flags_katex_parse_error_from_stray_math_backslash(self) -> None:
         issues = self.scan(
             r'<html><body><p>affine line <span class="math-inline math-katex">'

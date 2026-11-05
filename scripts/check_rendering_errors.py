@@ -40,6 +40,8 @@ DISPLAY_DELIMITER_RE = re.compile(r"(\\\[|\\\]|\$\$)")
 INLINE_MATH_RE = re.compile(r"(?<!\\)\$(?!\$)([^$\n]{1,500}?)(?<!\\)\$")
 RAW_LATEX_COMMAND_RE = re.compile(r"\\(?:lhd|cdots|triangleleft|cong|subseteq|mathbb|mathcal|frac|to|in)\b")
 VISIBLE_BACKSLASH_RE = re.compile(r"\\+")
+# The renderer has no thematic breaks, so a source rule shows up as literal text.
+THEMATIC_BREAK_RE = re.compile(r"(?:-{3,}|\*{3,}|_{3,})")
 
 
 @dataclass
@@ -105,6 +107,9 @@ class RenderedHtmlChecker(HTMLParser):
     def _check_text(self, text: str) -> None:
         raw_math_spans: list[tuple[int, int]] = []
         raw_latex_spans: list[tuple[int, int]] = []
+
+        if THEMATIC_BREAK_RE.fullmatch(text):
+            self._add_issue("error", "raw_thematic_break", text)
 
         for match in HUGO_PLACEHOLDER_RE.finditer(text):
             self._add_issue("error", "hugo_shortcode_placeholder", match.group(0))
