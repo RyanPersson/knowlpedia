@@ -1877,7 +1877,7 @@ def render_homepage(
             '<section class="start-subjects start-collections" aria-labelledby="collections-title">'
             '<div class="start-section-heading"><h2 id="collections-title">Sources and collections</h2>'
             '<p>Read through a paper or explore a connected collection.</p></div><ul>'
-            + "".join(collection_links) + '</ul></section>' if collection_links else "",
+            + "".join(collection_links) + '</ul></section>' if collection_links and profile.name == "development" else "",
             '</main>',
         ]
     )

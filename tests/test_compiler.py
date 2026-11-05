@@ -599,6 +599,18 @@ class RenderContractTests(unittest.TestCase):
         homepage = compiler.render_homepage(registry, {"title": "Knowlpedia"})
         self.assertNotIn("start-paths", homepage)
 
+    def test_home_collection_links_are_development_only(self) -> None:
+        item = compiler.Knowl(
+            id="shale-paper/one", title="One", kind="knowl", summary="s", aliases=[], domains=[],
+            source_path=Path("x.knowl.md"), core_markdown="",
+        )
+        registry = {item.id: item}
+        package = {"title": "Knowlpedia"}
+        self.assertIn("start-collections", compiler.render_homepage(registry, package, compiler.BUILD_PROFILES["development"]))
+        production = compiler.render_homepage(registry, package, compiler.BUILD_PROFILES["production"])
+        self.assertNotIn("start-collections", production)
+        self.assertNotIn("Sources and collections", production)
+
     def test_home_subject_links_to_its_page_or_else_its_index_section(self) -> None:
         def knowl(knowl_id: str) -> compiler.Knowl:
             item = compiler.Knowl(
