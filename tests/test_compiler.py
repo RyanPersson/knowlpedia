@@ -197,6 +197,10 @@ class BuildProfileTests(unittest.TestCase):
             self.assertTrue((development_out / "indexes" / "dependencies.json").is_file())
             self.assertTrue((development_out / "assets" / "knowl-testing.js").is_file())
             self.assertFalse((production_out / "assets" / "knowl-testing.js").exists())
+            self.assertTrue((development_out / "illuminated" / "index.html").is_file())
+            for relative in ("illuminated", "assets/illuminated.css", "assets/illumination.svg"):
+                self.assertTrue((development_out / relative).exists())
+                self.assertFalse((production_out / relative).exists())
             self.assertIn(
                 'data-knowlpedia-profile="development"',
                 (development_out / "index.html").read_text(encoding="utf-8"),
@@ -209,6 +213,8 @@ class BuildProfileTests(unittest.TestCase):
             self.assertIn('data-knowlpedia-development-content="false"', production_html)
             self.assertIn('data-knowlpedia-testing-ui="false"', production_html)
             self.assertNotIn('id="testing-open"', production_html)
+            self.assertNotIn('illuminated.css', production_html)
+            self.assertNotIn('data-edition-theme', production_html)
 
     def test_production_does_not_parse_malformed_testing_content(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

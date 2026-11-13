@@ -393,7 +393,8 @@
   }
 
   function toggleTheme() {
-    const nextTheme = effectiveTheme() === "dark" ? "light" : "dark";
+    const current = document.documentElement.dataset.theme || effectiveTheme();
+    const nextTheme = current === "dark" ? "light" : "dark";
     try {
       localStorage.setItem(themeKey, nextTheme);
     } catch (error) {}
@@ -528,7 +529,7 @@
   }
 
   function initTheme() {
-    applyTheme(effectiveTheme());
+    applyTheme(document.documentElement.dataset.theme || effectiveTheme());
     const button = document.getElementById("theme-toggle");
     if (button) button.addEventListener("click", toggleTheme);
     if (window.matchMedia) {

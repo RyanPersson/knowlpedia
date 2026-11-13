@@ -299,7 +299,10 @@ def check_build_profile(root: Path, required_profile: str) -> list[Issue]:
         root / "fragments" / "documents",
         root / "testing",
         root / "review",
+        root / "illuminated",
         root / "assets" / "knowl-testing.js",
+        root / "assets" / "illuminated.css",
+        root / "assets" / "illumination.svg",
     ]
     for path in forbidden_paths:
         if path.exists():

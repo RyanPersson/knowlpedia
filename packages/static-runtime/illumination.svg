@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" fill="none" stroke="black" stroke-width="1.2">
+  <!-- Original vector ornament: a ruled corner, a vine, and compass leaves. -->
+  <path d="M8 152V8h144M15 134V15h119M24 111V24h87"/>
+  <path d="M34 115c27-35 9-70 72-77M34 115c14-9 28-8 33 4-16 6-28 4-33-4Zm10-24c-19-7-24-20-17-32 17 10 21 21 17 32Zm8-28c5-19 19-27 32-22-6 18-18 25-32 22Zm28-23c8-17 20-22 33-15-8 14-20 19-33 15Z"/>
+  <path d="M43 40c-3-14-17-16-21-8 1 9 13 13 21 8Zm0 0c14 3 16 17 8 21-9-1-13-13-8-21Z"/>
+  <circle cx="43" cy="40" r="3" fill="black"/>
+  <circle cx="118" cy="37" r="2" fill="black"/>
+  <path d="m16 141 4 4-4 4-4-4Zm125-125 4 4 4-4-4-4Z" fill="black"/>
+</svg>

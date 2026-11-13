@@ -6,7 +6,8 @@
 
   const paletteKey = "knowl-palette";
   const feedbackTokenKey = "knowl-codex-access-key";
-  const palettes = ["current", "original", "washi", "sumi", "aizome"];
+  const palettes = ["current", "original", "washi", "sumi", "aizome", "vellum", "lapis", "black-hours"];
+  const manuscripts = ["vellum", "lapis", "black-hours"];
   let returnFocus = null;
   let feedbackKnowl = null;
   let feedbackPoll = null;
@@ -30,19 +31,48 @@
   function applyPalette(palette) {
     const next = palettes.includes(palette) ? palette : "current";
     document.documentElement.dataset.palette = next;
+    if (manuscripts.includes(next)) document.documentElement.dataset.manuscript = next;
+    else delete document.documentElement.dataset.manuscript;
     document.querySelectorAll(".palette-option[data-palette-value]").forEach((button) => {
       const selected = button.dataset.paletteValue === next;
       button.setAttribute("aria-checked", selected ? "true" : "false");
       button.tabIndex = selected ? 0 : -1;
     });
+    document.querySelectorAll(".palette-options").forEach((group) => {
+      if (!group.querySelector('[aria-checked="true"]')) {
+        const first = group.querySelector(".palette-option");
+        if (first) first.tabIndex = 0;
+      }
+    });
+    document.querySelectorAll("[data-edition-note]").forEach((note) => {
+      note.hidden = note.dataset.editionNote !== next;
+    });
+    const status = document.querySelector("[data-edition-status]");
+    if (status) {
+      const selected = document.querySelector(`.edition-choice[data-palette-value="${next}"] strong`);
+      status.textContent = selected ? `${selected.textContent} edition selected. The style follows you as you read.` : "Original site palette selected.";
+    }
   }
 
-  function choosePalette(palette) {
+  function choosePalette(palette, preferredTheme) {
     const next = palettes.includes(palette) ? palette : "current";
     try {
       localStorage.setItem(paletteKey, next);
     } catch (error) {}
     applyPalette(next);
+    if (preferredTheme && document.documentElement.dataset.theme !== preferredTheme) {
+      const toggle = document.getElementById("theme-toggle");
+      if (toggle) toggle.click();
+    }
+    syncEditionUrl();
+  }
+
+  function syncEditionUrl() {
+    if (window.location.pathname.replace(/\/$/, "") !== "/illuminated") return;
+    const url = new URL(window.location.href);
+    url.searchParams.set("palette", effectivePalette());
+    url.searchParams.set("theme", document.documentElement.dataset.theme);
+    window.history.replaceState(null, "", url);
   }
 
   function closeTesting(restoreFocus = true) {
@@ -78,7 +108,7 @@
 
   function handlePaletteClick(event) {
     const button = event.target.closest(".palette-option[data-palette-value]");
-    if (button) choosePalette(button.dataset.paletteValue);
+    if (button) choosePalette(button.dataset.paletteValue, button.dataset.editionTheme);
   }
 
   function handlePaletteKeydown(event) {
@@ -93,7 +123,7 @@
     else if (event.key === "ArrowLeft" || event.key === "ArrowUp") next = (current - 1 + buttons.length) % buttons.length;
     else next = (current + 1) % buttons.length;
     buttons[next].focus();
-    choosePalette(buttons[next].dataset.paletteValue);
+    choosePalette(buttons[next].dataset.paletteValue, buttons[next].dataset.editionTheme);
   }
 
   function feedbackDialog() {
@@ -342,16 +372,19 @@
 
   function init() {
     applyPalette(effectivePalette());
+    if (window.location.pathname.replace(/\/$/, "") === "/illuminated") choosePalette(effectivePalette());
+    const themeToggle = document.getElementById("theme-toggle");
+    if (themeToggle) themeToggle.addEventListener("click", syncEditionUrl);
     const trigger = document.getElementById("testing-open");
     const close = document.getElementById("testing-close");
-    const options = document.querySelector(".palette-options");
+    const options = document.querySelectorAll(".palette-options");
     const panel = document.getElementById("testing-panel");
     if (trigger) trigger.addEventListener("click", toggleTesting);
     if (close) close.addEventListener("click", () => closeTesting());
-    if (options) {
-      options.addEventListener("click", handlePaletteClick);
-      options.addEventListener("keydown", handlePaletteKeydown);
-    }
+    options.forEach((group) => {
+      group.addEventListener("click", handlePaletteClick);
+      group.addEventListener("keydown", handlePaletteKeydown);
+    });
     if (panel) {
       document.addEventListener("click", (event) => {
         const themeToggle = document.getElementById("theme-toggle");

@@ -158,9 +158,9 @@ try {
     throw new Error("Testing panel does not link to the development-only content hub");
   }
   const paletteOptions = testingPanel.locator(".palette-option");
-  if ((await paletteOptions.count()) !== 5) throw new Error("Testing panel does not expose all five palettes");
+  if ((await paletteOptions.count()) !== 8) throw new Error("Testing panel does not expose all eight palettes");
 
-  const palettes = ["current", "original", "washi", "sumi", "aizome"];
+  const palettes = ["current", "original", "washi", "sumi", "aizome", "vellum", "lapis", "black-hours"];
   const signatures = { light: new Set(), dark: new Set() };
   for (const palette of palettes) {
     await testingPanel.locator(`[data-palette-value="${palette}"]`).click();
@@ -187,7 +187,7 @@ try {
     }
   }
   if (signatures.light.size !== palettes.length || signatures.dark.size !== palettes.length) {
-    throw new Error("The palette choices do not produce five distinct light and dark background pairs");
+    throw new Error("The palette choices do not produce eight distinct light and dark background pairs");
   }
 
   await testingPanel.locator('[data-palette-value="washi"]').click();
@@ -201,7 +201,7 @@ try {
     throw new Error("The selected palette did not persist across a reload");
   }
 
-  console.log("Runtime smoke test passed: search, five persistent light/dark palettes, contrasting trunk backgrounds, nested sections, matching section backgrounds, focus, Escape, and mobile layout.");
+  console.log("Runtime smoke test passed: search, eight persistent light/dark palettes, contrasting trunk backgrounds, nested sections, matching section backgrounds, focus, Escape, and mobile layout.");
 } finally {
   await browser.close();
 }

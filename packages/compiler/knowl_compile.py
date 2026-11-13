@@ -136,7 +136,7 @@ def runtime_asset_version() -> str:
     """Return a stable cache key for the browser runtime shipped by this build."""
     runtime_dir = Path(__file__).resolve().parents[1] / "static-runtime"
     digest = hashlib.sha256()
-    for filename in ("knowl.css", "knowl.js", "graph.js", "knowl-testing.js", "facsimile.js", "document-math.js", "catalog.js", "catalog.css", "finite-groups.js", "finite-groups.css", "lie-groups.js", "lie-groups.css"):
+    for filename in ("knowl.css", "illuminated.css", "illumination.svg", "knowl.js", "graph.js", "knowl-testing.js", "facsimile.js", "document-math.js", "catalog.js", "catalog.css", "finite-groups.js", "finite-groups.css", "lie-groups.js", "lie-groups.css"):
         path = runtime_dir / filename
         if not path.is_file():
             continue
@@ -1671,14 +1671,31 @@ window.MathJax = {startup: {typeset: false}, tex: {inlineMath: [['\\\\(', '\\\\)
     }}());
   </script>"""
     palette_script = """
-        var palette = localStorage.getItem("knowl-palette");
-        var palettes = ["current", "original", "washi", "sumi", "aizome"];
+        var palette = null;
+        try { palette = localStorage.getItem("knowl-palette"); } catch (error) {}
+        var palettes = ["current", "original", "washi", "sumi", "aizome", "vellum", "lapis", "black-hours"];
+        var manuscripts = ["vellum", "lapis", "black-hours"];
+        var params = new URLSearchParams(window.location.search);
+        var requested = params.get("palette");
+        if (palettes.indexOf(requested) !== -1) {
+          palette = requested;
+          try { localStorage.setItem("knowl-palette", palette); } catch (error) {}
+        } else if (window.location.pathname.replace(/\\/$/, "") === "/illuminated" && manuscripts.indexOf(palette) === -1) {
+          palette = "vellum";
+        }
         if (palettes.indexOf(palette) === -1) palette = "current";
-        document.documentElement.dataset.palette = palette;""" if profile.show_testing_ui else ""
+        document.documentElement.dataset.palette = palette;
+        if (manuscripts.indexOf(palette) !== -1) document.documentElement.dataset.manuscript = palette;
+        var requestedTheme = params.get("theme");
+        if (requestedTheme === "light" || requestedTheme === "dark") {
+          document.documentElement.dataset.theme = requestedTheme;
+          try { localStorage.setItem("knowl-theme", requestedTheme); } catch (error) {}
+        }""" if profile.show_testing_ui else ""
     theme_script = """  <script>
     (function () {
       try {
-        var theme = localStorage.getItem("knowl-theme");
+        var theme = null;
+        try { theme = localStorage.getItem("knowl-theme"); } catch (error) {}
         if (theme !== "dark" && theme !== "light") {
           theme = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
         }
@@ -1701,6 +1718,7 @@ __PALETTE_SCRIPT__
     <button type="button" id="testing-close" class="icon-button" aria-label="Close testing panel">&times;</button>
   </div>
   <p class="testing-intro">Compare temporary site-wide CSS settings. Your selection is saved in this browser.</p>
+  <p class="testing-content-link"><a href="/illuminated/?palette=vellum&amp;theme=light">Explore the illuminated editions &#8599;</a></p>
   <p class="testing-content-link"><a href="/testing/">Browse development-only documents</a></p>
   <fieldset class="testing-fieldset">
     <legend>Color palette</legend>
@@ -1710,10 +1728,14 @@ __PALETTE_SCRIPT__
       <button type="button" class="palette-option" data-palette-value="washi" role="radio" aria-checked="false"><span class="palette-swatch" aria-hidden="true"><i></i><i></i></span><span><strong>Washi</strong><small>Warm paper and charcoal</small></span></button>
       <button type="button" class="palette-option" data-palette-value="sumi" role="radio" aria-checked="false"><span class="palette-swatch" aria-hidden="true"><i></i><i></i></span><span><strong>Sumi mist</strong><small>Cool ink and fog</small></span></button>
       <button type="button" class="palette-option" data-palette-value="aizome" role="radio" aria-checked="false"><span class="palette-swatch" aria-hidden="true"><i></i><i></i></span><span><strong>Aizome</strong><small>Indigo mountain haze</small></span></button>
+      <button type="button" class="palette-option" data-palette-value="vellum" data-edition-theme="light" role="radio" aria-checked="false"><span class="palette-swatch" aria-hidden="true"><i></i><i></i></span><span><strong>Vellum</strong><small>Rubric, parchment &amp; gold</small></span></button>
+      <button type="button" class="palette-option" data-palette-value="lapis" data-edition-theme="dark" role="radio" aria-checked="false"><span class="palette-swatch" aria-hidden="true"><i></i><i></i></span><span><strong>Lapis</strong><small>Indigo &amp; geometric gilding</small></span></button>
+      <button type="button" class="palette-option" data-palette-value="black-hours" data-edition-theme="dark" role="radio" aria-checked="false"><span class="palette-swatch" aria-hidden="true"><i></i><i></i></span><span><strong>Black Hours</strong><small>Charcoal, silver &amp; gold</small></span></button>
     </div>
   </fieldset>
 </aside>""" if profile.show_testing_ui else ""
     testing_script = f'  <script defer src="/assets/knowl-testing.js?v={asset_version}"></script>' if profile.show_testing_ui else ""
+    illuminated_style = f'  <link rel="stylesheet" href="/assets/illuminated.css?v={asset_version}">' if profile.show_testing_ui else ""
     page_script_html = (
         f'  <script defer src="/assets/{escape_attr(page_script)}?v={asset_version}"></script>'
         if page_script
@@ -1732,6 +1754,7 @@ __PALETTE_SCRIPT__
 {theme_script}
   <link rel="stylesheet" href="/assets/katex.min.css?v={asset_version}">
   <link rel="stylesheet" href="/assets/knowl.css?v={asset_version}">
+{illuminated_style}
   <script defer src="/assets/knowl.js?v={asset_version}"></script>
 {testing_script}
 {page_script_html}
@@ -1765,6 +1788,106 @@ __PALETTE_SCRIPT__
 </body>
 </html>
 """
+
+
+def render_illuminated_page(registry: dict[str, Knowl], profile: BuildProfile) -> str:
+    """A development-only specimen book, using the existing public knowls verbatim."""
+    if not profile.show_testing_ui:
+        raise ValueError("Illuminated specimens require the development profile")
+    editions = (
+        ("vellum", "light", "I", "Vellum", "Parchment, rubric & gold"),
+        ("lapis", "dark", "II", "Lapis", "Indigo & geometric gilding"),
+        ("black-hours", "dark", "III", "Black Hours", "Charcoal, silver & gold"),
+    )
+    choices = "".join(
+        f'<button type="button" class="palette-option edition-choice" data-palette-value="{value}" '
+        f'data-edition-theme="{theme}" role="radio" aria-checked="false" tabindex="-1">'
+        f'<span class="edition-monogram" aria-hidden="true">{number}</span>'
+        f'<span><strong>{name}</strong><small>{description}</small></span>'
+        '<span class="edition-selected" aria-hidden="true">&#10003;</span></button>'
+        for value, theme, number, name, description in editions
+    )
+    specimens = []
+    contents = []
+    for knowl_id, number, kind in (
+        ("algebra-groups/group", "I", "Definition"),
+        ("algebra-modules/projective-summand-of-free", "II", "Characterization"),
+        ("linear-algebra/inner-product-space", "III", "Definition"),
+    ):
+        knowl = registry.get(knowl_id)
+        if not knowl or knowl.visibility != "production":
+            continue
+        anchor = f"specimen-{number.lower()}"
+        contents.append(f'<li><a href="#{anchor}"><span>{number}</span>{html.escape(knowl.title)}</a></li>')
+        sections = "".join(
+            '<details class="knowl-section"><summary>'
+            f'<span>{render_section_title(section["title"], registry)}</span>'
+            '<span class="section-state" aria-hidden="true">Open</span></summary>'
+            f'<div class="section-body">{render_section(section, registry)}</div></details>'
+            for section in knowl.sections[:2]
+        )
+        specimens.append(
+            f'<article class="illumination-specimen" id="{anchor}">'
+            f'<header class="page-header"><p class="kind">{number} &nbsp; / &nbsp; {kind}</p>'
+            f'<h2>{render_inline(knowl.title, registry)}</h2>'
+            f'<a class="edition-read-link" href="{escape_attr(target_href(knowl.id))}">Read full entry &#8599;</a></header>'
+            '<section class="core-section" data-compact-core="true">'
+            + render_markdown(without_redundant_leading_h1(knowl.core_markdown), registry)
+            + render_structured_core(knowl, registry)
+            + '</section>' + sections + '</article>'
+        )
+    body = '''<main class="illuminated-lab" id="main-content">
+  <header class="edition-intro">
+    <div>
+      <p class="edition-eyebrow">Knowlpedia &nbsp; / &nbsp; The illuminated editions</p>
+      <h1><span class="illuminated-cap">M</span>athematics,<br><em>illuminated.</em></h1>
+      <p class="edition-intro-copy">Three ways to read a connected mathematical library.<br>Choose an edition. Follow a definition. Stay on the page.</p>
+    </div>
+    <svg class="edition-compass" viewBox="0 0 240 240" aria-hidden="true" focusable="false">
+      <g fill="none" stroke="currentColor" stroke-width="0.8">
+        <circle cx="120" cy="120" r="104"/><circle cx="120" cy="120" r="98"/>
+        <circle cx="120" cy="120" r="62"/><circle cx="120" cy="89" r="31"/>
+        <circle cx="93.15" cy="135.5" r="31"/><circle cx="146.85" cy="135.5" r="31"/>
+        <path d="M120 16v208M16 120h208M46.46 46.46l147.08 147.08M46.46 193.54L193.54 46.46" opacity=".35"/>
+        <path d="M120 24l83.14 144H36.86ZM120 216L36.86 72h166.28Z"/>
+        <path d="M120 2v12m0 212v12M2 120h12m212 0h12" stroke-width="2"/>
+      </g>
+      <g fill="currentColor"><circle cx="120" cy="120" r="3"/><circle cx="120" cy="16" r="2.5"/><circle cx="224" cy="120" r="2.5"/><circle cx="120" cy="224" r="2.5"/><circle cx="16" cy="120" r="2.5"/></g>
+    </svg>
+  </header>
+  <div class="edition-picker">
+    <div class="palette-options edition-choices" role="radiogroup" aria-label="Illuminated edition">''' + choices + '''</div>
+    <p class="edition-status" data-edition-status role="status" aria-live="polite"></p>
+  </div>
+  <div class="edition-layout">
+    <div class="edition-folio">
+      <div class="edition-running-head"><span>A connected book of mathematics</span><span>Selected passages &nbsp; I–III</span></div>
+      ''' + "".join(specimens) + '''
+      <footer class="edition-colophon"><span aria-hidden="true">&#10022;</span><p>Each idea opens onto another.</p><a href="/">Continue into the library &#8594;</a></footer>
+    </div>
+    <aside class="edition-margin" aria-label="Reading notes">
+      <p class="edition-margin-kicker">In this folio</p>
+      <ol class="edition-contents">''' + "".join(contents) + '''</ol>
+      <div class="edition-margin-note">
+        <h2>A book with margins<br>that open.</h2>
+        <p>Click an underlined concept to unfold its definition. Follow another concept inside it to go one level deeper.</p>
+        <p>Close a margin note with its × button, or press Escape.</p>
+      </div>
+      <div class="edition-material-note" data-edition-note="vellum">
+        <p class="edition-margin-kicker">I &nbsp; / &nbsp; Vellum</p><p>Warm parchment, red initials, and fine gold ruling. A quiet edition for long proofs and daylight reading.</p>
+      </div>
+      <div class="edition-material-note" data-edition-note="lapis" hidden>
+        <p class="edition-margin-kicker">II &nbsp; / &nbsp; Lapis</p><p>Deep indigo, ivory text, and geometric gold borders. Ornament gives the page structure; the mathematics has room to breathe.</p>
+      </div>
+      <div class="edition-material-note" data-edition-note="black-hours" hidden>
+        <p class="edition-margin-kicker">III &nbsp; / &nbsp; Black Hours</p><p>Soft charcoal, silver lettering, and burnished gold. A nocturnal edition with restrained decoration.</p>
+      </div>
+      <p class="edition-margin-tip">Use the sun / moon button above to try each edition in both light and dark.</p>
+    </aside>
+  </div>
+</main>'''
+    return html_document("Illuminated editions · Knowlpedia", body, preload_mode="visible", profile=profile,
+                         seo_head='<meta name="robots" content="noindex, nofollow">')
 
 
 def directory_title(subject_id: str) -> str:
@@ -2503,6 +2626,8 @@ def copy_runtime_assets(out_dir: Path, profile: BuildProfile, include_document_m
     if profile.show_testing_ui:
         shutil.copyfile(runtime_dir / "knowl-testing.js", assets_dir / "knowl-testing.js")
         shutil.copyfile(runtime_dir / "facsimile.js", assets_dir / "facsimile.js")
+        for filename in ("illuminated.css", "illumination.svg"):
+            shutil.copyfile(runtime_dir / filename, assets_dir / filename)
     if include_document_math and profile.include_development_content:
         shutil.copyfile(runtime_dir / "document-math.js", assets_dir / "document-math.js")
         mathjax = repo_root() / 'node_modules/mathjax/es5'
@@ -2717,6 +2842,9 @@ def write_site_for_ids(
             testing_path.parent.mkdir(parents=True, exist_ok=True)
             testing_path.write_text(render_testing_hub(registry, package, profile), encoding="utf-8")
             write_development_pages(out_dir, registry, profile)
+            illuminated_path = out_dir / "illuminated" / "index.html"
+            illuminated_path.parent.mkdir(parents=True, exist_ok=True)
+            illuminated_path.write_text(render_illuminated_page(registry, profile), encoding="utf-8")
 
     for knowl in target_knowls:
         page_path = out_dir / slug_to_relpath(knowl.id) / "index.html"
