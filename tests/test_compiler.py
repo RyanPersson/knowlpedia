@@ -298,6 +298,18 @@ class RenderContractTests(unittest.TestCase):
         self.assertIn('<h3 id="exercises-2">', rendered)
         self.assertNotIn(" id=", compiler.render_markdown(markdown, {}))
 
+    def test_blockquote_keeps_paragraphs_math_and_expandable_links(self) -> None:
+        term = self.make_knowl()
+        rendered = compiler.render_markdown(
+            f"Introduction\n> First paragraph.\n>\n> Second with [[{term.id}|a term]].\n"
+            "> \\[\n> x > 0\n> \\]\nAfter the quote.",
+            {term.id: term},
+        )
+        self.assertIn("<p>Introduction</p>\n<blockquote><p>First paragraph.</p>\n<p>Second", rendered)
+        self.assertIn(f'data-knowl="{compiler.fragment_href(term.id)}"', rendered)
+        self.assertIn('class="math-display', rendered)
+        self.assertIn("</blockquote>\n<p>After the quote.</p>", rendered)
+
     def test_power_series_brackets_inside_math_are_not_wikilinks(self) -> None:
         rendered = compiler.render_inline(r"$\mathbb{F}_q[[t]]$", {})
         self.assertIn('class="katex"', rendered)

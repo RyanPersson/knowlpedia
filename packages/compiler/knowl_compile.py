@@ -43,6 +43,7 @@ from knowl_patterns import FENCED_CODE_RE, INLINE_CODE_RE, MARKDOWN_LINK_RE, MAT
 DISPLAY_MATH_RE = re.compile(r"(?s)(\\\[(.+?)\\\]|\$\$(.+?)\$\$)")
 DIAGRAM_ENV_RE = re.compile(r"\\begin\{(tikzpicture|tikzcd|CD)\}")
 AGENT_STATUS_RE = re.compile(r"^\d+[smhd]\d+[smhd]\s+·\s+gpt-[^·]+·.*[↑↓↻Δ]")
+BLOCKQUOTE_RE = re.compile(r"^[ \t]*>(?:[ \t]|$)")
 OLD_HUGO_TOPIC_LINKS = [
     ("Analysis", "/analysis/"),
     ("Convex Analysis", "/convex-analysis/"),
@@ -1059,6 +1060,15 @@ def render_markdown(markdown: str, registry: dict[str, Knowl], heading_ids: bool
             i += 1
             continue
 
+        if BLOCKQUOTE_RE.match(line):
+            close_list()
+            quoted = []
+            while i < len(lines) and (marker := BLOCKQUOTE_RE.match(lines[i])):
+                quoted.append(lines[i][marker.end():])
+                i += 1
+            out.append("<blockquote>" + render_markdown("\n".join(quoted), registry) + "</blockquote>")
+            continue
+
         marker = private_markdown.render_marker(stripped)
         if marker is not None:
             close_list()
@@ -1224,6 +1234,7 @@ def render_markdown(markdown: str, registry: dict[str, Knowl], heading_ids: bool
             if (
                 not next_line
                 or next_line.startswith("#")
+                or BLOCKQUOTE_RE.match(next_line)
                 or next_line.startswith("```")
                 or next_line in {"\\[", "$$", "$"}
                 or is_agent_status_line(next_line)
