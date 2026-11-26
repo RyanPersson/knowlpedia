@@ -33,7 +33,6 @@ if _COMPILER_DIR not in sys.path:
 from graph_algorithms import cycle_witnesses
 import catalog
 import catalog_html
-import grh_lean
 import diagrams
 import private_facsimile
 import private_markdown
@@ -2778,7 +2777,6 @@ def write_site_for_ids(
                     section_path.write_text(render_section(section, registry), encoding="utf-8")
 
     if not only_ids:
-        grh_lean.publish(content_roots[0][0], out_dir, registry, html_document, profile)
         if catalog_data is not None:
             catalog.export_catalog(catalog_data, out_dir / "indexes")
             runtime_dir = Path(__file__).resolve().parents[1] / "static-runtime"
