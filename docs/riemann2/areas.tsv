@@ -1,0 +1,42 @@
+reduction-zeros	new	Statements.lean Main.lean New/Main.lean New/Reduction/Zeros Lib/Analytic
+reduction-main	new	New/Reduction/Lattices New/Reduction/Data New/Reduction/PrimeSums.lean New/Reduction/IntegralTargetForms.lean New/Reduction/ShortAndEnough.lean New/Reduction/MainInequality.lean New/Reduction/OneSidedBound.lean New/Determinant/Twist
+derivatives-divisibility	new	New/Derivatives/Divisibility New/Derivatives/Field New/Derivatives/FormalGroup
+derivatives-vacuum	new	New/Derivatives/Vacuum New/Derivatives/Sharpness
+upper-objects	new	New/UpperBound/Kernels New/UpperBound/Objects
+upper-seesaw	new	New/UpperBound/Seesaw
+upper-divisibility	new	New/UpperBound/Divisibility New/UpperBound/Size
+upper-elementary-divisors	new	New/UpperBound/ElementaryDivisors
+spanning-core	new	New/Spanning/SecondMoment New/Spanning/Multiplicities New/Spanning/Bessel
+spanning-unfolding-a	new	New/Spanning/Unfolding (first half of the files in import order)
+spanning-unfolding-b	new	New/Spanning/Unfolding (second half of the files in import order)
+spanning-remaining-a	new	New/Spanning/RemainingTerms (first half of the files in import order)
+spanning-remaining-b	new	New/Spanning/RemainingTerms (second half of the files in import order)
+spanning-mainterm	new	New/Spanning/MainTerm
+spanning-frames-a	new	New/Spanning/Frames (first half of the files in import order)
+spanning-frames-b	new	New/Spanning/Frames (second half of the files in import order)
+determinant-exchange	new	New/Determinant/Norms New/Determinant/Exchange
+determinant-chain	new	New/Determinant/Chain New/Determinant/AuxiliaryForms
+onelift-comparison	new	New/OneLift/TestedForms.lean New/OneLift/LiftVolumeHeight.lean New/OneLift/ComparisonOperator
+onelift-values	new	New/OneLift/FalseLifts New/OneLift/HeckeValues
+congruences-first-order	new	New/Congruences/FitTwistsExist.lean New/Congruences/FirstOrder
+congruences-selmer	new	New/Congruences/GaloisRepresentations New/Congruences/Selmer
+congruences-lifting	new	New/Congruences/LocalLoss New/Congruences/Lifting
+appendix-discrete-series	new	New/Appendix
+lib-adelic-groups	lib	Lib/Adelic/Adeles Lib/Adelic/Unitary Lib/Adelic/Witt Lib/Adelic/QuotientMeasure Lib/Adelic/Reduction Lib/Adelic/*.lean
+lib-automorphic-forms	lib	Lib/Adelic/AutomorphicForms Lib/Adelic/Hecke Lib/Adelic/TraceFormula
+lib-class-field-local	lib	Lib/ClassField/Places Lib/ClassField/Local Lib/ClassField/LocalDuality Lib/ClassField/GaloisCohomology Lib/ClassField/GreenbergWiles
+lib-class-field-global	lib	Lib/ClassField/Global Lib/ClassField/HeckeCharacter Lib/ClassField/HeckeL Lib/ClassField/Avatar Lib/ClassField/*.lean Lib/Cyclotomic
+lib-cm	lib	Lib/CM
+lib-cohomology	lib	Lib/Cohomology
+lib-discrete-series-measures	lib	Lib/DiscreteSeries/Haar Lib/DiscreteSeries/Bruhat Lib/DiscreteSeries/Bessel Lib/DiscreteSeries/*.lean
+lib-discrete-series-characters	lib	Lib/DiscreteSeries/Character Lib/DiscreteSeries/FlenstedJensen Lib/DiscreteSeries/Holomorphic Lib/DiscreteSeries/Rigidity Lib/DiscreteSeries/Theta
+lib-galois-representations	lib	Lib/GaloisRep
+lib-general	lib	Lib/General Lib/Base.lean Lib/Speed.lean
+lib-gln	lib	Lib/GLn Lib/LocalGL
+lib-padic-comparison	lib	Lib/PadicComparison
+lib-padic-hodge	lib	Lib/PadicHodge
+lib-shimura-abelian	lib	Lib/Shimura/AbelianScheme Lib/Shimura/ComplexTheta Lib/Shimura/ThetaModuli Lib/Shimura/ThetaNormality Lib/Shimura/Uniformisation Lib/Shimura/*.lean
+lib-shimura-models	lib	Lib/Shimura/CongruenceRelation Lib/Shimura/Deformation Lib/Shimura/GoodReduction Lib/Shimura/HeckeTower Lib/Shimura/IntegralModel Lib/Shimura/TraceFormula Lib/Shimura/Transfer
+lib-siegel-weil	lib	Lib/SiegelWeil
+lib-weil-construction	lib	Lib/Weil/Construction Lib/Weil/Fock Lib/Weil/MixedModel Lib/Weil/*.lean
+lib-weil-dual-pairs	lib	Lib/Weil/DualPair Lib/Weil/Periods Lib/Weil/CompactLift Lib/Weil/Unramified

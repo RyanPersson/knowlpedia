@@ -629,6 +629,37 @@ class RenderContractTests(unittest.TestCase):
         self.assertIn('<a href="/index/#subject-algebra-coalgebras">', homepage)
         self.assertIn('<a href="/index/#subject-shale-paper">', homepage)
 
+    def test_proofs_have_their_own_home_page_section(self) -> None:
+        registry = {}
+        for knowl_id, flagged in (
+            ("analysis/concept", False),
+            ("proofs/main", True),
+            ("proofs/main/lemma", False),
+        ):
+            knowl = self.make_knowl()
+            knowl.id = knowl_id
+            knowl.title = knowl_id
+            knowl.visibility = "production"
+            knowl.proof = flagged
+            registry[knowl_id] = knowl
+        homepage = compiler.render_homepage(registry, {"title": "Knowlpedia"})
+        self.assertIn('class="start-subjects start-proofs"', homepage)
+        self.assertIn('<a href="/proofs/main/">', homepage)
+        # Lemmas of a proof are reached through it, and "proofs" is not a subject.
+        self.assertNotIn('/proofs/main/lemma/', homepage)
+        self.assertNotIn('subject-proofs', homepage)
+        self.assertLess(homepage.index('id="proofs-title"'), homepage.index('id="subjects-title"'))
+
+        registry["proofs/main"].proof = False
+        homepage = compiler.render_homepage(registry, {"title": "Knowlpedia"})
+        self.assertNotIn("start-proofs", homepage)
+
+    def test_proof_flag_is_read_from_front_matter(self) -> None:
+        meta = {"id": "proofs/main", "title": "Main", "kind": "page", "summary": "A proof.", "proof": True}
+        self.assertTrue(compiler.knowl_from_meta(meta, Path("proofs/main.knowl.md"), "Body.").proof)
+        del meta["proof"]
+        self.assertFalse(compiler.knowl_from_meta(meta, Path("proofs/main.knowl.md"), "Body.").proof)
+
     def test_learning_path_page_has_no_kind_label(self) -> None:
         knowl = self.make_knowl()
         knowl.kind = "page"

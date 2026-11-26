@@ -46,10 +46,10 @@ SUBJECT_QUALIFIERS = {
     "stat-mech-quantum": "quantum statistical mechanics",
 }
 # Long-form documents stand on their own; a subject would add nothing.
-UNQUALIFIED_SUBJECTS = frozenset({"knowlification", "posts"})
+UNQUALIFIED_SUBJECTS = frozenset({"knowlification", "posts", "proofs"})
 
 # Landing pages that do not list a subject's results use their own title alone.
-NON_SUBJECT_LANDING_PAGES = frozenset({"catalog", "knowlification", "langlands-letter", "posts", "search", "shale-paper"})
+NON_SUBJECT_LANDING_PAGES = frozenset({"catalog", "knowlification", "langlands-letter", "posts", "proofs", "search", "shale-paper"})
 # Names for a subject's landing page where the index label would read badly.
 SUBJECT_PAGE_NAMES = {"analysis": "Analysis", "langlands": "Langlands program"}
 
@@ -164,6 +164,8 @@ def kind_label(knowl: Any) -> str | None:
     kind = knowl.kind.lower()
     if knowl.learning_path:
         return "learning path"
+    if getattr(knowl, "proof", False):
+        return "proof"
     if kind == "knowl":
         return None if is_statement(knowl) else "definition"
     if kind not in LABELLED_KINDS or kind in plain_text(knowl.title).lower():

@@ -64,6 +64,8 @@ OLD_HUGO_TOPIC_LINKS = [
 
 GRAPH_DEFAULT_FOCUS = "linear-algebra/vector-space"
 DIRECTORY_EXCLUDED_SUBJECTS = frozenset({"search"})
+# Knowls under this prefix form the "Proofs" section of the home page.
+PROOFS_SUBJECT = "proofs"
 SOURCE_COLLECTIONS = {
     "langlands-letter": "Langlands's letter",
     "shale-paper": "Shale's paper",
@@ -428,6 +430,7 @@ class Knowl:
     relations: list[dict[str, Any]] = field(default_factory=list)
     knowls_open: bool = False
     learning_path: bool = False
+    proof: bool = False
     visibility: str = "production"
     content_source: str = ""
     anchors: set[str] = field(default_factory=set)
@@ -758,6 +761,7 @@ def knowl_from_meta(
         relations=list(meta.get("relations", [])),
         knowls_open=bool(meta.get("knowls_open", False)),
         learning_path=bool(meta.get("learning_path", False)),
+        proof=bool(meta.get("proof", False)),
         redirect_to=redirect_to,
         redirect_sections=dict(redirect_sections),
         facsimile_manifest=meta.get("facsimile_manifest"),
@@ -1586,7 +1590,7 @@ def render_page(
     kind = display_kind(knowl.kind)
     compact_core_attr = ' data-compact-core="true"' if knowl.progressive_sections else ""
     # A learning path is introduced by its title alone.
-    kind_html = f'<p class="kind">{html.escape(kind)}</p>' if kind and not knowl.learning_path else ""
+    kind_html = f'<p class="kind">{html.escape(kind)}</p>' if kind and not (knowl.learning_path or knowl.proof) else ""
     core_heading = core_heading_for_kind(knowl.kind)
     core_heading_html = (
         f'<h2 class="core-heading">{html.escape(core_heading)}</h2>' if core_heading else ""
@@ -1825,6 +1829,17 @@ def learning_paths(registry: dict[str, Knowl]) -> list[Knowl]:
     )
 
 
+def proof_documents(registry: dict[str, Knowl]) -> list[Knowl]:
+    """Top-level proof documents, flagged with ``proof = true`` in front matter."""
+    return sorted(
+        (
+            knowl for knowl in registry.values()
+            if knowl.proof and knowl.visibility == "production" and not knowl.redirect_to
+        ),
+        key=lambda knowl: knowl.title.casefold(),
+    )
+
+
 def render_homepage(
     registry: dict[str, Knowl],
     package: dict[str, Any],
@@ -1835,10 +1850,17 @@ def render_homepage(
         f'<li><a href="{escape_attr(target_href(knowl.id))}"><span>{render_inline(knowl.title, registry)}</span></a></li>'
         for knowl in learning_paths(registry)
     )
+    proof_links = "".join(
+        f'<li><a href="{escape_attr(target_href(knowl.id))}"><span>{render_inline(knowl.title, registry)}</span></a></li>'
+        for knowl in proof_documents(registry)
+    )
     knowl_count = sum(len(knowls) for knowls in grouped.values())
     subject_links = []
     collection_links = []
     for subject_id, knowls in grouped.items():
+        if subject_id == PROOFS_SUBJECT:
+            # Proofs have their own home page section, parallel to subjects.
+            continue
         title = directory_title(subject_id)
         collection = subject_id in SOURCE_COLLECTIONS
         links = collection_links if collection else subject_links
@@ -1870,6 +1892,10 @@ def render_homepage(
             '<div class="start-section-heading"><h2 id="paths-title">Learning paths</h2>'
             '<p>Read a subject in prerequisite order, with each definition and theorem shown in place.</p></div>'
             f'<ul>{path_links}</ul></section>' if path_links else "",
+            '<section class="start-subjects start-proofs" aria-labelledby="proofs-title">'
+            '<div class="start-section-heading"><h2 id="proofs-title">Proofs</h2>'
+            '<p>Complete proofs written as linked knowls: unfold any definition or lemma in place.</p></div>'
+            f'<ul>{proof_links}</ul></section>' if proof_links else "",
             '<section class="start-subjects" aria-labelledby="subjects-title">',
             '<div class="start-section-heading"><h2 id="subjects-title">Subjects</h2><p>Compact definitions first; examples, proofs, and references when needed.</p></div>',
             '<ul>' + "".join(subject_links) + '</ul>',

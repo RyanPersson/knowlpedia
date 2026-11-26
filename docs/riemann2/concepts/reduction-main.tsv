@@ -1,0 +1,56 @@
+commutative ring	definition	NEW?	algebra-rings	A ring with commutative multiplication and identity.	ring	CommRing
+module	definition	algebra-modules/module	algebra-modules	Module over a ring.	ring	Module
+submodule	definition	NEW	algebra-modules	A subset of a module closed under addition and scalar multiplication.	module	Submodule
+linear map	definition	NEW	algebra-modules	A map of modules over a ring that is additive and commutes with scalars.	module	LinearMap
+finitely generated module	definition	NEW	algebra-modules	A module spanned by finitely many elements.	module	Submodule.FG
+determinant of a square matrix	definition	NEW	linear-algebra	The Leibniz determinant of a square matrix over a commutative ring; multiplicative.	commutative ring	Matrix.det
+valuation ring (domain)	definition	NEW	algebra-commutative	An integral domain O such that for any two elements one divides the other (equivalently x or 1/x in O for all x in Frac O). Its ideals are totally ordered.	integral domain	ValuationRing
+Smith normal form over a valuation domain	theorem	NEW	algebra-modules	Every square matrix A over a valuation domain is g·diag(d)·g' with g, g' invertible.	valuation ring (domain); determinant of a square matrix	isValuationPair_top.smith_normal_form
+discrete valuation ring	definition	algebra-commutative/dvr	algebra-commutative	Local PID that is not a field; normalized valuation v.		IsDiscreteValuationRing
+length of a module	definition	algebra-modules/length-module	algebra-modules	Length of a composition series, in N ∪ {∞}; length(O/z) = v(z) over a DVR.	module	Module.length
+Smith normal form theorem	theorem	algebra-modules/smith-normal-form-theorem	algebra-modules	Over a PID every matrix is equivalent to a diagonal one.		
+field isomorphism	definition	NEW	algebra-fields-galois	Bijective ring homomorphism between fields.	field	RingEquiv
+field automorphism	definition	algebra-fields-galois/field-automorphism	algebra-fields-galois	Here: all (discontinuous) automorphisms of C.		ℂ ≃+* ℂ
+algebraic closure	definition	algebra-fields-galois/algebraic-closure	algebra-fields-galois	Used for Q_l.		PadicAlgCl
+p-adic number	definition	NEW (cf. algebra-fields-galois/p-adic-field)	algebraic-number-theory	The field Q_p, completion of Q for the p-adic absolute value.	p-adic absolute value	Padic
+p-adic absolute value	definition	NEW	algebraic-number-theory	|q|_p = p^(-v_p(q)) on Q, normalized |p|_p = 1/p; extends uniquely to an algebraic closure of Q_p and to C_p.		padicNorm
+product formula for the rational numbers	theorem	NEW	algebraic-number-theory	For q in Q^×: |q| · ∏_p |q|_p = 1.	p-adic absolute value	New.log_product_formula
+isomorphism of algebraically closed fields of equal characteristic and uncountable cardinality	theorem	NEW	algebra-fields-galois	(Steinitz) Two algebraically closed fields of the same characteristic and the same uncountable cardinality are isomorphic; an isomorphism of subfields of smaller cardinality (e.g. finitely generated, with algebraic extensions) extends to an isomorphism. Used: any embedding of a number field Q(H) ⊂ C into F extends to C ≅ F.	algebraic closure; transcendence degree	exists_ringEquiv_extend
+field norm	definition	algebra-fields-galois/norm-field	algebra-fields-galois	N_{L/K}; product of conjugates.		Algebra.norm
+number field	definition	algebra-fields-galois/number-field	algebra-fields-galois			NumberField
+vector space	definition	NEW?	linear-algebra	Module over a field.	module	
+inner product space	definition	NEW	functional-analysis	Complex vector space with a positive definite hermitian form, conjugate-linear in the first variable (Mathlib convention).	vector space	InnerProductSpace
+positive definite hermitian matrix	definition	NEW	linear-algebra	Hermitian matrix G with v*Gv > 0 for v ≠ 0.		Matrix.PosDef
+Gram determinant	definition	NEW	linear-algebra	det(<v_i, v_k>) for a finite family of vectors; nonzero iff the family is linearly independent.	inner product space; determinant of a square matrix	Matrix.gram
+orthonormal basis	definition	NEW	linear-algebra	Basis with <e_i,e_k> = δ_ik.	inner product space	
+adjoint of a linear map between inner product spaces	definition	NEW	linear-algebra	u* with <u x, y> = <x, u* y>, finite-dimensional case.	inner product space	LinearMap.adjoint
+Hadamard's inequality	theorem	NEW	linear-algebra	The determinant of a positive semidefinite hermitian matrix is at most the product of its diagonal entries.	positive definite hermitian matrix	New.norm_det_formGram_le
+Fischer's inequality	theorem	NEW	linear-algebra	For a positive semidefinite block matrix, det ≤ det(A11)·det(A22).	positive definite hermitian matrix	New.fischer_det_inequality
+Cauchy-Schwarz inequality for Gram determinants	theorem	NEW	linear-algebra	|det(<v_i,w_k>)|^2 ≤ det(<v_i,v_k>) det(<w_i,w_k>) for a positive semidefinite form (Cauchy–Schwarz in the exterior power).	Gram determinant	New.norm_det_pairing_sq_le
+imaginary quadratic field	definition	algebra-fields-galois/imaginary-quadratic-field	algebra-fields-galois	K = Q(sqrt(-d)), here d prime ≡ 7 mod 8, as a subfield of C.		QuadField
+Legendre symbol	definition	NEW	elementary-number-theory	(n/d) for an odd prime d: 0 if d | n, 1 if n is a nonzero square mod d, -1 otherwise; a Dirichlet character mod d (chiK).		legendreSym; New.chiK
+Jacobi symbol	definition	NEW	elementary-number-theory	Multiplicative extension of the Legendre symbol to odd moduli; (a/b) depends on b only modulo 4a (reciprocity).	Legendre symbol	jacobiSym
+cyclotomic extension	definition	algebra-fields-galois/cyclotomic-extension	algebra-fields-galois			IsCyclotomicExtension
+cyclotomic polynomial	definition	algebra-fields-galois/cyclotomic-polynomial	algebra-fields-galois			Polynomial.cyclotomic
+primitive root of unity	definition	algebra-fields-galois/primitive-root-of-unity	algebra-fields-galois			IsPrimitiveRoot
+CM field	definition	NEW	algebraic-number-theory	Totally complex quadratic extension of a totally real number field; has a canonical complex conjugation.	number field; infinite place of a number field	IsCMField
+infinite place of a number field	definition	NEW	algebraic-number-theory	Equivalence class of embeddings into C up to complex conjugation.	number field	NumberField.InfinitePlace
+CM type	definition	NEW	algebraic-number-theory	A choice, for each infinite place of a CM field, of an embedding into C inducing it.	CM field	New.CMType
+Galois group	definition	algebra-fields-galois/galois-group	algebra-fields-galois			
+Euler totient function	definition	NEW	elementary-number-theory	φ(n) = #(Z/n)^×.		Nat.totient
+Euler-Mascheroni constant	definition	NEW	analysis	γ = lim (∑_{k≤n} 1/k − log n).		Real.eulerMascheroniConstant
+Dirichlet character	definition	NEW	analytic-number-theory	Multiplicative map χ: Z/N → C, zero on non-units (Mathlib: DirichletCharacter ℂ N); trivial character 1; change of level (induced character).		DirichletCharacter
+Dirichlet L-function	definition	NEW	analytic-number-theory	L(s,χ) = ∑ χ(n) n^{-s}, continued to C (to C∖{1} for χ trivial); Mathlib DirichletCharacter.LFunction. For the induced character ψ mod q0: L(s,ψ) = L(s,χ) ∏_{p|q0}(1−χ(p)p^{-s}).	Dirichlet character	DirichletCharacter.LFunction
+non-vanishing of Dirichlet L-functions on the line Re s = 1	theorem	NEW	analytic-number-theory	L(s,χ) ≠ 0 for Re s ≥ 1 (s ≠ 1 if χ trivial).	Dirichlet L-function	DirichletCharacter.LFunction_ne_zero_of_one_le_re
+von Mangoldt function	definition	NEW	analytic-number-theory	Λ(n) = log p if n = p^k, k ≥ 1, else 0.		ArithmeticFunction.vonMangoldt
+Mertens' first theorem	theorem	NEW	analytic-number-theory	∑_{n≤X} Λ(n)/n = log X + O(1); used in the weak form ≤ 2 log X.	von Mangoldt function	sum_vonMangoldt_div_le
+root discriminant	definition	NEW	algebraic-number-theory	rd_E = |disc E|^{1/[E:Q]}.	discriminant of a number field	NumberField.rootDiscr
+different ideal	definition	NEW (cf. algebra-fields-galois/codifferent)	algebraic-number-theory	Inverse of the codifferent; its absolute norm is |disc|.		differentIdeal
+class number	definition	algebra-fields-galois/class-number	algebra-fields-galois			NumberField.classNumber
+ideal class group	definition	algebra-fields-galois/ideal-class-group	algebra-fields-galois			ClassGroup
+algebraic integer	definition	algebra-fields-galois/algebraic-integer	algebra-fields-galois	Ring of integers O_K, O_E.		NumberField.RingOfIntegers
+Fermat's theorem on sums of two squares	theorem	NEW	elementary-number-theory	A prime p ≡ 1 mod 4 is a sum of two squares.		Nat.Prime.sq_add_sq
+Behrend's construction	theorem	NEW	combinatorics	Some sphere in {0..H-1}^n contains at least H^n/(nH^2) lattice points; integers with such digit vectors contain no nontrivial weighted three-term relations.		Behrend.exists_large_sphere
+Siegel-Walfisz theorem	theorem	NEW	analytic-number-theory	Primes in progressions with modulus up to a power of log; used in the form New.exists_prime_modEq_one_log_mem (primes ≡ 1 mod M^k in logarithmic windows [U, U+W]).	Dirichlet L-function	New.exists_prime_modEq_one_log_mem
+automorphic character of U(1)	definition	NEW	automorphic-forms	Continuous character of U(1)(A)/U(1)(E^+) for a CM field E; weight (exponents at infinite places) and tame part (characters of residue fields).	CM field; adele ring	New.AutChar; New.AutChar.HasWeight
+Hecke L-function	definition	NEW	automorphic-forms	Partial L-function of the Hecke character x ↦ ν(x/x̄) of E.	automorphic character of U(1)	New.AutChar.L
