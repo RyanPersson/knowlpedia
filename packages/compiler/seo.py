@@ -46,10 +46,10 @@ SUBJECT_QUALIFIERS = {
     "stat-mech-quantum": "quantum statistical mechanics",
 }
 # Long-form documents stand on their own; a subject would add nothing.
-UNQUALIFIED_SUBJECTS = frozenset({"grh-lean", "knowlification", "posts"})
+UNQUALIFIED_SUBJECTS = frozenset({"knowlification", "posts"})
 
 # Landing pages that do not list a subject's results use their own title alone.
-NON_SUBJECT_LANDING_PAGES = frozenset({"catalog", "grh-lean", "knowlification", "langlands-letter", "posts", "search", "shale-paper"})
+NON_SUBJECT_LANDING_PAGES = frozenset({"catalog", "knowlification", "langlands-letter", "posts", "search", "shale-paper"})
 # Names for a subject's landing page where the index label would read badly.
 SUBJECT_PAGE_NAMES = {"analysis": "Analysis", "langlands": "Langlands program"}
 
