@@ -108,3 +108,57 @@ Doubt: in properties-of-resolution-forms item 3 I say the level primes are congr
 ## Sharpness/BoundAttained.lean (447 lines) — read in full
 
 Knowls: twelve-space-and-indicator-data (definition), theta-product-times-monomials-as-a-vector (lemma, full), expansion-in-indicator-data (lemma, outline: Fourier inversion and the expansion of translates of the vacuum in indicator data are Lib lemmas), reduction-to-the-curve (theorem, full), size-of-the-sharpness-constant (lemma, outline: final scale inequality asserted), sharpness-of-the-valuation-bound (theorem, full).
+
+## Audit response
+
+All 41 findings of `knowlpedia-content/reviews/riemann2-audit` for this area were checked against the cited Lean lines. 41 accepted, 0 rejected. No `proof_status` changed (the corrections fix wording, hypotheses, citations or a proof step without leaving a new gap). Slugs/ids were not renamed; titles, summaries and link texts were.
+
+| # | knowl | finding | verdict | change |
+|---|---|---|---|---|
+| 1 | area page | Both six-copy conclusions are upper bounds of zero (high) | accepted | link texts now "least valuation at most zero ..."; both leaf titles changed (see 8, 26) |
+| 2 | area page | Standard data give integrality at the chosen prime | accepted | intro bullet and section 4 bullet now quantify "for each p and iota_p, data standard at iota_p"; leaf title "... at any prime" |
+| 3 | cm-curve-and-period | CM-lattice existence theorem chooses the scale | accepted | remark restated: every nonzero fractional ideal has a complex multiple carrying a CM lattice |
+| 4 | existence-of-resolution-product-along-tight-frame | dependency for rational finite translates | accepted | `?lean:New.entireTheta_translate_finiteImage` |
+| 5 | jet-ring-is-stable-under-derivatives | Leibniz induction must retain membership | accepted | proof now uses the subset of the jet ring with derivatives in the jet ring |
+| 6 | least-valuation-along-couplings | distinguished theta factor changes index | accepted | six scales indexed 0..5 with delta_0 = 1 |
+| 7 | least-valuation-rules | parameter-series hypothesis in the rescaling rule | accepted | item 3 states H_c in O[[y(mu z)]] |
+| 8 | least-valuation-zero-when-forms-span | upper bound of zero | accepted | title "Least valuation at most zero when the forms span the coordinates" |
+| 9 | resolution-product-integral-values | rational approximation declaration | accepted | `?lean:New.exists_finiteImage_approx` |
+| 10 | scaled-linear-forms-are-p-integral | extension preserves integrality through equivalent valuations | accepted | "isometric" replaced by continuous, valuation-equivalent extension |
+| 11 | stability-of-standard-data | lattice coordinates for integral unitary points | accepted | item 2 states g in the standard finite unitary group, coordinates of the point of V, element a_f g a_f^-1 of U(J) |
+| 12 | standard-data | multiplicative absolute value | accepted | condition stated as membership in the local ring of integers, abs <= 1, ord >= 0 |
+| 13 | standard-data-as-theta-products | summary strengthens finite-image integrality | accepted | summary says "finite images integral above p" |
+| 14 | standard-data-as-theta-products | common multiple omits b | accepted | Step 1 now returns m = m_0 b (as Lean does), so Step 2's product is correct |
+| 15 | taylor-series-on-a-line-from-jet-series | identify the Weil model and its theta evaluations | accepted | S(V) introduced as the Banach model, f(x) = theta(rho(x) f), bound from the norm of theta |
+| 16 | taylor-series-on-a-line-from-jet-series | entireness needs the real vacuum condition | accepted | Theta_f defined for all f, entire under signs +1 and real-vacuum invariance |
+| 17 | theta-product-times-monomials-as-a-vector | complex form vs p-adic image | accepted | complex forms mu-tilde introduced, iota_p applied afterwards |
+| 18 | vector-determined-by-jet-series | theta evaluation in the uniqueness step | accepted | exact evaluation identity and the nature of the injectivity lemma stated |
+| 19 | bound-for-the-partner-minimum-sum | data comparison k <= 2^s | accepted | chain k <= r <= 3x^5 <= x^11 <= m^22 = 2^s added (taken from the size table of the Lean reading guide; Lean itself uses the magnitude calculus) |
+| 20 | conjugates-of-jets-of-translates | phase in local constancy | accepted | cites `New.Space.isLocallyConstant_rho_finVec` and explains the character |
+| 21 | copy-substitution | chain rule as an identity of series | accepted | property 0 added |
+| 22 | existence-of-resolution-product-along-tight-frame | two declarations absent from the proof | accepted | `cmPeriod_mem_cmCurve_lattice` moved to cm-curve-and-period; `norm_map_selfDualAddChar` moved to integral-vacuum-in-rank-one with its finite-order argument |
+| 23 | integral-series-in-parameters-after-scaling | threshold vs chosen scale | accepted | rho_p introduced as the threshold (also in derivatives-of-the-formal-parameter) |
+| 24 | jets-along-homogeneous-polynomials | infinite-place index of the Fock signs | accepted | Sigma defined, sign epsilon_i at (v, i) |
+| 25 | lattice-a0-is-galois-stable | name the differentiated polynomial | accepted | g = Phi_{q1}'(zeta) (also in two other knowls) |
+| 26 | least-valuation-zero-at-inert-primes | title turns upper bound into equality | accepted | title "Nonpositive least valuation along a tight frame at an inert prime" |
+| 27 | legendre-bounds-for-the-data | attribution to Mathlib | accepted | attributed to `New.padicValNat_factorial_mem_Icc` |
+| 28 | modulus-of-jet-scale | isogeny citation | accepted | `New.exists_isIsogeny_of_mul_mem_lattice`, `New.conj_isogeny_mul_mem_lattice` |
+| 29 | norm-bounded-by-values-at-finite-points | space carrying the inner product | accepted | "inner product on S(V)" |
+| 30 | reduction-to-the-curve | integer-product valuation lemma in wrong knowl | accepted | `norm_natCast_prod_eq_rpow_neg_sum` moved to sharpness-of-the-valuation-bound |
+| 31 | resolution-from-tight-frame | division by an allowed zero | accepted | nu >= 1, Lean convention noted |
+| 32 | sharpness-of-the-valuation-bound | weight at which S_p is evaluated | accepted | formula for S_p and the local prime sum added |
+| 33 | six-scaled-copies-are-a-unit | index of the distinguished copy | accepted | delta_0..delta_5 everywhere (also least-valuation-with-a-unit-form) |
+| 34 | six-scaled-copies-are-a-unit | norm-pair closure | accepted | cited theorem stated with the closure of (alpha, alpha conj alpha) |
+| 35 | size-of-the-sharpness-constant | zero vacuum value before logarithm | accepted | bounds multiplied, no logarithm of the vacuum value |
+| 36 | sparseness-along-powers-of-minus-p | place of a nonunit | accepted | [nu] defined for all integers (identity place for nonunits) |
+| 37 | stability-of-standard-data | translated-vacuum formula | accepted | cites `omega_finHeisenbergOp_intVacuum` and the two extra identities |
+| 38 | standard-data-as-theta-products | namespace of the approximation lemma | accepted | `?lean:New.exists_finiteImage_approx` |
+| 39 | tight-frames-of-all-large-lengths | root-of-unity frame assumed | accepted | parameters, E, zeta and the frame lemma stated in the lemma |
+| 40 | unit-coefficient-at-the-power-degree | residue calculations attributed to Lib | accepted | links `proofs/grh/derivatives-divisibility/coupling-sum-derivatives` |
+| 41 | vacuum-expansion | translation notation hides an idele factor | accepted | y_f and gamma_f defined before the conditions |
+
+Coordinator's extra points:
+- (2) `HasNormalForm` (NormalForm.lean:50) and the twisted translation (`CMLattice.twistedTranslate` = `thetaShift` of m H, AppellHumbertData.lean:144, H(l,z) = pi conj(l) z / A, Sigma/Basic.lean:105) were opened; the statements in this area agree with them (the set S is `partnerExponents`, which for p = d contains e = 0; made explicit). The former doubts 1 and 2 of this report are thereby settled. Normal-form statements now link `proofs/grh/derivatives-divisibility/normal-form`, `normal-form-of-theta-products`, `coupling`, `coupling-sum`; resolution-product and jet-ring link `cm-curve-setting`.
+- (3) No knowl of this area linked `derivatives-divisibility/field-setting`.
+- Lean names: the five `New.Data.*` names listed in lean-references.md are structure fields and were confirmed valid there; the two wrong `New.Space.*` names are fixed (findings 4, 9, 38). Sidecar: `New.CMLattice.IsIsogeny` corrected to `PeriodPair.IsIsogeny`; the sigma-function entry now says the Lean sigma is a normalised variant; third column contains only `NEW` or corpus ids.
+- Nothing in this audit requires a change in another area.
