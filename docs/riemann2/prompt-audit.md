@@ -1,0 +1,7 @@
+An independent audit of your {AREA} knowls against the Lean has come in; please process it.
+
+Read /home/codex/code/knowlpedia-root/knowlpedia-content/reviews/riemann2-audit/areas/{AREA}.md (per-page ledger with every finding, its reasoning, the proposed correction and the Lean lines), the rows for your area in reviews/riemann2-audit/findings.tsv, and the entries of reviews/riemann2-audit/lean-references.md and structural-checks.md that concern your files.
+
+For each finding, high priority first, then medium, then low: open the cited Lean lines and check the finding yourself; if it is right, correct the knowl (statement, proof, summary, front matter) from the Lean source, not just by pasting the proposed text; if you conclude it is wrong, leave the knowl and record why. Keep the house rules of documents/riemann2/GUIDE.md (re-read its Addenda at the end); if a correction means a proof is no longer complete, lower `proof_status` to "outline" and say what is asserted. Fix the wrong `?lean:` names listed for your area. In the sidecar use exactly `NEW` or a corpus id in the third column.
+
+Do not edit files under reviews/ and do not touch other areas' knowls; if a finding implies a change in another area, note it. Append a section "Audit response" to documents/riemann2/reports/{AREA}.md with one line per finding: knowl, finding title, accepted/rejected, what changed. No subagents; you are the only agent running. Reply with a short summary: findings accepted, rejected (with reasons), status changes.

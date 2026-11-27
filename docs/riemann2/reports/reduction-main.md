@@ -36,3 +36,37 @@ The criterion `New.LFunction_ne_zero_of_primeRemainder_le` needs `∀ᶠ x : ℝ
 - Bundling: `regular-family-of-twists` and `data-derived-quantities` hold several small definitions each; could be split if the one-concept rule is enforced strictly. `IsNegligible`, `RankOneIndex` only mentioned.
 - Existing-corpus IDs used were checked by opening the files (module, dvr, length-module, smith-normal-form-theorem [PID case only], number-field, field-automorphism, algebraic-closure, norm-field, cyclotomic-extension [title only], cyclotomic-polynomial, primitive-root-of-unity, imaginary-quadratic-field, class-number, ideal-class-group, algebraic-integer).
 - Lean names in ?lean: placeholders for other areas: namespaces verified for most (New.Data.*, New.exists_isRegularFamily, New.IsSpread.exists_few_le_finrank_iSup_range); NOT verified: `New.Data.chiZero`, `New.Data.chiM`, `New.Data.chiMLocal`, `New.WeilData.upsilonU1`, `New.AutChar.HasWeight`, `New.Data.singleLift`, `New.Data.goodForms`, `New.DescentPair.IsOrthogonalToFalseLifts`, `New.DescentPair.IsTestForm`, `New.Data.CriticalPair.HasLiftRank`, `New.Data.chiMLocal_zpow_ne_one_iff_isChosen`, `New.LevelPlaces.LevelForm.integralForms`, `New.Data.e₀`, `New.Data.compositeLift`, `New.Data.IsChainDatum`, `New.Data.lowerChain`, `New.Data.turnRatio`, `New.Data.quotientRatio`, `New.Parameters.vacuumBoundConst`.
+
+## Audit response
+
+All 22 findings for this area were checked against the cited Lean lines; all accepted, none rejected. No `proof_status` changed (the corrected pages were either already "outline" or the correction did not remove a proof step).
+
+| knowl | finding | verdict | change |
+|---|---|---|---|
+| data-derived-quantities | (high) character of lift j has weight −κ_j | accepted | κ_j now labelled "minus the weight of the character of lift j", link to lift-characters; summary adjusted |
+| reduction-main (page) | identify the ramified source | accepted | §5 now defines 𝒮 as the ramified source inside 𝒮_X and fixes the meaning of dim 𝒮 |
+| reduction-main (page) | keep n ≥ (1−4/b²)d_T for Theorem C | accepted | §6 states (1−4/b²)d_T ≤ n ≤ d_T for the family, cancellation by n ≤ d_T and h_main+F ≥ 0, n ≥ d_T/2 only for the division |
+| covolume-bound | hermitian Gram determinant is not a lattice covolume | accepted | remark rewritten: squared norm in the exterior power; "covolume" is the source's name, example 1, i |
+| data-exist | rd_E ≤ q₁d and q₁d ≤ b are separate | accepted | different gives rd_E ≤ q₁d; q₁d ≤ b from large-scale bounds (`IsLargeScale.q₁_mul_d_le_exp`), marked asserted |
+| data-sizes | fifth scale estimate needs the tower bound | accepted | proof now derives x₁^(3l₀²) ≤ √b from l₀ ≤ 81s, s ≤ 32 log x |
+| height-bound | Weil-height comparison is wrong | accepted | remark replaced by the rational example (y=2, H=1/2) and the sharp value −log|z| |
+| inverse-ratio-height | Z_j is for the lift restricted to good forms | accepted | Z_j(ϑ^j) := det(u*u), u the single lift restricted to the good forms on W_j |
+| log-bound-calculus | hypotheses on powers and reciprocals | accepted | A ∈ ℕ; reciprocal rules stated separately with F > 0 |
+| regular-family-of-twists | which false lifts | accepted | false lifts taken for (e₀, Z^⊥) spelled out |
+| sparse-places-exist | zero-denominator convention | accepted | convention quotient = 0 when nH = 0; "at most nH² radii" |
+| target-lattice | specify level and weight of S_ϑ | accepted | S_ϑ described by `columnsY`, `lastEntry m`, `lastResidueLevel` (identity at chosen places, block upper triangular at Q), `lastLevelChar` |
+| theorem-b-enough-forms | full source nonzero | accepted | added 𝒮_X ≠ 0 via `New.Data.sourceFormCoords` (quoted) |
+| colength-bounds-length | relLength is a length | accepted | reference reworded |
+| colength-divides | length remark needs M finitely generated | accepted | "for finitely generated M" added |
+| data-exist | positive modulus in the prime-window input | accepted | M′ positive integer divisible by 4, A a fixed natural number |
+| data-sizes | source of the root-discriminant bound | accepted | linked proofs/grh/derivatives-divisibility/size-of-the-different, `New.Data.rootDisc_mem_Icc` |
+| gain-normalisation | log 0 convention | accepted | convention stated in (c) |
+| grh | proposition name claimed twice | accepted | `lean = ["New.grh"]` only; alias and Statements.lean removed from front matter; statement links `?lean:DirichletLNonvanishingRightOfHalf` |
+| log-product-formula | explanation at q = 0 | accepted | "For q ≠ 0 …; for q = 0 it is 0 = 0" |
+| regular-family-of-twists | size of the four-block index set | accepted | blocks 12, 4, 4, max(2z−20, 0); sum is 2z iff z ≥ 10 |
+| theorem-a-short-forms | zero image and logarithm | accepted | bound stated for the squared norm directly, exponents compared afterwards |
+
+Other items:
+- `?lean:` names: `lean-references.md` lists no wrong name used in this area (checked all 62 distinct placeholder names of the area against its "Names to correct" headings). I additionally verified by namespace the names I had flagged as unverified in the first report (`New.Data.chiZero`, `chiM`, `chiMLocal`, `New.WeilData.upsilonU1`, `New.AutChar.HasWeight`, `New.Data.singleLift`, `New.Data.goodForms`, `New.DescentPair.IsOrthogonalToFalseLifts`, `New.DescentPair.IsTestForm`, `New.Data.CriticalPair.HasLiftRank`, `New.Data.chiMLocal_zpow_ne_one_iff_isChosen`, `New.LevelPlaces.LevelForm.integralForms`, `New.Data.e₀`, `New.Data.compositeLift`, `New.Data.IsChainDatum`, `New.Data.lowerChain`, `New.Data.turnRatio`, `New.Data.quotientRatio`, `New.Parameters.vacuumBoundConst`): all exist under those names. No change needed.
+- Sidecar (structural-checks): the four rows with `NEW?` / `NEW (cf. …)` now carry the exact sentinel `NEW`, with the comparison moved into the description.
+- Implication for another area (not edited by me): the finding on derivatives-divisibility/chosen-places-and-characters ("every root of unity is a power of ζ") is answered by part (6) of `proofs/grh/reduction-main/field-e-properties` (`New.Parameters.exists_zeta_pow_eq`); that page can link it.

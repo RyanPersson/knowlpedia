@@ -1,4 +1,4 @@
-commutative ring	definition	NEW?	algebra-rings	A ring with commutative multiplication and identity.	ring	CommRing
+commutative ring	definition	NEW	algebra-rings	A ring with commutative multiplication and identity. [was marked 'NEW?': check the corpus for an existing knowl before creating]	ring	CommRing
 module	definition	algebra-modules/module	algebra-modules	Module over a ring.	ring	Module
 submodule	definition	NEW	algebra-modules	A subset of a module closed under addition and scalar multiplication.	module	Submodule
 linear map	definition	NEW	algebra-modules	A map of modules over a ring that is additive and commutes with scalars.	module	LinearMap
@@ -12,13 +12,13 @@ Smith normal form theorem	theorem	algebra-modules/smith-normal-form-theorem	alge
 field isomorphism	definition	NEW	algebra-fields-galois	Bijective ring homomorphism between fields.	field	RingEquiv
 field automorphism	definition	algebra-fields-galois/field-automorphism	algebra-fields-galois	Here: all (discontinuous) automorphisms of C.		ℂ ≃+* ℂ
 algebraic closure	definition	algebra-fields-galois/algebraic-closure	algebra-fields-galois	Used for Q_l.		PadicAlgCl
-p-adic number	definition	NEW (cf. algebra-fields-galois/p-adic-field)	algebraic-number-theory	The field Q_p, completion of Q for the p-adic absolute value.	p-adic absolute value	Padic
+p-adic number	definition	NEW	algebraic-number-theory	The field Q_p, completion of Q for the p-adic absolute value. [was marked 'NEW (cf. algebra-fields-galois/p-adic-field)': check the corpus for an existing knowl before creating]	p-adic absolute value	Padic
 p-adic absolute value	definition	NEW	algebraic-number-theory	|q|_p = p^(-v_p(q)) on Q, normalized |p|_p = 1/p; extends uniquely to an algebraic closure of Q_p and to C_p.		padicNorm
 product formula for the rational numbers	theorem	NEW	algebraic-number-theory	For q in Q^×: |q| · ∏_p |q|_p = 1.	p-adic absolute value	New.log_product_formula
 isomorphism of algebraically closed fields of equal characteristic and uncountable cardinality	theorem	NEW	algebra-fields-galois	(Steinitz) Two algebraically closed fields of the same characteristic and the same uncountable cardinality are isomorphic; an isomorphism of subfields of smaller cardinality (e.g. finitely generated, with algebraic extensions) extends to an isomorphism. Used: any embedding of a number field Q(H) ⊂ C into F extends to C ≅ F.	algebraic closure; transcendence degree	exists_ringEquiv_extend
 field norm	definition	algebra-fields-galois/norm-field	algebra-fields-galois	N_{L/K}; product of conjugates.		Algebra.norm
 number field	definition	algebra-fields-galois/number-field	algebra-fields-galois			NumberField
-vector space	definition	NEW?	linear-algebra	Module over a field.	module	
+vector space	definition	NEW	linear-algebra	Module over a field. [was marked 'NEW?': check the corpus for an existing knowl before creating]	module	
 inner product space	definition	NEW	functional-analysis	Complex vector space with a positive definite hermitian form, conjugate-linear in the first variable (Mathlib convention).	vector space	InnerProductSpace
 positive definite hermitian matrix	definition	NEW	linear-algebra	Hermitian matrix G with v*Gv > 0 for v ≠ 0.		Matrix.PosDef
 Gram determinant	definition	NEW	linear-algebra	det(<v_i, v_k>) for a finite family of vectors; nonzero iff the family is linearly independent.	inner product space; determinant of a square matrix	Matrix.gram
@@ -45,7 +45,7 @@ non-vanishing of Dirichlet L-functions on the line Re s = 1	theorem	NEW	analytic
 von Mangoldt function	definition	NEW	analytic-number-theory	Λ(n) = log p if n = p^k, k ≥ 1, else 0.		ArithmeticFunction.vonMangoldt
 Mertens' first theorem	theorem	NEW	analytic-number-theory	∑_{n≤X} Λ(n)/n = log X + O(1); used in the weak form ≤ 2 log X.	von Mangoldt function	sum_vonMangoldt_div_le
 root discriminant	definition	NEW	algebraic-number-theory	rd_E = |disc E|^{1/[E:Q]}.	discriminant of a number field	NumberField.rootDiscr
-different ideal	definition	NEW (cf. algebra-fields-galois/codifferent)	algebraic-number-theory	Inverse of the codifferent; its absolute norm is |disc|.		differentIdeal
+different ideal	definition	NEW	algebraic-number-theory	Inverse of the codifferent; its absolute norm is |disc|. [was marked 'NEW (cf. algebra-fields-galois/codifferent)': check the corpus for an existing knowl before creating]		differentIdeal
 class number	definition	algebra-fields-galois/class-number	algebra-fields-galois			NumberField.classNumber
 ideal class group	definition	algebra-fields-galois/ideal-class-group	algebra-fields-galois			ClassGroup
 algebraic integer	definition	algebra-fields-galois/algebraic-integer	algebra-fields-galois	Ring of integers O_K, O_E.		NumberField.RingOfIntegers
