@@ -64,3 +64,4 @@ DONE: upper-elementary-divisors (67 knowls; 44 full/1 outline; sidecar 44). Gap:
 PARTIAL: spanning-core 52 knowls (22 full/11 outline; sidecar 67). REMAINING unread: Bessel/{Average,OpenCellBound,OpenCellPairing,LargeFunction,CutTailBound,SchurBound,FillingData} (continuation sent to afe0da4).
 Window 3 (after 1pm 11-26): spanning-core continuation was cut by limit mid-Bessel; resumed afe0da4. Lock re-armed.
 DONE: spanning-core 66 knowls (25 full/17 outline; sidecar 78), all 17 files verbatim. Next: spanning-unfolding-a (ad1d539).
+DONE: spanning-unfolding-a 81 knowls (62 full/5 outline; sidecar 62). Folder has 19 files (not 22): a took first 11; b must take ONLY last 8: Setup, BesselLevelStructure, SquareExpansion, MomentBounds, Moments, Terms, Link, TermStructure. ~240 external ?lean names, some are structure fields. Next: spanning-unfolding-b (af8c29f).
