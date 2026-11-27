@@ -75,3 +75,4 @@ REVIEW UPDATES merged (content HEAD 32adcbe6): reviews/riemann2-audit/updates/{b
 AUDIT QUEUE: derivatives-vacuum (running), upper-objects, upper-seesaw, upper-divisibility, upper-elementary-divisors, spanning-core, spanning-unfolding-a, spanning-unfolding-b, then re-touch derivatives-divisibility (8) + reduction-main (2). Then forward: spanning-remaining-a...
 AUDIT-FIX DONE: derivatives-vacuum (41/41). Next: upper-objects (a7e1079).
 AUDIT-FIX DONE: upper-objects (43/43). Next: upper-seesaw (aecec73).
+AUDIT-FIX DONE: upper-seesaw (48/49, 1 belongs to upper-divisibility). Next: upper-divisibility (a902022).

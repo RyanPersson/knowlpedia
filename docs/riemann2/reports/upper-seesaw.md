@@ -110,3 +110,68 @@ Policy used for "full": every step is a computation given in the text, a linked 
 Namespaces: the two inferred ones were confirmed (`New.Grading.exists_isGraded`, `New.Data.isArrow_swap_thetaKernelY_datumY`); `New.Grading.inclXFin`/`besselFin` confirmed by the `namespace New`/`namespace Grading` lines of `Lib/Weil/Periods/Grading.lean`. Links added in this pass were checked the same way; one was corrected (`New.Rows.span_piM`).
 
 Remaining doubts: (a) the exponent comparison in double-lift-evaluation-equivariant; (b) the block identity in admissible-evaluation-of-edge-pairs; (c) the mixed-model inputs of finite-zero-term are cited by Lean name without restating them exactly; (d) concept linking of standard terms was partly mechanical (first pass) and was not redone.
+
+## Audit response
+
+Source: `knowlpedia-content/reviews/riemann2-audit/areas/upper-seesaw.md` and the 49 rows of `findings.tsv` for this area (the two `updates/*` folders contain no rows, ledger entries or sidecar corrections for upper-seesaw). The audited snapshot already contained the third pass (51 knowls), so no finding was "already resolved". Every finding was checked against the Lean lines cited; all 48 findings on this area's pages are accepted, one concerns another area. No `proof_status` changed (35 full, 7 outline).
+
+High
+- area page — The string description stops one stage before the top — accepted — notation paragraph now restricts "X_j plus a string" to j<m, mentions the middle vector of norm −N only for odd strings, and describes Y_m as the standard space of rank n_m−1 of codimension one in X_m; the same is stated in tower-gradings-and-evaluated-data.
+- iterated-unfolding — The top stage has zero string vectors — accepted — string length in part 4 is max(0, m−2−k), with the case k=m−1 identified with the last grading.
+- neighbour-lattice-representatives — The quotient modulo β can be infinite — accepted — part 2 and its proof use D_β (the number of matrices modulo β if finite, 0 otherwise, as Lean's `Nat.card`); the infinite case is treated separately; summary changed. neighbour-vacuum uses the same D_β.
+- support-of-unfolding-stages — The lattice bounds use the chosen modulus — accepted — Q is now the chosen modulus of the tame character (`TameChar.Q`), not the set of ramified places; same wording corrected in stage-cuts, point-datum-periods, point-data-admissible, tower-lattice-data, seesaw-identity, evaluated-data-admissible and the area page.
+- unfolding-stages — Restrict unipotent covariance to degree at least two — accepted — property 2 states the transformation law on U^{≥2} only (`IsEquivariant.unipotent_mul`), with the remark that it is the whole unipotent radical for odd strings.
+
+Medium
+- area page — The summary extends the coefficient bounds to all twists — accepted — summary qualified (integral away from the modulus; bounded when the modulus is empty).
+- area page — A tame character carries a chosen supporting modulus — accepted — notation paragraph rewritten.
+- admissible-combination — The example conflates modulus, denominator and empty-modulus condition — accepted — remark rewritten with n=q, p=(Q=∅), d=𝒞^{2m} before and d=1 after the rescaling.
+- admissible-evaluation-of-edge-pairs — Split level omits residue degree one — accepted — hypothesis spelled out (N splits completely, residue fields Z/N, N a uniformiser).
+- double-lift-data — Give the scaled finite translation vector — accepted — the translation is ρ_f(α^{-1}(S^♭)_f) with S^♭ the coordinates in the frame of the Hom space; the self-link is removed (also the structural check).
+- double-unfolding-integral — Rank twists and adelic coefficients — accepted — complement now names the rank twists a_o υ^{⌊r/2⌋}, b_o υ^{⌊r/2⌋} and defines t(φ(x)) as t(ρ(x_∞)^{-1}φ(x_f)).
+- evaluated-data-admissible — Excluding the π_N places does not prove coprimality — accepted — gcd(N,q)=1 now taken from the defining condition gcd(MN,q)=1 of a tame character (`TameChar.coprime`).
+- evaluated-data-admissible — Third matrix shape — accepted — the three exponent bounds are n_m², n_m², 2n_m².
+- graded-lattice-basis — Mixed entries unspecified — accepted — all unlisted pairings are 0.
+- graded-lattice-basis — Odd length alone does not prevent self-duality — accepted — remark now says the failure is at the places where N is not a unit.
+- integral-as-sum-over-cut — Scalar for an arbitrary archimedean function — accepted — κ defined with the totalised (Bochner) integral convention.
+- iterated-unfolding — Supply a graded point in the Bessel orbit — accepted — part 3 of lattice-bounds-induction-step is invoked for the existence of a graded translate.
+- lifting-conditions-for-the-two-pairs — Lengths 1,0,0 do not define the last double lift — accepted — c_Y=c_{Y'} (consecutive strings) is a stated hypothesis of both cases.
+- lower-chain-of-poincare-series — Use Petersson nondegeneracy — accepted — the last step takes x to be the difference of the two forms.
+- neighbour-lattice — Qualify the identification with the zero-term lattice — accepted — remark now states the hypotheses and links part 1 of admissible-evaluation-of-edge-pairs.
+- neighbour-vacuum — Explicit sum versus sum over all classes — accepted — summary and a sentence before the theorem distinguish the two.
+- neighbour-vacuum — The denominator can be zero — accepted — D_β with the finite-or-zero convention.
+- point-data-admissible — Chosen modulus — accepted — wording and summary.
+- point-datum-periods — Prescribed modulus set — accepted — wording.
+- schrodinger-operator-admissible — The projection averages over the conjugate places — accepted — P^𝔪 and the lifted function are now defined precisely.
+- seesaw-identity — Terminal identity in joint invariance — accepted — the bullet states b_j in the level for j<m and b_m=1; seesaw-datum property 1 likewise; the support condition is made explicit.
+- stage-cuts — Chosen modulus — accepted — wording.
+- stage-cuts — The initial cut needs invariance of the chosen level — accepted — the case j=0 is now argued separately (image of the level of X_0 lies in the chosen level; multiplicity 1).
+- top-of-the-chain — Adelic coefficient of the upper form — accepted — t(ψ(h)) defined as t(ρ(h_∞)^{-1}ψ(h_f)).
+- tower-gradings-and-evaluated-data — Target of the evaluated datum — accepted — second factor is Hom(X_{2i+1},X_{2i+2}); last grading described (definite part of n_m−1 vectors, constant 1).
+- unfolding-stage-as-coefficient-of-chain — Odd string length in the uniqueness step — accepted — the step cites `IsEquivariant.eq_sourceFn` with the odd length m−1−(2i+2).
+- unfolding-stages — Rational points over the fixed field — accepted — R(E) replaced by R(F)=Γ∩R, F=E⁺, in unfolding-stages, iterated-unfolding, integral-as-sum-over-cut, top-of-the-chain.
+
+Low
+- area page — Seven outline labels include a construction — accepted — wording "of the 42 items with a proof-status label".
+- admissible-evaluation-of-edge-pairs — K undefined — accepted — K defined before C=cK.
+- admissible-evaluation-of-edge-pairs — Stale dependency status — accepted — remark updated (zero-term-lattice is full, finite-zero-term is the outline).
+- double-unfolding-integral — Extend the pure tensor calculation by linearity — accepted.
+- evaluated-data-admissible — Summary identifies modulus norm with conductor norm — accepted — summary reworded.
+- moved-vacuum-admissible — Two undefined symbols — accepted — ψ and c_0 identified.
+- neighbour-lattice — Representatives in y/N — accepted — integer representative in {0,…,N−1}.
+- neighbour-vacuum — Scalar pairings for matrices — accepted — convention stated before the formulas.
+- schrodinger-operator-admissible — Support idempotent dropped — accepted — 1_S inserted, y_b written as conj(1_S ϖ^{-1} z_b).
+- seesaw-datum — Empty-modulus condition on both size bounds — accepted.
+- shift-maps-lattices — Finite frame versus finite group point — accepted — frames are B, B′, points p=x_f, p′=x′_f.
+- standard-lattice-membership — Separate subscript for the distinguished coordinate — accepted — y_e, c_e.
+- string-lattices-line-by-line — Coordinate changed in the lift — accepted — z_e, y_e.
+- tower-lattice-data — Level places include all of the assigned modulus — accepted — wording.
+- unfolding-stage-as-coefficient-of-chain — Absorb the scalar z — accepted — the complement is applied to z·v.
+- unfolding-stages — Separate the terminal function from the recurrence — accepted — index ranges stated.
+- upper-divisibility/chain-datum-as-a-weak-chain-datum — two quoted names — not this area's page; for the owner: the names are `New.Seesaw.IsAdmissibleCombination` (and its `bind`), with the page `proofs/grh/upper-seesaw/admissible-combination-substitution`, and `New.Space.omega_projOn`.
+
+Other audit files
+- structural-checks: self-link in double-lift-data removed; `lean_files` of vacuum-translate-away-from-level now also lists `EdgePairEvaluation.lean`.
+- lean-references: `New.Grading.besselFin` and `New.Grading.inclXFin` are confirmed as written; the other entries naming Seesaw declarations concern pages of upper-divisibility (`New.Seesaw.isAdmissibleCombination_schrodingerOp_of_reduction`, `New.Seesaw.poleColumn`, `New.Seesaw.poleRow`).
+- Sidecar: the row "Conductor of a Hecke character" was removed (no longer used); third column is `NEW` or a corpus id in all 44 rows.
+- Agreement with the corrected upper-objects knowls was checked for the objects quoted here (spaces Y_j with string indices 0..2ϱ−j, idele a=α/conj(chosen idele), lattice scale exponent ⌈(m−j)/2⌉, chain datum, joint invariance with b_m=1, composite lift): consistent. Grid centres, signs of W_j and descent pairs are not quoted in this area.
