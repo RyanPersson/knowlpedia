@@ -69,3 +69,4 @@ REVIEW: friend's audit on origin/riemann2-review merged into riemann2 (reviews/r
 DONE: spanning-unfolding-b 89 knowls (61 full/1 outline; sidecar 47), 8 files verbatim. NOW: audit-fix passes, one author at a time in order: reduction-zeros ac5511e, reduction-main a14da12, derivatives-divisibility acebff8, derivatives-vacuum acc6db7, upper-objects a7e1079, upper-seesaw aecec73, upper-divisibility a902022, upper-elementary-divisors a0d7741, spanning-core afe0da4. Then forward: spanning-remaining-a...
 AUDIT-FIX DONE: reduction-zeros (19/19 accepted). Next audit-fix: reduction-main (a14da12) incl. note: grh knowl should not claim DirichletLNonvanishingRightOfHalf.
 AUDIT-FIX DONE: reduction-main (22/22 accepted). Next: derivatives-divisibility (acebff8); hint: chosen-places-and-characters finding answered by reduction-main/field-e-properties part 6.
+AUDIT-FIX DONE: derivatives-divisibility (20/20; field-setting deleted; 38 knowls). Next: derivatives-vacuum (acc6db7).

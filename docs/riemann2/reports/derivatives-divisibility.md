@@ -1,9 +1,9 @@
 # Coverage report: derivatives-divisibility (complete)
 
-Output: 39 knowls in `knowlpedia-content/content/proofs/grh/derivatives-divisibility/`, the area page
-`proofs/grh/derivatives-divisibility.knowl.md`, the sidecar `concepts/derivatives-divisibility.tsv` (43 rows).
+Output (after the audit): 38 knowls in `knowlpedia-content/content/proofs/grh/derivatives-divisibility/`, the area page
+`proofs/grh/derivatives-divisibility.knowl.md`, the sidecar `concepts/derivatives-divisibility.tsv` (46 rows).
 
-Kinds: 3 notation, 12 definition, 2 construction, 9 lemma, 4 proposition, 9 theorem.
+Kinds: 2 notation, 12 definition, 2 construction, 9 lemma, 4 proposition, 9 theorem.
 proof_status: 26 full, 1 outline (size-of-the-different, part 3). The 12 remaining are definitions/notation
 (some definition knowls carry short proofs of their listed properties).
 
@@ -22,7 +22,7 @@ All ten files were read completely (heads, statements, proofs). None was compile
 | Field/WeilData.lean | 545 | full | places-above-split-primes, weil-data-of-e, vacuum-root |
 | Field/ChosenPlaces.lean | 455 | full | chosen-places-and-characters, critical-pair, size-of-the-different |
 
-Plus three setting knowls with `lean = []` (p-adic-setting, cm-curve-setting, field-setting) that restate
+Plus two setting knowls with `lean = []` (p-adic-setting, cm-curve-setting; field-setting was removed after the audit, see below) that restate
 notation owned by other areas (Lib/CM/FormalGroup/PrimeNotation, Lib/CM/Sigma, New/Reduction/Data/FieldsAndPlaces)
 with `?lean:` links, so that the cores of the other knowls stay short.
 
@@ -66,3 +66,35 @@ with `?lean:` links, so that the cores of the other knowls stay short.
    (equivalent when the jet is nonzero; trivial otherwise), the-count as the norm inequality.
 8. `Space.jetSeries_mul_eq_rescale` (Resolution.lean) is only mentioned in a remark of theta-product, not given a knowl.
 9. `prerequisites = []` everywhere (placeholders pending), as the guide prescribes for drafts.
+
+## Audit response
+
+Setting knowls: `field-setting` was deleted; all its links now point to `proofs/grh/reduction-main/field-e-and-its-places`
+(finished owner), with `?lean:New.Parameters.placeOfInt`, `…chiK_eq_one_of_dvd`, `…dvd_d_add_one_div_four_of_dvd_q₁` links where
+those facts are used; the local notation (nu_m, finite places, v•w) is defined in frobenius-on-generators and the area page.
+`p-adic-setting` and `cm-curve-setting` are kept: no finished area owns `New.piPrime`, `New.valRingCp`, `New.CMLattice`, etc.
+(library declarations); they already consist of `?lean:` links and should be retired when owners exist.
+Literal `[[`/`]]` in mathematics replaced by `[\![`/`]\!]` in all 16 affected files (and removed from two TOML summaries).
+
+- area page — High: coupling divisibility needs a bound on the exponential scale — accepted; §2 now states the norm condition |(varpi^(p+1)/p) pi| <= p^(-1/(p-1)) and the two conditions on Z, and notes that v(varpi)=rho_p, pi=pi_p supply it.
+- area page — Medium: determinant norm lower bound / additive cost — accepted; §4 restated as a bound on the weighted sum of valuations, pairings only for non-exempt pairs.
+- area page — Medium: Frobenius description is unramified — accepted; §5 restricts the Frobenius element to p not dividing q1 d and separates the residue congruence at p = d.
+- cm-curve-setting — High: normalised sigma — accepted (checked `PeriodPair.σ`, Basic.lean); sigma is now defined by oddness, sigma'(0)=1 and its transformation law, linked `?lean:PeriodPair.σ`, distinguished from the classical sigma; theta defined via the explicit twisted translation. Sidecar: new rows "normalised sigma function of a lattice", "theta function of a lattice"; classical row corrected.
+- the-count — High: missing integrality of H — accepted; remark now requires H in O[[y(u_j† z)]] and says why.
+- chosen-places-and-characters — Medium: roots of unity are powers of zeta — accepted; Kronecker's theorem named (new sidecar row), parts 6 and 7 of reduction-main/field-e-properties linked.
+- deduction-term — Medium: attainable cost, not minimum — accepted; remark rewritten.
+- frobenius-congruence-for-theta — Medium: twisted torsion values — accepted; Step 1 defines G[u] = G(u) exp(-n pi |u|^2/(2A)) and uses it (links `New.CMLattice.torsionValue`, `…hasIntegralValues_theta`).
+- frobenius-congruence-for-theta — Low: isogeny reference — accepted; `?lean:PeriodPair.IsIsogeny`.
+- frobenius-on-generators — Medium: Euler's criterion alone insufficient — accepted; quadratic reciprocity with d ≡ 3 mod 4 and the case p = d inserted.
+- partner-of-a-place — Medium: unit test on -p^e at e = 0 — accepted; fallback to the identity only when -p^e is not prime to q1.
+- product-of-minors — Medium: direction of the Schur expansion — accepted; remark rewritten.
+- weil-data-of-e — Medium: full group of roots of unity — accepted; field-e-properties part 6 linked.
+- weil-data-of-e — Low: integral finite ideles in the normalisation of upsilon — accepted; wording fixed.
+- count-with-charges — Low: floor(log_p 0) convention — accepted; stated in the truncated form.
+- exponent-on-one-curve — Low: summary drops e = 0 — accepted; summary fixed.
+- exponent-series — Low: property 3 holds at all primes — accepted (Lean `exists_rescale_theta_eq_mul_expSubst` has no non-split hypothesis); properties 2, 3 stated for every prime.
+- normal-form-of-theta-products — Low: coefficient identity absent — accepted; multinomial formula of `New.coeff_subst_linearSeries` stated in Step 1.
+- predicted-divisibility — Low: splitting terminology needs d ≡ 7 mod 8 — accepted; the knowl now assumes d ≡ 7 mod 8 and notes that the source works with the symbol (p/d) for any prime d.
+- supersingular-coefficient-unit — Low: n = 0 in the differentiated power — accepted; n = 0 handled separately.
+
+Rejected: none. proof_status changes: none (still 26 full, 1 outline). No change needed in other areas.
