@@ -69,8 +69,65 @@ Knowls: `valuation-of-chains-at-unmarked-primes` (proposition, outline), `valuat
 - Files not covered: none. No file was skimmed.
 - Why so many outlines: almost every result here combines (i) an input from another area and (ii) numerical comparisons that Lean discharges by `D.le_of_hasLogBound` (instance search over orders of magnitude). I did not re-derive (ii) by hand; each knowl says which comparison is asserted. A later pass with the `Reduction/Data/Magnitudes` and `Sizes` files open could upgrade several outlines (JetExponent, Estimates, MarkOperator, ArchimedeanSize) to full.
 - Paraphrased foreign definitions (not checked in their defining files): `IsChainDatum`, `IsWeakChainDatum`, `IsAdmissibleCombination`, `IsJointlyInvariant`, `Kernel.raises`, `GaugeLe`, `standardData`, `restrictToY`/`branching`/`branchExponent`, `upOperator`, `mirabolic`, `directDatum`, `LiftLaw`, `FrobeniusCycle` (opened, structure read), `IsOntoUpToColength`/`ColengthDvd` (opened), `predictedDivisibility` (opened), `heckeSplit`, `heckePolyOp`, `mainAmount`, `totalRemainder`, `mainPrimeSum`. Statements involving them follow the docstrings of my files.
-- Specific doubts are listed per file above; the main ones: the gloss on stabilisers of primes above an inert p (`orbits-at-an-exceptional-prime`); the Schur-matrix convention at non-a-places (`action-of-an-edge-on-the-variables`, part 3); the reading of `diagonalWeight` (`one-lift-evaluated-at-a-neighbor`); the direction of `sum_branchExponent` (`size-of-the-composite-lift`).
+- (Superseded in part by the section "Audit response" below.) Specific doubts are listed per file above; the main ones: the gloss on stabilisers of primes above an inert p (`orbits-at-an-exceptional-prime`); the Schur-matrix convention at non-a-places (`action-of-an-edge-on-the-variables`, part 3); the reading of `diagonalWeight` (`one-lift-evaluated-at-a-neighbor`); the direction of `sum_branchExponent` (`size-of-the-composite-lift`).
 - `x₁` is a real number in these files (`⌈D.x₁⌉₊`, `p < D.x₁`, `D.x₁ = exp D.logX₁` implicitly), while `x`, `b`, `a` are integers; knowls treat it so.
 - Definition knowls that also carry a short proposition with proof (no `proof_status` field since kind is definition): `setup-at-the-level-prime`, `scaling-generator` (kind construction, status full), `short-form` (property under subtraction of a translate).
 - Links: in-area links use real ids (all 60 resolve); other areas by `?lean:` placeholders; standard concepts by `?c:` (15 distinct names in the text) or real corpus ids (group, group-algebra, residue-field, rank-nullity-theorem). The sidecar has 46 lines, including concepts used only in prose (Weil representation, theta lift, Hecke algebra, …) for which no `?c:` link was placed where the Lean-name link already carries the reference.
 - `prerequisites = []` everywhere, as instructed for drafts with placeholders.
+
+## Audit response
+
+Source: `knowlpedia-content/reviews/riemann2-audit/areas/upper-divisibility.md`, the 41 rows of `findings.tsv`, `lean-references.md`, and `updates/b4aa180e/concepts.md` (the two `updates/*` folders contain no other entry for this area). Each finding was checked against the cited Lean lines. 40 accepted, 0 rejected, 1 concerns another area. No `proof_status` changed (all affected proofs were already outlines; the seven full proofs are untouched except `properties-of-marked-sets`, where a justification and a correct name were added and the proof stays full).
+
+High
+- `divisibility-bound` — erasing long rows does not give the lift valuation by itself — accepted. Remark rewritten: db is a contribution to an exponent; the direct bound p^(-db) is stated only for the empty set and standard data at a non-split prime; for non-empty sets the jet exponent is (charged boxes) − db under the partner condition on the charges, leading to the lift loss. Summary changed; chapter link now points to `proofs/grh/derivatives-divisibility`.
+- `hecke-cosets-as-edges` — edge steps parametrise δK_l, not K_lδ — accepted (Lean uses the quotient `GL n (LocField l) ⧸ localIntGL n l`, i.e. left cosets, and tests δ⁻¹δ′ ∈ K_l). Statement, proof and summary now speak of left cosets δ_g(β)K_l, with the remark that on the other side all βd give one coset.
+
+Medium
+- area page — b-places are a chosen sparse subset of class −1; F(p) defined — accepted; notation paragraph and section 1 changed.
+- area page — full marks: for each a-place the induced prime or its conjugate, at an exceptional p < x₁ — accepted.
+- `all-lifts-become-direct` — sources of the quoted inputs — accepted; steps 2, 4, 5 and the status paragraph now name `Objects/Columns.lean` and `Objects/LiftLawsModuloN.lean`; `New.IsSplitLevel.norm_detCharAt_diagN_anti`.
+- `allowed-loss` — only nonzero losses are assigned to slots — accepted; proof now discards terms with zero allowed loss (including p = 0) first.
+- `chain-of-lifts-as-a-sum-over-classes` — class sum taken after combining the integrands — accepted; proof rewritten (class integral, sum over x inside, joint invariance of the summed integrand, then trivial stabilisers).
+- `data-of-a-weak-chain-datum-are-standard` — missing projection lemma — accepted; part 5 (`projOn_translateDatum`) added with proof.
+- `direct-lifts-lose-little` — local insertion depends on the vacuum projection — accepted; Dir_j defined through the Schrödinger operator, which factors through the projection on the vacuum above N.
+- `direct-lifts-lose-little` — wrong qualified names — accepted (`New.Seesaw.isAdmissibleCombination_schrodingerOp_of_reduction`, `New.Parameters.mem_raises_of_standardData`, `New.IsSplitLevel.directDatum`).
+- `elementary-divisors-of-the-scaled-hecke-operator-given-a-frobenius-cycle` — inverse transpose in the origin coordinate — accepted; coordinate written (o(e), g_e^{-T}P_r); same in `hecke-operator-as-a-sum-over-edges`.
+- `gain` — divisibility holds on a submodule — accepted; remark rewritten.
+- `gauge-and-size-of-the-restriction-to-y-m` — unspecified archimedean norm — accepted; Weyl Gram norms named, branching-map properties linked as `New.Data.IsBranchingMap.*`.
+- `hecke-operator-as-a-sum-over-edges` — right translation summed over left cosets — accepted.
+- `hecke-transfer-through-the-chain` — which character value enters R — accepted; χ = base change of ν_{e+1} at the uniformiser (untwisted), rank twists give the unramifiedness hypotheses, even ranks give Frobenius values z^{n_i}χ; name `New.SiegelWeil.hecke_transfer_of_pairing`.
+- `local-prime-sum` — regrouping needs y ≤ a — accepted; remark corrected and linked to `prime-sum-grouped-by-primes` (it also wrongly said the identity was not proved in my files).
+- `one-lift-evaluated-at-a-neighbor` — criterion ranges over all standard data — accepted; jet scale stated; `New.Parameters.*` names.
+- `row-lengths-and-jet-sizes` — summary claimed linear growth — accepted; summary changed.
+- `scaled-hecke-operator` — cokernel estimate is modulo p^j — accepted; remark rewritten.
+- `short-forms-span-at-a-free-level` — weight embeddings are Φ_τ ∘ conj — accepted; Step 4 changed.
+- `valuation-of-a-chain-at-a-non-split-prime` — auxiliary g supported on Λ ∪ conj Λ — accepted; condition (c) restated with a tuple at Λ and its unitary extension.
+- `valuation-of-chains-at-unmarked-primes` — normalisation of the jets — accepted; kernel scale c·c₀ with c = conj(π̄_M), ratio with c alone.
+
+Low
+- `upper-objects/chain-of-lifts` (other area) — class-points link target lacks the definition — not mine; my link `?lean:New.classPoints` resolves to `upper-objects/jointly-invariant-chain-is-a-plain-sum`. Noted for the upper-objects author.
+- area page — seven items are full — accepted; sentence changed.
+- `action-of-an-edge-on-the-variables` — diagram at non-a-places is empty below rank k — accepted; statement and proof of (2), (3) changed, uncertainty note removed.
+- `allowed-loss` — last inequality also needs a lower bound on log x₁ — accepted; now cited as the full size comparison.
+- `chain-datum-as-a-weak-chain-datum` — names — accepted (`New.Seesaw.IsAdmissibleCombination`, its `bind`, `New.Space.omega_projOn`); the definitions of chain datum and weak chain datum were compared with `upper-objects/chain-datum-and-composite-lift` and agree.
+- `class-number-bound-for-the-standard-lattice` — `New.Space.exists_short_basis_stdSpace` — accepted.
+- `classes-of-primes` — conventions at p ≤ 1 — accepted; stated.
+- `divisibility-bound` — log_p at p ≤ 1 — accepted; knowl now takes p prime and states the source convention.
+- `expanding-the-gluing` — representative of the residue; `New.Seesaw.poleColumn/poleRow` — accepted.
+- `expanding-the-gluing` — `New.Space.finHeisenbergOp_finHeisenbergOp` — accepted.
+- `gauge-bound-for-a-chain-of-lifts` — C ≥ 0 / max(C,0); also the datum is moved by ω(g,g′) inside the jet map, as in `upper-objects/gauge-raising-data` — accepted.
+- `level-at-n-as-a-mirabolic-group` — `New.IsSplitLevel.*` names — accepted.
+- `only-collisions-lose` — indicator of I_p — accepted; sentence replaced.
+- `properties-of-marked-sets` — reason for p ∤ q₁; `New.Parameters.*` names — accepted.
+- `ramified-source-forms-are-the-image-of-the-ramifying-operator` — summary read as exact codimension — accepted (also on the area page).
+- `setup-at-the-level-prime` — `New.IsSplitLevel.upOperator` — accepted.
+- `short-forms-span-at-a-free-level` — `New.Rows.*`, `New.Space.*` names — accepted.
+- `size-of-one-kernel` — comparison with 2a — accepted; argument and `rowMainLength_add_rowSlack_le` supplied.
+- `up-operator-preserves-source-forms` — ramified vector: congruent to 1 modulo N at the other places — accepted.
+
+Other changes asked by the coordinator
+- All 25 wrong `?lean:` spellings listed in `lean-references.md` for this area are corrected. The remaining unresolved `?lean:` names (54) are declarations of `Lib` or structure fields without a knowl of their own; the audit found their spellings valid.
+- Foreign definitions compared with their owning knowls and Lean definitions: `IsChainDatum`, `IsWeakChainDatum` (agree), `Kernel.raises` (max(c,0) and ω(g,h) added), `standardData` (agrees), `restrictToY`/`branching`/`branchExponent` (agree; `sum_branchExponent` is an equality, now stated so), `mainAmount`/`totalRemainder`/`mainPrimeSum` (agree), `diagonalWeight` (agrees with my reading), `ramified` (corrected), `schrodingerOpAt` (corrected), `upOperator`, `mirabolic`, `directDatum`, `LiftLaw` (agree; names qualified).
+- The four glosses flagged in my report: (i) stabiliser of a prime above an inert p: now stated as in the Lean comment (Frobenius = (class of −p, conjugation)); the proof of that description is still not read; (ii) Schur-matrix convention: settled by the audit, text fixed; (iii) `diagonalWeight`: confirmed; (iv) `sum_branchExponent`: equality, fixed.
+- Sidecar: Weyl module row now says irreducible over C and defined by construction over a general ring; Kronecker product row states commutative scalars. Third column is `NEW` or a corpus id in every row.
