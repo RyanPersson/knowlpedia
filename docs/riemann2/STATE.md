@@ -77,3 +77,4 @@ AUDIT-FIX DONE: derivatives-vacuum (41/41). Next: upper-objects (a7e1079).
 AUDIT-FIX DONE: upper-objects (43/43). Next: upper-seesaw (aecec73).
 AUDIT-FIX DONE: upper-seesaw (48/49, 1 belongs to upper-divisibility). Next: upper-divisibility (a902022).
 AUDIT-FIX DONE: upper-divisibility (40/41; 1 low for upper-objects: classPoints def in chain-of-lifts — pending). Next: upper-elementary-divisors (a0d7741).
+AUDIT-FIX DONE: upper-elementary-divisors (30/30; now 45 full/0 outline). Next: spanning-core (afe0da4) — main audit + updates/b4aa180e.
