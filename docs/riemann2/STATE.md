@@ -70,3 +70,6 @@ DONE: spanning-unfolding-b 89 knowls (61 full/1 outline; sidecar 47), 8 files ve
 AUDIT-FIX DONE: reduction-zeros (19/19 accepted). Next audit-fix: reduction-main (a14da12) incl. note: grh knowl should not claim DirichletLNonvanishingRightOfHalf.
 AUDIT-FIX DONE: reduction-main (22/22 accepted). Next: derivatives-divisibility (acebff8); hint: chosen-places-and-characters finding answered by reduction-main/field-e-properties part 6.
 AUDIT-FIX DONE: derivatives-divisibility (20/20; field-setting deleted; 38 knowls). Next: derivatives-vacuum (acc6db7).
+Window 4 (after 10pm 11-26): derivatives-vacuum audit-fix cut by limit; resumed acc6db7.
+REVIEW UPDATES merged (content HEAD 32adcbe6): reviews/riemann2-audit/updates/{b4aa180e,9712a76c}/ — verified 61 fixes resolved; NEW findings: spanning-core 26, spanning-unfolding-a 69, spanning-unfolding-b 53(+7 old open), derivatives-divisibility 8, reduction-main 2. prompt-audit.md now tells authors to read updates/*. Always `git fetch` + merge origin/riemann2-review at window start.
+AUDIT QUEUE: derivatives-vacuum (running), upper-objects, upper-seesaw, upper-divisibility, upper-elementary-divisors, spanning-core, spanning-unfolding-a, spanning-unfolding-b, then re-touch derivatives-divisibility (8) + reduction-main (2). Then forward: spanning-remaining-a...
