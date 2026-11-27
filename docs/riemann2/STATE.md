@@ -62,3 +62,5 @@ DONE (verbatim complete): upper-objects now 64 knowls, 16 full/14 outline; 4 fir
 STANDARD RESUME MESSAGE = 'depth terms' (verbatim reading incl. tactics, no filter, no subagents, stop in import order if short).
 DONE: upper-elementary-divisors (67 knowls; 44 full/1 outline; sidecar 44). Gap: ElementaryDivisorTheorem.lean 476-612 statements only (consequences-of-large-degree outline). Scratchpad k.sh collision early on -> check spanning-core ids. Next: spanning-core (resumed afe0da4).
 PARTIAL: spanning-core 52 knowls (22 full/11 outline; sidecar 67). REMAINING unread: Bessel/{Average,OpenCellBound,OpenCellPairing,LargeFunction,CutTailBound,SchurBound,FillingData} (continuation sent to afe0da4).
+Window 3 (after 1pm 11-26): spanning-core continuation was cut by limit mid-Bessel; resumed afe0da4. Lock re-armed.
+DONE: spanning-core 66 knowls (25 full/17 outline; sidecar 78), all 17 files verbatim. Next: spanning-unfolding-a (ad1d539).
